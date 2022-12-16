@@ -1,9 +1,9 @@
-import type { ReactElement } from "react";
-import Head from "next/head";
+import type { ReactElement } from 'react';
+import Head from 'next/head';
 
 type Props = {
     children: ReactElement;
-    meta: {
+    meta?: {
         title: string;
     };
 };
@@ -12,9 +12,11 @@ export default function Layout({ meta, children }: Props) {
     return (
         <>
             <Head>
-                <title data-testid="meta-title">{meta.title}</title>
+                <title>{meta?.title}</title>
             </Head>
-            <main>{children}</main>
+            <header data-testid="header"></header>
+            <main data-testid="main"> {children}</main>
+            <footer data-testid="footer"></footer>
         </>
     );
 }

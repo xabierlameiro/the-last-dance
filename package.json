@@ -7,7 +7,9 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "test": "jest --coverage",
+        "watch": "jest --watchAll"
     },
     "dependencies": {
         "@code-hike/mdx": "^0.7.5-next.0",
