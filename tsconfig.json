@@ -17,7 +17,7 @@
         "baseUrl": "./",
         "paths": {
             "@/components/*": ["src/components/*"],
-            "@/layout": ["src/components/Layout/index.tsx"]
+            "@/Layout": ["src/components/Layout/index.tsx"]
         },
         "plugins": [
             {
