@@ -103,3 +103,7 @@ a {
         color-scheme: dark;
     }
 }
+
+code > .ch-code-scroll-content > div {
+    transform: initial !important;
+}

@@ -7,20 +7,20 @@ export const meta = {
 
 <CH.Code lineNumbers={true} style={{ width:'100%', maxWidth: '750px', margin:'100px auto'}}>
 
-```js index.tsx box=8[23:38]
+```tsx index.tsx box=9[23:38]
 import React from "react";
 import styles from "./knowledge.module.css";
 
 type Props = {
-    name?: string,
+    name?: string;
     // link[16:21] https://www.linkedin.com/in/xlameiro/
-    linkedin?: string,
+    linkedin?: string;
 };
 
 const App = ({ name = "Xabier Lameiro" }: Props) => {
     return (
         <main className={`${styles.experience} ${styles.education}`}>
-            "Hello, my name is {name}! and I'm Frontend developer. \n I was born
+            "👋, my name is {name}! and I'm Frontend developer. \n I was born
             and raised in Spain but currently live in Ireland, \n trying to
             improve my English. I like web development, applications, \n
             automations and the IOT."
@@ -37,6 +37,7 @@ export { App, App as default };
     --javascript: 5 years;
     --react: 3.5 years;
     --nextjs: 1.5 years;
+    --gatsby: 1.5 years;
 }
 
 .experience {
