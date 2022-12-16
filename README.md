@@ -8,4 +8,6 @@
     git push -u origin master
     yarn add @next/mdx @mdx-js/loader @mdx-js/react
     yarn add @code-hike/mdx@next
+    yarn add @vercel/analytics
+    yarn add -D jest jest-environment-jsdom @testing-library/react @testing-library/jest-dom
 ```
