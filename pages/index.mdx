@@ -29,11 +29,18 @@ export { App, App as default };
 ```
 
 ```css knowledge.css
+:root {
+    --html-css: 5 years;
+    --javascript: 5 years;
+    --react: 3.5 years;
+    --nextjs: 1.5 years;
+}
+
 .experience {
-    Plexus Tech / Spain: 2 years !important;
-    Orienteed / Spain: 1.5 years;
-    Getronics / Spain:  .3 years;
-    Viewnext / Spain : 1.5 years;
+    Plexus Tech : 2 years !important;
+    Orienteed : 1.5 years;
+    Getronics :  .3 years;
+    Viewnext  : 1.5 years;
     Interlinea srl / Italy :  .4 years;
 }
 
@@ -45,12 +52,11 @@ export { App, App as default };
 
 ```json contact.json
 {
-    "email": "xabier.lameiro@gmail.com"
+    "email": "xabier.lameiro@gmail.com",
+    "phone": "+353 85 883 84 79"
 }
 ```
 
 </CH.Code>
 
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>;
-
-;
