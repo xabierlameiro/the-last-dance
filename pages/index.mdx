@@ -7,8 +7,9 @@ export const meta = {
 
 <CH.Code lineNumbers={true} style={{ width:'100%', maxWidth: '750px', margin:'100px auto'}}>
 
-```js index.tsx
+```js index.tsx box=8[23:38]
 import React from "react";
+import styles from "./knowledge.module.css";
 
 type Props = {
     name?: string,
@@ -16,19 +17,19 @@ type Props = {
 
 const App = ({ name = "Xabier Lameiro" }: Props) => {
     return (
-        <h1>
+        <main className={`${styles.experience} ${styles.education}`}>
             "Hello, my name is {name}! and I'm Frontend developer. \n I was born
             and raised in Spain but currently live in Ireland, \n trying to
             improve my English. I like web development, applications, \n
-            automations and the Iot."
-        </h1>
+            automations and the IOT."
+        </main>
     );
 };
 
 export { App, App as default };
 ```
 
-```css knowledge.css
+```css knowledge.module.css
 :root {
     --html-css: 5 years;
     --javascript: 5 years;
