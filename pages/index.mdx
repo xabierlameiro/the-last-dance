@@ -1,4 +1,4 @@
-import LayoutWithSEO from "@/layout";
+import Layout from "@/layout";
 
 export const meta = {
     author: "Xabier Lameiro",
@@ -51,8 +51,6 @@ export { App, App as default };
 
 </CH.Code>
 
-export default ({ children }) => (
-    <LayoutWithSEO meta={meta}>{children}</LayoutWithSEO>
-);
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>;
 
 ;
