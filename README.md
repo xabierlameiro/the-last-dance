@@ -6,4 +6,6 @@
     git remote add origin https://github.com/xabierlameiro/the-last-dance.git
     git branch -M master
     git push -u origin master
+    yarn add @next/mdx @mdx-js/loader @mdx-js/react
+    yarn add @code-hike/mdx@next
 ```
