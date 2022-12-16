@@ -1,15 +1,15 @@
-import Layout from "@/layout";
+import Layout from '@/layout';
 
 export const meta = {
-    author: "Xabier Lameiro",
-    title: "My personal website",
+    author: 'Xabier Lameiro',
+    title: 'My personal website',
 };
 
 <CH.Code lineNumbers={true} style={{ width:'100%', maxWidth: '750px', margin:'100px auto'}}>
 
 ```tsx index.tsx box=9[23:38]
-import React from "react";
-import styles from "./knowledge.module.css";
+import React from 'react';
+import styles from './knowledge.module.css';
 
 type Props = {
     name?: string;
@@ -17,14 +17,14 @@ type Props = {
     linkedin?: string;
 };
 
-const App = ({ name = "Xabier Lameiro" }: Props) => {
+const App = ({ name = 'Xabier Lameiro' }: Props) => {
     return (
         <main>
             <h1>👋, my name is {name}!</h1>
             <p>
                 I&apos;m Frontend developer. I was born and raised in Spain but
                 currently live in Ireland, trying to improve my English. I like
-                web development, applications,  automations and the IOT.
+                web development, applications, automations and the IOT.
             </p>
         </main>
     );
@@ -35,13 +35,13 @@ export { App, App as default };
 
 ```css knowledge.module.css
 :root {
-    --html-css: 5 years;
-    --javascript: 5 years;
-    --typescript: 3 years;
-    --react: 3.5 years;
-    --redux: 2 years;
-    --nextjs: 1.5 years;
-    --gatsby: 1.5 years;
+    --html-css : 5 years;
+    --javascript : 5 years;
+    --typescript : 3 years;
+    --react : 3.5 years;
+    --redux : 2 years;
+    --nextjs : 1.5 years;
+    --gatsby : 1.5 years;
 }
 
 .experience {
@@ -54,7 +54,7 @@ export { App, App as default };
 
 .education {
     Superior Technician in Web Applications Development : 2 years;
-    Technician in Microcomputer and Networks  : 2 years;
+    Technician in Microcomputer and Networks : 2 years;
 }
 ```
 
