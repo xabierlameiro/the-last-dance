@@ -31,7 +31,7 @@ a:hover { text-decoration:underline; }
 .pad1y { padding: 10px 0; }
 .pad2x { padding: 0 20px; }
 .pad2 { padding: 20px; }
-.pad1 { padding: 10px; }
+.pad1 { padding: 10px; width: 100%; overflow: scroll; }
 .space-left2 { padding-left:55px; }
 .space-right2 { padding-right:20px; }
 .center { text-align:center; }
@@ -143,7 +143,7 @@ table.coverage td span.cline-any {
     width: 7px;
     display: inline-block;
     margin-left: 0.5em;
-    background: url(sort-arrow-sprite.png) no-repeat scroll 0 0 transparent;
+    background: url(/coverage/sort-arrow-sprite.png) no-repeat scroll 0 0 transparent;
 }
 .coverage-summary .sorted .sorter {
     background-position: 0 -20px;

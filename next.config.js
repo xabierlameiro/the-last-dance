@@ -17,6 +17,14 @@ const withMDX = nextMDX({
 });
 
 export default withMDX({
+    rewrites: async () => {
+        return [
+            {
+                source: '/:coverage',
+                destination: '/:coverage/index.html',
+            },
+        ];
+    },
     // Append the default value with md extensions
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {
