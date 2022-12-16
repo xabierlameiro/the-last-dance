@@ -1,5 +1,6 @@
 {
     "name": "the-last-dance",
+    "type": "module",
     "version": "0.1.0",
     "private": true,
     "scripts": {
