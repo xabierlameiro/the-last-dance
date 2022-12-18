@@ -12,7 +12,8 @@
         "coverage": "rm -rf public/coverage && jest --coverage && node custom-reporter.js",
         "watch": "jest --watchAll",
         "test:clear": "jest --clearCache",
-        "test:ci": "jest --ci"
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build"
     },
     "dependencies": {
         "@code-hike/mdx": "^0.7.5-next.0",
@@ -26,6 +27,13 @@
         "react-dom": "^18.2.0"
     },
     "devDependencies": {
+        "@storybook/addon-essentials": "^7.0.0-beta.12",
+        "@storybook/addon-interactions": "^7.0.0-beta.12",
+        "@storybook/addon-links": "^7.0.0-beta.12",
+        "@storybook/blocks": "^7.0.0-beta.12",
+        "@storybook/nextjs": "^7.0.0-beta.12",
+        "@storybook/react": "^7.0.0-beta.12",
+        "@storybook/testing-library": "^0.0.13",
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^13.4.0",
         "@testing-library/user-event": "^14.4.3",
@@ -35,8 +43,10 @@
         "eslint": "^8.30.0",
         "eslint-config-next": "^13.0.7",
         "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-storybook": "^0.6.8",
         "jest": "^28.1.2",
         "jest-environment-jsdom": "^29.3.1",
+        "storybook": "^7.0.0-beta.12",
         "typescript": "^4.9.4"
     }
 }

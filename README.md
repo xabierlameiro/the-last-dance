@@ -10,4 +10,6 @@
     yarn add @code-hike/mdx@next
     yarn add @vercel/analytics
     yarn add -D jest jest-environment-jsdom @testing-library/react @testing-library/jest-dom
+    yarn add -D @testing-library/user-event
+    npx storybook@next init
 ```
