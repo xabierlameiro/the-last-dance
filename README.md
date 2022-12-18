@@ -12,4 +12,5 @@
     yarn add -D jest jest-environment-jsdom @testing-library/react @testing-library/jest-dom
     yarn add -D @testing-library/user-event
     npx storybook@next init
+    yarn add -D @storybook/addons @storybook/theming
 ```
