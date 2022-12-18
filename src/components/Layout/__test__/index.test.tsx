@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Layout from '@/Layout';
+import Layout from '@/layout';
 
 describe('Layout component', () => {
     it('should render the header, main and footer', () => {
