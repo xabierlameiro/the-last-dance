@@ -9,13 +9,13 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 /** @type {import('jest').Config} */
 const customJestConfig = {
-    reporters: ['default', ['<rootDir>/custom-reporter.js', {}]],
     setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
     coverageDirectory: 'public/coverage',
     testEnvironment: 'jest-environment-jsdom',
     coverageReporters: ['html'],
+    collectCoverageFrom: ['src/components/**/*.tsx'],
     moduleNameMapper: {
-        '^@/layout(.*)$': '<rootDir>src/components/layout/index.tsx$1',
+        '^@/layout(.*)$': '<rootDir>src/components/Layout/index.tsx$1',
         '^@/test$': '<rootDir>/jest.setup.js',
         '^@/components(.*)$': '<rootDir>src/components/$1',
         '^@/hooks(.*)$': '<rootDir>src/hooks/$1',

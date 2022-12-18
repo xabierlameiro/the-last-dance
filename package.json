@@ -9,7 +9,7 @@
         "start": "next start",
         "lint": "next lint",
         "test": "jest",
-        "coverage": "rm -rf public/coverage && jest --coverage && jest --coverage",
+        "coverage": "rm -rf public/coverage && jest --coverage && node custom-reporter.js",
         "watch": "jest --watchAll",
         "test:clear": "jest --clearCache",
         "test:ci": "jest --ci"

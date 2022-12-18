@@ -7,13 +7,13 @@
 }
 
 #__next .ch-code-scroll-parent {
-    font-size: 12px;
+    font-size: 12.5px;
 }
 
 
 @media screen and (min-width: 767px) {
     #__next .ch-code-scroll-parent {
-        font-size: 14px;
+        font-size: 15px;
     }
 
     #__next .ch-codeblock,
@@ -23,7 +23,7 @@
        
     }
     
-    .ch-editor-frame {
+    #__next .ch-editor-frame {
         max-width: 800px;
         height: 480px;
         max-height: 480px;
