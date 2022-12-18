@@ -1,21 +1,30 @@
-.ch-code-scroll-parent {
-    font-size: 13.3px;
-}
-.ch-codeblock,
-.ch-codegroup {
+#__next .ch-codeblock,
+#__next .ch-codegroup {
     margin: 0;
     border-radius: 0;
     height: 100vh;
+    min-height: 100vh;
 }
 
+#__next .ch-code-scroll-parent {
+    font-size: 12px;
+}
+
+
 @media screen and (min-width: 767px) {
-    .ch-codeblock,
-    .ch-codegroup {
-        margin: 0;
+    #__next .ch-code-scroll-parent {
+        font-size: 14px;
     }
 
+    #__next .ch-codeblock,
+    #__next .ch-codegroup {
+        height: 580px;
+        min-height: 580px;
+    }
+    
     .ch-editor-frame {
         max-width: 800px;
+        height: 480px;
         max-height: 480px;
         border-radius: 6px;
         margin: 100px auto;
