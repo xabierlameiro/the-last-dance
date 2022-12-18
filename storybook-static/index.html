@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>@storybook/cli - Storybook</title>
+
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+      
+
+    <style>
+      #storybook-root[hidden]{
+        display: none !important;
+      }
+    </style>
+
+    
+  </head>
+  <body>
+    <div id="root"></div>
+
+    
+    <script>
+      
+        
+          window['FEATURES'] = {
+  "warnOnLegacyHierarchySeparator": true,
+  "buildStoriesJson": false,
+  "storyStoreV7": true,
+  "breakingChangesV7": true,
+  "interactionsDebugger": false,
+  "argTypeTargetsV7": true
+};
+        
+      
+        
+          window['REFS'] = {};
+        
+      
+        
+          window['LOGLEVEL'] = "info";
+        
+      
+        
+          window['DOCS_OPTIONS'] = {
+  "enabled": true,
+  "defaultName": "Docs",
+  "docsPage": true
+};
+        
+      
+        
+          window['CONFIG_TYPE'] = "PRODUCTION";
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </script>
+    
+
+    <script type="module">
+      import './sb-manager/runtime.mjs';
+
+      
+      import './sb-addons/addon-links/dist/manager.mjs';
+      
+      import './sb-addons/addon-essentials/dist/controls/manager.mjs';
+      
+      import './sb-addons/addon-essentials/dist/actions/manager.mjs';
+      
+      import './sb-addons/addon-essentials/dist/backgrounds/manager.mjs';
+      
+      import './sb-addons/addon-essentials/dist/viewport/manager.mjs';
+      
+      import './sb-addons/addon-essentials/dist/toolbars/manager.mjs';
+      
+      import './sb-addons/addon-essentials/dist/measure/manager.mjs';
+      
+      import './sb-addons/addon-essentials/dist/outline/manager.mjs';
+      
+      import './sb-addons/addon-interactions/dist/manager.mjs';
+           
+    </script>    
+
+    <link href="./sb-preview/runtime.mjs" rel="preload" as="script">
+  </body>
+</html>
