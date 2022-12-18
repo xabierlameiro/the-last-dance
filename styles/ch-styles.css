@@ -18,15 +18,16 @@
 
     #__next .ch-codeblock,
     #__next .ch-codegroup {
-        height: 580px;
-        min-height: 580px;
+        height: initial;
+        min-height: initial;
+       
     }
     
     .ch-editor-frame {
         max-width: 800px;
         height: 480px;
         max-height: 480px;
-        border-radius: 6px;
         margin: 100px auto;
+        border-radius: 6px;
     }
 }
