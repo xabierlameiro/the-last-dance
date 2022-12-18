@@ -47,7 +47,7 @@ class CustomReporter {
 
                     replaced = replaced.replace(
                         /(.*)<link rel="shortcut icon" (.*)\s* href="(.*)" \/>/,
-                        '<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">'
+                        '<link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">'
                     );
 
                     replaced = replaced.replace(
