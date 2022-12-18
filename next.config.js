@@ -23,6 +23,10 @@ export default withMDX({
                 source: '/:coverage',
                 destination: '/:coverage/index.html',
             },
+            {
+                source: '/:storybook',
+                destination: 'https://storybook.xabierlameiro.com',
+            },
         ];
     },
     // Append the default value with md extensions
