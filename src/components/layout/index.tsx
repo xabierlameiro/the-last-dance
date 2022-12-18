@@ -8,7 +8,7 @@ type Props = {
     };
 };
 
-export default function Layout({ meta, children }: Props) {
+const Layout = ({ meta, children }: Props) => {
     return (
         <>
             <Head>
@@ -19,4 +19,6 @@ export default function Layout({ meta, children }: Props) {
             <footer data-testid="footer"></footer>
         </>
     );
-}
+};
+
+export default Layout;
