@@ -20,13 +20,11 @@
     #__next .ch-codegroup {
         height: initial;
         min-height: initial;
-       
     }
-    
     #__next .ch-editor-frame {
         max-width: 800px;
-        height: 480px;
-        max-height: 480px;
+        height: 500px;
+        max-height: 500px;
         margin: 100px auto;
         border-radius: 6px;
     }
