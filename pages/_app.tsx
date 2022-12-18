@@ -1,4 +1,5 @@
 import '../styles/globals.css';
+import "../styles/ch-styles.css";
 import '@code-hike/mdx/dist/index.css';
 import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';

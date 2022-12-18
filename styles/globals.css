@@ -90,7 +90,6 @@ body {
 
 body {
     color: rbg(--foreground-rgb);
-    padding: 10px;
 }
 
 a {

@@ -17,7 +17,10 @@
         "baseUrl": "./",
         "paths": {
             "@/components/*": ["src/components/*"],
-            "@/layout": ["src/components/layout"]
+            "@/layout": ["src/components/layout"],
+            "@/hooks/*": ["src/hooks/*"],
+            "@/constants/*": ["src/constants/*"],
+            "@/test": ["./jest.setup.js"]
         },
         "plugins": [
             {

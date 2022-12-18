@@ -5,8 +5,8 @@
 <head>
     <title>Code coverage by Xabier Lameiro</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="prettify.css" />
-    <link rel="stylesheet" href="base.css" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
 <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
@@ -18,34 +18,34 @@
     
 <body>
 <div class='wrapper'>
-    <div class='pad1'><h1><a href='/'>Return</a></h1></h1><h1><a href='/coverage'>All tests</a></a> index.tsx</h1>
+    <div class='pad1'><h1><a href='/'>Return</a></h1></h1><h1><a href='/coverage'>All tests</a></a> / <a href="index.html">components/VisibilityManager</a> index.tsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
@@ -84,7 +84,16 @@
 <a name='L20'></a><a href='#L20'>20</a>
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
-<a name='L23'></a><a href='#L23'>23</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -95,53 +104,68 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { ReactElement } from 'react';
-import Head from 'next/head';
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { ReactElement } from 'react'
+import useWindowResize from '@/hooks/useWidowResize'
+import { mobileMax, tabletMax, tabletMin, desktopMin } from '@/constants/devices'
 &nbsp;
 type Props = {
-    children: ReactElement;
-    meta?: {
-        title: string;
-    };
-};
-&nbsp;
-export default function Layout({ meta, children }: Props) {
-    return (
-        &lt;&gt;
-            &lt;Head&gt;
-                &lt;title&gt;{meta?.title}&lt;/title&gt;
-            &lt;/Head&gt;
-            &lt;header data-testid="header"&gt;&lt;/header&gt;
-            &lt;main data-testid="main"&gt; {children}&lt;/main&gt;
-            &lt;footer data-testid="footer"&gt;&lt;/footer&gt;
-        &lt;/&gt;
-    );
+	children: ReactElement | ReactElement[]
+	hideOnDesktop?: boolean
+	hideOnTablet?: boolean
+	hideOnMobile?: boolean
 }
+&nbsp;
+const VisibilityManager = (props: Props): ReactElement | null =&gt; {
+	const { children, hideOnDesktop, hideOnTablet, hideOnMobile } = props
+	const { width } = useWindowResize()
+&nbsp;
+	const isMobile = width &lt;= mobileMax
+	const isTablet = width &lt;= tabletMax &amp;&amp; width &gt;= tabletMin
+	const isDesktop = width &gt;= desktopMin
+&nbsp;
+	const hideBecauseOfWidth =
+		(hideOnDesktop &amp;&amp; isDesktop) || (hideOnTablet &amp;&amp; isTablet) || (hideOnMobile &amp;&amp; isMobile)
+&nbsp;
+	if (hideBecauseOfWidth) {
+		return null
+	}
+&nbsp;
+	return &lt;&gt;{children}&lt;/&gt;
+}
+&nbsp;
+export default VisibilityManager
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage automatically generated by Xabier Lameiro on 18/12/2022
-        <script src="prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="sorter.js"></script>
-        <script src="block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     

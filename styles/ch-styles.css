@@ -1,0 +1,23 @@
+.ch-code-scroll-parent {
+    font-size: 13.3px;
+}
+.ch-codeblock,
+.ch-codegroup {
+    margin: 0;
+    border-radius: 0;
+    height: 100vh;
+}
+
+@media screen and (min-width: 767px) {
+    .ch-codeblock,
+    .ch-codegroup {
+        margin: 0;
+    }
+
+    .ch-editor-frame {
+        max-width: 800px;
+        max-height: 480px;
+        border-radius: 6px;
+        margin: 100px auto;
+    }
+}

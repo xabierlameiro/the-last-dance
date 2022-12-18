@@ -10,11 +10,16 @@ const createJestConfig = nextJest({
 /** @type {import('jest').Config} */
 const customJestConfig = {
     reporters: ['default', ['<rootDir>/custom-reporter.js', {}]],
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
     coverageDirectory: 'public/coverage',
     testEnvironment: 'jest-environment-jsdom',
     coverageReporters: ['html'],
     moduleNameMapper: {
         '^@/layout(.*)$': '<rootDir>src/components/layout/index.tsx$1',
+        '^@/test$': '<rootDir>/jest.setup.js',
+        '^@/components(.*)$': '<rootDir>src/components/$1',
+        '^@/hooks(.*)$': '<rootDir>src/hooks/$1',
+        '^@/constants(.*)$': '<rootDir>src/constants/$1',
     },
 };
 

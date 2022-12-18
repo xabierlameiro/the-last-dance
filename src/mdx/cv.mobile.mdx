@@ -1,0 +1,72 @@
+<CH.Code lineNumbers={true} >
+
+```tsx index.tsx box=9[23:38]
+import React from 'react';
+import styles from './knowledge.module.css';
+
+type Props = {
+    name?: string;
+    // link[16:21] https://www.linkedin.com/in/xlameiro/
+    linkedin?: string;
+    // link[16:21] /coverage
+    coverage?: string;
+};
+
+const name = 'Xabier Lameiro';
+
+const App = ({ name = name }: Props) => {
+ return (
+  <main className={`${styles.experience}`}>
+
+   <h1>👋, my name is {name}!</h1>
+
+   <p className={`${styles.education}`}>
+     I&apos;m Frontend developer. 
+     I was born and raised in Spain but
+     currently live in Ireland, trying 
+     to improve my English. I like web
+     development, apps, automations and
+     the IOT...
+   </p>
+  </main>
+ );
+};
+
+export { App, App as default };
+```
+
+```css knowledge.module.css
+:root {
+  --html-css : 5 years;
+  --javascript : 5 years;
+  --typescript : 3 years;
+  --react : 3.5 years;
+  --redux : 2 years;
+  --nextjs : 1.5 years;
+  --gatsby : 1.5 years;
+}
+
+.experience {
+  Plexus Tech / Spain : 2 years !important;
+  Orienteed / Spain : 1.5 years;
+  Getronics / Spain :  .3 years;
+  Viewnext / Spain  : 1.5 years;
+  Interlinea srl / Italy :  .4 years;
+}
+
+.education {
+  /* Certificate of Higher Education */ 
+  Web Applications Development : 2 years;
+  /* Vocational Education and Training */
+  Microcomputer and Networks : 2 years;
+}
+```
+
+```json contact.json
+{
+    "email": "xabier.lameiro@gmail.com",
+    "phone": "+353 85 883 84 79"
+}
+```
+
+</CH.Code>

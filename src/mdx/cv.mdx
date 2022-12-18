@@ -1,11 +1,4 @@
-import Layout from '@/layout';
-
-export const meta = {
-    author: 'Xabier Lameiro',
-    title: 'My personal website',
-};
-
-<CH.Code lineNumbers={true} style={{ width:'100%', maxWidth: '750px', margin:'100px auto'}}>
+<CH.Code lineNumbers={true} >
 
 ```tsx index.tsx box=9[23:38]
 import React from 'react';
@@ -21,7 +14,7 @@ type Props = {
 
 const App = ({ name = 'Xabier Lameiro' }: Props) => {
     return (
-        <main>
+        <main className={`${styles.experience} ${styles.education}`}>
             <h1>👋, my name is {name}!</h1>
             <p>
                 I&apos;m Frontend developer. I was born and raised in Spain but
@@ -55,8 +48,8 @@ export { App, App as default };
 }
 
 .education {
-    Superior Technician in Web Applications Development : 2 years;
-    Technician in Microcomputer and Networks : 2 years;
+    Certificate of Higher Education in Web Applications Development : 2 years;
+    Vocational Education and Training in Microcomputer and Networks : 2 years;
 }
 ```
 
@@ -68,5 +61,3 @@ export { App, App as default };
 ```
 
 </CH.Code>
-
-export default ({ children }) => <Layout meta={meta}>{children}</Layout>;
