@@ -11,14 +11,8 @@ const createJestConfig = nextJest({
 const customJestConfig = {
     reporters: ['default', ['<rootDir>/custom-reporter.js', {}]],
     coverageDirectory: 'public/coverage',
-    collectCoverage: true,
-    coverageReporters: ['json', 'html'],
-    testEnvironment: 'jsdom',
-    // Add more setup options before each test is run
-    // setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-    // if using TypeScript with a baseUrl set to the root directory then you need the below for alias' to work
-    moduleDirectories: ['node_modules', '<rootDir>/'],
-    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node', 'mdx'],
+    testEnvironment: 'jest-environment-jsdom',
+    coverageReporters: ['html'],
     moduleNameMapper: {
         '^@/layout(.*)$': '<rootDir>src/components/layout/index.tsx$1',
     },
