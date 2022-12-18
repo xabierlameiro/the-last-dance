@@ -17,7 +17,7 @@
         "baseUrl": "./",
         "paths": {
             "@/components/*": ["src/components/*"],
-            "@/layout": ["src/components/Layout"],
+            "@/Layout": ["src/components/Layout"],
             "@/hooks/*": ["src/hooks/*"],
             "@/constants/*": ["src/constants/*"],
             "@/test": ["./jest.setup.js"]
@@ -34,7 +34,8 @@
         "**/*.ts",
         "**/*.tsx",
         "**/*.mdx",
-        ".next/types/**/*.ts"
+        ".next/types/**/*.ts",
+        "custom-reporter.js"
     ],
     "exclude": ["node_modules"]
 }
