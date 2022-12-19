@@ -36,7 +36,7 @@
 }
 
 @media (hover: hover) {
-    .dock img:hover {
+    .dock li:hover img {
         width: 100px;
         height: 100px;
         transform: translateY(-20px);
@@ -55,4 +55,5 @@
     position: absolute;
     left: 50%;
     transform: translate(-50%, 20px);
+    color: #fff;
 }
