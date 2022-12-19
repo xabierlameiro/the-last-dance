@@ -3,7 +3,9 @@ import '@testing-library/jest-dom';
 import Layout from '@/layout';
 
 jest.mock('@/components/Dock', () => () => {
-    return <div />;
+    const Dock = () => <div />;
+    Dock.displayName = 'Dock';
+    return Dock;
 });
 
 describe('Layout component', () => {
