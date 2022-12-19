@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { render, screen } from '@/test';
 import { menu } from '@/constants/navMenu';
 import Icon from '../';
 

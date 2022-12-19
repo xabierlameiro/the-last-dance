@@ -37,8 +37,8 @@
     display: flex;
 }
 .ch-frame-button {
-    width: 1em;
-    height: 1em;
+    width: 14px;
+    height: 14px;
     border: 0.08em solid;
     border-radius: 50%;
     display: inline-block;

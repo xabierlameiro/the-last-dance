@@ -10,6 +10,7 @@ const createJestConfig = nextJest({
 /** @type {import('jest').Config} */
 const customJestConfig = {
     setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    coveragePathIgnorePatterns: ['^.*\\.stories\\.[jt]sx?$'],
     coverageDirectory: 'public/coverage',
     testEnvironment: 'jest-environment-jsdom',
     coverageReporters: ['html'],

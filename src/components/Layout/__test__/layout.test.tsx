@@ -1,5 +1,4 @@
 import { render, screen } from '@/test';
-import '@testing-library/jest-dom';
 import Layout from '@/layout';
 
 jest.mock('next/router', () => ({

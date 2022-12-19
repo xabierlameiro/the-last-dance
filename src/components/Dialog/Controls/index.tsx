@@ -1,19 +1,55 @@
 import styles from './controls.module.css';
+import { BiX, BiMinus, BiExpandAlt } from 'react-icons/bi';
 
-const Controls = () => {
+export function clx(...classes: string[]) {
+    return classes.join(' ');
+}
+
+type Props = {
+    onClickClose?: () => Function;
+    onClickMinimise?: () => Function;
+    onClickMaximise?: () => Function;
+};
+
+const Controls = ({
+    onClickClose,
+    onClickMinimise,
+    onClickMaximise,
+}: Props) => {
     return (
-        <div className={styles.ch_frame_buttons}>
+        <div data-testid="controls" className={styles.ch_frame_buttons}>
             <div
-                className={`${styles.ch_frame_button} ${styles.ch_frame_button_left}`}
-            ></div>
-            <div className={styles.ch_frame_button_space}></div>
+                className={clx(
+                    styles.ch_frame_button,
+                    styles.ch_frame_button_left
+                )}
+            >
+                <BiX aria-label="close" onClick={onClickClose} title="Close" />
+            </div>
             <div
-                className={`${styles.ch_frame_button} ${styles.ch_frame_button_middle}`}
-            ></div>
-            <div className={styles.ch_frame_button_space}></div>
+                className={clx(
+                    styles.ch_frame_button,
+                    styles.ch_frame_button_middle
+                )}
+            >
+                <BiMinus
+                    aria-label="minimise"
+                    onClick={onClickMinimise}
+                    title="Minimise"
+                />
+            </div>
             <div
-                className={`${styles.ch_frame_button} ${styles.ch_frame_button_right}`}
-            ></div>
+                className={clx(
+                    styles.ch_frame_button,
+                    styles.ch_frame_button_right
+                )}
+            >
+                <BiExpandAlt
+                    aria-label="maximise"
+                    onClick={onClickMaximise}
+                    title="Maximise"
+                />
+            </div>
         </div>
     );
 };

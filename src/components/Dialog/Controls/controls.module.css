@@ -1,20 +1,27 @@
 .ch_frame_buttons {
-    flex-shrink: 0;
-    height: 1em;
-    width: 4.16em;
     display: flex;
+    cursor: pointer;
+    gap: 6px;
 }
 .ch_frame_button {
-    width: 1em;
-    height: 1em;
+    width: 14px;
+    height: 14px;
     border: 0.08em solid;
     border-radius: 50%;
     display: inline-block;
     box-sizing: border-box;
+    display: grid;
+    place-content: center;
 }
-.ch_frame_button_space {
-    width: 0.56em;
+.ch_frame_button svg {
+    color: #000;
+    transform: scale(0.8);
+    opacity: 0;
 }
+.ch_frame_buttons:hover .ch_frame_button svg {
+    opacity: 1;
+}
+
 .ch_frame_button_left {
     border-color: #ce5347;
     background-color: #ed6b60;
@@ -26,4 +33,8 @@
 .ch_frame_button_right {
     border-color: #58a942;
     background-color: #62c554;
+}
+.ch_frame_button_right svg {
+    transform: scale(0.45) rotate(93deg);
+    stroke-width: 2px;
 }
