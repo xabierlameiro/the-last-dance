@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import Head from 'next/head';
+import Dock from '@/components/Dock';
 
 type Props = {
     children: ReactElement;
@@ -17,6 +18,7 @@ const Layout = ({ meta, children }: Props) => {
             <header data-testid="header"></header>
             <main data-testid="main"> {children}</main>
             <footer data-testid="footer"></footer>
+            <Dock />
         </>
     );
 };

@@ -18,34 +18,34 @@
     
 <body>
 <div class='wrapper'>
-    <div class='pad1'><h1><a href='/'>Return</a></h1></h1><h1><a href='/coverage'>All tests</a></a> / <a href="index.html">VisibilityManager</a> index.tsx</h1>
+    <div class='pad1'><h1><a href='/'>Return</a></h1></h1><h1><a href='/coverage'>All tests</a></a> / <a href="index.html">Dock</a> dock.stories.tsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>13/13</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>9/9</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>12/12</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
@@ -60,7 +60,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -78,23 +78,13 @@
 <a name='L14'></a><a href='#L14'>14</a>
 <a name='L15'></a><a href='#L15'>15</a>
 <a name='L16'></a><a href='#L16'>16</a>
-<a name='L17'></a><a href='#L17'>17</a>
-<a name='L18'></a><a href='#L18'>18</a>
-<a name='L19'></a><a href='#L19'>19</a>
-<a name='L20'></a><a href='#L20'>20</a>
-<a name='L21'></a><a href='#L21'>21</a>
-<a name='L22'></a><a href='#L22'>22</a>
-<a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a>
-<a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L17'></a><a href='#L17'>17</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -103,55 +93,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { ReactElement } from 'react'
-import useWindowResize from '@/hooks/useWidowResize'
-import { mobileMax, tabletMax, tabletMin, desktopMin } from '@/constants/devices'
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// Button.stories.js|jsx
 &nbsp;
-type Props = {
-	children: ReactElement | ReactElement[]
-	hideOnDesktop?: boolean
-	hideOnTablet?: boolean
-	hideOnMobile?: boolean
-}
+import React from <span class="cstat-no" title="statement not covered" >'react';</span>
+import { iconUrls } from '@/constants/navMenu';
+import Dock from <span class="cstat-no" title="statement not covered" >'.';</span>
 &nbsp;
-const VisibilityManager = (props: Props): ReactElement | null =&gt; {
-	const { children, hideOnDesktop, hideOnTablet, hideOnMobile } = props
-	const { width } = useWindowResize()
+<span class="cstat-no" title="statement not covered" >export default <span class="cstat-no" title="statement not covered" >{</span></span>
+    /* 👇 The title prop is optional.
+     * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
+     * to learn how to generate automatic titles
+     */
+    title: 'Dock / Dock',
+    component: Dock,
+};<span class="fstat-no" title="function not covered" ></span>
 &nbsp;
-	const isMobile = width &lt;= mobileMax
-	const isTablet = width &lt;= tabletMax &amp;&amp; width &gt;= tabletMin
-	const isDesktop = width &gt;= desktopMin
-&nbsp;
-	const hideBecauseOfWidth =
-		(hideOnDesktop &amp;&amp; isDesktop) || (hideOnTablet &amp;&amp; isTablet) || (hideOnMobile &amp;&amp; isMobile)
-&nbsp;
-	if (hideBecauseOfWidth) {
-		return null
-	}
-&nbsp;
-	return &lt;&gt;{children}&lt;/&gt;
-}
-&nbsp;
-export default VisibilityManager
+export const <span class="cstat-no" title="statement not covered" >Primary<span class="fstat-no" title="function not covered" > </span>= <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(</span>) =&gt; <span class="cstat-no" title="statement not covered" >&lt;</span>Dock /&gt;;</span></span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->

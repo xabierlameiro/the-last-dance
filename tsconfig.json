@@ -35,7 +35,8 @@
         "**/*.tsx",
         "**/*.mdx",
         ".next/types/**/*.ts",
-        "custom-reporter.js"
+        "custom-reporter.js",
+        "./next.config.ts"
     ],
     "exclude": ["node_modules"]
 }

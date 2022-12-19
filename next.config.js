@@ -30,4 +30,7 @@ export default withMDX({
     experimental: {
         appDir: true,
     },
+    images: {
+        domains: ['uploads-ssl.webflow.com'],
+    },
 });
