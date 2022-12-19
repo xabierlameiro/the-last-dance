@@ -184,9 +184,9 @@ export function <span class="cstat-no" title="statement not covered" >clx<span c
 }
 &nbsp;
 type Props = {
-    onClickClose?: () =&gt; Function;
-    onClickMinimise?: () =&gt; Function;
-    onClickMaximise?: () =&gt; Function;
+    onClickClose?: () =&gt; Function | void;
+    onClickMinimise?: () =&gt; Function | void;
+    onClickMaximise?: () =&gt; Function | void;
 };
 &nbsp;
 const Controls = ({

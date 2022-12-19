@@ -24,7 +24,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
@@ -38,14 +38,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
@@ -88,8 +88,7 @@
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -97,13 +96,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -121,20 +119,19 @@ import styles from <span class="cstat-no" title="statement not covered" >'./dial
 import Controls from <span class="cstat-no" title="statement not covered" >'./Controls';</span>
 &nbsp;
 type Props = {
+    open?: boolean;
     children: React.ReactNode;
+    onClickClose?: () =&gt; Function | void;
+    onClickMinimise?: () =&gt; Function | void;
+    onClickMaximise?: () =&gt; Function | void;
 };
 &nbsp;
-const Dialog = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span> children }: Props) =&gt; {</span>
-    const [isOpen, setIsOpen] = <span class="cstat-no" title="statement not covered" >React.useState(false);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >    React.useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
-<span class="cstat-no" title="statement not covered" >        setIsOpen(true);</span>
-    }, []);
-&nbsp;
+const Dialog = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(p</span>rops: Props) =&gt; {</span>
+    const { open, children, ...rest } = <span class="cstat-no" title="statement not covered" >props;</span>
     return (
-        &lt;div className={`${styles.dialog} ${isOpen ? styles.open : ''}`}&gt;
+        &lt;div className={`${styles.dialog} ${open ? styles.open : ''}`}&gt;
             &lt;header&gt;
-                &lt;Controls /&gt;
+                &lt;Controls {...rest} /&gt;
             &lt;/header&gt;
             &lt;main className={styles.content}&gt;{children}&lt;/main&gt;
             &lt;footer&gt;&lt;/footer&gt;

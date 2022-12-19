@@ -1,13 +1,14 @@
 import Layout from '@/layout';
 import Dialog from '@/components/Dialog';
 
+const meta = {
+    title: 'This is the Comments page',
+};
+
 const Page = () => {
-    const meta = {
-        title: "This is the Xabier's blog",
-    };
     return (
         <Layout meta={meta}>
-            <Dialog>
+            <Dialog open>
                 <></>
             </Dialog>
         </Layout>

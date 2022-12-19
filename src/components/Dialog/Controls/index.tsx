@@ -6,9 +6,9 @@ export function clx(...classes: string[]) {
 }
 
 type Props = {
-    onClickClose?: () => Function;
-    onClickMinimise?: () => Function;
-    onClickMaximise?: () => Function;
+    onClickClose?: () => Function | void;
+    onClickMinimise?: () => Function | void;
+    onClickMaximise?: () => Function | void;
 };
 
 const Controls = ({

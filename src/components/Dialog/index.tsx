@@ -3,20 +3,19 @@ import styles from './dialog.module.css';
 import Controls from './Controls';
 
 type Props = {
+    open?: boolean;
     children: React.ReactNode;
+    onClickClose?: () => Function | void;
+    onClickMinimise?: () => Function | void;
+    onClickMaximise?: () => Function | void;
 };
 
-const Dialog = ({ children }: Props) => {
-    const [isOpen, setIsOpen] = React.useState(false);
-
-    React.useEffect(() => {
-        setIsOpen(true);
-    }, []);
-
+const Dialog = (props: Props) => {
+    const { open, children, ...rest } = props;
     return (
-        <div className={`${styles.dialog} ${isOpen ? styles.open : ''}`}>
+        <div className={`${styles.dialog} ${open ? styles.open : ''}`}>
             <header>
-                <Controls />
+                <Controls {...rest} />
             </header>
             <main className={styles.content}>{children}</main>
             <footer></footer>
