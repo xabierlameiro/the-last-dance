@@ -20,6 +20,7 @@
             "@/layout": ["src/components/Layout/index.tsx"],
             "@/hooks/*": ["src/hooks/*"],
             "@/constants/*": ["src/constants/*"],
+            "@/mdx/*": ["src/mdx/*"],
             "@/test": ["./jest.setup.js"]
         },
         "plugins": [

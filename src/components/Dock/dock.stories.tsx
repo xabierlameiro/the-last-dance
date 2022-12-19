@@ -1,7 +1,6 @@
 // Button.stories.js|jsx
 
 import React from 'react';
-import { iconUrls } from '@/constants/navMenu';
 import Dock from '.';
 
 export default {

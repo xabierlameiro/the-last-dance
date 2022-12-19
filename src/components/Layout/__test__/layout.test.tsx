@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Layout from '@/layout';
 
+jest.mock('@/components/Dock', () => () => {
+    return <div />;
+});
+
 describe('Layout component', () => {
     it('should render the header, main and footer', () => {
         render(

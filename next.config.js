@@ -31,6 +31,6 @@ export default withMDX({
         appDir: true,
     },
     images: {
-        domains: ['uploads-ssl.webflow.com'],
+        domains: ['uploads-ssl.webflow.com', 'code.visualstudio.com'],
     },
 });

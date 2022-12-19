@@ -1,7 +1,7 @@
 // Button.stories.js|jsx
 
 import React from 'react';
-import { iconUrls } from '@/constants/navMenu';
+import { menu } from '@/constants/navMenu';
 import Icon from './';
 
 export default {
@@ -13,6 +13,4 @@ export default {
     component: Icon,
 };
 
-export const Primary = () => (
-    <Icon src={iconUrls[0].url} alt={iconUrls[0].alt} />
-);
+export const Primary = () => <Icon src={menu[0].img} alt={menu[0].alt} />;

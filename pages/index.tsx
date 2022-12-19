@@ -1,5 +1,5 @@
-import CVMobile from '../src/mdx/cv-mobile.mdx';
-import CVDesktop from '../src/mdx/cv.mdx';
+import CVMobile from '@/mdx/cv-mobile.mdx';
+import CVDesktop from '@/mdx/cv.mdx';
 import VisibilityManager from '@/components/VisibilityManager';
 import Layout from '@/layout';
 

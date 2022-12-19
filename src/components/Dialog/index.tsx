@@ -3,17 +3,22 @@ import styles from './dialog.module.css';
 import Controls from './Controls';
 
 type Props = {
-    open: boolean;
     children: React.ReactNode;
 };
 
-const Dialog = ({ open, children }: Props) => {
+const Dialog = ({ children }: Props) => {
+    const [isOpen, setIsOpen] = React.useState(false);
+
+    React.useEffect(() => {
+        setIsOpen(true);
+    }, []);
+
     return (
-        <div className={`${styles.dialog} ${open ? styles.open : ''}`}>
+        <div className={`${styles.dialog} ${isOpen ? styles.open : ''}`}>
             <header>
                 <Controls />
             </header>
-            <main>{children}</main>
+            <main className={styles.content}>{children}</main>
             <footer></footer>
         </div>
     );
