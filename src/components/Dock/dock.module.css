@@ -35,21 +35,24 @@
     transition: all 0.2s ease;
 }
 
-.dock img:hover {
-    width: 100px;
-    height: 100px;
-    transform: translateY(-20px);
-}
+@media (hover: hover) {
+    .dock img:hover {
+        width: 100px;
+        height: 100px;
+        transform: translateY(-20px);
+    }
 
-.dock li:hover + li img {
-    width: 90px;
-    height: 90px;
-    transform: translateY(-18px);
+    .dock li:hover + li img {
+        width: 90px;
+        height: 90px;
+        transform: translateY(-18px);
+    }
 }
 
 .selected::after {
     content: '.';
     font-size: 40px;
     position: absolute;
+    left: 50%;
     transform: translate(-50%, 20px);
 }
