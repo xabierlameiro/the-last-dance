@@ -2,7 +2,10 @@
     display: flex;
     cursor: pointer;
     gap: 6px;
+    outline: none;
+    user-select: none;
 }
+
 .ch_frame_button {
     width: 14px;
     height: 14px;
@@ -12,12 +15,16 @@
     box-sizing: border-box;
     display: grid;
     place-content: center;
+    outline: none;
+    user-select: none;
 }
+
 .ch_frame_button svg {
     color: #000;
     transform: scale(0.8);
     opacity: 0;
 }
+
 .ch_frame_buttons:hover .ch_frame_button svg {
     opacity: 1;
 }
@@ -26,14 +33,17 @@
     border-color: #ce5347;
     background-color: #ed6b60;
 }
+
 .ch_frame_button_middle {
     border-color: #d6a243;
     background-color: #f5be4f;
 }
+
 .ch_frame_button_right {
     border-color: #58a942;
     background-color: #62c554;
 }
+
 .ch_frame_button_right svg {
     transform: scale(0.45) rotate(93deg);
     stroke-width: 2px;

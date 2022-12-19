@@ -22,12 +22,16 @@
     display: flex;
     list-style: none;
     cursor: pointer;
+    outline: none;
+    user-select: none;
 }
 
 .dock li {
     display: flex;
     align-items: center;
     position: relative;
+    outline: none;
+    user-select: none;
 }
 
 .dock img {

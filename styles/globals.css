@@ -80,6 +80,7 @@
     box-sizing: border-box;
     padding: 0;
     margin: 0;
+    outline: none;
 }
 
 html,
@@ -89,7 +90,6 @@ body {
 }
 
 body {
-    color: rbg(--foreground-rgb);
     background-image: url('/background-image.jpeg');
     background-size: cover;
     background-repeat: no-repeat;
