@@ -10,7 +10,6 @@
     font-size: 12.5px;
 }
 
-
 @media screen and (min-width: 767px) {
     #__next .ch-code-scroll-parent {
         font-size: 15px;
@@ -28,4 +27,35 @@
         margin: 100px auto;
         border-radius: 6px;
     }
+}
+
+.ch-frame-buttons {
+    margin: 0 0.8em;
+    flex-shrink: 0;
+    height: 1em;
+    width: 4.16em;
+    display: flex;
+}
+.ch-frame-button {
+    width: 1em;
+    height: 1em;
+    border: 0.08em solid;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+}
+.ch-frame-button-space {
+    width: 0.56em;
+}
+.ch-frame-button-left {
+    border-color: #ce5347;
+    background-color: #ed6b60;
+}
+.ch-frame-button-middle {
+    border-color: #d6a243;
+    background-color: #f5be4f;
+}
+.ch-frame-button-right {
+    border-color: #58a942;
+    background-color: #62c554;
 }

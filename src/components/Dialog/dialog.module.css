@@ -1,0 +1,19 @@
+.dialog {
+    position: absolute;
+    top: 420px;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 62px);
+    transform: scale(0);
+    background: #fff;
+    box-shadow: 0 8px 32px 0 rgb(31 38 135 / 37%);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    transition: all 0.3s ease-in;
+    padding: 10px;
+}
+
+.dialog.open {
+    top: 0;
+    transform: scale(1);
+}

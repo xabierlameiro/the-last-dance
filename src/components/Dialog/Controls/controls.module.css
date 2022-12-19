@@ -1,11 +1,10 @@
-.ch-frame-buttons {
-    margin: 0 0.8em;
+.ch_frame_buttons {
     flex-shrink: 0;
     height: 1em;
     width: 4.16em;
     display: flex;
 }
-.ch-frame-button {
+.ch_frame_button {
     width: 1em;
     height: 1em;
     border: 0.08em solid;
@@ -13,18 +12,18 @@
     display: inline-block;
     box-sizing: border-box;
 }
-.ch-frame-button-space {
+.ch_frame_button_space {
     width: 0.56em;
 }
-.ch-frame-button-left {
+.ch_frame_button_left {
     border-color: #ce5347;
     background-color: #ed6b60;
 }
-.ch-frame-button-middle {
+.ch_frame_button_middle {
     border-color: #d6a243;
     background-color: #f5be4f;
 }
-.ch-frame-button-right {
+.ch_frame_button_right {
     border-color: #58a942;
     background-color: #62c554;
 }
