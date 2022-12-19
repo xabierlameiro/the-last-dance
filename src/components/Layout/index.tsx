@@ -18,7 +18,7 @@ const Layout = ({ meta, children }: Props) => {
             <header data-testid="header"></header>
             <main data-testid="main"> {children}</main>
             <footer data-testid="footer"></footer>
-            <Dock />
+            <Dock data-testid="nav" />
         </>
     );
 };
