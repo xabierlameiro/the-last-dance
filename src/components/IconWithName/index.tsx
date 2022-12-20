@@ -9,7 +9,7 @@ type Props = {
 
 const IconWithName = ({ icon, alt, name }: Props) => {
     return (
-        <div className={styles.option}>
+        <div data-testid="icon-with-name" className={styles.option}>
             <Image src={icon} alt={alt} width={44} height={42} />
             <p className={styles.optionText}>{name}</p>
         </div>

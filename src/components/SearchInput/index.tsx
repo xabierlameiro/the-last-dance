@@ -18,7 +18,7 @@ const SearchInput = ({
     return (
         <input
             type="text"
-            data-testid="searchInput"
+            data-testid="search-input"
             onBlur={onBlur}
             onChange={onChange}
             className={styles.input}

@@ -10,7 +10,7 @@ const Dock = () => {
 
     return (
         <>
-            <nav className={styles.dock}>
+            <nav className={styles.dock} data-testid="dock">
                 <ul>
                     {menu.map(({ link, img, alt }, index) => (
                         <li

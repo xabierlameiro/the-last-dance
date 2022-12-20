@@ -29,9 +29,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
@@ -127,7 +127,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import styles from './navigation.module.css';
 &nbsp;
@@ -147,12 +147,12 @@ const NavigationArrows = ({
     return (
         &lt;nav className={styles.nav}&gt;
             &lt;BiChevronLeft
-                className={disabledLeft ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.disabled </span>: ''}
+                className={disabledLeft ? styles.disabled : ''}
                 data-testid="left"
                 onClick={onClickLeft}
             /&gt;
             &lt;BiChevronRight
-                className={disabledRight ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.disabled </span>: ''}
+                className={disabledRight ? styles.disabled : ''}
                 data-testid="right"
                 onClick={onClickRight}
             /&gt;

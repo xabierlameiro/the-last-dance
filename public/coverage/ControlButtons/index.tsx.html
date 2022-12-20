@@ -29,9 +29,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
@@ -126,7 +126,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -181,7 +181,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import styles from './controls.module.css';
 import { BiX, BiMinus, BiExpandAlt } from 'react-icons/bi';
 &nbsp;
@@ -228,7 +228,7 @@ const Controls = ({
                 className={clx(
                     styles.ch_frame_button,
                     styles.ch_frame_button_right,
-                    disabled ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.ch_frame_button_disabled </span>: ''
+                    disabled ? styles.ch_frame_button_disabled : ''
                 )}
             &gt;
                 &lt;BiExpandAlt

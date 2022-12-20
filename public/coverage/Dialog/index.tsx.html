@@ -29,9 +29,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.66% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -100,7 +100,8 @@
 <a name='L36'></a><a href='#L36'>36</a>
 <a name='L37'></a><a href='#L37'>37</a>
 <a name='L38'></a><a href='#L38'>38</a>
-<a name='L39'></a><a href='#L39'>39</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -117,10 +118,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -137,7 +138,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React from 'react';
 import styles from './dialog.module.css';
 &nbsp;
@@ -164,13 +166,14 @@ const Dialog = (props: Props) =&gt; {
 &nbsp;
     return (
         &lt;div
-            className={`${styles.dialog} ${withPadding ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.padding </span>: ''} ${
-                open ? styles.open : <span class="branch-1 cbranch-no" title="branch not covered" >''</span>
-            } ${modalMode ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.modalMode </span>: ''}`}
+            data-testid="dialog"
+            className={`${styles.dialog} ${withPadding ? styles.padding : ''} ${
+                open ? styles.open : ''
+            } ${modalMode ? styles.modalMode : ''}`}
         &gt;
-            &lt;header data-testid="modal-header"&gt;{header()}&lt;/header&gt;
-            &lt;main data-testid="modal-body"&gt;{body()}&lt;/main&gt;
-            &lt;footer data-testid="modal-footer"&gt;{footer()}&lt;/footer&gt;
+            &lt;header data-testid="dialog-header"&gt;{header()}&lt;/header&gt;
+            &lt;main data-testid="dialog-body"&gt;{body()}&lt;/main&gt;
+            &lt;footer data-testid="dialog-footer"&gt;{footer()}&lt;/footer&gt;
         &lt;/div&gt;
     );
 };

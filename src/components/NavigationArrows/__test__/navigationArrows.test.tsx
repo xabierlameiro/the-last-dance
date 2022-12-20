@@ -31,4 +31,10 @@ describe('NavigationArrows component', () => {
         fireEvent.click(screen.getByTestId('right'));
         expect(onClickRight).toHaveBeenCalledTimes(0);
     });
+
+    it('Should disabled', () => {
+        render(<NavigationArrows disabledLeft disabledRight />);
+        expect(screen.getByTestId('left')).toHaveClass('disabled');
+        expect(screen.getByTestId('right')).toHaveClass('disabled');
+    });
 });

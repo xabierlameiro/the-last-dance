@@ -24,13 +24,14 @@ const Dialog = (props: Props) => {
 
     return (
         <div
+            data-testid="dialog"
             className={`${styles.dialog} ${withPadding ? styles.padding : ''} ${
                 open ? styles.open : ''
             } ${modalMode ? styles.modalMode : ''}`}
         >
-            <header data-testid="modal-header">{header()}</header>
-            <main data-testid="modal-body">{body()}</main>
-            <footer data-testid="modal-footer">{footer()}</footer>
+            <header data-testid="dialog-header">{header()}</header>
+            <main data-testid="dialog-body">{body()}</main>
+            <footer data-testid="dialog-footer">{footer()}</footer>
         </div>
     );
 };

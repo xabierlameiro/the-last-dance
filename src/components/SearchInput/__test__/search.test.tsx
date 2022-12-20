@@ -7,7 +7,7 @@ describe('SearchInput component', () => {
         const onChange = jest.fn();
 
         render(<SearchInput onBlur={onBlur} onChange={onChange} />);
-        const searchInput = screen.getByTestId('searchInput');
+        const searchInput = screen.getByTestId('search-input');
         fireEvent.change(searchInput, { target: { value: 'test' } });
         expect(onChange).toHaveBeenCalledTimes(1);
 
