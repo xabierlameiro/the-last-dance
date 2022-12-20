@@ -18,13 +18,9 @@ const Dock = () => {
                                 pathname === link ? styles.selected : ''
                             }`}
                         >
-                            {link ? (
-                                <Link href={link}>
-                                    <Icon src={img} alt={alt} />
-                                </Link>
-                            ) : (
+                            <Link href={link}>
                                 <Icon src={img} alt={alt} />
-                            )}
+                            </Link>
                         </li>
                     ))}
                 </ul>

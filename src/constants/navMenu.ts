@@ -17,5 +17,6 @@ export const menu = [
     {
         img: 'https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853f10f5994a4d27b0aa_system-preferences.png',
         alt: 'System pref icon',
+        link: '/settings',
     },
 ];

@@ -24,14 +24,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
@@ -45,7 +45,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
@@ -88,9 +88,40 @@
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -101,7 +132,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -117,9 +167,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React from <span class="cstat-no" title="statement not covered" >'react';</span>
 import styles from <span class="cstat-no" title="statement not covered" >'./dialog.module.css';</span>
 import Controls from <span class="cstat-no" title="statement not covered" >'./Controls';</span>
+import NavigationArrows from <span class="cstat-no" title="statement not covered" >'./NavigationArrows';</span>
+import { CgLayoutGridSmall } from <span class="cstat-no" title="statement not covered" >'react-icons/cg';</span>
+import SearchInput from <span class="cstat-no" title="statement not covered" >'./Search';</span>
 &nbsp;
 type Props = {
+    modal?: boolean;
+    showControls?: boolean;
     open?: boolean;
+    disabled?: boolean;
     children: React.ReactNode;
     onClickClose?: () =&gt; Function | void;
     onClickMinimise?: () =&gt; Function | void;
@@ -127,11 +183,30 @@ type Props = {
 };
 &nbsp;
 const Dialog = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(p</span>rops: Props) =&gt; {</span>
-    const { open, children, ...rest } = <span class="cstat-no" title="statement not covered" >props;</span>
+    const {
+        open,
+        children,
+        modal,
+        disabled = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>
+        showControls = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>
+        ...rest
+    } = <span class="cstat-no" title="statement not covered" >props;</span>
     return (
-        &lt;div className={`${styles.dialog} ${open ? styles.open : ''}`}&gt;
-            &lt;header&gt;
-                &lt;Controls {...rest} /&gt;
+        &lt;div
+            className={`${styles.dialog} ${open ? styles.open : ''} ${
+                modal ? styles.modal : ''
+            }`}
+        &gt;
+            &lt;header className={styles.header}&gt;
+                &lt;Controls {...rest} disabled={disabled} /&gt;
+                {<span class="branch-0 cbranch-no" title="branch not covered" >showControls &amp;&amp; (</span>
+                    &lt;&gt;
+                        &lt;NavigationArrows /&gt;
+                        &lt;CgLayoutGridSmall className={styles.layoutIcon} /&gt;
+                        &lt;h1 className={styles.title}&gt;System Preferences&lt;/h1&gt;
+                        &lt;SearchInput /&gt;
+                    &lt;/&gt;
+                )}
             &lt;/header&gt;
             &lt;main className={styles.content}&gt;{children}&lt;/main&gt;
             &lt;footer&gt;&lt;/footer&gt;
@@ -145,7 +220,7 @@ const Dialog = <span class="cstat-no" title="statement not covered" ><span class
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
-                Code coverage automatically generated by Xabier Lameiro on 19/12/2022
+                Code coverage automatically generated by Xabier Lameiro on 20/12/2022
         <script src="../prettify.js"></script>
         <script>
             window.onload = function () {

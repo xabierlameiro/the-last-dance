@@ -7,8 +7,8 @@
 }
 
 .ch_frame_button {
-    width: 14px;
-    height: 14px;
+    width: 12.8px;
+    height: 12.8px;
     border: 0.08em solid;
     border-radius: 50%;
     display: inline-block;
@@ -21,7 +21,7 @@
 
 .ch_frame_button svg {
     color: #000;
-    transform: scale(0.8);
+    transform: scale(0.7);
     opacity: 0;
 }
 
@@ -47,4 +47,15 @@
 .ch_frame_button_right svg {
     transform: scale(0.45) rotate(93deg);
     stroke-width: 2px;
+}
+
+.ch_frame_button_disabled {
+    user-select: none;
+    cursor: default;
+    background-color: lightgrey;
+    opacity: 0.4;
+}
+
+.ch_frame_buttons:hover .ch_frame_button_disabled svg {
+    opacity: 0;
 }

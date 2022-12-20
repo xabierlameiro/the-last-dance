@@ -6,12 +6,14 @@ export function clx(...classes: string[]) {
 }
 
 type Props = {
+    disabled?: boolean;
     onClickClose?: () => Function | void;
     onClickMinimise?: () => Function | void;
     onClickMaximise?: () => Function | void;
 };
 
 const Controls = ({
+    disabled,
     onClickClose,
     onClickMinimise,
     onClickMaximise,
@@ -41,7 +43,8 @@ const Controls = ({
             <div
                 className={clx(
                     styles.ch_frame_button,
-                    styles.ch_frame_button_right
+                    styles.ch_frame_button_right,
+                    disabled ? styles.ch_frame_button_disabled : ''
                 )}
             >
                 <BiExpandAlt
