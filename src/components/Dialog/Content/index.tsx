@@ -26,10 +26,10 @@ const Content = () => {
                     <Image
                         src="/language.jpeg"
                         alt="hero"
-                        width={45}
-                        height={43}
+                        width={44}
+                        height={42}
                     />
-                    <p className={styles.optionText}>Language and region</p>
+                    <p className={styles.optionText}>Language & Region</p>
                 </div>
             </section>
         </>
