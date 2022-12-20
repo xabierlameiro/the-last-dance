@@ -1,12 +1,13 @@
-import styles from './dock.module.css';
+import React from 'react';
 import { menu } from '@/constants/navMenu';
 import Icon from '@/components/Dock/Icon';
-import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
+import styles from './dock.module.css';
 
 const Dock = () => {
     const { pathname } = useRouter();
+
     return (
         <>
             <nav className={styles.dock}>

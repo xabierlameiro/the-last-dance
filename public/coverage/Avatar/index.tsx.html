@@ -18,34 +18,34 @@
     
 <body>
 <div class='wrapper'>
-    <div class='pad1'><h1><a href='/'>Return</a></h1></h1><h1><a href='/coverage'>All tests</a></a> / <a href="index.html">Dock</a> index.tsx</h1>
+    <div class='pad1'><h1><a href='/'>Return</a></h1></h1><h1><a href='/coverage'>All tests</a></a> / <a href="index.html">Avatar</a> index.tsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
@@ -91,18 +91,7 @@
 <a name='L27'></a><a href='#L27'>27</a>
 <a name='L28'></a><a href='#L28'>28</a>
 <a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a>
-<a name='L34'></a><a href='#L34'>34</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L30'></a><a href='#L30'>30</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -110,7 +99,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -128,39 +120,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React from 'react';
-import { menu } from '@/constants/navMenu';
-import Icon from '@/components/Dock/Icon';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import styles from './dock.module.css';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import styles from './avatar.module.css';
+import Image from 'next/image';
 &nbsp;
-const Dock = () =&gt; {
-    const { pathname } = useRouter();
+type Props = {
+    name: string;
+    description: string;
+    img: string;
+    alt: string;
+};
 &nbsp;
+const Avatar = ({ name, description, img, alt }: Props) =&gt; {
     return (
-        &lt;&gt;
-            &lt;nav className={styles.dock}&gt;
-                &lt;ul&gt;
-                    {menu.map(({ link, img, alt }, index) =&gt; (
-                        &lt;li
-                            key={index}
-                            className={`${
-                                pathname === link ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.selected </span>: ''
-                            }`}
-                        &gt;
-                            &lt;Link href={link}&gt;
-                                &lt;Icon src={img} alt={alt} /&gt;
-                            &lt;/Link&gt;
-                        &lt;/li&gt;
-                    ))}
-                &lt;/ul&gt;
-            &lt;/nav&gt;
-        &lt;/&gt;
+        &lt;section data-testid="avatar" className={styles.userInfo}&gt;
+            &lt;Image
+                className={styles.avatar}
+                src={img}
+                alt={alt}
+                width={71}
+                height={71}
+            /&gt;
+            &lt;div className={styles.userDetails}&gt;
+                &lt;h2 className={styles.username}&gt;{name}&lt;/h2&gt;
+                &lt;p className={styles.description}&gt;{description}&lt;/p&gt;
+            &lt;/div&gt;
+        &lt;/section&gt;
     );
 };
 &nbsp;
-export default Dock;
+export default Avatar;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->

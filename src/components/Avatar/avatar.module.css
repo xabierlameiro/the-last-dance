@@ -1,0 +1,31 @@
+.userInfo {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: auto auto 1fr;
+    gap: 5px;
+}
+
+.avatar {
+    clip-path: circle(32px at center);
+    cursor: pointer;
+    outline: none;
+}
+
+.userDetails {
+    padding-top: 8px;
+    display: grid;
+    align-content: flex-start;
+    gap: 4px;
+    color: rgba(108, 108, 112, 1);
+}
+
+.username {
+    font-size: 18px;
+    font-weight: normal;
+    margin: 0;
+}
+
+.description {
+    font-size: 11px;
+    font-weight: normal;
+}

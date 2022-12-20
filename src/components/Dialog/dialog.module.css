@@ -1,4 +1,5 @@
 .dialog {
+    box-sizing: border-box;
     position: absolute;
     left: 0;
     top: 430px;
@@ -18,7 +19,7 @@
     transform: scale(1);
 }
 
-.dialog.modal {
+.dialog.modalMode {
     width: 670px;
     height: 600px;
     border-radius: 10px;
@@ -28,55 +29,20 @@
 }
 
 @media screen and (max-width: 768px) {
-    .dialog.modal {
+    .dialog.modalMode {
         border-radius: 0;
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
     }
 }
 
-.dialog.modal.open {
+.dialog.modalMode.open {
     top: 45%;
     transform: translate(-50%, -50%) scale(1);
 }
 
-.content {
-    height: inherit;
+.padding {
+    padding: 20px;
 }
 
-.header {
-    display: grid;
-    grid-auto-flow: column;
-    justify-items: center;
-    grid-template-columns: 72px 88px 30px 1fr min-content;
-    align-items: center;
-    border-bottom: 1px solid rgba(108, 108, 112, 0.3);
-    padding: 10px;
-}
-
-@media screen and (max-width: 768px) {
-    .header {
-        grid-template-columns: 72px 78px 30px 1fr;
-    }
-}
-.layoutIcon {
-    width: 30px;
-    height: 30px;
-    transform: scale(1.3);
-    fill-opacity: 0.3;
-    cursor: pointer;
-}
-
-.title {
-    font-size: 14.5px;
-    color: rgba(108, 108, 112, 1);
-    user-select: none;
-    justify-self: flex-start;
-    text-indent: 10px;
-}
-
-@media screen and (max-width: 768px) {
-    .title {
-        display: none;
-    }
-}
+/* TOOD: mover esto de aki a donde aplique junto con este html  */

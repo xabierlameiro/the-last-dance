@@ -18,34 +18,34 @@
     
 <body>
 <div class='wrapper'>
-    <div class='pad1'><h1><a href='/'>Return</a></h1></h1><h1><a href='/coverage'>All tests</a></a> / <a href="index.html">Dock</a> index.tsx</h1>
+    <div class='pad1'><h1><a href='/'>Return</a></h1></h1><h1><a href='/coverage'>All tests</a></a> / <a href="index.html">NavigationArrows</a> index.tsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>2/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
@@ -97,28 +97,6 @@
 <a name='L33'></a><a href='#L33'>33</a>
 <a name='L34'></a><a href='#L34'>34</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -128,39 +106,61 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React from 'react';
-import { menu } from '@/constants/navMenu';
-import Icon from '@/components/Dock/Icon';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import styles from './dock.module.css';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
+import styles from './navigation.module.css';
 &nbsp;
-const Dock = () =&gt; {
-    const { pathname } = useRouter();
+type Props = {
+    disabledLeft?: boolean;
+    disabledRight?: boolean;
+    onClickRight?: () =&gt; void;
+    onClickLeft?: () =&gt; void;
+};
 &nbsp;
+const NavigationArrows = ({
+    disabledLeft,
+    onClickLeft,
+    disabledRight,
+    onClickRight,
+}: Props) =&gt; {
     return (
-        &lt;&gt;
-            &lt;nav className={styles.dock}&gt;
-                &lt;ul&gt;
-                    {menu.map(({ link, img, alt }, index) =&gt; (
-                        &lt;li
-                            key={index}
-                            className={`${
-                                pathname === link ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.selected </span>: ''
-                            }`}
-                        &gt;
-                            &lt;Link href={link}&gt;
-                                &lt;Icon src={img} alt={alt} /&gt;
-                            &lt;/Link&gt;
-                        &lt;/li&gt;
-                    ))}
-                &lt;/ul&gt;
-            &lt;/nav&gt;
-        &lt;/&gt;
+        &lt;nav className={styles.nav}&gt;
+            &lt;BiChevronLeft
+                className={disabledLeft ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.disabled </span>: ''}
+                data-testid="left"
+                onClick={onClickLeft}
+            /&gt;
+            &lt;BiChevronRight
+                className={disabledRight ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.disabled </span>: ''}
+                data-testid="right"
+                onClick={onClickRight}
+            /&gt;
+        &lt;/nav&gt;
     );
 };
 &nbsp;
-export default Dock;
+export default NavigationArrows;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->

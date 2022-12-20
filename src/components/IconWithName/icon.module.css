@@ -1,0 +1,17 @@
+.option {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    outline: none;
+}
+
+.optionText {
+    font-size: 11.5px;
+    font-weight: normal;
+    color: rgba(108, 108, 112, 1);
+    text-align: center;
+}

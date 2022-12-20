@@ -1,49 +1,36 @@
 import React from 'react';
 import styles from './dialog.module.css';
-import Controls from './Controls';
-import NavigationArrows from './NavigationArrows';
-import { CgLayoutGridSmall } from 'react-icons/cg';
-import SearchInput from './Search';
 
 type Props = {
-    modal?: boolean;
-    showControls?: boolean;
     open?: boolean;
-    disabled?: boolean;
-    children: React.ReactNode;
-    onClickClose?: () => Function | void;
-    onClickMinimise?: () => Function | void;
-    onClickMaximise?: () => Function | void;
+    withPadding?: boolean;
+    modalMode?: boolean;
+    header?: () => JSX.Element;
+    body?: () => JSX.Element;
+    footer?: () => JSX.Element;
 };
 
 const Dialog = (props: Props) => {
     const {
         open,
-        children,
-        modal,
-        disabled = false,
-        showControls = false,
-        ...rest
+        withPadding,
+        modalMode,
+        header = () => <></>,
+        body = () => <></>,
+        footer = () => <></>,
     } = props;
+
+    // if (!open) return null;
+
     return (
         <div
-            className={`${styles.dialog} ${open ? styles.open : ''} ${
-                modal ? styles.modal : ''
-            }`}
+            className={`${styles.dialog} ${withPadding ? styles.padding : ''} ${
+                open ? styles.open : ''
+            } ${modalMode ? styles.modalMode : ''}`}
         >
-            <header className={styles.header}>
-                <Controls {...rest} disabled={disabled} />
-                {showControls && (
-                    <>
-                        <NavigationArrows />
-                        <CgLayoutGridSmall className={styles.layoutIcon} />
-                        <h1 className={styles.title}>System Preferences</h1>
-                        <SearchInput />
-                    </>
-                )}
-            </header>
-            <main className={styles.content}>{children}</main>
-            <footer></footer>
+            <header data-testid="modal-header">{header()}</header>
+            <main data-testid="modal-body">{body()}</main>
+            <footer data-testid="modal-footer">{footer()}</footer>
         </div>
     );
 };

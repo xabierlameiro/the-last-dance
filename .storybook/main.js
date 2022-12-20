@@ -12,4 +12,5 @@ export default {
     docs: {
         docsPage: false,
     },
+    staticDirs: ['../public'],
 };

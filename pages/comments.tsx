@@ -8,9 +8,7 @@ const meta = {
 const Page = () => {
     return (
         <Layout meta={meta}>
-            <Dialog open>
-                <></>
-            </Dialog>
+            <Dialog open />
         </Layout>
     );
 };

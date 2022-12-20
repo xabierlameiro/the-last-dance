@@ -1,4 +1,5 @@
 import { themes } from '@storybook/theming';
+import '../styles/globals.css';
 
 export const parameters = {
     layout: 'centered',
