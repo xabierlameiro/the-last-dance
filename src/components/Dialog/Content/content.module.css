@@ -1,0 +1,57 @@
+.content {
+    padding: 18px 24px 54px;
+    border-bottom: 1px solid rgba(108, 108, 112, 0.3);
+}
+.confg {
+    padding: 18px 24px 99px;
+    border-bottom: 1px solid rgba(108, 108, 112, 0.3);
+}
+
+.userInfo {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: auto auto 1fr;
+    gap: 5px;
+}
+
+.avatar {
+    clip-path: circle(32px at center);
+    cursor: pointer;
+    outline: none;
+}
+
+.userDetails {
+    padding-top: 8px;
+    display: grid;
+    align-content: flex-start;
+    gap: 4px;
+    color: rgba(108, 108, 112, 1);
+}
+
+.username {
+    font-size: 18px;
+    font-weight: normal;
+    margin: 0;
+}
+
+.description {
+    font-size: 11px;
+    font-weight: normal;
+}
+
+.option {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    outline: none;
+}
+
+.optionText {
+    font-size: 11.5px;
+    font-weight: normal;
+    color: rgba(108, 108, 112, 1);
+}
