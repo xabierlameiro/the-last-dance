@@ -16,7 +16,7 @@ const meta = {
 const Header = () => {
     return (
         <header className={styles.header}>
-            <ControlButtons />
+            <ControlButtons disabled />
             <NavigationArrows />
             <GridLayoutControl />
             <SearchInput />
