@@ -1,9 +1,6 @@
 import styles from './controls.module.css';
 import { BiX, BiMinus, BiExpandAlt } from 'react-icons/bi';
-
-export function clx(...classes: string[]) {
-    return classes.join(' ');
-}
+import { clx } from '@/helpers';
 
 type Props = {
     disabled?: boolean;
