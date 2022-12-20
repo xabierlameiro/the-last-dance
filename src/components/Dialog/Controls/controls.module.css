@@ -50,6 +50,7 @@
 }
 
 .ch_frame_button_disabled {
+    pointer-events: none;
     user-select: none;
     cursor: default;
     background-color: lightgrey;
