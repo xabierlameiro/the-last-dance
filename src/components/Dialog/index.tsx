@@ -20,8 +20,6 @@ const Dialog = (props: Props) => {
         footer = () => <></>,
     } = props;
 
-    // if (!open) return null;
-
     return (
         <div
             data-testid="dialog"
@@ -30,7 +28,9 @@ const Dialog = (props: Props) => {
             } ${modalMode ? styles.modalMode : ''}`}
         >
             <header data-testid="dialog-header">{header()}</header>
-            <main data-testid="dialog-body">{body()}</main>
+            <main className={styles.body} data-testid="dialog-body">
+                {body()}
+            </main>
             <footer data-testid="dialog-footer">{footer()}</footer>
         </div>
     );

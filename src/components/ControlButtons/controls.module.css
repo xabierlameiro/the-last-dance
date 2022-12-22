@@ -60,3 +60,7 @@
 .ch_frame_buttons:hover .ch_frame_button_disabled svg {
     opacity: 0;
 }
+
+.withPadding {
+    padding: 0 10px;
+}

@@ -2,11 +2,13 @@ import React from 'react';
 import { menu } from '@/constants/navMenu';
 import Icon from '@/components/Dock/Icon';
 import { useRouter } from 'next/router';
+import { useDialog } from '@/context/dialog';
 import Link from 'next/link';
 import styles from './dock.module.css';
 
 const Dock = () => {
     const { pathname } = useRouter();
+    const { dispatch } = useDialog();
 
     return (
         <>
@@ -15,6 +17,7 @@ const Dock = () => {
                     {menu.map(({ link, img, alt }, index) => (
                         <li
                             key={index}
+                            onClick={() => dispatch({ type: 'open' })}
                             className={`${
                                 pathname === link ? styles.selected : ''
                             }`}

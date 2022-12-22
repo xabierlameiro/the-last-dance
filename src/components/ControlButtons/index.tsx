@@ -4,6 +4,7 @@ import { clx } from '@/helpers';
 
 type Props = {
     disabled?: boolean;
+    withPadding?: boolean;
     onClickClose?: () => Function | void;
     onClickMinimise?: () => Function | void;
     onClickMaximise?: () => Function | void;
@@ -11,44 +12,48 @@ type Props = {
 
 const Controls = ({
     disabled,
+    withPadding,
     onClickClose,
     onClickMinimise,
     onClickMaximise,
 }: Props) => {
     return (
-        <div data-testid="controls" className={styles.ch_frame_buttons}>
+        <div
+            data-testid="controls"
+            className={`${styles.ch_frame_buttons} ${
+                withPadding ? styles.withPadding : ''
+            }`}
+        >
             <div
+                onClick={onClickClose}
+                aria-label="close"
                 className={clx(
                     styles.ch_frame_button,
                     styles.ch_frame_button_left
                 )}
             >
-                <BiX aria-label="close" onClick={onClickClose} title="Close" />
+                <BiX title="Close" />
             </div>
             <div
+                aria-label="minimise"
+                onClick={onClickMinimise}
                 className={clx(
                     styles.ch_frame_button,
                     styles.ch_frame_button_middle
                 )}
             >
-                <BiMinus
-                    aria-label="minimise"
-                    onClick={onClickMinimise}
-                    title="Minimise"
-                />
+                <BiMinus title="Minimise" />
             </div>
             <div
+                aria-label="maximise"
+                onClick={onClickMaximise}
                 className={clx(
                     styles.ch_frame_button,
                     styles.ch_frame_button_right,
                     disabled ? styles.ch_frame_button_disabled : ''
                 )}
             >
-                <BiExpandAlt
-                    aria-label="maximise"
-                    onClick={onClickMaximise}
-                    title="Maximise"
-                />
+                <BiExpandAlt title="Maximise" />
             </div>
         </div>
     );

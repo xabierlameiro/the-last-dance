@@ -1,4 +1,17 @@
-<CH.Code lineNumbers={true} >
+import ControlButtons from '@/components/ControlButtons';
+import { useDialog } from '@/context/dialog';
+
+<CH.Code lineNumbers render={()=> {
+    const { dispatch } = useDialog();
+    return (
+        <ControlButtons
+            disabled
+            withPadding
+            onClickClose={() => dispatch({ type: 'close' })}
+            onClickMinimise={() =>dispatch({ type: 'close' })}
+        />
+    );
+}}>
 
 ```tsx index.tsx box=9[23:38]
 import React from 'react';

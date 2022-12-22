@@ -8,15 +8,22 @@ import ControlButtons from '@/components/ControlButtons';
 import NavigationArrows from '@/components/NavigationArrows';
 import SearchInput from '@/components/SearchInput';
 import GridLayoutControl from '@/components/GridLayoutControl';
+import { useDialog } from '@/context/dialog';
 
 const meta = {
     title: 'This is the Settings page',
 };
 
 const Header = () => {
+    const { dispatch } = useDialog();
+    const close = () => dispatch({ type: 'close' });
     return (
         <header className={styles.header}>
-            <ControlButtons disabled />
+            <ControlButtons
+                disabled
+                onClickClose={close}
+                onClickMinimise={close}
+            />
             <NavigationArrows />
             <GridLayoutControl />
             <SearchInput />
@@ -47,9 +54,13 @@ const Content = () => {
 };
 
 const Page = () => {
+    const {
+        state: { open },
+    } = useDialog();
+
     return (
         <Layout meta={meta}>
-            <Dialog body={Content} header={Header} open modalMode />
+            <Dialog body={Content} header={Header} open={open} modalMode />
         </Layout>
     );
 };

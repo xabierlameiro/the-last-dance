@@ -2,8 +2,7 @@
 #__next .ch-codegroup {
     margin: 0;
     border-radius: 0;
-    height: 100vh;
-    min-height: 100vh;
+    height: 100%;
 }
 
 #__next .ch-code-scroll-parent {
@@ -12,19 +11,17 @@
 
 @media screen and (min-width: 767px) {
     #__next .ch-code-scroll-parent {
-        font-size: 15px;
+        font-size: 13px;
     }
 
     #__next .ch-codeblock,
     #__next .ch-codegroup {
-        height: initial;
-        min-height: initial;
+        height: 100%;
+        min-height: 100%;
     }
     #__next .ch-editor-frame {
-        max-width: 800px;
-        height: 500px;
-        max-height: 500px;
-        margin: 100px auto;
+        max-width: 100%;
+        height: 100%;
         border-radius: 6px;
     }
 }

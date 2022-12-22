@@ -45,4 +45,7 @@
     padding: 20px;
 }
 
-/* TOOD: mover esto de aki a donde aplique junto con este html  */
+.body {
+    height: inherit;
+    max-height: inherit;
+}

@@ -1,4 +1,10 @@
-export const menu = [
+type Item = {
+    img: string;
+    alt: string;
+    link: string;
+};
+
+export const menu: Array<Item> = [
     {
         img: 'https://code.visualstudio.com/assets/branding/app-icon.png',
         alt: 'VS code icon',
