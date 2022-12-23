@@ -27,9 +27,7 @@ describe('Controls component', () => {
     it('Should renders Controls but with Maximise disabled', () => {
         render(<Controls disabled />);
         const controlsElement = screen.getByTestId('controls');
-        // select 3 child
         const controlsElementChild = controlsElement.children[2];
-        // check if the element is disabled
         expect(controlsElementChild).toHaveClass('ch_frame_button_disabled');
     });
 });

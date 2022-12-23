@@ -1,5 +1,6 @@
 import { render, screen } from '@/test';
 import Layout from '@/layout';
+import { DialogProvider } from '@/context/dialog';
 
 jest.mock('next/router', () => ({
     useRouter() {
@@ -22,9 +23,11 @@ jest.mock('next/router', () => ({
 describe('Layout component', () => {
     it('should render the header, main and footer', () => {
         render(
-            <Layout>
-                <div />
-            </Layout>
+            <DialogProvider>
+                <Layout>
+                    <div />
+                </Layout>
+            </DialogProvider>
         );
         expect(screen.getByTestId('header')).toBeInTheDocument();
         expect(screen.getByTestId('main')).toBeInTheDocument();
