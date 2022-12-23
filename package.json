@@ -16,12 +16,12 @@
         "build-storybook": "storybook build"
     },
     "dependencies": {
-        "@code-hike/mdx": "^0.7.5-next.0",
         "@mdx-js/loader": "^2.2.1",
         "@mdx-js/react": "^2.2.1",
         "@next/font": "13.0.7",
         "@next/mdx": "^13.0.7",
         "@vercel/analytics": "^0.1.6",
+        "@xabierlameiro/code-hike": "2.0.5",
         "next": "^13.0.7",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"

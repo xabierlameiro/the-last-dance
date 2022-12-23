@@ -1056,20 +1056,6 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@code-hike/mdx@^0.7.5-next.0":
-  version "0.7.5-next.0"
-  resolved "https://registry.npmjs.org/@code-hike/mdx/-/mdx-0.7.5-next.0.tgz"
-  integrity sha512-b1Zo/yTGg2l2hJEpWj4jtNigA1uH5zn1w3gJMccUyvoLlzWbC2V7D4xwFm6e87KYpiDttneVtCvUfBD/BcxOtw==
-  dependencies:
-    hast-util-to-estree "^1.4.0"
-    is-plain-obj "^3.0.0"
-    node-fetch "^2.0.0"
-    remark-rehype "^8.1.0"
-    shiki "^0.10.1"
-    unified "^9.2.2"
-    unist-util-visit "^2.0.0"
-    unist-util-visit-parents "^3.0.0"
-
 "@colors/colors@1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
@@ -3332,6 +3318,20 @@
   dependencies:
     "@webassemblyjs/ast" "1.11.1"
     "@xtuc/long" "4.2.2"
+
+"@xabierlameiro/code-hike@2.0.5":
+  version "2.0.5"
+  resolved "https://npm.pkg.github.com/download/@xabierlameiro/code-hike/2.0.5/5bb908e0f083decf2c5f397acc61c121d22108a7#5bb908e0f083decf2c5f397acc61c121d22108a7"
+  integrity sha512-daL6MYG/SApbQqsX9AAqqHLdXTAAnggseVLk0ToRffZcDof37dgf4RVpdDSDc48Up5xKjUYkxPo+7/NpL6pn6Q==
+  dependencies:
+    hast-util-to-estree "^1.4.0"
+    is-plain-obj "^3.0.0"
+    node-fetch "^2.0.0"
+    remark-rehype "^8.1.0"
+    shiki "^0.10.1"
+    unified "^9.2.2"
+    unist-util-visit "^2.0.0"
+    unist-util-visit-parents "^3.0.0"
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
