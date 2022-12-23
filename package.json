@@ -22,7 +22,9 @@
         "@next/mdx": "^13.0.7",
         "@vercel/analytics": "^0.1.6",
         "@xabierlameiro/code-hike": "2.0.5",
+        "dotenv-load": "^2.0.1",
         "next": "^13.0.7",
+        "next-env": "^1.1.1",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
     },
