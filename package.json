@@ -3,6 +3,7 @@
     "type": "module",
     "version": "0.1.0",
     "private": true,
+    "package-name": "git+https://process.env.GITHUB_TOKEN:x-oauth-basic@github.com/xabierlameiro/code-hike.git",
     "scripts": {
         "dev": "next dev",
         "build": "next build",
