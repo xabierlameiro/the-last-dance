@@ -92,13 +92,6 @@ body {
     font-family: var(--font-mono);
 }
 
-body {
-    background-image: url('/background-image.jpeg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
-
 a {
     color: inherit;
     text-decoration: none;

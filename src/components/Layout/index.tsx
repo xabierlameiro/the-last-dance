@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import Head from 'next/head';
 import Dock from '@/components/Dock';
+import BackgroundImage from '../BackgroundImage';
 
 type Props = {
     children: ReactElement;
@@ -12,6 +13,7 @@ type Props = {
 const Layout = ({ meta, children }: Props) => {
     return (
         <>
+            <BackgroundImage />
             <Head>
                 <title>{meta?.title}</title>
             </Head>
