@@ -2,6 +2,8 @@
     "name": "the-last-dance",
     "type": "module",
     "version": "0.1.0",
+    "description": "The Last Dance",
+    "license": "MIT",
     "private": true,
     "scripts": {
         "dev": "next dev",
