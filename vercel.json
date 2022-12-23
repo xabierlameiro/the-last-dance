@@ -1,0 +1,7 @@
+{
+    "build": {
+        "env": {
+            "NPM_RC": "@npm_rc"
+        }
+    }
+}
