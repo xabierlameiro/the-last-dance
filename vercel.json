@@ -1,7 +1,0 @@
-{
-    "build": {
-        "env": {
-            "NPM_RC": "@xabierlameiro/code-hike"
-        }
-    }
-}
