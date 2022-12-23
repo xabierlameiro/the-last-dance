@@ -3,7 +3,6 @@
 import React from 'react';
 import SearchInput from '.';
 import { ComponentStory } from '@storybook/react';
-import { within, userEvent } from '@storybook/testing-library';
 
 export default {
     /* 👇 The title prop is optional.
@@ -29,9 +28,4 @@ Primary.args = {
     disabled: false,
     placeHolderText: 'Search',
     value: '',
-};
-
-Primary.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId('searchInput'));
 };

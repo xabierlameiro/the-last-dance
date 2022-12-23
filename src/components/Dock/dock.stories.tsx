@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Dock from '.';
+import { DialogProvider } from '@/context/dialog';
 
 export default {
     /* 👇 The title prop is optional.
@@ -12,4 +13,8 @@ export default {
     component: Dock,
 };
 
-export const Primary = () => <Dock />;
+export const Primary = () => (
+    <DialogProvider>
+        <Dock />
+    </DialogProvider>
+);

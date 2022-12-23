@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { within, userEvent } from '@storybook/testing-library';
-import Controls from '.';
+import ControlButtons from '.';
 
 export default {
     /* 👇 The title prop is optional.
@@ -16,12 +15,12 @@ export default {
         onClickMinimise: { action: 'onClickMinimise' },
         onClickMaximise: { action: 'onClickMaximise' },
     },
-    component: Controls,
-} as ComponentMeta<typeof Controls>;
+    component: ControlButtons,
+} as ComponentMeta<typeof ControlButtons>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof Controls> = (args) => (
-    <Controls {...args} />
+const Template: ComponentStory<typeof ControlButtons> = (args) => (
+    <ControlButtons {...args} />
 );
 
 // 👇 Each story then reuses that template
@@ -29,11 +28,4 @@ export const Primary = Template.bind({});
 
 Primary.args = {
     disabled: false,
-};
-
-Primary.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTitle('Close'));
-    await userEvent.click(canvas.getByTitle('Minimise'));
-    await userEvent.click(canvas.getByTitle('Maximise'));
 };

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { within, userEvent } from '@storybook/testing-library';
 import NavigarionArrows from '.';
 
 export default {
@@ -30,10 +29,4 @@ export const Primary = Template.bind({});
 Primary.args = {
     disabledLeft: false,
     disabledRight: false,
-};
-
-Primary.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByTestId('left'));
-    await userEvent.click(canvas.getByTestId('right'));
 };

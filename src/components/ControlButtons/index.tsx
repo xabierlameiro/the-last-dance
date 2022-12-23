@@ -10,7 +10,7 @@ type Props = {
     onClickMaximise?: () => Function | void;
 };
 
-const Controls = ({
+const ControlButtons = ({
     disabled,
     withPadding,
     onClickClose,
@@ -26,7 +26,7 @@ const Controls = ({
         >
             <div
                 onClick={onClickClose}
-                aria-label="close"
+                data-testid="close"
                 className={clx(
                     styles.ch_frame_button,
                     styles.ch_frame_button_left
@@ -35,7 +35,7 @@ const Controls = ({
                 <BiX title="Close" />
             </div>
             <div
-                aria-label="minimise"
+                data-testid="minimise"
                 onClick={onClickMinimise}
                 className={clx(
                     styles.ch_frame_button,
@@ -45,7 +45,7 @@ const Controls = ({
                 <BiMinus title="Minimise" />
             </div>
             <div
-                aria-label="maximise"
+                data-testid="maximise"
                 onClick={onClickMaximise}
                 className={clx(
                     styles.ch_frame_button,
@@ -59,4 +59,4 @@ const Controls = ({
     );
 };
 
-export default Controls;
+export default ControlButtons;
