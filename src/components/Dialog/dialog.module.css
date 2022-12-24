@@ -9,9 +9,8 @@
     transform: scale(0);
     background: #fff;
     box-shadow: 0 8px 32px 0 rgb(31 38 135 / 37%);
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
     transition: all 0.3s ease-in;
+    overflow: hidden;
 }
 
 .dialog.open {
@@ -27,18 +26,21 @@
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
 }
-
-@media screen and (max-width: 768px) {
-    .dialog.modalMode {
-        border-radius: 0;
-        border-bottom-left-radius: 10px;
-        border-bottom-right-radius: 10px;
-    }
-}
-
 .dialog.modalMode.open {
     top: 45%;
     transform: translate(-50%, -50%) scale(1);
+}
+
+@media screen and (max-width: 768px) {
+    .dialog.modalMode {
+        width: calc(100% - 20px);
+        height: calc(100% - 20px);
+    }
+    .dialog.modalMode.open {
+        top: 10px;
+        left: 10px;
+        transform: scale(1);
+    }
 }
 
 .padding {
@@ -46,6 +48,6 @@
 }
 
 .body {
-    height: inherit;
-    max-height: inherit;
+    height: 100%;
+    max-height: 100%;
 }
