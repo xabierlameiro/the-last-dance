@@ -28,7 +28,8 @@
         "next": "^13.0.7",
         "next-env": "^1.1.1",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "react-intl": "^6.2.5"
     },
     "devDependencies": {
         "@storybook/addon-essentials": "^7.0.0-beta.12",

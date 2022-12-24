@@ -9,6 +9,7 @@ import NavigationArrows from '@/components/NavigationArrows';
 import SearchInput from '@/components/SearchInput';
 import GridLayoutControl from '@/components/GridLayoutControl';
 import { useDialog } from '@/context/dialog';
+import { useIntl } from 'react-intl';
 
 const meta = {
     title: 'This is the Settings page',
@@ -16,6 +17,7 @@ const meta = {
 
 const Header = () => {
     const { dispatch } = useDialog();
+    const { formatMessage: f } = useIntl();
     const close = () => dispatch({ type: 'close' });
     return (
         <header className={styles.header}>
@@ -25,13 +27,14 @@ const Header = () => {
                 onClickMinimise={close}
             />
             <NavigationArrows />
-            <GridLayoutControl />
-            <SearchInput />
+            <GridLayoutControl routeName={f({ id: 'settings.title' })} />
+            <SearchInput placeHolderText={f({ id: 'settings.search' })} />
         </header>
     );
 };
 
 const Content = () => {
+    const { formatMessage: f } = useIntl();
     return (
         <>
             <div className={styles.content}>
@@ -39,14 +42,14 @@ const Content = () => {
                     alt="TODO change this"
                     img="/avatar.png"
                     name="Xabier Lameiro Cardama"
-                    description="ID of Apple"
+                    description={f({ id: 'settings.desc' })}
                 />
             </div>
             <section className={styles.confg}>
                 <IconWithName
                     alt="TODO change this"
                     icon="/language.jpeg"
-                    name="Language & Region"
+                    name={f({ id: 'settings.lang' })}
                 />
             </section>
         </>

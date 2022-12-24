@@ -33,4 +33,8 @@ export default withMDX({
     images: {
         domains: ['uploads-ssl.webflow.com', 'code.visualstudio.com'],
     },
+    i18n: {
+        locales: ['en', 'es', 'gl'],
+        defaultLocale: 'en',
+    },
 });
