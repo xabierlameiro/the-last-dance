@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './dialog.module.css';
+import { clx } from '@/helpers';
 
 type Props = {
     open?: boolean;
@@ -23,9 +24,12 @@ const Dialog = (props: Props) => {
     return (
         <div
             data-testid="dialog"
-            className={`${styles.dialog} ${withPadding ? styles.padding : ''} ${
-                open ? styles.open : ''
-            } ${modalMode ? styles.modalMode : ''}`}
+            className={clx(
+                styles.dialog,
+                open ? styles.open : '',
+                withPadding ? styles.padding : '',
+                modalMode ? styles.modalMode : ''
+            )}
         >
             <header data-testid="dialog-header">{header()}</header>
             <main className={styles.body} data-testid="dialog-body">

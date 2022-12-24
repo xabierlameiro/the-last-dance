@@ -20,9 +20,10 @@ const ControlButtons = ({
     return (
         <div
             data-testid="controls"
-            className={`${styles.ch_frame_buttons} ${
+            className={clx(
+                styles.ch_frame_buttons,
                 withPadding ? styles.withPadding : ''
-            }`}
+            )}
         >
             <div
                 onClick={onClickClose}

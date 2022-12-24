@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useDialog } from '@/context/dialog';
 import Link from 'next/link';
 import styles from './dock.module.css';
+import { clx } from '@/helpers';
 
 const Dock = () => {
     const { pathname } = useRouter();
@@ -18,9 +19,9 @@ const Dock = () => {
                         <li
                             key={index}
                             onClick={() => dispatch({ type: 'open' })}
-                            className={`${
+                            className={clx(
                                 pathname === link ? styles.selected : ''
-                            }`}
+                            )}
                         >
                             <Link href={link}>
                                 <Icon src={img} alt={alt} />
