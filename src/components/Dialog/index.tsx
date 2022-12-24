@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import styles from './dialog.module.css';
 import { clx } from '@/helpers';
 
@@ -6,9 +6,9 @@ type Props = {
     open?: boolean;
     withPadding?: boolean;
     modalMode?: boolean;
-    header?: () => JSX.Element;
-    body?: () => JSX.Element;
-    footer?: () => JSX.Element;
+    header?: ReactNode;
+    body?: ReactNode;
+    footer?: ReactNode;
 };
 
 const Dialog = (props: Props) => {
@@ -16,9 +16,9 @@ const Dialog = (props: Props) => {
         open,
         withPadding,
         modalMode,
-        header = () => <></>,
-        body = () => <></>,
-        footer = () => <></>,
+        header = <></>,
+        body = <></>,
+        footer = <></>,
     } = props;
 
     return (
@@ -31,11 +31,11 @@ const Dialog = (props: Props) => {
                 modalMode ? styles.modalMode : ''
             )}
         >
-            <header data-testid="dialog-header">{header()}</header>
+            <header data-testid="dialog-header">{header}</header>
             <main className={styles.body} data-testid="dialog-body">
-                {body()}
+                {body}
             </main>
-            <footer data-testid="dialog-footer">{footer()}</footer>
+            <footer data-testid="dialog-footer">{footer}</footer>
         </div>
     );
 };

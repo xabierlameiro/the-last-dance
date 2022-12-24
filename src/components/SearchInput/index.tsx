@@ -19,11 +19,11 @@ const SearchInput = ({
         <input
             type="text"
             data-testid="search-input"
+            value={value}
             onBlur={onBlur}
             onChange={onChange}
             className={styles.input}
             disabled={disabled}
-            value={value}
             placeholder={placeHolderText}
         />
     );

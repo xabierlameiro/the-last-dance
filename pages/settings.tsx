@@ -11,10 +11,6 @@ import GridLayoutControl from '@/components/GridLayoutControl';
 import { useDialog } from '@/context/dialog';
 import { useIntl } from 'react-intl';
 
-const meta = {
-    title: 'This is the Settings page',
-};
-
 const Header = () => {
     const { dispatch } = useDialog();
     const { formatMessage: f } = useIntl();
@@ -39,16 +35,16 @@ const Content = () => {
         <>
             <div className={styles.content}>
                 <Avatar
-                    alt="TODO change this"
                     img="/avatar.png"
                     name="Xabier Lameiro Cardama"
+                    alt={f({ id: 'settings.avatar' })}
                     description={f({ id: 'settings.desc' })}
                 />
             </div>
             <section className={styles.confg}>
                 <IconWithName
-                    alt="TODO change this"
                     icon="/language.jpeg"
+                    alt={f({ id: 'settings.langAlt' })}
                     name={f({ id: 'settings.lang' })}
                 />
             </section>
@@ -57,13 +53,17 @@ const Content = () => {
 };
 
 const Page = () => {
-    const {
-        state: { open },
-    } = useDialog();
+    const { formatMessage: f } = useIntl();
+    const { open } = useDialog();
 
     return (
-        <Layout meta={meta}>
-            <Dialog body={Content} header={Header} open={open} modalMode />
+        <Layout meta={{ title: f({ id: 'settings.seo.title' }) }}>
+            <Dialog
+                body={<Content />}
+                header={<Header />}
+                open={open}
+                modalMode
+            />
         </Layout>
     );
 };

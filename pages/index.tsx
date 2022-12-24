@@ -5,22 +5,18 @@ import VisibilityManager from '@/components/VisibilityManager';
 import Layout from '@/layout';
 import Dialog from '@/components/Dialog';
 import { useDialog } from '@/context/dialog';
+import { useIntl } from 'react-intl';
 
 const Page = () => {
-    const {
-        state: { open },
-    } = useDialog();
-
-    const meta = {
-        title: "This is the Xabier's portfolio",
-    };
+    const { open } = useDialog();
+    const { formatMessage: f } = useIntl();
 
     return (
-        <Layout meta={meta}>
+        <Layout meta={{ title: f({ id: 'home.seo.title' }) }}>
             <Dialog
                 open={open}
                 modalMode
-                body={() => (
+                body={
                     <>
                         <VisibilityManager hideOnDesktop hideOnTablet>
                             <CVMobile />
@@ -29,7 +25,7 @@ const Page = () => {
                             <CVDesktop />
                         </VisibilityManager>
                     </>
-                )}
+                }
             ></Dialog>
         </Layout>
     );

@@ -57,7 +57,7 @@ const useDialog = () => {
         dispatch(context.state, context.dispatch);
     };
 
-    return { ...context, dialog };
+    return { ...context.state, dispatch: context.dispatch, dialog };
 };
 
 export { DialogProvider, useDialog };
