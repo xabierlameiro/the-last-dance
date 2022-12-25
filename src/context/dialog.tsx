@@ -3,14 +3,16 @@ type ContextProviderProps = { children: React.ReactNode };
 type StateContextType = { state: State; dispatch: Dispatch } | undefined;
 type Dispatch = (action: Action) => void;
 type Action = {
-    type: 'alternate' | 'open' | 'close';
+    type: 'alternate' | 'open' | 'close' | 'toggleLang';
 };
 type State = {
     open: boolean;
+    lang: boolean;
 };
 
 const defaultValues = {
     open: true,
+    lang: false,
 };
 
 const DialogStateContext = React.createContext<StateContextType>(undefined);
@@ -32,6 +34,12 @@ const dialogReducer = (state: State, action: Action) => {
                 ...state,
                 open: false,
             };
+        case 'toggleLang':
+            return {
+                ...state,
+                lang: !state.lang,
+            };
+
         default:
             throw new Error(`Unknown action type: ${action.type}`);
     }

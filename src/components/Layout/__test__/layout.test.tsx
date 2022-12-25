@@ -2,6 +2,13 @@ import { render, screen } from '@/test';
 import Layout from '@/layout';
 import { DialogProvider } from '@/context/dialog';
 
+// mocking next-intl
+jest.mock('react-intl', () => ({
+    useIntl: () => ({
+        formatMessage: jest.fn(),
+    }),
+}));
+
 jest.mock('next/router', () => ({
     useRouter() {
         return {

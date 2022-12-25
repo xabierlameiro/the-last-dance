@@ -23,5 +23,5 @@ Primary.args = {
     open: true,
     modalMode: true,
     withPadding: true,
-    header: () => <ControlButtons />,
+    header: <ControlButtons />,
 };
