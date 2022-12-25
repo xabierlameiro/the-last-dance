@@ -25,34 +25,3 @@
         grid-template-columns: 72px 78px 30px 1fr;
     }
 }
-
-.lang_container {
-    background-color: lightgrey;
-    border-radius: 5px;
-    width: inherit;
-    height: calc(100% - 250px);
-    margin: 0 20px 20px;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-}
-
-.lang_label {
-    font-size: 13px;
-    padding-bottom: 5px;
-}
-.lang_select {
-    width: 200px;
-    height: 400px;
-    overflow: auto;
-    font-size: 13px;
-    outline: none;
-}
-.lang_select option {
-    outline: none;
-    padding: 10px;
-}
-
-.lang_select option:checked {
-    background-color: lightskyblue;
-}

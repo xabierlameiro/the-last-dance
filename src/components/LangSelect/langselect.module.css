@@ -1,0 +1,30 @@
+.lang_container {
+    background-color: lightgrey;
+    border-radius: 5px;
+    width: inherit;
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.lang_label {
+    font-size: 13px;
+    padding-bottom: 5px;
+}
+.lang_select {
+    width: 200px;
+    height: 100%;
+    overflow: auto;
+    font-size: 13px;
+    outline: none;
+    height: 360px;
+}
+.lang_select option {
+    outline: none;
+    padding: 10px;
+}
+
+.lang_select option:checked {
+    background-color: lightskyblue;
+}

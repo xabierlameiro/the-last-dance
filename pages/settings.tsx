@@ -8,10 +8,9 @@ import ControlButtons from '@/components/ControlButtons';
 import NavigationArrows from '@/components/NavigationArrows';
 import SearchInput from '@/components/SearchInput';
 import GridLayoutControl from '@/components/GridLayoutControl';
+import LangeSelect from '@/components/LangSelect';
 import { useDialog } from '@/context/dialog';
 import { useIntl } from 'react-intl';
-import { useRouter } from 'next/router';
-import { messages } from '../src/intl/translations';
 
 const Header = () => {
     const { lang, dispatch } = useDialog();
@@ -39,7 +38,6 @@ const Header = () => {
 const Content = () => {
     const { formatMessage: f } = useIntl();
     const { lang, dispatch } = useDialog();
-    const router = useRouter();
 
     if (lang)
         return (
@@ -51,34 +49,7 @@ const Content = () => {
                         alt={f({ id: 'settings.langAlt' })}
                         name={f({ id: 'settings.lang.description' })}
                     />
-                </div>
-                <div className={styles.lang_container}>
-                    <label className={styles.lang_label} htmlFor="lang">
-                        {f({ id: 'settings.lang.preferred' })}
-                    </label>
-                    <select
-                        id="lang"
-                        name="lang"
-                        className={styles.lang_select}
-                        size={Object.keys(messages).length}
-                        onChange={(e) => {
-                            router.push(router.pathname, router.pathname, {
-                                locale: e.target.value,
-                            });
-                        }}
-                    >
-                        {Object.entries(messages).map(([key, value]) => {
-                            return (
-                                <option
-                                    key={key}
-                                    value={key}
-                                    selected={router.locale === key}
-                                >
-                                    {value.language}
-                                </option>
-                            );
-                        })}
-                    </select>
+                    <LangeSelect />
                 </div>
             </>
         );
