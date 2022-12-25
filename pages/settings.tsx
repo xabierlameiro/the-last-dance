@@ -1,16 +1,18 @@
 import React from 'react';
 import styles from '@/styles/settings.module.css';
-import Layout from '@/layout';
-import Dialog from '@/components/Dialog';
-import Avatar from '@/components/Avatar';
-import IconWithName from '@/components/IconWithName';
-import ControlButtons from '@/components/ControlButtons';
-import NavigationArrows from '@/components/NavigationArrows';
-import SearchInput from '@/components/SearchInput';
-import GridLayoutControl from '@/components/GridLayoutControl';
-import LangeSelect from '@/components/LangSelect';
-import { useDialog } from '@/context/dialog';
 import { useIntl } from 'react-intl';
+import { useDialog } from '@/context/dialog';
+import {
+    Layout,
+    Avatar,
+    Dialog,
+    LangeSelect,
+    SearchInput,
+    IconWithName,
+    ControlButtons,
+    NavigationArrows,
+    GridLayoutControl,
+} from '@/components';
 
 const Header = () => {
     const { lang, dispatch } = useDialog();

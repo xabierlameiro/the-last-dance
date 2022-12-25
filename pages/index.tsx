@@ -1,9 +1,7 @@
 import * as React from 'react';
 import CVMobile from '@/mdx/cv-mobile.mdx';
 import CVDesktop from '@/mdx/cv.mdx';
-import VisibilityManager from '@/components/VisibilityManager';
-import Layout from '@/layout';
-import Dialog from '@/components/Dialog';
+import { Layout, Dialog, VisibilityManager } from '@/components';
 import { useDialog } from '@/context/dialog';
 import { useIntl } from 'react-intl';
 
