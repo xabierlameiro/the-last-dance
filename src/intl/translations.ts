@@ -1,5 +1,6 @@
 export const messages = {
     en: {
+        'blog.title': 'This is the blog page',
         language: 'English',
         'home.seo.title': 'This is the Xabier Lameiro landing page',
         'settings.seo.title':
@@ -17,6 +18,7 @@ export const messages = {
         'background.image.alt': 'This is the background image',
     },
     es: {
+        'blog.title': 'Esta es la página de blog',
         language: 'Español',
         'home.seo.title': 'Esta es la página de aterrizaje de Xabier Lameiro',
         'settings.seo.title':
@@ -34,6 +36,7 @@ export const messages = {
         'background.image.alt': 'Esta es la imagen de fondo',
     },
     gl: {
+        'blog.title': 'Esta é a páxina de blog',
         language: 'Galego',
         'home.seo.title': 'Esta é a páxina de aterrizaxe de Xabier Lameiro',
         'settings.seo.title':
