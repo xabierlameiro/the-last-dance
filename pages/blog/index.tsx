@@ -1,7 +1,7 @@
 import Layout from '@/layout';
 import Dialog from '@/components/Dialog';
 import React from 'react';
-import { getAllPosts } from 'src/api';
+import { getPostsByLocale } from '@/helpers/fileReader';
 import { useIntl } from 'react-intl';
 import Link from 'next/link';
 
@@ -53,9 +53,7 @@ const Page = ({ posts }: any) => {
 };
 
 export const getStaticProps = async ({ locale }: any) => {
-    const posts = await getAllPosts().filter(
-        (item: any) => item.meta.locale === locale
-    );
+    const posts = await getPostsByLocale(locale);
     return {
         props: {
             posts,

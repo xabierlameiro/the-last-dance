@@ -1,5 +1,5 @@
 import { MDXRemote } from 'next-mdx-remote';
-import { getPostBySlug, getAllPosts } from '../../src/api';
+import { getPostBySlug, getAllPosts } from '@/helpers/fileReader';
 import { serialize } from 'next-mdx-remote/serialize';
 
 const PostPage = ({ post }: any) => {
