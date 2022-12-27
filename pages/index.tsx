@@ -1,6 +1,6 @@
 import * as React from 'react';
-import CVMobile from '@/mdx/cv-mobile.mdx';
-import CVDesktop from '@/mdx/cv.mdx';
+import CVMobile from '@/mdx/home/cv-mobile.mdx';
+import CVDesktop from '@/mdx/home/cv.mdx';
 import { Layout, Dialog, VisibilityManager } from '@/components';
 import { useDialog } from '@/context/dialog';
 import { useIntl } from 'react-intl';
