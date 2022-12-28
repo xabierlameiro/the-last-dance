@@ -13,6 +13,7 @@ export const serializePath = (route: string, fileName: string) => {
         mdxOptions: {
             remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
             useDynamicImport: true,
+            development: false,
         },
     });
 };
@@ -22,5 +23,6 @@ export const serialize = (mdx: string) =>
         mdxOptions: {
             remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
             useDynamicImport: true,
+            development: false,
         },
     });
