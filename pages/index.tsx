@@ -1,32 +1,55 @@
 import * as React from 'react';
-import CVMobile from '@/mdx/home/cv-mobile.mdx';
-import CVDesktop from '@/mdx/home/cv.mdx';
 import { Layout, Dialog, VisibilityManager } from '@/components';
-import { useDialog } from '@/context/dialog';
 import { useIntl } from 'react-intl';
+import { MDXRemote } from 'next-mdx-remote';
+import { components } from '@/helpers/mdxjs';
+import { serializePath } from '@/helpers/mdx';
+import { useDialog } from '@/context/dialog';
 
-const Page = () => {
+const Page = ({ content }: any) => {
     const { open } = useDialog();
     const { formatMessage: f } = useIntl();
 
     return (
         <Layout meta={{ title: f({ id: 'home.seo.title' }) }}>
             <Dialog
-                open={open}
                 modalMode
+                open={open}
                 body={
                     <>
                         <VisibilityManager hideOnDesktop hideOnTablet>
-                            <CVMobile />
+                            <MDXRemote
+                                {...content.mobile}
+                                components={components}
+                            />
                         </VisibilityManager>
                         <VisibilityManager hideOnMobile>
-                            <CVDesktop />
+                            <MDXRemote
+                                {...content.desktop}
+                                components={components}
+                            />
                         </VisibilityManager>
                     </>
                 }
             ></Dialog>
         </Layout>
     );
+};
+
+export const getStaticProps = async (params: any) => {
+    const { locale } = params;
+    const path = 'src/mdx/home';
+    const desktop = await serializePath(path, `cv.${locale}.mdx`);
+    const mobile = await serializePath(path, `cv-mobile.${locale}.mdx`);
+
+    return {
+        props: {
+            content: {
+                desktop: desktop,
+                mobile: mobile,
+            },
+        },
+    };
 };
 
 export default Page;

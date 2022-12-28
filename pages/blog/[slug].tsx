@@ -1,12 +1,21 @@
 import { MDXRemote } from 'next-mdx-remote';
+import { useDialog } from '@/context/dialog';
+import { Layout, Dialog } from '@/components';
 import { getPostBySlug, getAllPosts } from '@/helpers/fileReader';
-import { serialize } from 'next-mdx-remote/serialize';
+import { components } from '@/helpers/mdxjs';
+import { serialize } from '@/helpers/mdx';
 
 const PostPage = ({ post }: any) => {
+    const { open } = useDialog();
+
     return (
-        <div>
-            <MDXRemote {...post.content} />
-        </div>
+        <Layout meta={{ title: 'blog' }}>
+            <Dialog
+                modalMode
+                open={open}
+                body={<MDXRemote {...post.content} components={components} />}
+            ></Dialog>
+        </Layout>
     );
 };
 
