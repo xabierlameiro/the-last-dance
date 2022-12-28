@@ -9,7 +9,7 @@ const customRender = (ui, options) =>
 
 // hide error messages about act() being unsupported in production build
 const ignoredErrors = [
-    /act(...) is not supported in production builds of React, and might not behave as expected./,
+    /act(...) is not supported in production builds of React./,
 ];
 const consoleError = global.console.error;
 global.console.error = (...args) => {
