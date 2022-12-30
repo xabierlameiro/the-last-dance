@@ -1,0 +1,17 @@
+.header {
+    display: grid;
+    background-color: blanchedalmond;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    padding: 5px 10px;
+}
+.header div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+.header div svg {
+    color: deepskyblue;
+    font-size: 24px;
+}

@@ -3,6 +3,7 @@ import styles from './dialog.module.css';
 import { clx } from '@/helpers';
 
 type Props = {
+    dialogRef?: React.RefObject<HTMLDivElement>;
     open?: boolean;
     withPadding?: boolean;
     modalMode?: boolean;
@@ -13,6 +14,7 @@ type Props = {
 
 const Dialog = (props: Props) => {
     const {
+        dialogRef,
         open,
         withPadding,
         modalMode,
@@ -23,6 +25,7 @@ const Dialog = (props: Props) => {
 
     return (
         <div
+            ref={dialogRef}
             data-testid="dialog"
             className={clx(
                 styles.dialog,
