@@ -20,7 +20,13 @@ const Dock = () => {
                             key={index}
                             onClick={() => dispatch({ type: 'open' })}
                             className={clx(
-                                pathname === link ? styles.selected : ''
+                                pathname === link ||
+                                    pathname.includes(
+                                        // @ts-ignore
+                                        link[locale]?.split('/')[1]
+                                    )
+                                    ? styles.selected
+                                    : ''
                             )}
                         >
                             {/* @ts-ignore */}

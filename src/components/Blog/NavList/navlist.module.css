@@ -1,0 +1,43 @@
+.navTitle {
+    font-size: 12px;
+    font-weight: 100;
+    text-indent: 3px;
+    padding-bottom: 5px;
+}
+.postList {
+    list-style: none;
+    padding-bottom: 20px;
+}
+
+.postList li a {
+    display: grid;
+    grid-template-columns: auto 1fr 20px;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    padding: 5px;
+}
+
+.postList li svg {
+    font-size: 16px;
+    color: steelblue;
+}
+
+.selected .number,
+.postList .selected svg {
+    color: #fff;
+}
+
+.selected {
+    background-color: deepskyblue;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.number {
+    font-size: 12px;
+    color: grey;
+    text-align: right;
+}
+.tag {
+}

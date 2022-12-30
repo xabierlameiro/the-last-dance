@@ -4,95 +4,22 @@ import { Layout, Dialog, ControlButtons } from '@/components';
 import {
     getPostBySlug,
     getAllPosts,
-    getAllTags,
     getAllCategories,
     getPostsByLocaleAndCategory,
 } from '@/helpers/fileReader';
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
-import { BsFolder2, BsTag } from 'react-icons/bs';
-import { SlList, SlGrid } from 'react-icons/sl';
-import { IoTrashOutline } from 'react-icons/io5';
-import styles from '@/styles/blog.module.css';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
+import styles from '@/styles/blog.module.css';
 
-const PostPage = ({ post, tags, categories, posts, ...rest }: any) => {
+const PostPage = ({ post, tags, categories, posts }: any) => {
     const {
         query: { category, slug },
     } = useRouter();
     const { open, dispatch } = useDialog();
     const close = () => dispatch({ type: 'close' });
 
-    const PostList = () => {
-        return (
-            <ul>
-                {posts.map((item: any, index: number) => (
-                    <li
-                        key={index}
-                        className={
-                            slug == item.meta.slug ? styles.selected : ''
-                        }
-                    >
-                        <Link href={`/blog/${category}/${item.meta.slug}`}>
-                            <div className={styles.title}>
-                                {item.meta.title}
-                            </div>
-                            <div className={styles.excerpt}>
-                                {item.meta.excerpt}
-                            </div>
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-        );
-    };
-
-    const CategoriesList = () => {
-        return (
-            <ul className={styles.postList}>
-                {categories.map((item: any, index: number) => (
-                    <li key={index}>
-                        <Link
-                            href={item.href}
-                            className={
-                                category == item.category.toLowerCase()
-                                    ? styles.selected
-                                    : ''
-                            }
-                        >
-                            <BsFolder2 />
-                            <div className={styles.tag}>{item.category}</div>
-                            <div className={styles.number}>{item.total}</div>
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-        );
-    };
-
-    const TagList = () => {
-        return (
-            <ul className={styles.postList}>
-                {tags.map((item: any, index: number) => (
-                    <li key={index}>
-                        <Link
-                            href={item.href}
-                            className={
-                                category == item.tag.toLowerCase()
-                                    ? styles.selected
-                                    : ''
-                            }
-                        >
-                            <BsTag />
-                            <div className={styles.tag}>{item.tag}</div>
-                            <div className={styles.number}>{item.total}</div>
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-        );
-    };
     return (
         <Layout meta={{ title: 'blog' }}>
             <Dialog
@@ -105,27 +32,32 @@ const PostPage = ({ post, tags, categories, posts, ...rest }: any) => {
                                 onClickMinimise={close}
                             />
                             <div>
-                                <h2 className={styles.navTitle}>Topics</h2>
-                                <CategoriesList />
-                                <h2 className={styles.navTitle}>Tags</h2>
-                                <TagList />
+                                <NavList
+                                    title="Topics"
+                                    list={categories}
+                                    category={category}
+                                    isCategory
+                                />
+                                <NavList
+                                    title="Tags"
+                                    list={tags}
+                                    category={category}
+                                />
                             </div>
                         </nav>
                         <nav className={styles.secondNav}>
-                            <div className={styles.controls}>
-                                <SlList size={18} />
-                                <SlGrid size={14} />
-                                <IoTrashOutline size={19} />
-                            </div>
+                            <AsidePanel />
                             <div className={styles.postLinks}>
-                                <PostList />
+                                <PostList
+                                    posts={posts}
+                                    slug={slug}
+                                    category={category}
+                                />
                             </div>
                         </nav>
                         <article className={styles.article}>
-                            <div className={styles.controls}>
-                                <h1>hola</h1>
-                            </div>
-                            <div className={styles.postLinks}>
+                            <ArticlePanel />
+                            <div className={styles.body}>
                                 <MDXRemote
                                     {...post.content}
                                     components={components}
@@ -146,8 +78,7 @@ export const getStaticProps = async (data: any) => {
     } = data;
     const post = await getPostBySlug(data);
     const mdxSource = await serialize(post.content);
-    const tags = await getAllTags(locale);
-    const categories = await getAllCategories(locale);
+    const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);
 
     return {

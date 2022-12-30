@@ -77,6 +77,18 @@ export const getPostsByLocaleAndCategory = (
     );
 };
 
+// Get all posts by tag and locale
+export const getPostsByTag = (tag: string, locale: string) => {
+    const posts = getPostsByLocale(locale);
+    return posts.filter((post) => post.meta.tags.includes(tag));
+};
+
+// Get all posts by category and locale
+export const getPostsByCategory = (category: string, locale: string) => {
+    const posts = getPostsByLocale(locale);
+    return posts.filter((post) => post.meta.category === category);
+};
+
 // Get all diferent tags from all posts by locale in only one array
 export const getAllTags = (locale: string) => {
     const posts = getPostsByLocale(locale);
@@ -91,27 +103,19 @@ export const getAllTags = (locale: string) => {
     });
 };
 
-// Get all posts by tag and locale
-export const getPostsByTag = (tag: string, locale: string) => {
-    const posts = getPostsByLocale(locale);
-    return posts.filter((post) => post.meta.tags.includes(tag));
-};
-
-// Get all posts by category and locale
-export const getPostsByCategory = (category: string, locale: string) => {
-    const posts = getPostsByLocale(locale);
-    return posts.filter((post) => post.meta.category === category);
-};
-
-// Get all categories from all posts by locale in only one array
+// Get all categories / tags from all posts by locale in only one array
 export const getAllCategories = (locale: string) => {
     const posts = getPostsByLocale(locale);
     const categories = posts.map((post) => post.meta.category);
-    return [...new Set(categories)].map((category) => {
-        return {
-            category,
-            total: categories.filter((c) => c === category).length,
-            href: `/blog/${category.toLowerCase()}/${posts[0].meta.slug}`,
-        };
-    });
+    const tags = getAllTags(locale);
+    return {
+        categories: [...new Set(categories)].map((category) => {
+            return {
+                category,
+                total: categories.filter((c) => c === category).length,
+                href: `/blog/${category.toLowerCase()}/${posts[0].meta.slug}`,
+            };
+        }),
+        tags,
+    };
 };

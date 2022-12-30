@@ -1,0 +1,19 @@
+.articleControls {
+    border-bottom: 1px solid lightgrey;
+    display: grid;
+    padding: 0 20px;
+    grid-template-columns: 1fr repeat(2, max-content) 1fr repeat(5, max-content) 220px;
+    align-items: center;
+    gap: 20px;
+}
+.articleControls svg {
+    color: gray;
+    font-size: 21.5px;
+    stroke-width: 0%;
+}
+.articleControls input {
+    width: 100%;
+}
+.rotate {
+    transform: rotate(-50deg);
+}
