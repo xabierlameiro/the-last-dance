@@ -8,7 +8,7 @@ import styles from './dock.module.css';
 import { clx } from '@/helpers';
 
 const Dock = () => {
-    const { pathname } = useRouter();
+    const { pathname, locale } = useRouter();
     const { dispatch } = useDialog();
 
     return (
@@ -23,7 +23,8 @@ const Dock = () => {
                                 pathname === link ? styles.selected : ''
                             )}
                         >
-                            <Link href={link}>
+                            {/* @ts-ignore */}
+                            <Link href={link?.[locale] ?? link}>
                                 <Icon src={img} alt={alt} />
                             </Link>
                         </li>

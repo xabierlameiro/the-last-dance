@@ -1,7 +1,7 @@
 type Item = {
     img: string;
     alt: string;
-    link: string;
+    link: { en: string; es: string; gl: string } | string;
 };
 
 export const menu: Array<Item> = [
@@ -13,7 +13,11 @@ export const menu: Array<Item> = [
     {
         img: 'https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c849ec3735b52cef9_notes.png',
         alt: 'Notes icon',
-        link: '/blog',
+        link: {
+            en: '/blog/react/hello-world',
+            es: '/blog/react/hola-mundo',
+            gl: '/blog/react/ola-mundo',
+        },
     },
     {
         img: 'https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853ff487808618142bfa_terminal.png',

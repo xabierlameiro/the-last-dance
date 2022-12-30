@@ -5,7 +5,7 @@ import { DialogProvider } from '@/context/dialog';
 // mocking next-intl
 jest.mock('react-intl', () => ({
     useIntl: () => ({
-        formatMessage: jest.fn(),
+        formatMessage: (e: string) => e,
     }),
 }));
 

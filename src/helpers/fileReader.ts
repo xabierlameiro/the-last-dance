@@ -36,6 +36,9 @@ export const getPostBySlug = (slug: string) => {
             slug: data.slug,
             title: data.title,
             locale: data.locale,
+            category: data.category,
+            tags: data.tags,
+            excerpt: data.excerpt,
         },
     };
 };
@@ -59,4 +62,56 @@ export const getAllPosts = () => {
 export const getPostsByLocale = (locale: string) => {
     const posts = getAllPosts();
     return posts.filter((post) => post.meta.locale === locale);
+};
+
+// Get all posts by locale and category
+export const getPostsByLocaleAndCategory = (
+    locale: string,
+    category: string
+) => {
+    const posts = getPostsByLocale(locale);
+    return posts.filter(
+        (post) =>
+            post.meta.category.toLowerCase() === category?.toLowerCase() ||
+            post.meta.tags.includes(category)
+    );
+};
+
+// Get all diferent tags from all posts by locale in only one array
+export const getAllTags = (locale: string) => {
+    const posts = getPostsByLocale(locale);
+    const tags = posts.map((post) => post.meta.tags);
+    return [...new Set(tags.flat())].map((tag) => {
+        const postsBytag = getPostsByTag(tag, locale);
+        return {
+            tag,
+            total: tags.flat().filter((t) => t === tag).length,
+            href: `/blog/${tag.toLowerCase()}/${postsBytag[0].meta.slug}`,
+        };
+    });
+};
+
+// Get all posts by tag and locale
+export const getPostsByTag = (tag: string, locale: string) => {
+    const posts = getPostsByLocale(locale);
+    return posts.filter((post) => post.meta.tags.includes(tag));
+};
+
+// Get all posts by category and locale
+export const getPostsByCategory = (category: string, locale: string) => {
+    const posts = getPostsByLocale(locale);
+    return posts.filter((post) => post.meta.category === category);
+};
+
+// Get all categories from all posts by locale in only one array
+export const getAllCategories = (locale: string) => {
+    const posts = getPostsByLocale(locale);
+    const categories = posts.map((post) => post.meta.category);
+    return [...new Set(categories)].map((category) => {
+        return {
+            category,
+            total: categories.filter((c) => c === category).length,
+            href: `/blog/${category.toLowerCase()}/${posts[0].meta.slug}`,
+        };
+    });
 };

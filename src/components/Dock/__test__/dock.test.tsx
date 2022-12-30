@@ -5,7 +5,7 @@ import { DialogProvider } from '@/context/dialog';
 jest.mock('next/router', () => ({
     useRouter() {
         return {
-            pathname: '/blog',
+            pathname: '/',
         };
     },
 }));
