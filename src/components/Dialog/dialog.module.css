@@ -20,7 +20,7 @@
 
 .dialog.modalMode {
     width: 670px;
-    height: max-content;
+    height: 600px;
     border-radius: 10px;
     top: 95%;
     left: 50%;
