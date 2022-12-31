@@ -60,5 +60,37 @@
 }
 
 .body {
+    padding: 20px 60px;
+    height: calc(100vh - 120px);
+    overflow: scroll;
+}
+
+.body blockquote {
+    border-left: 5px solid dodgerblue;
+    padding: 10px;
+    margin: 10px 0;
+}
+.body a {
+    color: dodgerblue;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.body ul {
+    list-style: upper-roman;
+    margin-left: 10px;
+    padding: 10px;
+}
+
+.body p {
+    max-width: 1200px;
+}
+
+.body h1 {
+    text-align: center;
+    padding: 20px;
+}
+
+.body h2 {
     padding: 20px;
 }

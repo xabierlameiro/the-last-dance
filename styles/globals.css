@@ -113,3 +113,16 @@ a {
 code > .ch-code-scroll-content > div {
     transform: initial !important;
 }
+
+.ch-code-scroll-parent {
+    padding-right: 20px !important;
+}
+
+#__next .ch-codeblock,
+#__next .ch-codegroup {
+    margin: 0;
+}
+
+#__next .ch-code-scroll-parent {
+    font-size: 12px;
+}
