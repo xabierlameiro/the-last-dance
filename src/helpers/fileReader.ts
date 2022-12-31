@@ -30,9 +30,11 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
 // Return post content and meta data by slug
 export const getPostBySlug = (slug: string) => {
     const { data, content } = findPostBySlug(slug);
+    const readTime = readingTime(content);
     return {
         content,
         meta: {
+            readTime,
             slug: data.slug,
             title: data.title,
             locale: data.locale,
@@ -118,4 +120,20 @@ export const getAllCategories = (locale: string) => {
         }),
         tags,
     };
+};
+
+// Function to count words in a post but discard code blocks
+export const countWords = (content: string) => {
+    const words = content.split(/\s/g);
+    const codeBlocks = content.match(/```(.|\n)*?```/g) || [];
+    const codeBlocksWords = codeBlocks.map((block) => block.split(/\s/g));
+    const wordsInCodeBlocks = codeBlocksWords.flat().length;
+    return words.length - wordsInCodeBlocks;
+};
+
+// Function to calculate reading time of a post
+export const readingTime = (content: string) => {
+    const wordsPerMinute = 200;
+    const numberOfWords = countWords(content);
+    return Math.ceil(numberOfWords / wordsPerMinute);
 };

@@ -1,16 +1,24 @@
-import { RiEditBoxLine } from 'react-icons/ri';
 import { MdSortByAlpha, MdAddLink, MdOutlineChecklist } from 'react-icons/md';
-import { RxTable, RxUpload } from 'react-icons/rx';
+import { RxTable, RxUpload, RxStopwatch } from 'react-icons/rx';
 import { BiPhotoAlbum } from 'react-icons/bi';
 import { BsLock } from 'react-icons/bs';
 import { CgProfile } from 'react-icons/cg';
 import { SearchInput } from '@/components';
 import styles from './panel.module.css';
+import { useIntl } from 'react-intl';
 
-const ArticlePanel = () => {
+const ArticlePanel = ({ post }: any) => {
+    const { readTime } = post.meta;
+    const { formatMessage: f } = useIntl();
     return (
         <div className={styles.articleControls}>
-            <RiEditBoxLine size={20} />
+            <div className={styles.readTime}>
+                <RxStopwatch size={20} />
+                {f(
+                    { id: 'blog.readtime', description: 'read time' },
+                    { readTime }
+                )}
+            </div>
             <MdSortByAlpha />
             <MdOutlineChecklist />
             <RxTable size={18} />

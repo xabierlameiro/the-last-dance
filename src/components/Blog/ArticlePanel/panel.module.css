@@ -17,3 +17,11 @@
 .rotate {
     transform: rotate(-50deg);
 }
+
+.readTime {
+    font-size: 13px;
+    color: gray;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

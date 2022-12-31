@@ -1,6 +1,9 @@
 export const messages = {
     en: {
         'blog.title': 'This is the blog page',
+        'blog.categories': 'Topics',
+        'blog.readtime': `{readTime} minutes of reading time`,
+        'blog.tags': 'Tags',
         language: 'English',
         'home.seo.title': 'This is the Xabier Lameiro landing page',
         'settings.seo.title':
@@ -19,6 +22,9 @@ export const messages = {
     },
     es: {
         'blog.title': 'Esta es la página de blog',
+        'blog.categories': 'Temas',
+        'blog.tags': 'Etiquetas',
+        'blog.readtime': '{readTime} minutos de tiempo de lectura',
         language: 'Español',
         'home.seo.title': 'Esta es la página de aterrizaje de Xabier Lameiro',
         'settings.seo.title':
@@ -37,6 +43,9 @@ export const messages = {
     },
     gl: {
         'blog.title': 'Esta é a páxina de blog',
+        'blog.categories': 'Temas',
+        'blog.tags': 'Etiquetas',
+        'blog.readtime': '{readTime} minutos de tempo de lectura',
         language: 'Galego',
         'home.seo.title': 'Esta é a páxina de aterrizaxe de Xabier Lameiro',
         'settings.seo.title':

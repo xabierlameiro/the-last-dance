@@ -10,6 +10,7 @@ import {
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
 import { useRouter } from 'next/router';
+import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
 import styles from '@/styles/blog.module.css';
 
@@ -17,6 +18,7 @@ const PostPage = ({ post, tags, categories, posts }: any) => {
     const {
         query: { category, slug },
     } = useRouter();
+    const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
     const close = () => dispatch({ type: 'close' });
 
@@ -33,13 +35,13 @@ const PostPage = ({ post, tags, categories, posts }: any) => {
                             />
                             <div>
                                 <NavList
-                                    title="Topics"
+                                    title={f({ id: 'blog.categories' })}
                                     list={categories}
                                     category={category}
                                     isCategory
                                 />
                                 <NavList
-                                    title="Tags"
+                                    title={f({ id: 'blog.tags' })}
                                     list={tags}
                                     category={category}
                                 />
@@ -56,7 +58,7 @@ const PostPage = ({ post, tags, categories, posts }: any) => {
                             </div>
                         </nav>
                         <article className={styles.article}>
-                            <ArticlePanel />
+                            <ArticlePanel post={post} />
                             <div className={styles.body}>
                                 <MDXRemote
                                     {...post.content}
