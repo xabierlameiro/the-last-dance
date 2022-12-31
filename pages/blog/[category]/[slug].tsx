@@ -17,13 +17,14 @@ import styles from '@/styles/blog.module.css';
 const PostPage = ({ post, tags, categories, posts }: any) => {
     const {
         query: { category, slug },
+        asPath,
     } = useRouter();
     const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
     const close = () => dispatch({ type: 'close' });
 
     return (
-        <Layout meta={{ title: 'blog' }}>
+        <Layout meta={{ ...post.meta, url: asPath }}>
             <Dialog
                 open={open}
                 body={

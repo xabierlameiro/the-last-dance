@@ -31,16 +31,22 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
 export const getPostBySlug = (slug: string) => {
     const { data, content } = findPostBySlug(slug);
     const readTime = readingTime(content);
+    const numberOfWords = countWords(content);
     return {
         content,
         meta: {
             readTime,
+            numberOfWords,
             slug: data.slug,
             title: data.title,
             locale: data.locale,
             category: data.category,
+            author: data.author,
             tags: data.tags,
             excerpt: data.excerpt,
+            date: data.date,
+            image: data.image,
+            description: data.description,
         },
     };
 };
