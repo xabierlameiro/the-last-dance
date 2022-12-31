@@ -3,7 +3,7 @@ import fs from 'fs';
 import glob from 'glob';
 import matter from 'gray-matter';
 // Path to posts directory
-const POST_PATH = path.join(process.cwd(), 'posts');
+const POST_PATH = path.join(process.cwd(), 'data/blog/posts');
 
 // Find post by slug or file name
 const findPostBySlug = (slug: string | { params: { slug: string } }) => {

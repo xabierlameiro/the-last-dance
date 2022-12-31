@@ -10,7 +10,7 @@ import type { AppProps } from 'next/app';
 
 type locales = 'en' | 'es' | 'gl';
 
-export default function App({ Component, pageProps }: AppProps) {
+const App = ({ Component, pageProps }: AppProps) => {
     const { locale = 'en' } = useRouter();
     return (
         <IntlProvider locale={locale} messages={messages[locale as locales]}>
@@ -20,4 +20,6 @@ export default function App({ Component, pageProps }: AppProps) {
             </DialogProvider>
         </IntlProvider>
     );
-}
+};
+
+export default App;

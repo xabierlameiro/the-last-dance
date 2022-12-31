@@ -38,7 +38,7 @@ const Page = ({ content }: any) => {
 
 export const getStaticProps = async (params: any) => {
     const { locale } = params;
-    const path = 'src/mdx/home';
+    const path = 'data/home';
     const desktop = await serializePath(path, `cv.${locale}.mdx`);
     const mobile = await serializePath(path, `cv-mobile.${locale}.mdx`);
 

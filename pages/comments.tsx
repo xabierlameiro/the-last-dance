@@ -4,7 +4,7 @@ import Dialog from '@/components/Dialog';
 import ControlButtons from '@/components/ControlButtons';
 import { AiFillFolder } from 'react-icons/ai';
 import styles from '@/styles/comments.module.css';
-import Data from '../data/pages/comments/index.mdx';
+import Data from '../data/comments/index.mdx';
 const meta = {
     title: 'This is the Comments page',
 };
