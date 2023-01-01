@@ -9,7 +9,10 @@ const PostList = ({ posts, slug, category }: any) => {
                     key={index}
                     className={slug == item.meta.slug ? styles.selected : ''}
                 >
-                    <Link href={`/blog/${category}/${item.meta.slug}`}>
+                    <Link
+                        href={`/blog/${category}/${item.meta.slug}`}
+                        title={item.meta.title}
+                    >
                         <div className={styles.title}>{item.meta.title}</div>
                         <div className={styles.excerpt}>
                             {item.meta.excerpt}

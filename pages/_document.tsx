@@ -16,7 +16,7 @@ const Document = (props: any) => {
                 <meta name="robots" content="all" />
                 <meta name="googlebot" content="all" />
                 <meta name="google" content="notranslate" />
-                <link rel="icon" href="/favicon.svg" />
+                <link rel="icon" href="/favicon.svg" title="The favicon" />
                 <script
                     type="application/ld+json"
                     key="website-jsonld"

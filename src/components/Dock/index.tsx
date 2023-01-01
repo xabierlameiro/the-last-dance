@@ -30,7 +30,7 @@ const Dock = () => {
                             )}
                         >
                             {/* @ts-ignore */}
-                            <Link href={link?.[locale] ?? link}>
+                            <Link href={link?.[locale] ?? link} title={alt}>
                                 <Icon src={img} alt={alt} />
                             </Link>
                         </li>

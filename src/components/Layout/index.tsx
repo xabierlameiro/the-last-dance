@@ -77,7 +77,7 @@ const Layout = ({ meta, children, isBlog }: Props) => {
                 <meta name="twitter:title" content={title} />
                 <meta name="image" content={image} />
                 <meta property="og:image" content={image} />
-                <link rel="canonical" href={url} />
+                <link rel="canonical" href={url} title="Cannonical url" />
                 {meta?.alternate?.map(({ lang, url }, index) => (
                     <link
                         key={index}
@@ -86,6 +86,7 @@ const Layout = ({ meta, children, isBlog }: Props) => {
                             isNotEng(lang) ? `/${lang}` : ''
                         }/blog/${meta?.category?.toLowerCase()}/${url}`}
                         hrefLang={lang}
+                        title="Alternate url"
                     />
                 ))}
             </Head>
