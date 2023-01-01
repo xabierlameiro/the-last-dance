@@ -33,7 +33,7 @@ const Layout = ({ meta, children }: Props) => {
                 <meta property="og:image" content={meta?.image} />
                 <link
                     rel="canonical"
-                    href={`https://xabierlameiro.com${meta?.url}`}
+                    href={`https://xabierlameiro.com${meta?.url ?? ''}`}
                 />
 
                 {/* <script

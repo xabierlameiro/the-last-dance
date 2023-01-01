@@ -6,7 +6,7 @@ const Document = (props: any) => {
             <Head>
                 <link rel="icon" href="/favicon.svg" />
                 <meta charSet="utf-8" />
-                <meta name="theme-color" content="#000000" />
+                <meta name="theme-color" content="#FFF" />
                 <meta
                     property="og:site_name"
                     content="Xabier Lameiro Cardama"
@@ -19,6 +19,9 @@ const Document = (props: any) => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@xlameiro" />
                 <meta name="twitter:creator" content="@xlameiro" />
+                <meta name="robots" content="all" />
+                <meta name="googlebot" content="all" />
+                <meta name="google" content="notranslate" />
             </Head>
             <body>
                 <Main />
