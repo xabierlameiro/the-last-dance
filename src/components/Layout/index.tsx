@@ -22,7 +22,7 @@ type Props = {
 };
 
 const Layout = ({ meta, children, isBlog }: Props) => {
-    // TODO: Refactor this part
+    // TODO: Refactor this part, split this in other file
 
     const bla = useRouter();
     const { locale: l, pathname } = bla;
