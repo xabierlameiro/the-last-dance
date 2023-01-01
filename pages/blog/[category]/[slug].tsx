@@ -24,7 +24,7 @@ const PostPage = ({ post, tags, categories, posts }: any) => {
     const close = () => dispatch({ type: 'close' });
 
     return (
-        <Layout meta={{ ...post.meta, url: asPath }}>
+        <Layout meta={{ ...post.meta }} isBlog>
             <Dialog
                 open={open}
                 body={

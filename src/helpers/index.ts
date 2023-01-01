@@ -11,3 +11,5 @@ export const clx = (...classes: Array<string | null | undefined>) => {
 
     return classes.join(' ');
 };
+
+export const isNotEng = (locale: string | undefined) => locale !== 'en';
