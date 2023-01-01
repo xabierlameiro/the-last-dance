@@ -11,7 +11,12 @@ const Page = ({ content }: any) => {
     const { formatMessage: f } = useIntl();
 
     return (
-        <Layout meta={{ title: f({ id: 'home.seo.title' }) }}>
+        <Layout
+            meta={{
+                title: f({ id: 'home.seo.title' }),
+                description: f({ id: 'home.seo.description' }),
+            }}
+        >
             <Dialog
                 modalMode
                 open={open}
@@ -39,8 +44,8 @@ const Page = ({ content }: any) => {
 export const getStaticProps = async (params: any) => {
     const { locale } = params;
     const path = 'data/home';
-    const desktop = await serializePath(path, `cv.${locale}.mdx`);
-    const mobile = await serializePath(path, `cv-mobile.${locale}.mdx`);
+    const desktop = await serializePath(path, `${locale}.mdx`);
+    const mobile = await serializePath(path, `mobile.${locale}.mdx`);
 
     return {
         props: {

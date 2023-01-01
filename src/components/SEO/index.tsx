@@ -1,0 +1,101 @@
+import { useRouter } from 'next/router';
+import { website_url, author as auth } from '@/constants/site';
+import { getLang, cleanTrailingSlash } from '@/helpers';
+import Head from 'next/head';
+
+type Props = {
+    isBlog?: boolean;
+    meta?: {
+        title: string;
+        author?: string;
+        description?: string;
+        image?: string;
+        category?: string;
+        alternate?: Array<{ lang: string; url: string }>;
+        slug?: string;
+        url?: string;
+    };
+};
+
+const SEO = ({ meta, isBlog }: Props) => {
+    const { locale: l, pathname: path } = useRouter();
+    const category = meta?.category?.toLowerCase();
+    const url = isBlog
+        ? `${website_url}${getLang(l)}/blog/${category}/${meta?.slug}`
+        : `${website_url}${getLang(l)}${cleanTrailingSlash(path)}`;
+    const title = meta?.title;
+    const author = meta?.author || auth;
+    const description = meta?.description;
+    const image = meta?.image;
+
+    return (
+        <Head>
+            {isBlog ? (
+                <script
+                    type="application/ld+json"
+                    key="item-jsonld"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            '@context': 'https://schema.org',
+                            '@type': 'Article',
+                            headline: title,
+                            description: description,
+                            url: url,
+                            image: [`${website_url}/${image}`],
+                            datePublished: new Date().toISOString(),
+                            dateModified: new Date().toISOString(),
+                            author: [
+                                {
+                                    '@type': 'Person',
+                                    name: author,
+                                    url: website_url,
+                                },
+                            ],
+                        }),
+                    }}
+                />
+            ) : (
+                <>
+                    <link
+                        hrefLang="es"
+                        rel="alternate"
+                        href={`${website_url}/es${cleanTrailingSlash(path)}`}
+                    />
+                    <link
+                        hrefLang="gl"
+                        rel="alternate"
+                        href={`${website_url}/gl${cleanTrailingSlash(path)}`}
+                    />
+                </>
+            )}
+
+            <title>{title}</title>
+            <meta name="author" content={author} />
+            <meta name="description" content={description} />
+            <meta property="og:description" content={description} />
+            <meta name="twitter:description" content={description} />
+            <meta property="og:title" content={title} />
+            <meta name="twitter:title" content={title} />
+            <meta name="image" content={image} />
+            <meta property="og:image" content={image} />
+            <link
+                rel="canonical"
+                href={`${website_url}${cleanTrailingSlash(path)}`}
+                title="Canonical url"
+            />
+            {meta?.alternate?.map(({ lang, url }, index) => (
+                <link
+                    key={index}
+                    rel="alternate"
+                    href={`${website_url}${getLang(
+                        lang
+                    )}/blog/${category}/${url}`}
+                    hrefLang={lang}
+                    title="Alternate url"
+                />
+            ))}
+        </Head>
+    );
+};
+
+export default SEO;

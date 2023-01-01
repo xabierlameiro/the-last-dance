@@ -13,3 +13,8 @@ export const clx = (...classes: Array<string | null | undefined>) => {
 };
 
 export const isNotEng = (locale: string | undefined) => locale !== 'en';
+
+export const cleanTrailingSlash = (path: string) => (path !== '/' ? path : '');
+
+export const getLang = (lang: string | undefined) =>
+    isNotEng(lang) ? `/${lang}` : '';

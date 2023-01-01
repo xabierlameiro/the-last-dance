@@ -5,7 +5,10 @@ export const messages = {
         'blog.readtime': `{readTime} minutes of reading time`,
         'blog.tags': 'Tags',
         language: 'English',
-        'home.seo.title': 'This is the Xabier Lameiro landing page',
+        'home.seo.title':
+            'Front end developer, microcomputing and networks Technician',
+        'home.seo.description':
+            "I'm a developer with more than 5 years of experience working in the online banking sector, currently specialized in Nextjs and React. Passionate about technology and programming, I like to learn new things and share knowledge with the community.",
         'settings.seo.title':
             'Mac Os settings configuration custom for a web app',
         'settings.title': 'System Preferences',
@@ -26,7 +29,10 @@ export const messages = {
         'blog.tags': 'Etiquetas',
         'blog.readtime': '{readTime} minutos de tiempo de lectura',
         language: 'Español',
-        'home.seo.title': 'Esta es la página de aterrizaje de Xabier Lameiro',
+        'home.seo.title':
+            'Desarrollador front end, técnico en microinformática y redes',
+        'home.seo.description':
+            'Programador con más de 5 años de experencia trabajando en el sector de la banca online, actualmente especializado en Nextjs y React. Apasionado de la tecnología y la programación, me gusta aprender cosas nuevas y compartir conocimientos con la comunidad. ',
         'settings.seo.title':
             'Configuración de preferencias de Mac Os personalizada para una aplicación web',
         'settings.title': 'Preferencias del sistema',
@@ -47,7 +53,10 @@ export const messages = {
         'blog.tags': 'Etiquetas',
         'blog.readtime': '{readTime} minutos de tempo de lectura',
         language: 'Galego',
-        'home.seo.title': 'Esta é a páxina de aterrizaxe de Xabier Lameiro',
+        'home.seo.title':
+            'Desenvolvedor front end, técnico en microinformática e redes',
+        'home.seo.description':
+            'Programador con máis de 5 anos de experiencia traballando no sector da banca online, actualmente especializado en Nextjs e React. Apasionado da tecnoloxía e a programación, gustame aprender cousas novas e compartir coñecemento coa comunidade. ',
         'settings.seo.title':
             'Configuración de preferencias de Mac Os personalizada para unha aplicación web',
         'settings.title': 'Preferencias do sistema',
