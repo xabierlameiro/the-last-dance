@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://xabierlameiro.com/
+
+# Sitemaps
+Sitemap: https://xabierlameiro.com/sitemap.xml

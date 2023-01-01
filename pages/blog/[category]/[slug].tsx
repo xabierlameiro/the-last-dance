@@ -119,6 +119,73 @@ export const getStaticPaths = async () => {
         locale: post.meta.locale,
     }));
 
+    // TODO Remove this script to split function
+    const sitemap = [...tags, ...categories].reduce((acc: any, path: any) => {
+        const { locale, params } = path;
+        const { category, slug } = params;
+        const url = `https://xabierlameiro.com${
+            locale !== 'en' ? `/${locale}` : ''
+        }/blog/${category}/${slug}`;
+        return [...acc, url];
+    }, []);
+
+    const fs = require('fs');
+    const path = require('path');
+    const dir = path.join(process.cwd(), 'public');
+    const filePath = path.join(dir, 'sitemap.xml');
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        ${sitemap
+            .map((url: string) => {
+                return `
+                <url>
+                    <loc>${url}</loc>
+                    <lastmod>${new Date().toISOString()}</lastmod>
+                </url>
+                `;
+            })
+            .join('')}
+            <url>
+                <loc>https://xabierlameiro.com</loc>
+                <lastmod>${new Date().toISOString()}</lastmod>
+            </url>
+            <url>
+                <loc>https://xabierlameiro.com/es</loc>
+                <lastmod>${new Date().toISOString()}</lastmod>
+            </url>
+            <url>
+                <loc>https://xabierlameiro.com/gl</loc>
+                <lastmod>${new Date().toISOString()}</lastmod>
+            </url>
+            <url>
+                <loc>https://xabierlameiro.com/comments</loc>
+                <lastmod>${new Date().toISOString()}</lastmod>
+            </url>
+            <url>
+                <loc>https://xabierlameiro.com/es/comments</loc>
+                <lastmod>${new Date().toISOString()}</lastmod>
+            </url>
+            <url>
+                <loc>https://xabierlameiro.com/gl/comments</loc>
+                <lastmod>${new Date().toISOString()}</lastmod>
+            </url>
+            <url>
+                <loc>https://xabierlameiro.com/settings</loc>
+                <lastmod>${new Date().toISOString()}</lastmod>
+            </url>
+            <url>
+                <loc>https://xabierlameiro.com/es/settings</loc>
+                <lastmod>${new Date().toISOString()}</lastmod>
+            </url>
+            <url>
+                <loc>https://xabierlameiro.com/gl/settings</loc>
+                <lastmod>${new Date().toISOString()}</lastmod>
+            </url>
+        </urlset>
+    `;
+
+    fs.writeFileSync(filePath, xml);
+
     return {
         paths: [...tags, ...categories],
         fallback: false,

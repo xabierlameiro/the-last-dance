@@ -39,3 +39,5 @@ next-env.d.ts
 .npmrc
 package-lock.json
 storybook-static
+
+public/sitemap.xml
