@@ -47,6 +47,7 @@ export const getPostBySlug = (slug: string) => {
             date: data.date,
             image: data.image,
             description: data.description,
+            alternate: data.alternate,
         },
     };
 };

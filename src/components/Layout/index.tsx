@@ -2,7 +2,8 @@ import type { ReactElement } from 'react';
 import Head from 'next/head';
 import Dock from '@/components/Dock';
 import BackgroundImage from '../BackgroundImage';
-
+import { useRouter } from 'next/router';
+import { website_url } from '@/constants/site';
 type Props = {
     children: ReactElement;
     meta?: {
@@ -11,10 +12,12 @@ type Props = {
         description?: string;
         image?: string;
         url?: string;
+        alternate?: Array<{ lang: string; url: string }>;
     };
 };
 
 const Layout = ({ meta, children }: Props) => {
+    const { locale } = useRouter();
     return (
         <>
             <BackgroundImage />
@@ -33,42 +36,24 @@ const Layout = ({ meta, children }: Props) => {
                 <meta property="og:image" content={meta?.image} />
                 <link
                     rel="canonical"
-                    href={`https://xabierlameiro.com${meta?.url ?? ''}`}
+                    href={`${website_url}${
+                        locale !== 'en' ? `/${locale}` : ''
+                    }${meta?.url ?? ''}`}
                 />
-
-                {/* <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{
-                        __html: JSON.stringify({
-                            '@context': 'https://schema.org',
-                            '@type': 'WebSite',
-                            url: 'https://www.xabierlameiro.com',
-                            name: 'Xabier Lameiro Cardama',
-                            alternateName: 'xlameiro',
-                        }),
-                    }}
-                />
-
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{
-                        __html: JSON.stringify({
-                            '@context': 'https://schema.org',
-                            '@type': 'BlogPosting',
-                            mainEntityOfPage: {
-                                '@type': 'WebPage',
-                                '@id': 'https://www.xabierlameiro.com',
-                            },
-                            headline: meta?.title,
-                            image: {
-                                '@type': 'ImageObject',
-                                url: meta?.image,
-                            },
-                            datePublished: '2021-01-01',
-                            dateModified: '2021-01-01',
-                        }),
-                    }}
-                /> */}
+                {meta?.alternate?.map((alt, index) => (
+                    <link
+                        key={index}
+                        rel="alternate"
+                        href={`${website_url}${
+                            alt.lang !== 'en' ? `/${alt.lang}` : ''
+                        }/blog/${meta?.url
+                            ?.split('/')
+                            .filter((item) => item)
+                            .slice(-2, -1)[0]
+                            .replace(/-/g, ', ')}/${alt.url}`}
+                        hrefLang={alt.lang}
+                    />
+                ))}
             </Head>
             <header data-testid="header"></header>
             <main data-testid="main"> {children}</main>
