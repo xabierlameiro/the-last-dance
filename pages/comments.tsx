@@ -5,12 +5,11 @@ import ControlButtons from '@/components/ControlButtons';
 import { AiFillFolder } from 'react-icons/ai';
 import styles from '@/styles/comments.module.css';
 import Data from '../data/comments/index.mdx';
-const meta = {
-    title: 'This is the Comments page',
-};
+import { useIntl } from 'react-intl';
 
 const Page = () => {
     const dialogRef = React.useRef<HTMLDivElement>(null);
+    const { formatMessage: f } = useIntl();
     const [height, setHeight] = React.useState(0);
     const [width, setWidth] = React.useState(0);
 
@@ -22,7 +21,12 @@ const Page = () => {
     }, [dialogRef]);
 
     return (
-        <Layout meta={meta}>
+        <Layout
+            meta={{
+                title: f({ id: 'comments.seo.title' }),
+                description: 'comments.seo.description',
+            }}
+        >
             <Dialog
                 open
                 modalMode

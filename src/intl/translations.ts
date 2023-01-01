@@ -10,7 +10,9 @@ export const messages = {
         'home.seo.description':
             "I'm a developer with more than 5 years of experience working in the online banking sector, currently specialized in Nextjs and React. Passionate about technology and programming, I like to learn new things and share knowledge with the community.",
         'settings.seo.title':
-            'Mac Os settings configuration custom for a web app',
+            'Customized language, theme and region preferences for a web application',
+        'settings.seo.description':
+            'Web page for user preferences settings for your experience on the web, allows you to change the language, theme and region',
         'settings.title': 'System Preferences',
         'settings.desc':
             'Web application developer, microcomputing and networks',
@@ -22,6 +24,9 @@ export const messages = {
         'settings.search': 'Search',
         'settings.avatar': 'Avatar image',
         'background.image.alt': 'This is the background image',
+        'comments.seo.title': 'Web application comments',
+        'comments.seo.description':
+            'Web page for web application comments, allows users to leave comments on the content of the page',
     },
     es: {
         'blog.title': 'Esta es la página de blog',
@@ -34,7 +39,9 @@ export const messages = {
         'home.seo.description':
             'Programador con más de 5 años de experencia trabajando en el sector de la banca online, actualmente especializado en Nextjs y React. Apasionado de la tecnología y la programación, me gusta aprender cosas nuevas y compartir conocimientos con la comunidad. ',
         'settings.seo.title':
-            'Configuración de preferencias de Mac Os personalizada para una aplicación web',
+            'Configuración de preferencias de idioma, tema y región personalizada para una aplicación web',
+        'settings.seo.description':
+            'Pagina web de configuración de preferencias de usuario para su experiencia en la web, permite cambiar el idioma, el tema y la región',
         'settings.title': 'Preferencias del sistema',
         'settings.desc':
             'Desarrollador de aplicaciones web, microinformática y redes',
@@ -46,6 +53,9 @@ export const messages = {
         'settings.search': 'Buscar',
         'settings.avatar': 'Imagen de avatar',
         'background.image.alt': 'Esta es la imagen de fondo',
+        'comments.seo.title': 'Comentarios de la aplicación web',
+        'comments.seo.description':
+            'Página web de comentarios de la aplicación web, permite a los usuarios dejar comentarios sobre el contenido de la página',
     },
     gl: {
         'blog.title': 'Esta é a páxina de blog',
@@ -58,7 +68,9 @@ export const messages = {
         'home.seo.description':
             'Programador con máis de 5 anos de experiencia traballando no sector da banca online, actualmente especializado en Nextjs e React. Apasionado da tecnoloxía e a programación, gustame aprender cousas novas e compartir coñecemento coa comunidade. ',
         'settings.seo.title':
-            'Configuración de preferencias de Mac Os personalizada para unha aplicación web',
+            'Configuración de preferencias de idioma, tema e rexión personalizada para unha aplicación web',
+        'settings.seo.description':
+            'Páxina web de configuración de preferencias de usuario para a súa experiencia na web, permite cambiar o idioma, o tema e a rexión',
         'settings.title': 'Preferencias do sistema',
         'settings.desc':
             'Desenvolvedor de aplicacións web, microinformática e redes',
@@ -70,5 +82,8 @@ export const messages = {
         'settings.search': 'Buscar',
         'settings.avatar': 'Imaxe de avatar',
         'background.image.alt': 'Esta é a imaxe de fondo',
+        'comments.seo.title': 'Comentarios da aplicación web',
+        'comments.seo.description':
+            'Páxina web de comentarios da aplicación web, permite aos usuarios deixar comentarios sobre o contido da páxina',
     },
 };

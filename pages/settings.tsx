@@ -85,7 +85,12 @@ const Page = () => {
     const { open } = useDialog();
 
     return (
-        <Layout meta={{ title: f({ id: 'settings.seo.title' }) }}>
+        <Layout
+            meta={{
+                title: f({ id: 'settings.seo.title' }),
+                description: f({ id: 'settings.seo.description' }),
+            }}
+        >
             <Dialog
                 modalMode
                 open={open}
