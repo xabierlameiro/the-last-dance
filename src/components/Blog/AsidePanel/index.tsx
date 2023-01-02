@@ -4,7 +4,7 @@ import { IoTrashOutline } from 'react-icons/io5';
 
 const AsidePanel = () => {
     return (
-        <div className={styles.controls}>
+        <div className={styles.controls} data-testid="aside-panel">
             <SlList size={18} />
             <SlGrid size={14} />
             <IoTrashOutline size={19} />

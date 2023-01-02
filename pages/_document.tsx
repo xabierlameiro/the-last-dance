@@ -1,7 +1,12 @@
 import { Html, Head, Main, NextScript } from 'next/document';
 import { domain, author, socialNetworks } from '@/constants/site';
 
-const Document = (props: any) => {
+type Props = {
+    __NEXT_DATA__: {
+        locale: string;
+    };
+};
+const Document = (props: Props) => {
     return (
         <Html lang={props.__NEXT_DATA__.locale}>
             <Head>

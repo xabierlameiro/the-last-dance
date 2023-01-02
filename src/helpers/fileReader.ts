@@ -44,7 +44,7 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
  * @param {string} slug - Slug of the post.
  * @returns {Object} - Object with post content and meta data.
  */
-export const getPostBySlug = (slug: string) => {
+export const getPostBySlug = (slug: string | { params: { slug: string } }) => {
     const { data, content } = findPostBySlug(slug);
     const readTime = readingTime(content);
     const numberOfWords = countWords(content);
@@ -79,9 +79,7 @@ export const getPostBySlug = (slug: string) => {
  */
 const getPostSlugs = () => {
     let paths = glob.sync(`${POST_PATH}/**/*.mdx`);
-    paths = paths.map((path) =>
-        path.replace(`${POST_PATH}/`, '').replace(/\.mdx$/, '')
-    );
+    paths = paths.map((path) => path.replace(`${POST_PATH}/`, '').replace(/\.mdx$/, ''));
     return paths;
 };
 
@@ -142,15 +140,10 @@ export const getPostsByLocale = (locale: string) => {
  * @param {string} category - Category of the posts.
  * @returns {Object} - Object with posts.
  */
-export const getPostsByLocaleAndCategory = (
-    locale: string,
-    category: string
-) => {
+export const getPostsByLocaleAndCategory = (locale: string, category: string) => {
     const posts = getPostsByLocale(locale);
     return posts.filter(
-        (post) =>
-            post.meta.category.toLowerCase() === category?.toLowerCase() ||
-            post.meta.tags.includes(category)
+        (post) => post.meta.category.toLowerCase() === category?.toLowerCase() || post.meta.tags.includes(category)
     );
 };
 
@@ -246,9 +239,7 @@ export const getAllCategories = (locale: string) => {
             return {
                 category,
                 total: categories.filter((c) => c === category).length,
-                href: `/blog/${category.toLowerCase()}/${
-                    postsByCategory[0].meta.slug
-                }`,
+                href: `/blog/${category.toLowerCase()}/${postsByCategory[0].meta.slug}`,
             };
         }),
         tags,

@@ -8,7 +8,7 @@ const LangeSelect = () => {
     const router = useRouter();
 
     return (
-        <div className={styles.lang_container}>
+        <div className={styles.lang_container} data-testid="lang-select">
             <label className={styles.lang_label} htmlFor="lang">
                 {f({ id: 'settings.lang.preferred' })}
             </label>
@@ -25,11 +25,7 @@ const LangeSelect = () => {
             >
                 {Object.entries(messages).map(([key, value]) => {
                     return (
-                        <option
-                            key={key}
-                            value={key}
-                            selected={router.locale === key}
-                        >
+                        <option key={key} value={key} selected={router.locale === key}>
                             {value.language}
                         </option>
                     );

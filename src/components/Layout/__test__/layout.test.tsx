@@ -2,31 +2,6 @@ import { render, screen } from '@/test';
 import Layout from '@/layout';
 import { DialogProvider } from '@/context/dialog';
 
-// mocking next-intl
-jest.mock('react-intl', () => ({
-    useIntl: () => ({
-        formatMessage: (e: string) => e,
-    }),
-}));
-
-jest.mock('next/router', () => ({
-    useRouter() {
-        return {
-            route: '/',
-            pathname: '',
-            query: '',
-            asPath: '',
-            push: jest.fn(),
-            events: {
-                on: jest.fn(),
-                off: jest.fn(),
-            },
-            beforePopState: jest.fn(() => null),
-            prefetch: jest.fn(() => null),
-        };
-    },
-}));
-
 describe('Layout component', () => {
     it('should render the header, main and footer', () => {
         render(

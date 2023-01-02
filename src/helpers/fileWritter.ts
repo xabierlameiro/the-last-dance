@@ -15,13 +15,34 @@ const PUBLIC_DIR = path.join(process.cwd(), 'public');
  * @param {Array} locales - Array of locales
  * @returns {void}
  */
-export const createSiteMap = (routes: any[], locales: any[]) => {
-    const sitemap = routes.reduce((acc: any, path: any) => {
-        const { locale, params } = path;
-        const { category, slug } = params;
-        const url = `${domain}${locale !== defaultLocale ? `/${locale}` : ''}/blog/${category}/${slug}`;
-        return [...acc, url];
-    }, []);
+export const createSiteMap = (
+    routes: {
+        locale: string;
+        params: {
+            category: string;
+            slug: string;
+        };
+    }[],
+    locales: string[]
+) => {
+    const sitemap = routes.reduce(
+        (
+            acc: string[],
+            path: {
+                locale: string;
+                params: {
+                    category: string;
+                    slug: string;
+                };
+            }
+        ) => {
+            const { locale, params } = path;
+            const { category, slug } = params;
+            const url = `${domain}${locale !== defaultLocale ? `/${locale}` : ''}/blog/${category}/${slug}`;
+            return [...acc, url];
+        },
+        []
+    );
 
     const pages = fs
         .readdirSync(path.join(process.cwd(), '/pages'))
@@ -49,7 +70,7 @@ export const createSiteMap = (routes: any[], locales: any[]) => {
         ${locales
             .map((locale: string) => {
                 return pages
-                    .map((page: any) => {
+                    .map((page: { url: string; lastmod: string }) => {
                         return `
                         <url>
                             <loc>${locale === defaultLocale ? page.url : `${page.url}/${locale}`}</loc>

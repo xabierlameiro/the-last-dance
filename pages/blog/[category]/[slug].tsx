@@ -10,7 +10,43 @@ import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
 import styles from '@/styles/blog.module.css';
 
-const PostPage = ({ post, tags, categories, posts }: any) => {
+type Props = {
+    post: {
+        meta: {
+            title: string;
+            description: string;
+            slug: string;
+            readTime: string;
+            date: string;
+            tags: string[];
+            categories: string[];
+        };
+        content: {
+            compiledSource: string;
+        };
+    };
+    tags: {
+        category: string;
+        total: number;
+        href: string;
+        tag: string;
+    }[];
+    categories: {
+        category: string;
+        total: number;
+        href: string;
+        tag: string;
+    }[];
+    posts: {
+        meta: {
+            title: string;
+            excerpt: string;
+            slug: string;
+        };
+    }[];
+};
+
+const PostPage = ({ post, tags, categories, posts }: Props) => {
     const {
         query: { category, slug },
     } = useRouter();
@@ -43,7 +79,7 @@ const PostPage = ({ post, tags, categories, posts }: any) => {
                             </div>
                         </nav>
                         <article className={styles.article}>
-                            <ArticlePanel post={post} />
+                            <ArticlePanel readTime={post.meta.readTime} />
                             <div className={styles.body}>
                                 <MDXRemote {...post.content} components={components} />
                             </div>
@@ -55,7 +91,13 @@ const PostPage = ({ post, tags, categories, posts }: any) => {
     );
 };
 
-export const getStaticProps = async (data: any) => {
+export const getStaticProps = async (data: {
+    params: {
+        category: string;
+        slug: string;
+    };
+    locale: string;
+}) => {
     const {
         params: { category },
         locale,
@@ -78,27 +120,53 @@ export const getStaticProps = async (data: any) => {
     };
 };
 
-export const getStaticPaths = async ({ locales }: any) => {
+export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
     const posts = await getAllPosts();
 
-    const tags = posts.reduce((acc: any, post: any) => {
-        const paths = post.meta.tags.map((tag: string) => ({
+    const tags = posts.reduce(
+        (
+            acc: {
+                params: {
+                    category: string;
+                    slug: string;
+                };
+                locale: string;
+            }[],
+            post: {
+                meta: {
+                    tags: string[];
+                    slug: string;
+                    locale: string;
+                };
+            }
+        ) => {
+            const paths = post.meta.tags.map((tag: string) => ({
+                params: {
+                    category: tag.toLowerCase(),
+                    slug: post.meta.slug,
+                },
+                locale: post.meta.locale,
+            }));
+            return [...acc, ...paths];
+        },
+        []
+    );
+
+    const categories = posts.map(
+        (post: {
+            meta: {
+                category: string;
+                slug: string;
+                locale: string;
+            };
+        }) => ({
             params: {
-                category: tag.toLowerCase(),
+                category: post.meta.category.toLowerCase(),
                 slug: post.meta.slug,
             },
             locale: post.meta.locale,
-        }));
-        return [...acc, ...paths];
-    }, []);
-
-    const categories = posts.map((post: any) => ({
-        params: {
-            category: post.meta.category.toLowerCase(),
-            slug: post.meta.slug,
-        },
-        locale: post.meta.locale,
-    }));
+        })
+    );
 
     createSiteMap([...tags, ...categories], locales);
 

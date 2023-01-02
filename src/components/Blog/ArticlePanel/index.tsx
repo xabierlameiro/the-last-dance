@@ -7,16 +7,17 @@ import { SearchInput } from '@/components';
 import styles from './panel.module.css';
 import { useIntl } from 'react-intl';
 
-const ArticlePanel = ({ post }: any) => {
-    const { readTime } = post.meta;
+type Props = {
+    readTime?: string;
+};
+const ArticlePanel = ({ readTime }: Props) => {
     const { formatMessage: f } = useIntl();
     return (
-        <div className={styles.articleControls}>
+        <div className={styles.articleControls} data-testid="article-panel">
             <div className={styles.readTime}>
                 <RxStopwatch size={20} />
-                {f(
-                    { id: 'blog.readtime', description: 'read time' },
-                    { readTime }
+                {readTime && Number(readTime) >= 0 && (
+                    <>{f({ id: 'blog.readtime', description: 'read time' }, { readTime })}</>
                 )}
             </div>
             <MdSortByAlpha />

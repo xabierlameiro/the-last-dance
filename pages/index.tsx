@@ -6,7 +6,18 @@ import { components } from '@/helpers/mdxjs';
 import { serializePath } from '@/helpers/mdx';
 import { useDialog } from '@/context/dialog';
 
-const Page = ({ content }: any) => {
+type Props = {
+    content: {
+        desktop: {
+            compiledSource: string;
+        };
+        mobile: {
+            compiledSource: string;
+        };
+    };
+};
+
+const Page = ({ content }: Props) => {
     const { open } = useDialog();
     const { formatMessage: f } = useIntl();
 
@@ -24,16 +35,10 @@ const Page = ({ content }: any) => {
                 body={
                     <>
                         <VisibilityManager hideOnDesktop hideOnTablet>
-                            <MDXRemote
-                                {...content.mobile}
-                                components={components}
-                            />
+                            <MDXRemote {...content.mobile} components={components} />
                         </VisibilityManager>
                         <VisibilityManager hideOnMobile>
-                            <MDXRemote
-                                {...content.desktop}
-                                components={components}
-                            />
+                            <MDXRemote {...content.desktop} components={components} />
                         </VisibilityManager>
                     </>
                 }
@@ -42,7 +47,7 @@ const Page = ({ content }: any) => {
     );
 };
 
-export const getStaticProps = async (params: any) => {
+export const getStaticProps = async (params: { locale: string }) => {
     const { locale } = params;
     const path = 'data/home';
     const desktop = await serializePath(path, `${locale}.mdx`);
