@@ -1,3 +1,13 @@
+/**
+ * @description Utility function to concatenate classes.
+ *
+ * @example
+ *     clx('class1', 'class2', 'class3');
+ *     returns 'class1 class2 class3'
+ *
+ * @param {(string | null | undefined)[]} classes
+ * @returns {string}
+ */
 export const clx = (...classes: Array<string | null | undefined>) => {
     classes = classes
         .filter((element) => {
@@ -12,9 +22,36 @@ export const clx = (...classes: Array<string | null | undefined>) => {
     return classes.join(' ');
 };
 
+/**
+ * @description Utility function to check if locale is not english.
+ *
+ * @example
+ *     isNotEng('en');
+ *     returns false
+ *
+ * @param {string | undefined} locale
+ * @returns {boolean}
+ */
 export const isNotEng = (locale: string | undefined) => locale !== 'en';
 
+/**
+ * @description Utility function to clean trailing slash of a path.
+ *
+ * @example
+ *     cleanTrailingSlash('/');
+ *     returns ''
+ *
+ * @param {string} path
+ */
 export const cleanTrailingSlash = (path: string) => (path !== '/' ? path : '');
 
-export const getLang = (lang: string | undefined) =>
-    isNotEng(lang) ? `/${lang}` : '';
+/**
+ * @description Utility function to return lang if not english.
+ *
+ * @example
+ *     getLang('en');
+ *     returns ''
+ *
+ * @param {string | undefined} lang
+ */
+export const getLang = (lang: string | undefined) => (isNotEng(lang) ? `/${lang}` : '');

@@ -57,6 +57,7 @@
         "jest": "^28.1.2",
         "jest-environment-jsdom": "^29.3.1",
         "next-mdx-remote": "^4.2.0",
+        "prettier-plugin-jsdoc": "^0.4.2",
         "react-icons": "^4.7.1",
         "storybook": "^7.0.0-beta.12",
         "typescript": "^4.9.4"

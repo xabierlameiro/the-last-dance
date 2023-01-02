@@ -6,13 +6,15 @@ import matter from 'gray-matter';
 const POST_PATH = path.join(process.cwd(), 'data/blog');
 
 /**
- * Find post by slug
- * @param {string} slug - Slug of the post
- * @returns {Object} - Object with post content and meta data
+ * @description Find post by slug.
+ *
  * @example
- * findPostBySlug('first-post')
- * returns {content: '...', data: {readTime: 1, numberOfWords: 100, slug: 'first-post', title: 'First Post', locale: 'en', category: 'JavaScript', author: 'John Doe', tags: ['JavaScript'], excerpt: '...', date: '2021-01-01', image: '...', description: '...', alternate: '...'}}
- * */
+ *     findPostBySlug('first-post')
+ *     returns [{ content: '...', meta: {...} }]
+ *
+ * @param {string} slug - Slug of the post.
+ * @returns {Object} - Object with post content and meta data.
+ */
 const findPostBySlug = (slug: string | { params: { slug: string } }) => {
     let paths = glob.sync(`${POST_PATH}/**/*.mdx`);
 
@@ -33,13 +35,15 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
 };
 
 /**
- * Get post by slug
- * @param {string} slug - Slug of the post
- * @returns {Object} - Object with post content and meta data
+ * @description Get post by slug.
+ *
  * @example
- * getPostBySlug('first-post')
- * returns {content: '...', meta: {readTime: 1, numberOfWords: 100, slug: 'first-post', title: 'First Post', locale: 'en', category: 'JavaScript', author: 'John Doe', tags: ['JavaScript'], excerpt: '...', date: '2021-01-01', image: '...', description: '...', alternate: '...'}}
- * */
+ *     getPostBySlug('first-post')
+ *     returns [{ content: '...', meta: {...} }]
+ *
+ * @param {string} slug - Slug of the post.
+ * @returns {Object} - Object with post content and meta data.
+ */
 export const getPostBySlug = (slug: string) => {
     const { data, content } = findPostBySlug(slug);
     const readTime = readingTime(content);
@@ -65,12 +69,14 @@ export const getPostBySlug = (slug: string) => {
 };
 
 /**
- * Get all post slugs
- * @returns {Array} - Array with slugs
+ * @description Get all post slugs.
+ *
  * @example
- * getPostSlugs()
- * returns ['first-post', 'second-post']
- * */
+ *     getPostSlugs();
+ *     returns[('first-post', 'second-post')];
+ *
+ * @returns {Array} - Array with slugs.
+ */
 const getPostSlugs = () => {
     let paths = glob.sync(`${POST_PATH}/**/*.mdx`);
     paths = paths.map((path) =>
@@ -80,12 +86,19 @@ const getPostSlugs = () => {
 };
 
 /**
- * Get all posts
- * @returns {Object} - Object with posts
+ * @description Get all posts.
+ *
  * @example
- * getAllPosts()
- * returns [{content: '...', meta: {readTime: 1, numberOfWords: 100, slug: 'first-post', title: 'First Post', locale: 'en', category: 'JavaScript', author: 'John Doe', tags: ['JavaScript'], excerpt: '...', date: '2021-01-01', image: '...', description: '...', alternate: '...'}}]
- * */
+ *     getAllPosts();
+ *     returns[
+ *         {
+ *             content: '...',
+ *             meta: '...',
+ *         }
+ *     ];
+ *
+ * @returns {Object} - Object with posts.
+ */
 
 export const getAllPosts = () => {
     const slugs = getPostSlugs();
@@ -93,12 +106,19 @@ export const getAllPosts = () => {
 };
 
 /**
- * Get all posts by locale
- * @param {string} locale - Locale of the posts
- * @returns {Object} - Object with posts
+ * @description Get all posts by locale.
+ *
  * @example
- * getPostsByLocale('en')
- * returns [{content: '...', meta: {readTime: 1, numberOfWords: 100, slug: 'first-post', title: 'First Post', locale: 'en', category: 'JavaScript', author: 'John Doe', tags: ['JavaScript'], excerpt: '...', date: '2021-01-01', image: '...', description: '...', alternate: '...'}}]
+ *     getPostsByLocale('en');
+ *     returns[
+ *         {
+ *             content: '...',
+ *             meta: '...',
+ *         }
+ *     ];
+ *
+ * @param {string} locale - Locale of the posts.
+ * @returns {Object} - Object with posts.
  */
 
 export const getPostsByLocale = (locale: string) => {
@@ -107,13 +127,20 @@ export const getPostsByLocale = (locale: string) => {
 };
 
 /**
- * Get all posts by category and locale
- * @param {string} locale - Locale of the posts
- * @param {string} category - Category of the posts
- * @returns {Object} - Object with posts
+ * @description Get all posts by category and locale.
+ *
  * @example
- * getPostsByLocaleAndCategory('en', 'JavaScript')
- * returns [{content: '...', meta: {readTime: 1, numberOfWords: 100, slug: 'first-post', title: 'First Post', locale: 'en', category: 'JavaScript', author: 'John Doe', tags: ['JavaScript'], excerpt: '...', date: '2021-01-01', image: '...', description: '...', alternate: '...'}}]
+ *     getPostsByLocaleAndCategory('en', 'JavaScript');
+ *     returns[
+ *         {
+ *             content: '...',
+ *             meta: '...',
+ *         }
+ *     ];
+ *
+ * @param {string} locale - Locale of the posts.
+ * @param {string} category - Category of the posts.
+ * @returns {Object} - Object with posts.
  */
 export const getPostsByLocaleAndCategory = (
     locale: string,
@@ -128,13 +155,20 @@ export const getPostsByLocaleAndCategory = (
 };
 
 /**
- * Get all posts by tag and locale
- * @param {string} tag - Tag of the posts
- * @param {string} locale - Locale of the posts
- * @returns {Object} - Object with posts
+ * @description Get all posts by tag and locale.
+ *
  * @example
- * getPostsByTag('JavaScript', 'en')
- * returns [{content: '...', meta: {readTime: 1, numberOfWords: 100, slug: 'first-post', title: 'First Post', locale: 'en', category: 'JavaScript', author: 'John Doe', tags: ['JavaScript'], excerpt: '...', date: '2021-01-01', image: '...', description: '...', alternate: '...'}}]
+ *     getPostsByTag('JavaScript', 'en');
+ *     returns[
+ *         {
+ *             content: '...',
+ *             meta: '...',
+ *         }
+ *     ];
+ *
+ * @param {string} tag - Tag of the posts.
+ * @param {string} locale - Locale of the posts.
+ * @returns {Object} - Object with posts.
  */
 export const getPostsByTag = (tag: string, locale: string) => {
     const posts = getPostsByLocale(locale);
@@ -142,13 +176,20 @@ export const getPostsByTag = (tag: string, locale: string) => {
 };
 
 /**
- * Get all posts by category and locale
- * @param {string} category - Category of the posts
- * @param {string} locale - Locale of the posts
- * @returns {Object} - Object with posts
+ * @description Get all posts by category and locale.
+ *
  * @example
- * getPostsByCategory('JavaScript', 'en')
- * returns [{content: '...', meta: {readTime: 1, numberOfWords: 100, slug: 'first-post', title: 'First Post', locale: 'en', category: 'JavaScript', author: 'John Doe', tags: ['JavaScript'], excerpt: '...', date: '2021-01-01', image: '...', description: '...', alternate: '...'}}]
+ *     getPostsByCategory('JavaScript', 'en');
+ *     returns[
+ *         {
+ *             content: '...',
+ *             meta: '...',
+ *         }
+ *     ];
+ *
+ * @param {string} category - Category of the posts.
+ * @param {string} locale - Locale of the posts.
+ * @returns {Object} - Object with posts.
  */
 export const getPostsByCategory = (category: string, locale: string) => {
     const posts = getPostsByLocale(locale);
@@ -156,12 +197,20 @@ export const getPostsByCategory = (category: string, locale: string) => {
 };
 
 /**
- * Get all tags from all posts by locale
- * @param {string} locale - Locale of the posts
- * @returns {Object} - Object with tags
+ * @description Get all tags from all posts by locale.
+ *
  * @example
- * getAllTags('en')
- * returns [{tag: 'JavaScript', total: 2, href: '/blog/javascript/first-post'}]
+ *     getAllTags('en');
+ *     returns[
+ *         {
+ *             tag: 'JavaScript',
+ *             total: 2,
+ *             href: '/blog/javascript/first-post',
+ *         }
+ *     ];
+ *
+ * @param {string} locale - Locale of the posts.
+ * @returns {Object} - Object with tags.
  */
 export const getAllTags = (locale: string) => {
     const posts = getPostsByLocale(locale);
@@ -177,12 +226,14 @@ export const getAllTags = (locale: string) => {
 };
 
 /**
- * Get all categories from all posts by locale
- * @param {string} locale - Locale of the posts
- * @returns {Object} - Object with categories
+ * @description Get all categories from all posts by locale.
+ *
  * @example
- * getAllCategories('en')
- * returns {categories: [{category: 'JavaScript', total: 2, href: '/blog/javascript/first-post'}], tags: [{tag: 'JavaScript', total: 2, href: '/blog/javascript/first-post'}]}
+ *     getAllCategories('en')
+ *     returns { categories: [], tags: [] }
+ *
+ * @param {string} locale - Locale of the posts.
+ * @returns {Object} - Object with categories.
  */
 
 export const getAllCategories = (locale: string) => {
@@ -205,12 +256,14 @@ export const getAllCategories = (locale: string) => {
 };
 
 /**
- * Count words in a string
- * @param {string} content - String to count words
- * @returns {number} - Number of words
+ * @description Count words in a string.
+ *
  * @example
- * countWords('Hello world')
- * returns 2
+ *     countWords('Hello world')
+ *     returns 2
+ *
+ * @param {string} content - String to count words.
+ * @returns {number} - Number of words.
  */
 export const countWords = (content: string) => {
     const words = content.split(/\s/g);
@@ -221,12 +274,14 @@ export const countWords = (content: string) => {
 };
 
 /**
- * Calculate reading time in minutes
- * @param {string} content - String to calculate reading time
- * @returns {number} - Reading time in minutes
+ * @description Calculate reading time in minutes.
+ *
  * @example
- * readingTime('Hello world. This is a test. This is a test')
- * returns 2
+ *     readingTime('Hello world. This is a test. This is a test')
+ *     returns 2
+ *
+ * @param {string} content - String to calculate reading time.
+ * @returns {number} - Reading time in minutes.
  */
 export const readingTime = (content: string) => {
     const wordsPerMinute = 200;
