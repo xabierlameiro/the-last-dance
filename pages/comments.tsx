@@ -22,6 +22,7 @@ const Page = () => {
 
     return (
         <Layout
+            className="comments"
             meta={{
                 title: f({ id: 'comments.seo.title' }),
                 description: 'comments.seo.description',

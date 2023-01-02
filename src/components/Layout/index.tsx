@@ -5,6 +5,7 @@ import SEO from '@/components/SEO';
 
 type Props = {
     children: ReactElement;
+    className?: string;
     isBlog?: boolean;
     meta?: {
         title: string;
@@ -18,13 +19,15 @@ type Props = {
     };
 };
 
-const Layout = ({ meta, children, isBlog }: Props) => {
+const Layout = ({ meta, className, children, isBlog }: Props) => {
     return (
         <>
             <SEO meta={meta} isBlog={isBlog} />
             <BackgroundImage />
             <header data-testid="header"></header>
-            <main data-testid="main"> {children}</main>
+            <main data-testid="main" className={className}>
+                {children}
+            </main>
             <footer data-testid="footer"></footer>
             <Dock data-testid="nav" />
         </>

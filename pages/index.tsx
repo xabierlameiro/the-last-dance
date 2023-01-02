@@ -12,6 +12,7 @@ const Page = ({ content }: any) => {
 
     return (
         <Layout
+            className="home"
             meta={{
                 title: f({ id: 'home.seo.title' }),
                 description: f({ id: 'home.seo.description' }),

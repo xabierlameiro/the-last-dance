@@ -110,7 +110,8 @@ a {
     }
 }
 
-code > .ch-code-scroll-content > div {
+.comments code > .ch-code-scroll-content > div,
+.home code > .ch-code-scroll-content > div {
     transform: initial !important;
 }
 
