@@ -70,7 +70,7 @@ const SEO = ({ meta, isBlog }: Props) => {
             <meta name="twitter:title" content={title} />
             <meta name="image" content={image} />
             <meta property="og:image" itemProp="image" content={image} />
-            <link rel="canonical" href={`${domain}${cleanTrailingSlash(path)}`} title="Canonical url" />
+            <link rel="canonical" href={url} title="Canonical url" />
             {meta?.alternate?.map(({ lang, url }, index) => (
                 <link
                     key={index}
