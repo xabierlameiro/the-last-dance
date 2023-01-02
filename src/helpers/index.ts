@@ -1,3 +1,4 @@
+import { defaultLocale } from '@/constants/site';
 /**
  * @description Utility function to concatenate classes.
  *
@@ -23,7 +24,7 @@ export const clx = (...classes: Array<string | null | undefined>) => {
 };
 
 /**
- * @description Utility function to check if locale is not english.
+ * @description Utility function to check if locale is not defaultLocale.
  *
  * @example
  *     isNotEng('en');
@@ -32,7 +33,7 @@ export const clx = (...classes: Array<string | null | undefined>) => {
  * @param {string | undefined} locale
  * @returns {boolean}
  */
-export const isNotEng = (locale: string | undefined) => locale !== 'en';
+export const isNotEng = (locale: string | undefined) => locale !== defaultLocale;
 
 /**
  * @description Utility function to clean trailing slash of a path.

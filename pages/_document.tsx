@@ -1,5 +1,5 @@
 import { Html, Head, Main, NextScript } from 'next/document';
-import { website_url, author, socialNetworks } from '@/constants/site';
+import { domain, author, socialNetworks } from '@/constants/site';
 
 const Document = (props: any) => {
     return (
@@ -9,7 +9,7 @@ const Document = (props: any) => {
                 <meta name="theme-color" content="#FFF" />
                 <meta property="og:type" content="website" />
                 <meta property="og:site_name" content={author} />
-                <meta property="og:url" content={website_url} />
+                <meta property="og:url" content={domain} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@xlameiro" />
                 <meta name="twitter:creator" content="@xlameiro" />
@@ -24,7 +24,7 @@ const Document = (props: any) => {
                         __html: JSON.stringify({
                             '@context': 'https://schema.org',
                             '@type': 'WebSite',
-                            url: website_url,
+                            url: domain,
                             name: author,
                             alternateName: author,
                         }),
@@ -37,7 +37,7 @@ const Document = (props: any) => {
                             '@context': 'http://schema.org',
                             '@type': 'Person',
                             name: author,
-                            url: website_url,
+                            url: domain,
                             sameAs: socialNetworks,
                             email: 'mailto:xabier.lameiro@gmail.com',
                             image: '/profile.png',

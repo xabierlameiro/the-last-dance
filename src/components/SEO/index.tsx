@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { website_url, author as auth } from '@/constants/site';
+import { domain, author as auth } from '@/constants/site';
 import { getLang, cleanTrailingSlash } from '@/helpers';
 import Head from 'next/head';
 
@@ -21,8 +21,8 @@ const SEO = ({ meta, isBlog }: Props) => {
     const { locale: l, pathname: path } = useRouter();
     const category = meta?.category?.toLowerCase();
     const url = isBlog
-        ? `${website_url}${getLang(l)}/blog/${category}/${meta?.slug}`
-        : `${website_url}${getLang(l)}${cleanTrailingSlash(path)}`;
+        ? `${domain}${getLang(l)}/blog/${category}/${meta?.slug}`
+        : `${domain}${getLang(l)}${cleanTrailingSlash(path)}`;
     const title = meta?.title;
     const author = meta?.author || auth;
     const description = meta?.description;
@@ -41,14 +41,14 @@ const SEO = ({ meta, isBlog }: Props) => {
                             headline: title,
                             description: description,
                             url: url,
-                            image: [`${website_url}/${image}`],
+                            image: [`${domain}/${image}`],
                             datePublished: new Date().toISOString(),
                             dateModified: new Date().toISOString(),
                             author: [
                                 {
                                     '@type': 'Person',
                                     name: author,
-                                    url: website_url,
+                                    url: domain,
                                 },
                             ],
                         }),
@@ -56,16 +56,8 @@ const SEO = ({ meta, isBlog }: Props) => {
                 />
             ) : (
                 <>
-                    <link
-                        hrefLang="es"
-                        rel="alternate"
-                        href={`${website_url}/es${cleanTrailingSlash(path)}`}
-                    />
-                    <link
-                        hrefLang="gl"
-                        rel="alternate"
-                        href={`${website_url}/gl${cleanTrailingSlash(path)}`}
-                    />
+                    <link hrefLang="es" rel="alternate" href={`${domain}/es${cleanTrailingSlash(path)}`} />
+                    <link hrefLang="gl" rel="alternate" href={`${domain}/gl${cleanTrailingSlash(path)}`} />
                 </>
             )}
 
@@ -78,18 +70,12 @@ const SEO = ({ meta, isBlog }: Props) => {
             <meta name="twitter:title" content={title} />
             <meta name="image" content={image} />
             <meta property="og:image" content={image} />
-            <link
-                rel="canonical"
-                href={`${website_url}${cleanTrailingSlash(path)}`}
-                title="Canonical url"
-            />
+            <link rel="canonical" href={`${domain}${cleanTrailingSlash(path)}`} title="Canonical url" />
             {meta?.alternate?.map(({ lang, url }, index) => (
                 <link
                     key={index}
                     rel="alternate"
-                    href={`${website_url}${getLang(
-                        lang
-                    )}/blog/${category}/${url}`}
+                    href={`${domain}${getLang(lang)}/blog/${category}/${url}`}
                     hrefLang={lang}
                     title="Alternate url"
                 />
