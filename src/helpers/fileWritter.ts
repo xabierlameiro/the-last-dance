@@ -1,4 +1,5 @@
 import { domain, defaultLocale } from '@/constants/site';
+import { removeTrailingSlash } from '@/helpers';
 import fs from 'fs';
 import path from 'path';
 import prettier from 'prettier';
@@ -50,7 +51,7 @@ export const createSiteMap = (
         .map((page) => {
             page = page.replace('.tsx', '');
             return {
-                url: page === 'index' ? domain : `${domain}/${page}`,
+                url: page === 'index' ? '' : `${page}`,
                 lastmod: new Date().toISOString(),
             };
         });
@@ -73,7 +74,9 @@ export const createSiteMap = (
                     .map((page: { url: string; lastmod: string }) => {
                         return `
                         <url>
-                            <loc>${locale === defaultLocale ? page.url : `${page.url}/${locale}`}</loc>
+                            <loc>${removeTrailingSlash(
+                                locale === defaultLocale ? `${domain}/${page.url}` : `${domain}/${locale}/${page.url}`
+                            )}</loc>
                             <lastmod>${page.lastmod}</lastmod>
                         </url>
                     `;

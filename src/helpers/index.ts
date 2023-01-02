@@ -47,6 +47,23 @@ export const isNotEng = (locale: string | undefined) => locale !== defaultLocale
 export const cleanTrailingSlash = (path: string) => (path !== '/' ? path : '');
 
 /**
+ * @description Utility function to remove trailing slash of a string.
+ *
+ * @example
+ *     removeTrailingSlash('string/');
+ *     returns 'string'
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+export const removeTrailingSlash = (str: string) => {
+    if (str.substr(-1) === '/') {
+        return str.substr(0, str.length - 1);
+    }
+    return str;
+};
+
+/**
  * @description Utility function to return lang if not english.
  *
  * @example
