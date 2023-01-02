@@ -69,7 +69,7 @@ const SEO = ({ meta, isBlog }: Props) => {
             <meta property="og:title" content={title} />
             <meta name="twitter:title" content={title} />
             <meta name="image" content={image} />
-            <meta property="og:image" content={image} />
+            <meta property="og:image" itemProp="image" content={image} />
             <link rel="canonical" href={`${domain}${cleanTrailingSlash(path)}`} title="Canonical url" />
             {meta?.alternate?.map(({ lang, url }, index) => (
                 <link
@@ -77,7 +77,7 @@ const SEO = ({ meta, isBlog }: Props) => {
                     rel="alternate"
                     href={`${domain}${getLang(lang)}/blog/${category}/${url}`}
                     hrefLang={lang}
-                    title="Alternate url"
+                    title={`Alternate url for langueage ${lang}`}
                 />
             ))}
         </Head>

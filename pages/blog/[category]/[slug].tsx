@@ -13,7 +13,6 @@ import styles from '@/styles/blog.module.css';
 const PostPage = ({ post, tags, categories, posts }: any) => {
     const {
         query: { category, slug },
-        asPath,
     } = useRouter();
     const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
