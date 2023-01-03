@@ -31,7 +31,7 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --color-primary: #fff;
+        --color-primary: #000;
         --background-start-rgb: 0, 0, 0;
         --background-end-rgb: 0, 0, 0;
 
@@ -67,6 +67,7 @@ body {
     max-width: 100vw;
     overflow-x: hidden;
     font-family: var(--font-mono);
+    color: var(--color-primary);
 }
 
 .sb-main-centered.sb-show-main {
