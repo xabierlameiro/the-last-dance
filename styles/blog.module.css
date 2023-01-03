@@ -2,6 +2,15 @@
     display: grid;
     grid-template-columns: 200px 200px 1fr;
     height: 100%;
+    transition: all 0.5s ease-in-out;
+}
+@media screen and (max-width: 768px) {
+    .container {
+        grid-template-columns: 10px 10px 1fr;
+    }
+    .container.big {
+        grid-template-columns: 10px 200px 1fr;
+    }
 }
 
 .nav {
@@ -9,6 +18,15 @@
     padding: 20px 12px;
     display: grid;
     grid-template-rows: 40px auto auto 1fr;
+    overflow: hidden;
+}
+@media screen and (max-width: 768px) {
+    .nav {
+        padding: 20px 0px;
+        grid-template-rows: 1fr;
+        align-items: center;
+        justify-items: center;
+    }
 }
 
 .selected {
@@ -24,10 +42,25 @@
     grid-template-rows: 50px 1fr;
 }
 
+@media screen and (max-width: 768px) {
+    .article {
+    }
+}
+
 .secondNav {
     border-right: 1px solid lightgrey;
     display: grid;
     grid-template-rows: 50px 1fr;
+    overflow: hidden;
+}
+
+@media screen and (max-width: 768px) {
+    .secondNav {
+        padding: 20px 0px;
+        grid-template-rows: 1fr;
+        align-items: center;
+        justify-items: center;
+    }
 }
 
 .postLinks ul {
@@ -64,6 +97,12 @@
     height: calc(100vh - 120px);
     overflow: scroll;
 }
+@media screen and (max-width: 768px) {
+    .body {
+        padding: 0px 10px 20px;
+        width: calc(100vw - 20px);
+    }
+}
 
 .body blockquote {
     border-left: 5px solid dodgerblue;
@@ -93,4 +132,11 @@
 
 .body h2 {
     padding: 20px;
+}
+
+.swap {
+    width: 10px;
+    transform: rotate(90deg) scale(5);
+    color: darkgrey;
+    opacity: 0.5;
 }

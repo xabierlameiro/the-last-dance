@@ -1,6 +1,6 @@
 import { MDXRemote } from 'next-mdx-remote';
 import { useDialog } from '@/context/dialog';
-import { Layout, Dialog, ControlButtons } from '@/components';
+import { Layout, Dialog, ControlButtons, VisibilityManager } from '@/components';
 import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCategory } from '@/helpers/fileReader';
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
@@ -9,6 +9,9 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
 import styles from '@/styles/blog.module.css';
+import { TfiMinus } from 'react-icons/tfi';
+import React from 'react';
+import { clx } from '@/helpers';
 
 type Props = {
     post: {
@@ -54,29 +57,45 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     const { open, dispatch } = useDialog();
     const close = () => dispatch({ type: 'close' });
 
+    const [big, setBig] = React.useState(false);
+
+    const handleClick = () => {
+        setBig((big) => !big);
+    };
+
     return (
         <Layout meta={{ ...post.meta }} isBlog>
             <Dialog
                 open={open}
                 body={
-                    <div className={styles.container}>
+                    <div className={clx(styles.container, big ? styles.big : '')}>
                         <nav className={styles.nav}>
-                            <ControlButtons onClickClose={close} onClickMinimise={close} />
-                            <div>
-                                <NavList
-                                    title={f({ id: 'blog.categories' })}
-                                    list={categories}
-                                    category={category}
-                                    isCategory
-                                />
-                                <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
-                            </div>
+                            <VisibilityManager hideOnMobile>
+                                <ControlButtons onClickClose={close} onClickMinimise={close} />
+                                <div>
+                                    <NavList
+                                        title={f({ id: 'blog.categories' })}
+                                        list={categories}
+                                        category={category}
+                                        isCategory
+                                    />
+                                    <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
+                                </div>
+                            </VisibilityManager>
+                            <VisibilityManager hideOnDesktop>
+                                <TfiMinus className={styles.swap} onClick={handleClick} onDrag={handleClick} />
+                            </VisibilityManager>
                         </nav>
                         <nav className={styles.secondNav}>
-                            <AsidePanel />
-                            <div className={styles.postLinks}>
-                                <PostList posts={posts} slug={slug} category={category} />
-                            </div>
+                            <VisibilityManager hideOnMobile>
+                                <AsidePanel />
+                                <div className={styles.postLinks}>
+                                    <PostList posts={posts} slug={slug} category={category} />
+                                </div>
+                            </VisibilityManager>
+                            <VisibilityManager hideOnDesktop>
+                                <TfiMinus className={styles.swap} onClick={handleClick} />
+                            </VisibilityManager>
                         </nav>
                         <article className={styles.article}>
                             <ArticlePanel readTime={post.meta.readTime} />

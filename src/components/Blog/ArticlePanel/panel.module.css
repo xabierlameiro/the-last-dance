@@ -6,6 +6,15 @@
     align-items: center;
     gap: 20px;
 }
+@media screen and (max-width: 768px) {
+    .articleControls {
+        width: calc(100vw - 40px);
+        grid-template-columns: 200px repeat(2, max-content) 1fr repeat(5, max-content) 220px;
+        overflow: scroll;
+        margin: 0 10px;
+        padding: 0;
+    }
+}
 .articleControls svg {
     color: gray;
     font-size: 21.5px;
