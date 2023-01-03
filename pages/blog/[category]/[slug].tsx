@@ -1,3 +1,4 @@
+import React from 'react';
 import { MDXRemote } from 'next-mdx-remote';
 import { useDialog } from '@/context/dialog';
 import { Layout, Dialog, ControlButtons, VisibilityManager } from '@/components';
@@ -10,7 +11,6 @@ import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
 import styles from '@/styles/blog.module.css';
 import { TfiMinus } from 'react-icons/tfi';
-import React from 'react';
 import { clx } from '@/helpers';
 
 type Props = {
@@ -56,11 +56,34 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
     const close = () => dispatch({ type: 'close' });
-
+    // TODO: refactor this
     const [big, setBig] = React.useState(false);
+    const [big2, setBig2] = React.useState(false);
 
     const handleClick = () => {
         setBig((big) => !big);
+    };
+
+    // handler for left and right swipe
+    const handleSwipe = (e: React.TouchEvent<HTMLDivElement>) => {
+        const { clientX } = e.touches[0];
+        const { clientWidth } = e.currentTarget;
+        if (clientX < clientWidth / 2) {
+            setBig(true);
+        } else {
+            setBig(false);
+        }
+    };
+
+    // second handler for left and right swipe
+    const handleSwipe2 = (e: React.TouchEvent<HTMLDivElement>) => {
+        const { clientX } = e.touches[0];
+        const { clientWidth } = e.currentTarget;
+        if (clientX < clientWidth / 2) {
+            setBig2(true);
+        } else {
+            setBig2(false);
+        }
     };
 
     return (
@@ -68,34 +91,33 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
             <Dialog
                 open={open}
                 body={
-                    <div className={clx(styles.container, big ? styles.big : '')}>
-                        <nav className={styles.nav}>
-                            <VisibilityManager hideOnMobile>
-                                <ControlButtons onClickClose={close} onClickMinimise={close} />
-                                <div>
-                                    <NavList
-                                        title={f({ id: 'blog.categories' })}
-                                        list={categories}
-                                        category={category}
-                                        isCategory
-                                    />
-                                    <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
-                                </div>
-                            </VisibilityManager>
-                            <VisibilityManager hideOnDesktop>
-                                <TfiMinus className={styles.swap} onClick={handleClick} onDrag={handleClick} />
-                            </VisibilityManager>
+                    <div
+                        className={clx(styles.container, big && !big2 ? styles.big : big2 ? styles.big2 : '')}
+                        onTouchStart={handleSwipe}
+                    >
+                        <nav className={styles.nav} onTouchStart={handleSwipe2}>
+                            <ControlButtons onClickClose={close} onClickMinimise={close} />
+                            <div>
+                                <NavList
+                                    title={f({ id: 'blog.categories' })}
+                                    list={categories}
+                                    category={category}
+                                    isCategory
+                                />
+                                <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
+                            </div>
                         </nav>
-                        <nav className={styles.secondNav}>
-                            <VisibilityManager hideOnMobile>
-                                <AsidePanel />
-                                <div className={styles.postLinks}>
-                                    <PostList posts={posts} slug={slug} category={category} />
-                                </div>
-                            </VisibilityManager>
-                            <VisibilityManager hideOnDesktop>
-                                <TfiMinus className={styles.swap} onClick={handleClick} />
-                            </VisibilityManager>
+                        <nav className={styles.secondNav} onTouchStart={handleSwipe2}>
+                            <AsidePanel />
+                            <div className={styles.postLinks}>
+                                <PostList posts={posts} slug={slug} category={category} />
+                            </div>
+                            <TfiMinus
+                                className={clx(styles.swap, styles.left)}
+                                onClick={handleClick}
+                                onDrag={handleClick}
+                            />
+                            <TfiMinus className={styles.swap} onClick={handleClick} onDrag={handleClick} />
                         </nav>
                         <article className={styles.article}>
                             <ArticlePanel readTime={post.meta.readTime} />
