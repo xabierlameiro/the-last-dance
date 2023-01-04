@@ -55,6 +55,9 @@
         padding: 0px 10px 20px;
         width: calc(100vw - 20px);
     }
+    .navListContainer {
+        padding-right: 12px;
+    }
 }
 
 .body blockquote {

@@ -97,7 +97,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                     >
                         <nav className={styles.nav} onTouchStart={handleSwipe2}>
                             <ControlButtons onClickClose={close} onClickMinimise={close} />
-                            <div>
+                            <div className={styles.navListContainer}>
                                 <NavList
                                     title={f({ id: 'blog.categories' })}
                                     list={categories}
