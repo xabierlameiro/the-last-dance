@@ -8,10 +8,10 @@
     .container {
         grid-template-columns: 10px 10px 1fr;
     }
-    .container.big {
+    .container.openPosts {
         grid-template-columns: 10px 200px 1fr;
     }
-    .container.big2 {
+    .container.openCategories {
         grid-template-columns: 200px 10px 1fr;
     }
 }
@@ -88,23 +88,4 @@
 
 .body h2 {
     padding: 20px;
-}
-
-.swap {
-    width: 10px;
-    transform: rotate(90deg) scale(5);
-    color: darkgrey;
-    opacity: 0.5;
-    position: absolute;
-    right: 0;
-    top: 50%;
-}
-.swap.left {
-    left: 0;
-}
-
-@media screen and (min-width: 768px) {
-    .swap {
-        display: none;
-    }
 }

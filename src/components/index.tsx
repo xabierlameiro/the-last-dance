@@ -10,6 +10,7 @@ import Layout from '@/components/Layout';
 import NavigationArrows from '@/components/NavigationArrows';
 import SearchInput from '@/components/SearchInput';
 import VisibilityManager from '@/components/VisibilityManager';
+import SidesShift from '@/components/SidesShift';
 
 export {
     Avatar,
@@ -24,4 +25,5 @@ export {
     NavigationArrows,
     SearchInput,
     VisibilityManager,
+    SidesShift,
 };

@@ -1,16 +1,16 @@
 import React from 'react';
 import { MDXRemote } from 'next-mdx-remote';
 import { useDialog } from '@/context/dialog';
-import { Layout, Dialog, ControlButtons, VisibilityManager } from '@/components';
+import { Layout, Dialog, ControlButtons, SidesShift } from '@/components';
 import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCategory } from '@/helpers/fileReader';
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
 import { createSiteMap } from '@/helpers/fileWritter';
 import { useRouter } from 'next/router';
+import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
 import styles from '@/styles/blog.module.css';
-import { TfiMinus } from 'react-icons/tfi';
 import { clx } from '@/helpers';
 
 type Props = {
@@ -50,41 +50,13 @@ type Props = {
 };
 
 const PostPage = ({ post, tags, categories, posts }: Props) => {
-    const {
-        query: { category, slug },
-    } = useRouter();
     const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
     const close = () => dispatch({ type: 'close' });
-    // TODO: refactor this
-    const [big, setBig] = React.useState(false);
-    const [big2, setBig2] = React.useState(false);
-
-    const handleClick = () => {
-        setBig((big) => !big);
-    };
-
-    // handler for left and right swipe
-    const handleSwipe = (e: React.TouchEvent<HTMLDivElement>) => {
-        const { clientX } = e.touches[0];
-        const { clientWidth } = e.currentTarget;
-        if (clientX < clientWidth / 2) {
-            setBig(true);
-        } else {
-            setBig(false);
-        }
-    };
-
-    // second handler for left and right swipe
-    const handleSwipe2 = (e: React.TouchEvent<HTMLDivElement>) => {
-        const { clientX } = e.touches[0];
-        const { clientWidth } = e.currentTarget;
-        if (clientX < clientWidth / 2) {
-            setBig2(true);
-        } else {
-            setBig2(false);
-        }
-    };
+    const { left, onSideShiftLeft, right, onSideShiftRight } = useSideShift();
+    const {
+        query: { category, slug },
+    } = useRouter();
 
     return (
         <Layout meta={{ ...post.meta }} isBlog>
@@ -92,10 +64,13 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                 open={open}
                 body={
                     <div
-                        className={clx(styles.container, big && !big2 ? styles.big : big2 ? styles.big2 : '')}
-                        onTouchStart={handleSwipe}
+                        className={clx(
+                            styles.container,
+                            left && !right ? styles.openPosts : right ? styles.openCategories : ''
+                        )}
+                        onTouchStart={onSideShiftLeft}
                     >
-                        <nav className={styles.nav} onTouchStart={handleSwipe2}>
+                        <nav className={styles.nav} onTouchStart={onSideShiftRight}>
                             <ControlButtons onClickClose={close} onClickMinimise={close} />
                             <div className={styles.navListContainer}>
                                 <NavList
@@ -107,17 +82,13 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
                         </nav>
-                        <nav className={styles.secondNav} onTouchStart={handleSwipe2}>
+                        <nav className={styles.secondNav} onTouchStart={onSideShiftRight}>
                             <AsidePanel />
                             <div className={styles.postLinks}>
                                 <PostList posts={posts} slug={slug} category={category} />
                             </div>
-                            <TfiMinus
-                                className={clx(styles.swap, styles.left)}
-                                onClick={handleClick}
-                                onDrag={handleClick}
-                            />
-                            <TfiMinus className={styles.swap} onClick={handleClick} onDrag={handleClick} />
+                            <SidesShift leftPosition />
+                            <SidesShift />
                         </nav>
                         <article className={styles.article}>
                             <ArticlePanel readTime={post.meta.readTime} />
