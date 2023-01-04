@@ -27,9 +27,26 @@ export const decorators = [
                 backgroundColor: 'rgba(255, 255, 255, 0.5)',
                 boxShadow: '0 8px 32px 0 rgb(31 38 135 / 37%)',
                 borderRadius: '10px',
+                position: 'relative',
             }}
         >
             <Story />
         </div>
     ),
 ];
+
+export const globalTypes = {
+    locale: {
+        name: 'Locale',
+        description: 'Internationalization locale',
+        defaultValue: 'en',
+        toolbar: {
+            icon: 'globe',
+            items: [
+                { value: 'en', right: '🇺🇸', title: 'English' },
+                { value: 'es', right: '🇪🇸', title: 'Español' },
+                { value: 'gl', right: '🇪🇸', title: 'Galego' },
+            ],
+        },
+    },
+};
