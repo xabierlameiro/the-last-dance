@@ -38,6 +38,6 @@ Primary.parameters = {
     // See https://storybook.js.org/docs/react/writing-stories/parameters
     // to learn more about the parameters prop
     // See https://storybook.js.org/docs/react/essentials/controls
-    // to learn more about the controls addon
+
     controls: { expanded: true },
 };
