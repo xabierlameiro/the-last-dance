@@ -17,6 +17,7 @@ const LangeSelect = () => {
                 name="lang"
                 className={styles.lang_select}
                 size={Object.keys(messages).length}
+                defaultValue={router.locale}
                 onChange={(e) => {
                     router.push(router.pathname, router.pathname, {
                         locale: e.target.value,
@@ -25,7 +26,7 @@ const LangeSelect = () => {
             >
                 {Object.entries(messages).map(([key, value]) => {
                     return (
-                        <option key={key} value={key} selected={router.locale === key}>
+                        <option key={key} value={key}>
                             {value.language}
                         </option>
                     );

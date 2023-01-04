@@ -5,17 +5,14 @@ export const messages = {
         'blog.readtime': `{readTime} minutes of reading time`,
         'blog.tags': 'Tags',
         language: 'English',
-        'home.seo.title':
-            'Front end developer, microcomputing and networks Technician',
+        'home.seo.title': 'Front end developer, microcomputing and networks Technician',
         'home.seo.description':
             "I'm a developer with more than 5 years of experience working in the online banking sector, currently specialized in Nextjs and React. Passionate about technology and programming, I like to learn new things and share knowledge with the community.",
-        'settings.seo.title':
-            'Customized language, theme and region preferences for a web application',
+        'settings.seo.title': 'Customized language, theme and region preferences for a web application',
         'settings.seo.description':
             'Web page for user preferences settings for your experience on the web, allows you to change the language, theme and region',
         'settings.title': 'System Preferences',
-        'settings.desc':
-            'Web application developer, microcomputing and networks',
+        'settings.desc': 'Web application developer, microcomputing and networks',
         'settings.lang': 'Language & Region',
         'settings.langAlt': 'Language & Region Icon',
         'settings.lang.preferred': 'Preferred languages:',
@@ -34,8 +31,7 @@ export const messages = {
         'blog.tags': 'Etiquetas',
         'blog.readtime': '{readTime} minutos de tiempo de lectura',
         language: 'Español',
-        'home.seo.title':
-            'Desarrollador front end, técnico en microinformática y redes',
+        'home.seo.title': 'Desarrollador front end, técnico en microinformática y redes',
         'home.seo.description':
             'Programador con más de 5 años de experencia trabajando en el sector de la banca online, actualmente especializado en Nextjs y React. Apasionado de la tecnología y la programación, me gusta aprender cosas nuevas y compartir conocimientos con la comunidad. ',
         'settings.seo.title':
@@ -43,8 +39,7 @@ export const messages = {
         'settings.seo.description':
             'Pagina web de configuración de preferencias de usuario para su experiencia en la web, permite cambiar el idioma, el tema y la región',
         'settings.title': 'Preferencias del sistema',
-        'settings.desc':
-            'Desarrollador de aplicaciones web, microinformática y redes',
+        'settings.desc': 'Desarrollador de aplicaciones web, microinformática y redes',
         'settings.lang': 'Idioma y Región',
         'settings.langAlt': 'Icono de Idioma y Región',
         'settings.lang.preferred': 'Idiomas preferidos:',
@@ -63,8 +58,7 @@ export const messages = {
         'blog.tags': 'Etiquetas',
         'blog.readtime': '{readTime} minutos de tempo de lectura',
         language: 'Galego',
-        'home.seo.title':
-            'Desenvolvedor front end, técnico en microinformática e redes',
+        'home.seo.title': 'Desenvolvedor front end, técnico en microinformática e redes',
         'home.seo.description':
             'Programador con máis de 5 anos de experiencia traballando no sector da banca online, actualmente especializado en Nextjs e React. Apasionado da tecnoloxía e a programación, gustame aprender cousas novas e compartir coñecemento coa comunidade. ',
         'settings.seo.title':
@@ -72,8 +66,7 @@ export const messages = {
         'settings.seo.description':
             'Páxina web de configuración de preferencias de usuario para a súa experiencia na web, permite cambiar o idioma, o tema e a rexión',
         'settings.title': 'Preferencias do sistema',
-        'settings.desc':
-            'Desenvolvedor de aplicacións web, microinformática e redes',
+        'settings.desc': 'Desenvolvedor de aplicacións web, microinformática e redes',
         'settings.lang': 'Idioma e Rexión',
         'settings.langAlt': 'Icono de Idioma e Rexión',
         'settings.lang.preferred': 'Idiomas preferidos:',

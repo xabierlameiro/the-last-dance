@@ -30,12 +30,6 @@
     }
 }
 
-.selected {
-    background-color: deepskyblue;
-    border-radius: 5px;
-    color: #fff;
-}
-
 .article {
     width: 100%;
     height: 100%;
@@ -49,34 +43,6 @@
     display: grid;
     grid-template-rows: 50px 1fr;
     overflow: hidden;
-}
-.postLinks ul {
-    list-style: none;
-    padding: 10px;
-}
-.postLinks ul li a {
-    display: grid;
-    grid-template-rows: 20px auto;
-    padding: 10px 20px;
-    position: relative;
-}
-.postLinks ul li a::after {
-    content: '';
-    background: lightgrey;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    height: 1px;
-    width: 80%;
-    margin-right: 10px;
-}
-.postLinks ul .selectedPost {
-    background-color: dodgerblue;
-    color: #fff;
-    border-radius: 5px;
-}
-.postLinks ul .selectedPost::after {
-    content: unset;
 }
 
 .body {

@@ -20,7 +20,7 @@ const PostList = ({ posts, slug, category }: Props) => {
     if (category && typeof category == 'object') category = category[0];
 
     return (
-        <ul data-testid="post-list">
+        <ul data-testid="post-list" className={styles.list}>
             {posts.map(
                 (
                     item: {

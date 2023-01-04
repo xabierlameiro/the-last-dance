@@ -14,7 +14,13 @@ const ArticlePanel = ({ readTime }: Props) => {
     const { formatMessage: f } = useIntl();
     return (
         <div className={styles.articleControls} data-testid="article-panel">
-            <div className={styles.readTime}>
+            <div
+                className={styles.readTime}
+                {...(readTime &&
+                    Number(readTime) >= 0 && {
+                        title: f({ id: 'blog.readtime', description: 'read time' }, { readTime }),
+                    })}
+            >
                 <RxStopwatch size={20} />
                 {readTime && Number(readTime) >= 0 && (
                     <>{f({ id: 'blog.readtime', description: 'read time' }, { readTime })}</>

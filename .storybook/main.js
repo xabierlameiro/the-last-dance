@@ -4,6 +4,7 @@ export default {
         '@storybook/addon-links',
         '@storybook/addon-essentials',
         '@storybook/addon-interactions',
+        'storybook-react-intl',
     ],
     framework: {
         name: '@storybook/nextjs',

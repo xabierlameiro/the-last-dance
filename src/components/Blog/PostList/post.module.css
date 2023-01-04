@@ -1,3 +1,36 @@
+.list {
+    list-style: none;
+    padding: 10px;
+}
+
+.list li a {
+    display: grid;
+    grid-template-rows: 20px auto;
+    padding: 10px 20px;
+    position: relative;
+}
+
+.list li a::after {
+    content: '';
+    background: lightgrey;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 1px;
+    width: 80%;
+    margin-right: 10px;
+}
+
+.list .selectedPost {
+    background-color: dodgerblue;
+    color: #fff;
+    border-radius: 5px;
+}
+
+.selected a::after {
+    content: unset !important;
+}
+
 .title {
     font-size: 15px;
     font-weight: 600;
