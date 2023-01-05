@@ -1,5 +1,3 @@
-// Button.stories.js|jsx
-
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import Avatar from '.';

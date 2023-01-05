@@ -79,6 +79,7 @@
 
 .body p {
     max-width: 1200px;
+    padding: 10px 0;
 }
 
 .body h1 {

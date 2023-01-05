@@ -9,11 +9,7 @@ locale: 'es'
 excerpt: 'Como evitar perder 2 horas de tu vida por un error de NPM, que no deja ejecutar commandos de yarn o npm.'
 description: 'Como evitar perder 2 horas de tu vida por un error de NPM, que no deja ejecutar commandos de yarn o npm. Este error se produce cuando se intenta ejecutar un comando de yarn o npm y aparece el siguiente error: Failed to replace env in config: ${NPM_TOKEN}'
 image: '/posts/npm-token.png'
-alternate:
-    [
-        { lang: 'en', url: 'npm-token-solution-error' },
-        { lang: 'gl', url: 'npm-token-solucion-erro' },
-    ]
+alternate: [{ lang: 'en', url: 'npm-token-solution-error' }, { lang: 'gl', url: 'npm-token-solucion-erro' }]
 ---
 
 # Posible solución para NPM - Failed to replace env in config: $\{NPM_TOKEN}
@@ -24,9 +20,7 @@ Puede ser que en algún momento te hayas encontrado con este error al intentar e
 por que publique una de mis librerias en github y para poder instalarla desde github, necesitaba un token.
 Este token se genera en github y se guarda en las variables de entorno del sistema.
 
-<br />
-Pero es necesario crear un archivo .npmrc en la raiz del proyecto y añadir el siguiente
-contenido:
+Pero es necesario crear un archivo .npmrc en la raiz del proyecto y añadir el siguiente contenido:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -40,7 +34,6 @@ contenido:
 Lo que puede ocurrir es que dejes est archivo fuera de la carpeta del proyeccto y lo guardes en la carpeta de usuario,
 por ejemplo en mi caso lo guardé en la carpeta `C:\Users\xabierlameiro\.npmrc` y por eso me daba el error.
 
-<br />
 Para solucionarlo, lo que hice fue:
 
 <CH.Code style={{maxWidth: 'max-content', height:'max-content', margin: '20px 0'}}>
@@ -54,7 +47,5 @@ yarn install --verbose
 Me enseñó las rutas donde estaba buscando el archivo .npmrc y me di cuenta que lo estaba usando desde en la carpeta de usuario.
 
 Lo **_eliminé_** de la carpeta de usuario y lo volví a crear en la raiz del proyecto y ya no me daba el error.
-
-<br />
 
 > Espero que si os pasa lo mismo, os sirva de ayuda.
