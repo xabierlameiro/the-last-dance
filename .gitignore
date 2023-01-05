@@ -41,3 +41,4 @@ package-lock.json
 storybook-static
 
 public/sitemap.xml
+data/blog.template.mdx

@@ -9,11 +9,7 @@ locale: 'en'
 excerpt: 'In this post we are going to see how to publish the test coverage report in your React application.'
 description: 'I show you how to publish the testing coverage report with jest in your React or Nextjs application, so you or people can see the testing coverage of your project.'
 image: '/posts/publish-report.png'
-alternate:
-    [
-        { lang: 'es', url: 'publicar-reporte-pruebas-react' },
-        { lang: 'gl', url: 'publicar-informe-probas-react' },
-    ]
+alternate: [{ lang: 'es', url: 'publicar-reporte-pruebas-react' }, { lang: 'gl', url: 'publicar-informe-probas-react' }]
 ---
 
 # How to publish the test coverage report in your React application
@@ -22,14 +18,19 @@ In this post we are going to see how to publish the test coverage report in your
 
 -   **_[Jest](https://jestjs.io/)_**
 
+> A Perfect "alternative" for SonarQube for a small projects.
+
 It is not common or necessary to publish your test report of your application, there will even be those who think that it is somewhat imprudent because
 You can expose sensitive information from your application. But the main idea of this is that if you have an open source project and you want
 so that people can contribute, it's a good idea that they can see the test report so they know how well your project is covered or
 because you want to teach people how to test an application.
 
+<br />
+
 However, to have extra security, it is as simple as having it in a protected path with a username and password.
 
-> This example is developed in a web application made with **Nextjs** but it works for any web application that uses **jest**.
+<br />
+PD: This example is developed in a web application made with **Nextjs** but it works for any web application that uses **jest**.
 
 ## 1. Path for the report
 
@@ -63,6 +64,8 @@ const customJestConfig = {
 
 What this script does is modify the path of the static files that the report needs to function as images, css, javascript, etc.
 In addition, some report texts are customized.
+
+> The alternative if you use class is to use the class [CustomReporter](https://jestjs.io/docs/configuration) and implement the onRunComplete method.
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 

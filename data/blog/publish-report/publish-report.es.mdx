@@ -9,11 +9,7 @@ locale: 'es'
 excerpt: 'En este post vamos a ver como publicar el reporte de cobertura de testing en tu aplicación de React.'
 description: 'Muestro como publicar el reporte de cobertura de testing con jest en tu aplicación de React o Nextjs, para que tu mismo o la gente pueda ver la cobertura de testing de tu proyecto.'
 image: '/posts/publish-report.png'
-alternate:
-    [
-        { lang: 'en', url: 'publish-report-testing-react' },
-        { lang: 'gl', url: 'publicar-informe-probas-react' },
-    ]
+alternate: [{ lang: 'en', url: 'publish-report-testing-react' }, { lang: 'gl', url: 'publicar-informe-probas-react' }]
 ---
 
 # Como publicar el reporte de cobertura de testing en tu aplicación de React
@@ -22,14 +18,20 @@ En este post vamos a ver como publicar el reporte de cobertura de testing en tu 
 
 -   **_[Jest](https://jestjs.io/)_**
 
+> Una "alternativa" perfecta a SonarQube para pequeños proyectos.
+
 No es común ni necesario publicar tu reporte de testing de tu aplicación, incluso habrá quien opine que es algo inprudente por que
 puedes exponer información sensible de tu aplicación. Pero la idea principal de esto es que si tienes un proyecto open source y quieres
 que la gente pueda contribuir, es una buena idea que puedan ver el reporte de testing para que sepan que tan bien esta cubierto tu proyecto o
 por que quieres enseñar a la gente como hacer testing en de una aplicación.
 
-Sin embargo para tener seguridad extra, es tan sencillo como tenerlo en una ruta protegida con un usuario y contraseña.
+<br />
 
-> Este ejemplo esta desarrollado en una aplicacion web hecha con **Nextjs** pero vale para cualquier aplicación web que use **jest**.
+Sin embargo, para tener un extra de seguridad, es tan sencillo como tenerlo en una ruta protegida con usuario y contraseña.
+
+<br />
+PD: Este ejemplo está desarrollado en una aplicación web hecha con **Nextjs** pero sirve para cualquier aplicación web que
+use **jest**.
 
 ## 1. Ruta para el reporte
 
@@ -63,6 +65,8 @@ const customJestConfig = {
 
 Este escript lo que hace es modificar la ruta de los archivos estáticos que el reporte necesita para funcionar como imágnes, css, javascript, etc.
 Además se customizan algunos textos del reporte.
+
+> La alternativa si usa la clase es usar la clase [CustomReporter](https://jestjs.io/docs/configuration) e implementar el método onRunComplete.
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
