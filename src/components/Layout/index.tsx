@@ -1,7 +1,9 @@
 import type { ReactElement } from 'react';
-import Dock from '@/components/Dock';
 import BackgroundImage from '../BackgroundImage';
+import styles from './layout.module.css';
 import SEO from '@/components/SEO';
+import Footer from './Footer';
+import Header from './Header';
 
 type Props = {
     children: ReactElement;
@@ -21,16 +23,16 @@ type Props = {
 
 const Layout = ({ meta, className, children, isBlog }: Props) => {
     return (
-        <>
-            <SEO meta={meta} isBlog={isBlog} />
-            <BackgroundImage />
-            <header data-testid="header"></header>
+        <div className={styles.layout}>
+            <Header>
+                <SEO meta={meta} isBlog={isBlog} />
+            </Header>
             <main data-testid="main" className={className}>
+                <BackgroundImage />
                 {children}
             </main>
-            <footer data-testid="footer"></footer>
-            <Dock data-testid="nav" />
-        </>
+            <Footer />
+        </div>
     );
 };
 

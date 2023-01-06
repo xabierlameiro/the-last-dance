@@ -1,0 +1,45 @@
+.header {
+    height: 24px;
+    background: linear-gradient(to right, rgba(227, 168, 208, 1), rgba(228, 217, 234, 1), rgba(230, 194, 220, 1));
+    display: grid;
+    grid-template-columns: auto max-content 1fr auto;
+    gap: 20px;
+    align-items: center;
+    padding: 0 18px;
+    overflow: scroll;
+}
+
+.header::-webkit-scrollbar {
+    display: none;
+}
+.header svg {
+    height: 18px;
+    width: 18px;
+    fill: rgba(34, 25, 31, 1);
+}
+
+.route {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.dateAndHour {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 5px;
+    font-size: 14px;
+    color: rgba(var(--color-font));
+}
+
+.navLinks {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 20px;
+    width: max-content;
+}
+.navLinks a {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(var(--color-font));
+    text-decoration: none;
+}
