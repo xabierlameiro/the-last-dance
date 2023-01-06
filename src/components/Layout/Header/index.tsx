@@ -22,7 +22,7 @@ const DateAndHour = () => {
     }, []);
 
     return (
-        <div className={styles.dateAndHour}>
+        <div className={styles.dateAndHour} suppressHydrationWarning={true}>
             <span>{day}</span>
             <span>{dayNumber}</span>
             <span>{month}</span>

@@ -21,9 +21,11 @@
 .route {
     font-size: 14px;
     font-weight: 700;
+    user-select: none;
 }
 
 .dateAndHour {
+    user-select: none;
     display: grid;
     grid-auto-flow: column;
     gap: 5px;
