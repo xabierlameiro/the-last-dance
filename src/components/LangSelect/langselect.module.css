@@ -1,5 +1,5 @@
 .lang_container {
-    background-color: lightgrey;
+    background-color: rgba(var(--grey-color));
     border-radius: 5px;
     width: inherit;
     margin: 10px 0;
@@ -26,5 +26,5 @@
 }
 
 .lang_select option:checked {
-    background-color: lightskyblue;
+    background-color: rgba(var(--blue-color));
 }

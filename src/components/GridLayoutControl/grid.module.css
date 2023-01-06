@@ -15,7 +15,7 @@
 
 .title {
     font-size: 14.5px;
-    color: rgba(108, 108, 112, 1);
+    color: rgba(var(--color-font));
     user-select: none;
     justify-self: flex-start;
     text-indent: 10px;

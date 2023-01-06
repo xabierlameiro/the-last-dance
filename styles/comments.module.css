@@ -1,17 +1,24 @@
 .header {
     display: grid;
-    background-color: blanchedalmond;
+    background-color: rgba(var(--color-terminal-header));
     grid-template-columns: auto 1fr;
     align-items: center;
     padding: 5px 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    gap: 10px;
 }
 .header div {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: rgba(var(--color-terminal-font));
+    font-weight: 600;
+    font-size: 14px;
     gap: 5px;
 }
 .header div svg {
-    color: deepskyblue;
-    font-size: 24px;
+    color: rgba(var(--blue-color));
+    font-size: 20px;
 }

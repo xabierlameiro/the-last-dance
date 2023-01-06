@@ -1,5 +1,5 @@
 .articleControls {
-    border-bottom: 1px solid lightgrey;
+    border-bottom: 1px solid rgba(var(--grey-color));
     display: grid;
     padding: 0 20px;
     grid-template-columns: 1fr repeat(2, max-content) 1fr repeat(5, max-content) 220px;
@@ -19,7 +19,7 @@
     }
 }
 .articleControls svg {
-    color: gray;
+    color: rgba(var(--dark-grey-color));
     font-size: 21.5px;
     stroke-width: 0%;
 }
@@ -32,7 +32,7 @@
 
 .readTime {
     font-size: 13px;
-    color: gray;
+    color: rgba(var(--dark-grey-color));
     display: flex;
     align-items: center;
     gap: 10px;

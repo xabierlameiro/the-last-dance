@@ -20,7 +20,7 @@
 }
 
 .ch_frame_button svg {
-    color: #000;
+    color: rgba(var(--color-font));
     transform: scale(0.7);
     opacity: 0;
 }
@@ -30,18 +30,18 @@
 }
 
 .ch_frame_button_left {
-    border-color: #ce5347;
-    background-color: #ed6b60;
+    border-color: rgba(var(--red-color));
+    background-color: rgba(var(--red-color));
 }
 
 .ch_frame_button_middle {
-    border-color: #d6a243;
-    background-color: #f5be4f;
+    border-color: rgba(var(--yellow-color));
+    background-color: rgba(var(--yellow-color));
 }
 
 .ch_frame_button_right {
-    border-color: #58a942;
-    background-color: #62c554;
+    border-color: rgba(var(--green-color));
+    background-color: rgba(var(--green-color));
 }
 
 .ch_frame_button_right svg {
@@ -50,10 +50,11 @@
 }
 
 .ch_frame_button_disabled {
+    background-color: rgba(var(--disable-color));
+    border-color: rgba(var(--disable-color));
     pointer-events: none;
     user-select: none;
     cursor: default;
-    background-color: lightgrey;
     opacity: 0.4;
 }
 

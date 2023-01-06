@@ -17,7 +17,7 @@
 }
 
 .nav {
-    background-color: lightgrey;
+    background-color: rgba(var(--grey-color));
     padding: 20px 12px;
     display: grid;
     grid-template-rows: 40px auto auto 1fr;
@@ -39,7 +39,7 @@
 
 .secondNav {
     position: relative;
-    border-right: 1px solid lightgrey;
+    border-right: 1px solid rgba(var(--grey-color));
     display: grid;
     grid-template-rows: 50px 1fr;
     overflow: hidden;
@@ -61,14 +61,9 @@
 }
 
 .body blockquote {
-    border-left: 5px solid dodgerblue;
+    border-left: 5px solid rgba(var(--blue-color));
     padding: 10px;
     margin: 10px 0;
-}
-.body a {
-    color: dodgerblue;
-    text-decoration: underline;
-    font-weight: 600;
 }
 
 .body ul {

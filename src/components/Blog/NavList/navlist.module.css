@@ -16,28 +16,33 @@
     gap: 5px;
     font-size: 14px;
     padding: 5px;
+    color: rgba(var(--color-font));
+    text-decoration: none;
+    font-weight: 400;
 }
 
 .postList li svg {
     font-size: 16px;
-    color: steelblue;
+    color: rgba(var(--blue-color));
 }
 
 .selected .number,
 .postList .selected svg {
-    color: #fff;
+    color: rgba(var(--white-color));
 }
 
 .selected {
-    background-color: deepskyblue;
+    background-color: rgba(var(--blue-color));
     border-radius: 5px;
-    color: #fff;
+    color: rgba(var(--white-color));
+}
+
+li a.selected {
+    color: rgba(var(--white-color));
 }
 
 .number {
     font-size: 12px;
-    color: grey;
+    color: rgba(var(--grey-color));
     text-align: right;
-}
-.tag {
 }

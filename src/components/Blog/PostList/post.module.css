@@ -8,11 +8,13 @@
     grid-template-rows: 20px auto;
     padding: 10px 20px;
     position: relative;
+    text-decoration: none;
+    color: rgba(var(--color-font));
 }
 
 .list li a::after {
     content: '';
-    background: lightgrey;
+    background: rgba(var(--grey-color));
     position: absolute;
     bottom: 0;
     right: 0;
@@ -22,8 +24,8 @@
 }
 
 .list .selectedPost {
-    background-color: dodgerblue;
-    color: #fff;
+    background-color: rgba(var(--blue-color));
+    color: rgba(var(--white-color));
     border-radius: 5px;
 }
 
@@ -47,7 +49,11 @@
     text-overflow: ellipsis;
 }
 .selected {
-    background-color: deepskyblue;
+    background-color: rgba(var(--blue-color));
+
     border-radius: 5px;
-    color: #fff;
+}
+
+li.selected > a {
+    color: rgba(var(--white-color));
 }

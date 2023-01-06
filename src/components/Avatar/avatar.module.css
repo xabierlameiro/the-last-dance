@@ -16,7 +16,6 @@
     display: grid;
     align-content: flex-start;
     gap: 4px;
-    color: rgba(108, 108, 112, 1);
 }
 
 .username {

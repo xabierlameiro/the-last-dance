@@ -7,7 +7,7 @@
     max-width: 100vw;
     height: calc(100vh - 30px);
     transform: scale(0);
-    background: #fff;
+    background: rgba(var(--white-color));
     box-shadow: 0 8px 32px 0 rgb(31 38 135 / 37%);
     transition: all 0.3s ease-in;
     overflow: hidden;
