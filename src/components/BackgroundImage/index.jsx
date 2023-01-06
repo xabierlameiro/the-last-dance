@@ -9,6 +9,7 @@ const BackgroundImage = () => {
         <div className={styles.bgWrap}>
             <Image
                 fill
+                loading="eager"
                 sizes="100vw"
                 quality={100}
                 placeholder="blur"

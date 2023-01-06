@@ -37,6 +37,7 @@ const NavList = ({ title, list, category, isCategory }: Props) => {
                             <li key={index}>
                                 <Link
                                     href={item.href}
+                                    title={isCategory ? item.category : item.tag}
                                     className={
                                         isCategory
                                             ? category == item.category.toLowerCase()
