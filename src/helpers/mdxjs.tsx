@@ -5,14 +5,8 @@ import { CH } from '@xabierlameiro/code-hike/dist/components.cjs.js';
 
 export const ControlButtons = () => {
     const { dispatch } = useDialog();
-    return (
-        <CButtons
-            disabled
-            withPadding
-            onClickClose={() => dispatch({ type: 'close' })}
-            onClickMinimise={() => dispatch({ type: 'close' })}
-        />
-    );
+    const closeHandler = () => dispatch({ type: 'close' });
+    return <CButtons disabled withPadding onClickClose={closeHandler} onClickMinimise={closeHandler} />;
 };
 
 export const components = { CH, ControlButtons };

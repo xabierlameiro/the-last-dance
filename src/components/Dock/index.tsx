@@ -10,6 +10,7 @@ import { clx } from '@/helpers';
 const Dock = () => {
     const { pathname, locale } = useRouter();
     const { dispatch } = useDialog();
+    const clickHandler = () => dispatch({ type: 'open' });
 
     return (
         <>
@@ -18,7 +19,7 @@ const Dock = () => {
                     {menu.map(({ link, img, alt }, index) => (
                         <li
                             key={index}
-                            onClick={() => dispatch({ type: 'open' })}
+                            onClick={clickHandler}
                             className={clx(
                                 pathname === link ||
                                     pathname.includes(

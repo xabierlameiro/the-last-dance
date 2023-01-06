@@ -14,22 +14,20 @@ import {
     GridLayoutControl,
 } from '@/components';
 
+const toggleHandler = (dispatch: Function) => () => dispatch({ type: 'toggleLang' });
+
 const Header = () => {
     const { lang, dispatch } = useDialog();
     const { formatMessage: f } = useIntl();
     const close = () => dispatch({ type: 'close' });
     return (
         <header className={styles.header}>
-            <ControlButtons
-                disabled
-                onClickClose={close}
-                onClickMinimise={close}
-            />
+            <ControlButtons disabled onClickClose={close} onClickMinimise={close} />
             <NavigationArrows
                 disabledRight={lang}
                 disabledLeft={!lang}
-                onClickLeft={() => dispatch({ type: 'toggleLang' })}
-                onClickRight={() => dispatch({ type: 'toggleLang' })}
+                onClickLeft={toggleHandler(dispatch)}
+                onClickRight={toggleHandler(dispatch)}
             />
             <GridLayoutControl routeName={f({ id: 'settings.title' })} />
             <SearchInput placeHolderText={f({ id: 'settings.search' })} />
@@ -66,10 +64,7 @@ const Content = () => {
                     description={f({ id: 'settings.desc' })}
                 />
             </div>
-            <section
-                className={styles.confg}
-                onClick={() => dispatch({ type: 'toggleLang' })}
-            >
+            <section className={styles.confg} onClick={toggleHandler(dispatch)}>
                 <IconWithName
                     icon="/language.jpeg"
                     alt={f({ id: 'settings.langAlt' })}
@@ -91,12 +86,7 @@ const Page = () => {
                 description: f({ id: 'settings.seo.description' }),
             }}
         >
-            <Dialog
-                modalMode
-                open={open}
-                body={<Content />}
-                header={<Header />}
-            />
+            <Dialog modalMode open={open} body={<Content />} header={<Header />} />
         </Layout>
     );
 };
