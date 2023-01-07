@@ -23,10 +23,10 @@ const DateAndHour = () => {
 
     return (
         <div className={styles.dateAndHour}>
-            <span>{day}</span>
-            <span>{dayNumber}</span>
-            <span>{month}</span>
-            <span>{hour}</span>
+            <span suppressHydrationWarning>{day}</span>
+            <span suppressHydrationWarning>{dayNumber}</span>
+            <span suppressHydrationWarning>{month}</span>
+            <span suppressHydrationWarning>{hour}</span>
         </div>
     );
 };
