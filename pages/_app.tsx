@@ -1,6 +1,6 @@
 import '../styles/globals.css';
 import '@xabierlameiro/code-hike/dist/index.css';
-import { Analytics } from '@vercel/analytics/react';
+import Script from 'next/script';
 import { DialogProvider } from '@/context/dialog';
 import { IntlProvider } from 'react-intl';
 import { useRouter } from 'next/router';
@@ -12,12 +12,23 @@ type locales = 'en' | 'es' | 'gl';
 const App = ({ Component, pageProps }: AppProps) => {
     const { locale = 'en' } = useRouter();
     return (
-        <IntlProvider locale={locale} messages={messages[locale as locales]}>
-            <DialogProvider>
-                <Component {...pageProps} />
-                <Analytics />
-            </DialogProvider>
-        </IntlProvider>
+        <>
+            <Script strategy="afterInteractive" src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GA}`} />
+            <Script id="ga-script" strategy="afterInteractive">
+                {`
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', '${process.env.GA}');    
+                  
+                  `}
+            </Script>
+            <IntlProvider locale={locale} messages={messages[locale as locales]}>
+                <DialogProvider>
+                    <Component {...pageProps} />
+                </DialogProvider>
+            </IntlProvider>
+        </>
     );
 };
 
