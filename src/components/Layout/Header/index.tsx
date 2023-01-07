@@ -22,7 +22,7 @@ const DateAndHour = () => {
     }, []);
 
     return (
-        <div className={styles.dateAndHour} suppressHydrationWarning={true}>
+        <div className={styles.dateAndHour}>
             <span>{day}</span>
             <span>{dayNumber}</span>
             <span>{month}</span>
@@ -82,7 +82,7 @@ const NavLinks = () => {
 
 const Header = ({ children }: Props) => {
     return (
-        <header data-testid="header" className={styles.header}>
+        <header data-testid="header" className={styles.header} suppressHydrationWarning={true}>
             <SiBitcoincash />
             <Route />
             <NavLinks />
