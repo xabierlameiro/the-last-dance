@@ -1,0 +1,60 @@
+---
+title: 'Error: listen EADDRINUSE: address already in use 0.0.0.0:XXXX'
+slug: 'resolver-direccion-en-uso-error'
+author: 'Xabier Lameiro'
+date: '06-01-2023'
+category: 'Error'
+tags: ['node']
+locale: 'es'
+excerpt: 'Significa que la combinación de dirección de red y puerto especificada en el mensaje de error ya está siendo utilizada por otro proceso que se está ejecutando en su ordenador. Esto puede ocurrir cuando se intenta iniciar un servidor en un puerto que ya está siendo utilizado por otro programa.'
+description: 'Significa que la combinación de dirección de red y puerto especificada en el mensaje de error ya está siendo utilizada por otro proceso que se está ejecutando en su ordenador. Esto puede ocurrir cuando se intenta iniciar un servidor en un puerto que ya está siendo utilizado por otro programa.'
+image: '/posts/address-in-use.png'
+alternate: [{ lang: 'en', url: 'solve-address-in-use-error' }, { lang: 'gl', url: 'arranxar-direccion-en-uso-erro' }]
+---
+
+# Error: listen EADDRINUSE: address already in use 0.0.0.0:XXXX
+
+Si intenta iniciar un servidor en un puerto que ya está siendo utilizado por otro programa, obtendrá el siguiente error:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+MAKINOTE$ yarn start
+yarn run v1.22.19
+$ next start
+Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at Server.setupListenHandle [as _listen2] (node:net:1432:16)
+    at listenInCluster (node:net:1480:12)
+    at doListen (node:net:1629:7)
+    at processTicksAndRejections (node:internal/process/task_queues:84:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+```
+
+</CH.Code>
+
+## Encuentra el proceso que está usando el puerto
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+MAKINOTE$ lsof -i :3000
+COMMAND   PID                 USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+node    38091 xabier.lameirocardam   24u  IPv6 0xee02297dd086ebc1      0t0  TCP *:hbci (LISTEN)
+```
+
+</CH.Code>
+
+## Mata el proceso
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+MAKINOTE$ kill -9 38091
+```
+
+</CH.Code>

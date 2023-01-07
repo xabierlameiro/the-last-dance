@@ -43,6 +43,6 @@ li a.selected {
 
 .number {
     font-size: 12px;
-    color: rgba(var(--grey-color));
+    color: rgba(var(--color-font));
     text-align: right;
 }

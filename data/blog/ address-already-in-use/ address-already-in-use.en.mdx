@@ -1,0 +1,61 @@
+---
+title: 'Error: listen EADDRINUSE: address already in use 0.0.0.0:XXXX'
+slug: 'solve-address-in-use-error'
+author: 'Xabier Lameiro'
+date: '06-01-2023'
+category: 'Error'
+tags: ['node']
+locale: 'en'
+excerpt: 'Means that the network address and port combination specified in the error message is already in use by another process running on your computer. This can occur when you try to start a server on a port that is already being used by another program.'
+description: 'Means that the network address and port combination specified in the error message is already in use by another process running on your computer. This can occur when you try to start a server on a port that is already being used by another program.'
+image: '/posts/address-in-use.png'
+alternate:
+    [{ lang: 'es', url: 'resolver-direccion-en-uso-error' }, { lang: 'gl', url: 'arranxar-direccion-en-uso-erro' }]
+---
+
+# Error: listen EADDRINUSE: address already in use 0.0.0.0:XXXX
+
+When you try to start a server on a port that is already being used by another program, you will get the following error:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+MAKINOTE$ yarn start
+yarn run v1.22.19
+$ next start
+Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at Server.setupListenHandle [as _listen2] (node:net:1432:16)
+    at listenInCluster (node:net:1480:12)
+    at doListen (node:net:1629:7)
+    at processTicksAndRejections (node:internal/process/task_queues:84:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+```
+
+</CH.Code>
+
+## Find the process that is using the port
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+MAKINOTE$ lsof -i :3000
+COMMAND   PID                 USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+node    38091 xabier.lameirocardam   24u  IPv6 0xee02297dd086ebc1      0t0  TCP *:hbci (LISTEN)
+```
+
+</CH.Code>
+
+## Kill the process
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+MAKINOTE$ kill -9 38091
+```
+
+</CH.Code>
