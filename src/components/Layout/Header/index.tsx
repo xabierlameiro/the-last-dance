@@ -82,7 +82,7 @@ const NavLinks = () => {
 
 const Header = ({ children }: Props) => {
     return (
-        <header data-testid="header" className={styles.header} suppressHydrationWarning={true}>
+        <header data-testid="header" className={styles.header}>
             <SiBitcoincash />
             <Route />
             <NavLinks />

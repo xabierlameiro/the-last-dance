@@ -19,6 +19,7 @@
         "build-storybook": "storybook build"
     },
     "dependencies": {
+        "@google-analytics/data": "^3.1.2",
         "@mdx-js/loader": "^2.2.1",
         "@mdx-js/react": "^2.2.1",
         "@next/font": "13.0.7",
