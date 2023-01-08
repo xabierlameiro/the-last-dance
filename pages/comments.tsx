@@ -25,7 +25,7 @@ const Page = () => {
             className="comments"
             meta={{
                 title: f({ id: 'comments.seo.title' }),
-                description: 'comments.seo.description',
+                description: f({ id: 'comments.seo.description' }),
             }}
         >
             <Dialog
