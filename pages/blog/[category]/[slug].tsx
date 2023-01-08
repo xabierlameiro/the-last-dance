@@ -47,9 +47,10 @@ type Props = {
             slug: string;
         };
     }[];
+    analytics: any;
 };
 
-const PostPage = ({ post, tags, categories, posts }: Props) => {
+const PostPage = ({ post, tags, categories, posts, analytics }: Props) => {
     const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
     const close = () => dispatch({ type: 'close' });
@@ -91,7 +92,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                             <SidesShift />
                         </nav>
                         <article className={styles.article}>
-                            <ArticlePanel readTime={post.meta.readTime} />
+                            <ArticlePanel readTime={post.meta.readTime} analytics={analytics} />
                             <div className={styles.body}>
                                 <MDXRemote {...post.content} components={components} />
                             </div>
@@ -111,19 +112,34 @@ export const getStaticProps = async (data: {
     locale: string;
 }) => {
     const {
-        params: { category },
+        params: { category, slug },
         locale,
     } = data;
     const post = await getPostBySlug(data);
     const mdxSource = await serialize(post.content);
     const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);
+    let analytics = '';
+
+    // TODO: Move this logic on endpoint
+    try {
+        const target = locale === 'en' ? `/blog/${category}/${slug}` : `/${locale}/blog/${category}/${slug}`;
+        const query = await fetch(`${process.env.DOMAIN}/api/analytics?slug=${target}`);
+        const response = await query.json();
+        const [data] = response.response.rows;
+        const { metricValues = [] } = data || {};
+        const [values = { value: 0 }] = metricValues;
+        analytics = values.value;
+    } catch (e) {
+        console.log(e);
+    }
 
     return {
         props: {
             tags,
             categories,
             posts,
+            analytics,
             post: {
                 ...post,
                 content: mdxSource,

@@ -3,6 +3,7 @@ export const messages = {
         'blog.title': 'This is the blog page',
         'blog.categories': 'Topics',
         'blog.readtime': `{readTime} minutes of reading time`,
+        'blog.readHits': `{hits} hits`,
         'blog.tags': 'Tags',
         language: 'English',
         'home.seo.title': 'Front end developer, microcomputing and networks Technician',
@@ -30,6 +31,7 @@ export const messages = {
         'blog.categories': 'Temas',
         'blog.tags': 'Etiquetas',
         'blog.readtime': '{readTime} minutos de tiempo de lectura',
+        'blog.readHits': '{hits} visitas',
         language: 'Español',
         'home.seo.title': 'Desarrollador front end, técnico en microinformática y redes',
         'home.seo.description':
@@ -57,6 +59,7 @@ export const messages = {
         'blog.categories': 'Temas',
         'blog.tags': 'Etiquetas',
         'blog.readtime': '{readTime} minutos de tempo de lectura',
+        'blog.readHits': '{hits} visitas',
         language: 'Galego',
         'home.seo.title': 'Desenvolvedor front end, técnico en microinformática e redes',
         'home.seo.description':

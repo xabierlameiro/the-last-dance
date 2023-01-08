@@ -9,8 +9,9 @@ import { useIntl } from 'react-intl';
 
 type Props = {
     readTime?: string;
+    analytics?: number;
 };
-const ArticlePanel = ({ readTime }: Props) => {
+const ArticlePanel = ({ readTime, analytics }: Props) => {
     const { formatMessage: f } = useIntl();
     return (
         <div className={styles.articleControls} data-testid="article-panel">
@@ -24,6 +25,11 @@ const ArticlePanel = ({ readTime }: Props) => {
                 <RxStopwatch size={20} />
                 {readTime && Number(readTime) >= 0 && (
                     <>{f({ id: 'blog.readtime', description: 'read time' }, { readTime })}</>
+                )}
+                {Number(analytics) > 0 && (
+                    <span className={styles.analytics}>
+                        {f({ id: 'blog.readHits', description: 'read hits' }, { hits: analytics })}
+                    </span>
                 )}
             </div>
             <MdSortByAlpha />

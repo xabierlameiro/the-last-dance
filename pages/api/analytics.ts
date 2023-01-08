@@ -8,6 +8,9 @@ type Data = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+    const { query } = req;
+    const { slug = '/' } = query;
+
     const analyticsDataClient = new BetaAnalyticsDataClient({
         credentials: {
             client_email: process.env.ANALYTICS_CLIENT_EMAIL,
@@ -25,15 +28,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 endDate: 'today',
             },
         ],
+        dimensions: [
+            {
+                name: 'date',
+            },
+            {
+                name: 'pagePath',
+            },
+        ],
         metrics: [
             {
-                name: 'screenpageViews',
+                name: 'screenPageViews',
             },
-            {
-                name: 'engagementRate',
+        ],
+        dimensionFilter: {
+            filter: {
+                fieldName: 'pagePath',
+                stringFilter: {
+                    matchType: 'EXACT',
+                    value: slug.toString(),
+                },
             },
+        },
+        orderBys: [
             {
-                name: 'totalUsers',
+                dimension: {
+                    dimensionName: 'date',
+                },
             },
         ],
     });
