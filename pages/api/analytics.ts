@@ -1,5 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 
 type Data = {
@@ -7,7 +7,7 @@ type Data = {
     response?: any;
 };
 
-export default async function handler(res: NextApiResponse<Data>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
     const analyticsDataClient = new BetaAnalyticsDataClient({
         credentials: {
             client_email: process.env.ANALYTICS_CLIENT_EMAIL,
