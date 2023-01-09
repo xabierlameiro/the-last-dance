@@ -4,7 +4,7 @@ import { BetaAnalyticsDataClient } from '@google-analytics/data';
 
 type Data = {
     error?: string;
-    total?: number;
+    response?: any;
 };
 
 // jsdoc for handler function
@@ -23,7 +23,6 @@ type Data = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
     const { query } = req;
     const { slug = '/' } = query;
-    let total = 0;
 
     const analyticsDataClient = new BetaAnalyticsDataClient({
         credentials: {
@@ -73,15 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     });
 
     try {
-        total = response?.rows?.reduce((prev: any, curr: any) => {
-            return prev + parseInt(curr.metricValues[0].value, 0);
-        }, 0);
-    } catch (err: any) {
-        throw new Error('Error while parsing analytics data');
-    }
-
-    try {
-        res.status(200).json({ total });
+        res.status(200).json({ response });
     } catch (err: any) {
         res.status(500).json({ error: err });
     }

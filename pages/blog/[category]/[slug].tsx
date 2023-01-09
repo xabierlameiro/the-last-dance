@@ -119,15 +119,27 @@ export const getStaticProps = async (data: {
     const mdxSource = await serialize(post.content);
     const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);
-    const target = locale === 'en' ? `/blog/${category}/${slug}` : `/${locale}/blog/${category}/${slug}`;
-    const { total } = await (await fetch(`${process.env.DOMAIN}/api/analytics?slug=${target}`)).json();
+    let analytics = '';
+
+    try {
+        const target = locale === 'en' ? `/blog/${category}/${slug}` : `/${locale}/blog/${category}/${slug}`;
+        const query = await fetch(`${process.env.DOMAIN}/api/analytics?slug=${target}`);
+        const { response } = await query.json();
+        let total = response?.rows?.reduce((prev: any, curr: any) => {
+            return prev + parseInt(curr.metricValues[0].value, 0);
+        }, 0);
+
+        analytics = total;
+    } catch (e) {
+        console.log(e);
+    }
 
     return {
         props: {
             tags,
             categories,
             posts,
-            analytics: total,
+            analytics,
             post: {
                 ...post,
                 content: mdxSource,
