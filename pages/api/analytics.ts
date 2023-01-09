@@ -3,13 +3,27 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 
 type Data = {
-    error?: Error;
-    response?: any;
+    error?: string;
+    total?: number;
 };
 
+// jsdoc for handler function
+/**
+ * @description This function is used to get the total number of page views for a given page. It uses the Google
+ * Analytics Data API to get the data.
+ *
+ * @param {NextApiRequest} req
+ * @param {NextApiResponse<Data>} res
+ * @returns {Promise<{
+ *     error?: string;
+ *     total?: number;
+ * }>}
+ * @throws {Error: Error while parsing analytics data}
+ */
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
     const { query } = req;
     const { slug = '/' } = query;
+    let total = 0;
 
     const analyticsDataClient = new BetaAnalyticsDataClient({
         credentials: {
@@ -19,7 +33,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         projectId: process.env.ANALYTICS_PROJECT_ID,
     });
 
-    // Runs a simple report.
     const [response] = await analyticsDataClient.runReport({
         property: `properties/348472560`,
         dateRanges: [
@@ -60,7 +73,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     });
 
     try {
-        res.status(200).json({ response });
+        total = response?.rows?.reduce((prev: any, curr: any) => {
+            return prev + parseInt(curr.metricValues[0].value, 0);
+        }, 0);
+    } catch (err: any) {
+        throw new Error('Error while parsing analytics data');
+    }
+
+    try {
+        res.status(200).json({ total });
     } catch (err: any) {
         res.status(500).json({ error: err });
     }
