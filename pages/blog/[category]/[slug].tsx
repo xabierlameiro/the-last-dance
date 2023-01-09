@@ -125,11 +125,12 @@ export const getStaticProps = async (data: {
     try {
         const target = locale === 'en' ? `/blog/${category}/${slug}` : `/${locale}/blog/${category}/${slug}`;
         const query = await fetch(`${process.env.DOMAIN}/api/analytics?slug=${target}`);
-        const response = await query.json();
-        const [data] = response.response.rows;
-        const { metricValues = [] } = data || {};
-        const [values = { value: 0 }] = metricValues;
-        analytics = values.value;
+        const { response } = await query.json();
+        let total = response?.rows?.reduce((prev: any, curr: any) => {
+            return prev + parseInt(curr.metricValues[0].value, 0);
+        }, 0);
+
+        analytics = total;
     } catch (e) {
         console.log(e);
     }
