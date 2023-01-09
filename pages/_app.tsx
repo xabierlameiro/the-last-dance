@@ -26,7 +26,17 @@ const App = ({ Component, pageProps }: AppProps) => {
                   
                   `}
             </Script>
-            <IntlProvider locale={locale} messages={messages[locale as locales]}>
+            <IntlProvider
+                locale={locale}
+                messages={messages[locale as locales]}
+                defaultLocale="en"
+                onError={(err) => {
+                    // if  Missing locale data for locale: "gl" in Intl.NumberFormat ignore it
+                    if (err.message.includes('Missing locale data for locale: "gl"')) {
+                        return;
+                    }
+                }}
+            >
                 <DialogProvider>
                     <Component {...pageProps} />
                 </DialogProvider>

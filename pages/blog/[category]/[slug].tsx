@@ -53,11 +53,11 @@ type Props = {
 const PostPage = ({ post, tags, categories, posts, analytics }: Props) => {
     const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
-    const close = () => dispatch({ type: 'close' });
     const { left, onSideShiftLeft, right, onSideShiftRight } = useSideShift();
     const {
         query: { category, slug },
     } = useRouter();
+    const close = () => dispatch({ type: 'close' });
 
     return (
         <Layout meta={{ ...post.meta }} isBlog>
