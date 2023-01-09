@@ -4,7 +4,7 @@ import { BetaAnalyticsDataClient } from '@google-analytics/data';
 
 type Data = {
     error?: string;
-    response?: any;
+    total?: number;
 };
 
 /**
@@ -70,8 +70,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         ],
     });
 
+    if (!response || !response.rows) {
+        res.status(500).json({ error: 'Error while parsing analytics data' });
+        return;
+    }
+
+    let total = response.rows.reduce((prev: any, curr: any) => {
+        return prev + parseInt(curr.metricValues[0].value, 0);
+    }, 0);
+
     try {
-        res.status(200).json({ response });
+        res.status(200).json({ total });
     } catch (err: any) {
         res.status(500).json({ error: err });
     }

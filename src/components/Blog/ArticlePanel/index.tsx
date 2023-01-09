@@ -1,18 +1,29 @@
+import React from 'react';
 import { MdSortByAlpha, MdAddLink, MdOutlineChecklist } from 'react-icons/md';
 import { RxTable, RxUpload, RxStopwatch } from 'react-icons/rx';
 import { BiPhotoAlbum } from 'react-icons/bi';
 import { BsLock } from 'react-icons/bs';
 import { CgProfile } from 'react-icons/cg';
 import { SearchInput } from '@/components';
-import styles from './panel.module.css';
+import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
+import styles from './panel.module.css';
 
 type Props = {
     readTime?: string;
-    analytics?: number;
 };
-const ArticlePanel = ({ readTime, analytics }: Props) => {
+const ArticlePanel = ({ readTime }: Props) => {
+    const [hits, setHits] = React.useState(0);
     const { formatMessage: f } = useIntl();
+    const { asPath } = useRouter();
+
+    React.useEffect(() => {
+        (async () => {
+            const { total } = await fetch(`/api/analytics?slug=${asPath}`).then((res) => res.json());
+            setHits(total);
+        })();
+    }, [asPath]);
+
     return (
         <div className={styles.articleControls} data-testid="article-panel">
             <div
@@ -26,9 +37,9 @@ const ArticlePanel = ({ readTime, analytics }: Props) => {
                 {readTime && Number(readTime) >= 0 && (
                     <>{f({ id: 'blog.readtime', description: 'read time' }, { readTime })}</>
                 )}
-                {Number(analytics) > 0 && (
+                {Number(hits) > 0 && (
                     <span className={styles.analytics}>
-                        {f({ id: 'blog.readHits', description: 'read hits' }, { hits: analytics })}
+                        {f({ id: 'blog.readHits', description: 'read hits' }, { hits })}
                     </span>
                 )}
             </div>

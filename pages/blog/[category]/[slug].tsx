@@ -47,10 +47,9 @@ type Props = {
             slug: string;
         };
     }[];
-    analytics: any;
 };
 
-const PostPage = ({ post, tags, categories, posts, analytics }: Props) => {
+const PostPage = ({ post, tags, categories, posts }: Props) => {
     const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
     const { left, onSideShiftLeft, right, onSideShiftRight } = useSideShift();
@@ -92,7 +91,7 @@ const PostPage = ({ post, tags, categories, posts, analytics }: Props) => {
                             <SidesShift />
                         </nav>
                         <article className={styles.article}>
-                            <ArticlePanel readTime={post.meta.readTime} analytics={analytics} />
+                            <ArticlePanel readTime={post.meta.readTime} />
                             <div className={styles.body}>
                                 <MDXRemote {...post.content} components={components} />
                             </div>
@@ -112,40 +111,24 @@ export const getStaticProps = async (data: {
     locale: string;
 }) => {
     const {
-        params: { category, slug },
+        params: { category },
         locale,
     } = data;
     const post = await getPostBySlug(data);
     const mdxSource = await serialize(post.content);
     const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);
-    let analytics = '';
-
-    try {
-        const target = locale === 'en' ? `/blog/${category}/${slug}` : `/${locale}/blog/${category}/${slug}`;
-        const query = await fetch(`${process.env.DOMAIN}/api/analytics?slug=${target}`);
-        const { response } = await query.json();
-        let total = response?.rows?.reduce((prev: any, curr: any) => {
-            return prev + parseInt(curr.metricValues[0].value, 0);
-        }, 0);
-
-        analytics = total;
-    } catch (e) {
-        console.log(e);
-    }
 
     return {
         props: {
             tags,
             categories,
             posts,
-            analytics,
             post: {
                 ...post,
                 content: mdxSource,
             },
         },
-        revalidate: 10,
     };
 };
 

@@ -23,3 +23,9 @@ jest.mock('next/router', () => ({
         };
     },
 }));
+
+global.fetch = jest.fn(() =>
+    Promise.resolve({
+        json: () => Promise.resolve({}),
+    })
+);
