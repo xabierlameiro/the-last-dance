@@ -7,7 +7,6 @@ type Data = {
     response?: any;
 };
 
-// jsdoc for handler function
 /**
  * @description This function is used to get the total number of page views for a given page. It uses the Google
  * Analytics Data API to get the data.
