@@ -2,17 +2,18 @@ import React, { ReactNode } from 'react';
 import styles from './header.module.css';
 import { SiBitcoincash } from 'react-icons/si';
 import { useRouter } from 'next/router';
+import { useIntl } from 'react-intl';
 type Props = {
     children: ReactNode;
 };
 
-// TODO: Refactor this and internalize
 const DateAndHour = () => {
+    const { locale } = useRouter();
     const [date, setDate] = React.useState(new Date());
-    const day = date.toLocaleDateString('en-GB', { weekday: 'short' });
-    const dayNumber = date.toLocaleDateString('en-GB', { day: 'numeric' });
-    const month = date.toLocaleDateString('en-GB', { month: 'short' });
-    const hour = date.toLocaleTimeString('en-GB', { hour: 'numeric', minute: 'numeric' });
+    const day = date.toLocaleDateString(locale, { weekday: 'short' });
+    const dayNumber = date.toLocaleDateString(locale, { day: 'numeric' });
+    const month = date.toLocaleDateString(locale, { month: 'short' });
+    const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
 
     React.useEffect(() => {
         const interval = setInterval(() => {
@@ -31,23 +32,23 @@ const DateAndHour = () => {
     );
 };
 
-// TODO: Refactor this and internalize
 const Route = () => {
     const { pathname } = useRouter();
+    const { formatMessage: f } = useIntl();
     let route = pathname;
 
     switch (pathname) {
         case '/':
-            route = 'Code';
+            route = f({ id: 'home.breadcrumb' });
             break;
         case '/blog/[category]/[slug]':
-            route = 'Notes';
+            route = f({ id: 'blog.breadcrumb' });
             break;
         case '/comments':
-            route = 'Terminal';
+            route = f({ id: 'comments.breadcrumb' });
             break;
         case '/settings':
-            route = 'System Preferences';
+            route = f({ id: 'settings.breadcrumb' });
             break;
     }
 
