@@ -1,0 +1,89 @@
+---
+title: 'Erro non detectado: erro de reacción minimizado'
+slug: 'erro-non-detectado-react-minificado'
+author: 'Xabier Lameiro'
+date: '09-01-2023'
+category: 'Error'
+tags: ['react']
+locale: 'gl'
+excerpt: 'Error no detectado: error de reacción minimizado, visite https://reactjs.org/docs/error-decoder.html?invariant=425 para ver el mensaje completo o use el entorno de desarrollo no minimizado para errores completos y advertencias útiles adicionales.'
+description: 'Resuelva el error Error no detectado al usar fechas en React. El error aparece cuando la fecha y hora del navegador no están en el mismo formato que la fecha y hora del servidor.'
+image: '/posts/uncaught-error.png'
+alternate: [{ lang: 'en', url: 'uncaught-error-minified-react-error'  }, { lang: 'es', url: 'error-no-detectado-react-minificado' }]
+---
+
+# Erro non detectado: erro de reacción minimizado
+
+Ao usar React, pode atopar o seguinte erro: `Erro non detectado: erro de React minimizado, visite https://reactjs.org/docs/erro-decoder.html?invariant=425 para ver a mensaxe completa ou use a contorna de desenvolvemento non minimizado para erros completos e advertencias útiles adicionais.
+Este erro é causado polo uso de datas na aplicación. O erro aparece cando a data e a hora do navegador non teñen o mesmo formato que a data e a hora do servidor.
+
+Como resolvín o problema?
+
+## Código co erro
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```tsx component-random.tsx mark=18,19,20,21
+const DateAndHour = () => {
+    const { locale } = useRouter();
+    const [date, setDate] = React.useState(new Date());
+    const day = date.toLocaleDateString(locale, { weekday: 'short' });
+    const dayNumber = date.toLocaleDateString(locale, { day: 'numeric' });
+    const month = date.toLocaleDateString(locale, { month: 'short' });
+    const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
+
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setDate(new Date());
+        }, 60000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className={styles.dateAndHour}>
+            <span>{day}</span>
+            <span>{dayNumber}</span>
+            <span>{month}</span>
+            <span>{hour}</span>
+        </div>
+    );
+};
+```
+
+</CH.Code>
+
+## Código sen o erro
+
+Utilice o atributo `suppressHydrationWarning` para evitar o erro. Este atributo úsase para evitar o erro cando o servidor e o cliente presentan contido diferente.
+Pode atopar máis información sobre este atributo na [documentación de React](https://reactjs.org/docs/dom-elements.html#suppresshydrationwarning 'Documentación de React').
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```tsx component-random.tsx mark=18,19,20,21
+const DateAndHour = () => {
+    const { locale } = useRouter();
+    const [date, setDate] = React.useState(new Date());
+    const day = date.toLocaleDateString(locale, { weekday: 'short' });
+    const dayNumber = date.toLocaleDateString(locale, { day: 'numeric' });
+    const month = date.toLocaleDateString(locale, { month: 'short' });
+    const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
+
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setDate(new Date());
+        }, 60000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className={styles.dateAndHour}>
+            <span suppressHydrationWarning>{day}</span>
+            <span suppressHydrationWarning>{dayNumber}</span>
+            <span suppressHydrationWarning>{month}</span>
+            <span suppressHydrationWarning>{hour}</span>
+        </div>
+    );
+};
+```
+
+</CH.Code>
