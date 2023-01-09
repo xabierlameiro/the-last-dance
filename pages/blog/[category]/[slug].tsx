@@ -145,6 +145,7 @@ export const getStaticProps = async (data: {
                 content: mdxSource,
             },
         },
+        revalidate: 10,
     };
 };
 
@@ -200,7 +201,7 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
 
     return {
         paths: [...tags, ...categories],
-        fallback: false,
+        fallback: 'blocking',
     };
 };
 
