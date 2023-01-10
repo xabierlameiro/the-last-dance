@@ -3,12 +3,11 @@
     align-items: center;
     justify-self: center;
     font-size: 15px;
-    gap: 5px;
+    gap: 8px;
 }
 
 .views svg {
-    width: 18px;
-    height: 22px;
+    width: 19px;
 }
 
 svg.error {

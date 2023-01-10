@@ -11,15 +11,15 @@ type Props = {
 
 const Container = ({ children }: Props) => {
     return (
-        <div className={styles.views}>
-            <BsBook title="Number of views in this post from GA" />
+        <div className={styles.views} title="Number of views in this post from GA">
+            <BsBook />
             {children}
         </div>
     );
 };
 
 const StarCounter = () => {
-    const [views, setViews] = React.useState(0);
+    const [views, setViews] = React.useState(-1);
     const { asPath } = useRouter();
 
     React.useEffect(() => {
@@ -28,19 +28,19 @@ const StarCounter = () => {
                 const { total } = await fetch(`/api/analytics?slug=${asPath}`).then((res) => res.json());
                 setViews(total);
             } catch (e) {
-                setViews(-1);
+                setViews(-2);
             }
         })();
     }, [asPath]);
 
-    if (views === -1)
+    if (views === -2)
         return (
             <Container>
                 <RxCross2 className={styles.error} title="Error on endpoint" />
             </Container>
         );
 
-    if (views === 0)
+    if (views === -1)
         return (
             <Container>
                 <FaSpinner className={styles.spinner} title="Loading views" />

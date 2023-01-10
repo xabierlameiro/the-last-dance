@@ -15,8 +15,17 @@ type Props = {
 };
 
 const TimeRead = ({ readTime }: Props) => {
+    const { formatMessage: f } = useIntl();
+
     return (
-        <div className={styles.readContainer} data-testid="read-time">
+        <div
+            className={styles.readContainer}
+            {...(readTime &&
+                Number(readTime) >= 0 && {
+                    title: f({ id: 'blog.readtime', description: 'read time' }, { readTime }),
+                })}
+            data-testid="read-time"
+        >
             <RxStopwatch size={20} />
             <span>{readTime}</span>
         </div>
@@ -24,17 +33,9 @@ const TimeRead = ({ readTime }: Props) => {
 };
 
 const ArticlePanel = ({ readTime }: Props) => {
-    const { formatMessage: f } = useIntl();
-
     return (
         <div className={styles.articleControls} data-testid="article-panel">
-            <div
-                className={styles.readTime}
-                {...(readTime &&
-                    Number(readTime) >= 0 && {
-                        title: f({ id: 'blog.readtime', description: 'read time' }, { readTime }),
-                    })}
-            >
+            <div className={styles.readTime}>
                 <TimeRead readTime={readTime} />
                 <ViewCounter />
                 <StarCounter />
