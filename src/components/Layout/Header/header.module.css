@@ -7,6 +7,7 @@
     align-items: center;
     padding: 0 18px;
     overflow: scroll;
+    white-space: nowrap;
 }
 
 .header::-webkit-scrollbar {
