@@ -8,7 +8,7 @@
 }
 
 svg.starred {
-    color: rgba(var(--yellow-color));
+    fill: rgba(var(--yellow-color));
 }
 
 svg.error {
