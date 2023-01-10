@@ -41,3 +41,11 @@
     text-overflow: ellipsis;
     user-select: none;
 }
+
+.readContainer {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    font-size: 15px;
+    gap: 5px;
+}

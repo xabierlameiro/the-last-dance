@@ -5,24 +5,26 @@ import { BiPhotoAlbum } from 'react-icons/bi';
 import { BsLock } from 'react-icons/bs';
 import { CgProfile } from 'react-icons/cg';
 import { SearchInput } from '@/components';
-import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import styles from './panel.module.css';
+import StarCounter from '../StarCounter';
+import ViewCounter from '../ViewCounter';
 
 type Props = {
     readTime?: string;
 };
-const ArticlePanel = ({ readTime }: Props) => {
-    const [hits, setHits] = React.useState(0);
-    const { formatMessage: f } = useIntl();
-    const { asPath } = useRouter();
 
-    React.useEffect(() => {
-        (async () => {
-            const { total } = await fetch(`/api/analytics?slug=${asPath}`).then((res) => res.json());
-            setHits(total);
-        })();
-    }, [asPath]);
+const TimeRead = ({ readTime }: Props) => {
+    return (
+        <div className={styles.readContainer} data-testid="read-time">
+            <RxStopwatch size={20} />
+            <span>{readTime}</span>
+        </div>
+    );
+};
+
+const ArticlePanel = ({ readTime }: Props) => {
+    const { formatMessage: f } = useIntl();
 
     return (
         <div className={styles.articleControls} data-testid="article-panel">
@@ -33,15 +35,9 @@ const ArticlePanel = ({ readTime }: Props) => {
                         title: f({ id: 'blog.readtime', description: 'read time' }, { readTime }),
                     })}
             >
-                <RxStopwatch size={20} />
-                {readTime && Number(readTime) >= 0 && (
-                    <>{f({ id: 'blog.readtime', description: 'read time' }, { readTime })}</>
-                )}
-                {Number(hits) > 0 && (
-                    <span className={styles.analytics}>
-                        {f({ id: 'blog.readHits', description: 'read hits' }, { hits })}
-                    </span>
-                )}
+                <TimeRead readTime={readTime} />
+                <ViewCounter />
+                <StarCounter />
             </div>
             <MdSortByAlpha />
             <MdOutlineChecklist />
