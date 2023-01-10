@@ -4,6 +4,11 @@
     justify-self: center;
     font-size: 15px;
     gap: 5px;
+    cursor: pointer;
+}
+
+svg.starred {
+    color: rgba(var(--yellow-color));
 }
 
 svg.error {
