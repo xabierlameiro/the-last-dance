@@ -60,7 +60,6 @@ export const getPostBySlug = (slug: string | { params: { slug: string } }) => {
             author: data.author,
             tags: data.tags,
             excerpt: data.excerpt,
-            date: data.date,
             image: data.image,
             description: data.description,
             alternate: data.alternate,

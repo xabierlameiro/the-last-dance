@@ -20,7 +20,6 @@ type Props = {
             description: string;
             slug: string;
             readTime: string;
-            date: string;
             tags: string[];
             categories: string[];
         };

@@ -2,6 +2,7 @@ import { useDialog } from '@/context/dialog';
 import { default as CButtons } from '@/components/ControlButtons';
 // @ts-ignore
 import { CH } from '@xabierlameiro/code-hike/dist/components.cjs.js';
+import Date from '@/components/Date';
 
 export const ControlButtons = () => {
     const { dispatch } = useDialog();
@@ -9,4 +10,4 @@ export const ControlButtons = () => {
     return <CButtons disabled withPadding onClickClose={closeHandler} onClickMinimise={closeHandler} />;
 };
 
-export const components = { CH, ControlButtons };
+export const components = { CH, ControlButtons, Date };
