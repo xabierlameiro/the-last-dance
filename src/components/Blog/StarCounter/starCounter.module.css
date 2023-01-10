@@ -5,9 +5,12 @@
     font-size: 15px;
     gap: 5px;
     cursor: pointer;
+    text-decoration: none;
+    color: rgba(var(--yellow-color));
+    font-weight: 400;
 }
 
-svg.starred {
+.stars svg {
     fill: rgba(var(--yellow-color));
 }
 

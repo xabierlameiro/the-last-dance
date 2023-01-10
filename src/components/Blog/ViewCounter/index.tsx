@@ -3,7 +3,7 @@ import styles from './viewCounter.module.css';
 import { FaSpinner } from 'react-icons/fa';
 import { RxCross2 } from 'react-icons/rx';
 import { useRouter } from 'next/router';
-import { AiOutlineEye } from 'react-icons/ai';
+import { BsBook } from 'react-icons/bs';
 
 type Props = {
     children?: React.ReactNode;
@@ -11,8 +11,8 @@ type Props = {
 
 const Container = ({ children }: Props) => {
     return (
-        <div className={styles.stars}>
-            <AiOutlineEye title="Number of views in this post" />
+        <div className={styles.views}>
+            <BsBook title="Number of views in this post from GA" />
             {children}
         </div>
     );
