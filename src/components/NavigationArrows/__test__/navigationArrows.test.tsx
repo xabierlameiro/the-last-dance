@@ -6,12 +6,7 @@ describe('NavigationArrows component', () => {
         const onClickLeft = jest.fn();
         const onClickRight = jest.fn();
 
-        render(
-            <NavigationArrows
-                onClickLeft={onClickLeft}
-                onClickRight={onClickRight}
-            />
-        );
+        render(<NavigationArrows onClickLeft={onClickLeft} onClickRight={onClickRight} />);
 
         fireEvent.click(screen.getByTestId('left'));
         expect(onClickLeft).toHaveBeenCalledTimes(1);

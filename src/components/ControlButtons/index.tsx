@@ -10,38 +10,20 @@ type Props = {
     onClickMaximise?: () => Function | void;
 };
 
-const ControlButtons = ({
-    disabled,
-    withPadding,
-    onClickClose,
-    onClickMinimise,
-    onClickMaximise,
-}: Props) => {
+const ControlButtons = ({ disabled, withPadding, onClickClose, onClickMinimise, onClickMaximise }: Props) => {
     return (
-        <div
-            data-testid="controls"
-            className={clx(
-                styles.ch_frame_buttons,
-                withPadding ? styles.withPadding : ''
-            )}
-        >
+        <div data-testid="controls" className={clx(styles.ch_frame_buttons, withPadding ? styles.withPadding : '')}>
             <div
                 onClick={onClickClose}
                 data-testid="close"
-                className={clx(
-                    styles.ch_frame_button,
-                    styles.ch_frame_button_left
-                )}
+                className={clx(styles.ch_frame_button, styles.ch_frame_button_left)}
             >
                 <BiX title="Close" />
             </div>
             <div
                 data-testid="minimise"
                 onClick={onClickMinimise}
-                className={clx(
-                    styles.ch_frame_button,
-                    styles.ch_frame_button_middle
-                )}
+                className={clx(styles.ch_frame_button, styles.ch_frame_button_middle)}
             >
                 <BiMinus title="Minimise" />
             </div>

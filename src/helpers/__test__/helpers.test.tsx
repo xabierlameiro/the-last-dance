@@ -26,8 +26,6 @@ describe('clx', () => {
     it('Should return class name with condition and undefined', () => {
         expect(clx('a', true ? 'b' : '', undefined)).toBe('a b');
         expect(clx('a', false ? 'b' : '', undefined)).toBe('a');
-        expect(clx('a', true ? 'b' : '', false ? 'c' : '', undefined)).toBe(
-            'a b'
-        );
+        expect(clx('a', true ? 'b' : '', false ? 'c' : '', undefined)).toBe('a b');
     });
 });

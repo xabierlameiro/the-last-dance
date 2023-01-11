@@ -8,19 +8,10 @@ type Props = {
     onClickLeft?: () => void;
 };
 
-const NavigationArrows = ({
-    disabledLeft,
-    onClickLeft,
-    disabledRight,
-    onClickRight,
-}: Props) => {
+const NavigationArrows = ({ disabledLeft, onClickLeft, disabledRight, onClickRight }: Props) => {
     return (
         <nav className={styles.nav}>
-            <BiChevronLeft
-                className={disabledLeft ? styles.disabled : ''}
-                data-testid="left"
-                onClick={onClickLeft}
-            />
+            <BiChevronLeft className={disabledLeft ? styles.disabled : ''} data-testid="left" onClick={onClickLeft} />
             <BiChevronRight
                 className={disabledRight ? styles.disabled : ''}
                 data-testid="right"

@@ -4,12 +4,7 @@ import { render, screen } from '@/test';
 describe('Avatar component', () => {
     it('Should render img, name and description', () => {
         render(
-            <Avatar
-                alt="Alternative text"
-                img="/avatar.png"
-                name="Xabier Lameiro Cardama"
-                description="ID of Apple"
-            />
+            <Avatar alt="Alternative text" img="/avatar.png" name="Xabier Lameiro Cardama" description="ID of Apple" />
         );
         expect(screen.getByTestId('avatar')).toBeInTheDocument();
         expect(screen.getByText('Xabier Lameiro Cardama')).toBeInTheDocument();
