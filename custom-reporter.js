@@ -28,15 +28,9 @@ glob('public/coverage/**/*.?(html|css)', function (err, files) {
                 "<div class='pad1'><h1><a href='/'>Return</a></h1></h1><h1><a href='/coverage'>All tests</a>"
             );
 
-            replaced = replaced.replace(
-                /(\(.*)sort-arrow-sprite.png\)/g,
-                '(/coverage/sort-arrow-sprite.png)'
-            );
+            replaced = replaced.replace(/(\(.*)sort-arrow-sprite.png\)/g, '(/coverage/sort-arrow-sprite.png)');
 
-            replaced = replaced.replace(
-                /<title>(.*)<\/title>/,
-                '<title>Code coverage by Xabier Lameiro</title>'
-            );
+            replaced = replaced.replace(/<title>(.*)<\/title>/, '<title>Code coverage by Xabier Lameiro</title>');
 
             replaced = replaced.replace(
                 /(.*)<link rel="shortcut icon" (.*)\s* href="(.*)" \/>/,

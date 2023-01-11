@@ -16,7 +16,8 @@
         "watch": "jest --watchAll",
         "test:clear": "jest --clearCache",
         "storybook": "storybook dev -p 6006",
-        "build-storybook": "storybook build"
+        "build-storybook": "storybook build",
+        "prettier": "prettier --write ."
     },
     "dependencies": {
         "@google-analytics/data": "^3.1.2",

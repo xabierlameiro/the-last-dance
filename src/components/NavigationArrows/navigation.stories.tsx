@@ -19,9 +19,7 @@ export default {
 } as ComponentMeta<typeof NavigarionArrows>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof NavigarionArrows> = (args) => (
-    <NavigarionArrows {...args} />
-);
+const Template: ComponentStory<typeof NavigarionArrows> = (args) => <NavigarionArrows {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});
