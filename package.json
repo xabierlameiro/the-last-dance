@@ -12,7 +12,7 @@
         "start": "next start",
         "lint": "next lint",
         "test": "NODE_ENV=test jest",
-        "coverage": "rm -rf public/coverage && NODE_ENV=test jest --coverage && node custom-reporter.js",
+        "coverage": "rm -rf public/coverage && NODE_ENV=test jest --coverage && node custom-reporter.js && node searchConsole.js",
         "watch": "jest --watchAll",
         "test:clear": "jest --clearCache",
         "storybook": "storybook dev -p 6006",
