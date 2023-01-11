@@ -81,3 +81,7 @@ a {
 #__next .ch-code-scroll-parent {
     font-size: 12px;
 }
+
+.emoji {
+    font-size: 2em;
+}
