@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-    mobileMax,
-    tabletMax,
-    tabletMin,
-    desktopMin,
-} from '@/constants/devices';
+import { mobileMax, tabletMax, tabletMin, desktopMin } from '@/constants/devices';
 
 type WindowTpe = {
     isMobile: boolean;
@@ -23,9 +18,7 @@ function useWindowResize(): WindowTpe {
         const handleResize = () => {
             setWindowSize({
                 isMobile: window.innerWidth <= mobileMax,
-                isTablet:
-                    window.innerWidth <= tabletMax &&
-                    window.innerWidth >= tabletMin,
+                isTablet: window.innerWidth <= tabletMax && window.innerWidth >= tabletMin,
                 isDesktop: window.innerWidth >= desktopMin,
             });
         };

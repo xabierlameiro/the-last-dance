@@ -11,10 +11,7 @@ type Props = {
 
 const IconWithName = ({ icon, alt, name, horizontal }: Props) => {
     return (
-        <div
-            data-testid="icon-with-name"
-            className={clx(styles.option, horizontal ? styles.horizontal : '')}
-        >
+        <div data-testid="icon-with-name" className={clx(styles.option, horizontal ? styles.horizontal : '')}>
             <Image src={icon} alt={alt} width={44} height={42} />
             <p className={styles.optionText}>{name}</p>
         </div>

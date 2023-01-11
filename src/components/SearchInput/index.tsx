@@ -8,13 +8,7 @@ type Props = {
     onChange?: () => void;
 };
 
-const SearchInput = ({
-    value,
-    disabled,
-    onBlur,
-    onChange,
-    placeHolderText = 'Search',
-}: Props) => {
+const SearchInput = ({ value, disabled, onBlur, onChange, placeHolderText = 'Search' }: Props) => {
     return (
         <input
             type="text"

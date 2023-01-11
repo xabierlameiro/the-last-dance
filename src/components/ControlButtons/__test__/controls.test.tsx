@@ -8,11 +8,7 @@ describe('Controls component', () => {
         const onClickMaximise = jest.fn();
 
         render(
-            <Controls
-                onClickClose={onClickClose}
-                onClickMinimise={onClickMinimise}
-                onClickMaximise={onClickMaximise}
-            />
+            <Controls onClickClose={onClickClose} onClickMinimise={onClickMinimise} onClickMaximise={onClickMaximise} />
         );
         const controlsElement = screen.getByTestId('controls');
         expect(controlsElement).toBeInTheDocument();

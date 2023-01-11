@@ -14,9 +14,7 @@ export default {
 } as ComponentMeta<typeof GridLayoutControl>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof GridLayoutControl> = (args) => (
-    <GridLayoutControl {...args} />
-);
+const Template: ComponentStory<typeof GridLayoutControl> = (args) => <GridLayoutControl {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

@@ -17,9 +17,7 @@ export default {
     },
 };
 
-const Template: ComponentStory<typeof SearchInput> = (args) => (
-    <SearchInput {...args} />
-);
+const Template: ComponentStory<typeof SearchInput> = (args) => <SearchInput {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

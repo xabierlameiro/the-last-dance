@@ -13,15 +13,7 @@ type Props = {
 };
 
 const Dialog = (props: Props) => {
-    const {
-        dialogRef,
-        open,
-        withPadding,
-        modalMode,
-        header = <></>,
-        body = <></>,
-        footer = <></>,
-    } = props;
+    const { dialogRef, open, withPadding, modalMode, header = <></>, body = <></>, footer = <></> } = props;
 
     return (
         <div

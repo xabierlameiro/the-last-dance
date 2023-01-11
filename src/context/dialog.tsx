@@ -48,11 +48,7 @@ const dialogReducer = (state: State, action: Action) => {
 const DialogProvider = ({ children }: ContextProviderProps) => {
     const [state, dispatch] = React.useReducer(dialogReducer, defaultValues);
     const value = { state, dispatch };
-    return (
-        <DialogStateContext.Provider value={value}>
-            {children}
-        </DialogStateContext.Provider>
-    );
+    return <DialogStateContext.Provider value={value}>{children}</DialogStateContext.Provider>;
 };
 
 const useDialog = () => {
