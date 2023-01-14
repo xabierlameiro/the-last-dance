@@ -1,5 +1,6 @@
 import { Html, Head, Main, NextScript } from 'next/document';
 import { domain, author, socialNetworks } from '@/constants/site';
+import Script from 'next/script';
 
 type Props = {
     __NEXT_DATA__: {
@@ -23,6 +24,12 @@ const Document = (props: Props) => {
                 <meta name="twitter:creator" content="@xlameiro" />
                 <meta name="google" content="notranslate" />
                 <link rel="icon" href="/favicon.svg" title="The favicon" />
+                <Script
+                    async
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3537017956623483"
+                    strategy="lazyOnload"
+                    crossOrigin="anonymous"
+                />
                 <script
                     type="application/ld+json"
                     key="website-jsonld"

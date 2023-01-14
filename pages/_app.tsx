@@ -26,12 +26,7 @@ const App = ({ Component, pageProps }: AppProps) => {
                   
                   `}
             </Script>
-            <Script
-                async
-                strategy="afterInteractive"
-                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3537017956623483"
-                data-ad-client="ca-pub-3537017956623483"
-            />
+
             <IntlProvider
                 locale={locale}
                 messages={messages[locale as locales]}

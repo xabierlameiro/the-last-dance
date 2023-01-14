@@ -68,8 +68,9 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                 (window.adsbygoogle = window.adsbygoogle || []).push({});
             }
         } catch (err) {
-            console.log(
-                'Error while trying to load adsbygoogle. This is probably because you are not in production mode.'
+            console.error(
+                'Error while trying to load adsbygoogle. This is probably because you are not in production mode.',
+                err
             );
         }
     }, []);
