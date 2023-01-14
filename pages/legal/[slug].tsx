@@ -98,7 +98,7 @@ export const getStaticPaths = () => {
                 slug: path,
             },
         })),
-        fallback: true,
+        fallback: 'blocking',
     };
 };
 
