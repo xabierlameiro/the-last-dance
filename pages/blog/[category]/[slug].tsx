@@ -64,7 +64,9 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
 
     React.useEffect(() => {
         try {
-            (window.adsbygoogle = window.adsbygoogle || []).push({});
+            if (typeof window !== 'undefined' && typeof window.adsbygoogle !== 'undefined') {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+            }
         } catch (err) {
             console.log(
                 'Error while trying to load adsbygoogle. This is probably because you are not in production mode.'
@@ -98,7 +100,6 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                             <div className={styles.squareAd}>
                                 <ins
                                     className="adsbygoogle"
-                                    style={{ display: 'block', textAlign: 'center', width: '100%' }}
                                     data-ad-client="ca-pub-3537017956623483"
                                     data-ad-slot="4572463963"
                                     data-ad-format="auto"
@@ -120,10 +121,9 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 <div className={styles.mdx}>
                                     <MDXRemote {...post.content} components={components} />
                                 </div>
-                                <div className={styles.ads}>
+                                <div className={styles.verticalAd}>
                                     <ins
                                         className="adsbygoogle"
-                                        style={{ display: 'block', textAlign: 'center', width: '100%' }}
                                         data-ad-client="ca-pub-3537017956623483"
                                         data-ad-slot="3253844563"
                                         data-ad-format="auto"

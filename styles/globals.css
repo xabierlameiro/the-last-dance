@@ -85,3 +85,7 @@ a {
 .emoji {
     font-size: 2em;
 }
+
+.adsbygoogle {
+    background: red;
+}
