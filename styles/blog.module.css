@@ -80,10 +80,6 @@
     }
     .verticalAd {
         display: block;
-        width: 250px;
-        height: 600px;
-        position: absolute;
-        right: 30px;
     }
 }
 
@@ -120,17 +116,4 @@
 
 .body h2 {
     padding: 20px;
-}
-
-.squareAd {
-    display: none;
-}
-@media screen and (max-width: 1400px) and (min-width: 900px) {
-    .squareAd {
-        display: block;
-        width: 250px;
-        height: 250px;
-        position: absolute;
-        bottom: 20px;
-    }
 }

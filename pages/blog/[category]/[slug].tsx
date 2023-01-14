@@ -86,7 +86,9 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 />
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
-                            <GoogleAdsense client="ca-pub-3537017956623483" slot="4572463963" />;
+                            <div className={styles.squareAd}>
+                                <GoogleAdsense slot="4572463963" />
+                            </div>
                         </nav>
                         <nav className={styles.secondNav} onTouchStart={onSideShiftRight}>
                             <AsidePanel />
@@ -108,7 +110,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                         height: '100%',
                                     }}
                                 >
-                                    <GoogleAdsense client="ca-pub-3537017956623483" slot="3253844563" />;
+                                    <GoogleAdsense slot="3253844563" />
                                 </div>
                             </div>
                         </article>
