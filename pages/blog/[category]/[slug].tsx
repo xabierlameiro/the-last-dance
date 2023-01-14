@@ -104,7 +104,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 <div>
                                     <MDXRemote {...post.content} components={components} />
                                 </div>
-                                <div>
+                                <div className={styles.ads}>
                                     <ins
                                         className="adsbygoogle"
                                         style={{ display: 'block', textAlign: 'center', width: '100%' }}
