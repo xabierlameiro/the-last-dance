@@ -80,6 +80,9 @@
     }
     .verticalAd {
         display: block;
+        width: auto;
+        position: fixed;
+        right: 30px;
     }
 }
 
