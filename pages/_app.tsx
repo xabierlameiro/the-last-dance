@@ -1,3 +1,4 @@
+import React from 'react';
 import '../styles/globals.css';
 import '@xabierlameiro/code-hike/dist/index.css';
 import Script from 'next/script';
@@ -10,7 +11,18 @@ import type { AppProps } from 'next/app';
 type locales = 'en' | 'es' | 'gl';
 
 const App = ({ Component, pageProps }: AppProps) => {
-    const { locale = 'en' } = useRouter();
+    const { locale = 'en', asPath } = useRouter();
+
+    React.useEffect(() => {
+        var ads = document.getElementsByClassName('adsbygoogle').length;
+        for (var i = 0; i < ads; i++) {
+            try {
+                // @ts-ignore
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {}
+        }
+    }, [asPath]);
+
     return (
         <>
             <Script

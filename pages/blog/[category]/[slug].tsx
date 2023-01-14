@@ -12,6 +12,7 @@ import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
 import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
+import GoogleAdsense from '@/components/GoogleAdsense';
 
 type Props = {
     post: {
@@ -62,19 +63,6 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     } = useRouter();
     const close = () => dispatch({ type: 'close' });
 
-    React.useEffect(() => {
-        try {
-            if (typeof window !== 'undefined' && typeof window.adsbygoogle !== 'undefined') {
-                (window.adsbygoogle = window.adsbygoogle || []).push({});
-            }
-        } catch (err) {
-            console.error(
-                'Error while trying to load adsbygoogle. This is probably because you are not in production mode.',
-                err
-            );
-        }
-    }, []);
-
     return (
         <Layout meta={{ ...post.meta }} isBlog>
             <Dialog
@@ -98,20 +86,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 />
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
-                            <div
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                }}
-                            >
-                                <ins
-                                    className="adsbygoogle"
-                                    data-ad-client="ca-pub-3537017956623483"
-                                    data-ad-slot="4572463963"
-                                    data-ad-format="rectangle"
-                                    data-full-width-responsive="true"
-                                />
-                            </div>
+                            <GoogleAdsense client="ca-pub-3537017956623483" slot="4572463963" />;
                         </nav>
                         <nav className={styles.secondNav} onTouchStart={onSideShiftRight}>
                             <AsidePanel />
@@ -133,13 +108,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                         height: '100%',
                                     }}
                                 >
-                                    <ins
-                                        className="adsbygoogle"
-                                        data-ad-client="ca-pub-3537017956623483"
-                                        data-ad-slot="3253844563"
-                                        data-ad-format="rectangle"
-                                        data-full-width-responsive="true"
-                                    />
+                                    <GoogleAdsense client="ca-pub-3537017956623483" slot="3253844563" />;
                                 </div>
                             </div>
                         </article>
