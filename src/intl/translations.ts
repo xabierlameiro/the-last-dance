@@ -30,6 +30,10 @@ export const messages = {
             'Web page for web application comments, allows users to leave comments on the content of the page',
         'comments.breadcrumb': 'Terminal',
         'legal.breadcrumb': 'Legals',
+        'legal.cookies-policy': 'Cookies Policy',
+        'legal.legal-notice': 'Legal Notice',
+        'legal.privacy-policy': 'Privacy Policy',
+        'legal.search-placeholder': 'Search in legals',
     },
     es: {
         'blog.title': 'Esta es la página de blog',
@@ -63,6 +67,10 @@ export const messages = {
             'Página web de comentarios de la aplicación web, permite a los usuarios dejar comentarios sobre el contenido de la página',
         'comments.breadcrumb': 'Terminal',
         'legal.breadcrumb': 'Legales',
+        'legal.cookies-policy': 'Política de Cookies',
+        'legal.legal-notice': 'Aviso Legal',
+        'legal.privacy-policy': 'Política de Privacidad',
+        'legal.search-placeholder': 'Buscar en legales',
     },
     gl: {
         'blog.title': 'Esta é a páxina de blog',
@@ -96,5 +104,9 @@ export const messages = {
             'Páxina web de comentarios da aplicación web, permite aos usuarios deixar comentarios sobre o contido da páxina',
         'comments.breadcrumb': 'Terminal',
         'legal.breadcrumb': 'Legales',
+        'legal.cookies-policy': 'Política de Cookies',
+        'legal.legal-notice': 'Aviso Legal',
+        'legal.privacy-policy': 'Política de Privacidade',
+        'legal.search-placeholder': 'Buscar en legales',
     },
 };

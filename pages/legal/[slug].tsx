@@ -15,15 +15,34 @@ import { VscLaw } from 'react-icons/vsc';
 import { MdOutlinePrivacyTip } from 'react-icons/md';
 import matter from 'gray-matter';
 import { useDialog } from '@/context/dialog';
+import { useIntl } from 'react-intl';
 
 const LEGAL_PATH = path.join(process.cwd(), 'data/legal');
 
-// TODO: Refactor this component and add test and internationalization
-
+// TODO: Move read mdx file logic outside page
 const Page = ({ source, meta }: any) => {
     const { open, dispatch } = useDialog();
-
+    const { formatMessage: f } = useIntl();
+    const [selected, setSelected] = React.useState(0);
     const close = () => dispatch({ type: 'close' });
+
+    const links = [
+        {
+            title: f({ id: 'legal.cookies-policy' }),
+            href: '/legal/cookies-policy',
+            icon: <BiCookie />,
+        },
+        {
+            title: f({ id: 'legal.legal-notice' }),
+            href: '/legal/legal-notice',
+            icon: <VscLaw />,
+        },
+        {
+            title: f({ id: 'legal.privacy-policy' }),
+            href: '/legal/privacy-policy',
+            icon: <MdOutlinePrivacyTip />,
+        },
+    ];
 
     return (
         <Layout
@@ -41,27 +60,21 @@ const Page = ({ source, meta }: any) => {
                     <div className={styles.container}>
                         <nav className={styles.nav}>
                             <ControlButtons onClickClose={close} onClickMinimise={close} />
-                            <SearchInput />
-                            <span className={styles.title}>Legal documents</span>
+                            <SearchInput placeHolderText={f({ id: 'legal.search-placeholder' })} />
+                            <span className={styles.title}>{f({ id: 'legal.title' })}</span>
                             <ul>
-                                <li>
-                                    <Link href="/legal/cookies-policy">
-                                        <BiCookie />
-                                        <span>Cookies policy</span>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link href="/legal/legal-notice">
-                                        <VscLaw />
-                                        <span>Legal Notice</span>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link href="/legal/privacy-policy">
-                                        <MdOutlinePrivacyTip />
-                                        <span>Privacy policy</span>
-                                    </Link>
-                                </li>
+                                {links.map((link, index) => (
+                                    <li
+                                        key={index}
+                                        onClick={() => setSelected(index)}
+                                        className={selected === index ? styles.selected : ''}
+                                    >
+                                        <Link href={link.href}>
+                                            {link.icon}
+                                            <span>{link.title}</span>
+                                        </Link>
+                                    </li>
+                                ))}
                             </ul>
                         </nav>
                         <article className={styles.content}>{source && <MDXRemote {...source} />}</article>

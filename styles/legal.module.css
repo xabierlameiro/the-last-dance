@@ -72,3 +72,9 @@
     font-weight: 700;
     color: rgba(var(--dark-grey-color));
 }
+
+.selected {
+    background-color: rgba(var(--grey-shadow));
+    border-radius: 5px;
+    padding: 0 2px;
+}
