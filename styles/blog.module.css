@@ -82,7 +82,8 @@
     }
     .verticalAd {
         display: block;
-        width: auto;
+        width: 250px;
+        height: 100%;
         position: fixed;
         right: 30px;
     }
@@ -121,4 +122,8 @@
 
 .body h2 {
     padding: 20px;
+}
+
+.navAd {
+    overflow: hidden;
 }

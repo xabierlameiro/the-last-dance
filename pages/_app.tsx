@@ -19,7 +19,9 @@ const App = ({ Component, pageProps }: AppProps) => {
             try {
                 // @ts-ignore
                 (adsbygoogle = window.adsbygoogle || []).push({});
-            } catch (e) {}
+            } catch (error) {
+                console.log('Error loading adsbygoogle', error);
+            }
         }
     }, [asPath]);
 
@@ -38,7 +40,6 @@ const App = ({ Component, pageProps }: AppProps) => {
                   
                   `}
             </Script>
-
             <IntlProvider
                 locale={locale}
                 messages={messages[locale as locales]}
