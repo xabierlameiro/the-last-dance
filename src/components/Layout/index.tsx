@@ -10,6 +10,7 @@ type Props = {
     className?: string;
     isBlog?: boolean;
     meta?: {
+        noindex?: boolean;
         title: string;
         author?: string;
         description?: string;

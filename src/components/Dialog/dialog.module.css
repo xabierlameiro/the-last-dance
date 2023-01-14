@@ -27,6 +27,11 @@
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
 }
+
+.dialog.large {
+    width: 980px;
+}
+
 .dialog.modalMode.open {
     top: 45%;
     transform: translate(-50%, -50%) scale(1);

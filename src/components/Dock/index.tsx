@@ -16,26 +16,25 @@ const Dock = () => {
         <>
             <nav className={styles.dock} data-testid="dock">
                 <ul>
-                    {menu.map(({ link, img, alt }, index) => (
-                        <li
-                            key={index}
-                            onClick={clickHandler}
-                            className={clx(
-                                pathname === link ||
-                                    pathname.includes(
-                                        // @ts-ignore
-                                        link[locale]?.split('/')[1]
-                                    )
-                                    ? styles.selected
-                                    : ''
-                            )}
-                        >
-                            {/* @ts-ignore */}
-                            <Link href={link?.[locale] ?? link} title={alt}>
-                                <Icon src={img} alt={alt} />
-                            </Link>
-                        </li>
-                    ))}
+                    {menu.map(({ link, img, alt }, index) => {
+                        // TODO : Refactor this
+                        const path = pathname.split('/')[1];
+                        /* @ts-ignore */
+                        const term = typeof link === 'object' ? link[locale]?.split('/')[1] : link.split('/')[1];
+                        const check = term ? path.includes(term) : false;
+                        return (
+                            <li
+                                key={index}
+                                onClick={clickHandler}
+                                className={clx(pathname === link || check ? styles.selected : '')}
+                            >
+                                {/* @ts-ignore */}
+                                <Link href={link?.[locale] ?? link} title={alt}>
+                                    <Icon src={img} alt={alt} />
+                                </Link>
+                            </li>
+                        );
+                    })}
                 </ul>
             </nav>
         </>

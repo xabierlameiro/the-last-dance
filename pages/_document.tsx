@@ -21,8 +21,6 @@ const Document = (props: Props) => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@xlameiro" />
                 <meta name="twitter:creator" content="@xlameiro" />
-                <meta name="robots" content="index,follow" />
-                <meta name="googlebot" content="index,follow" />
                 <meta name="google" content="notranslate" />
                 <link rel="icon" href="/favicon.svg" title="The favicon" />
                 <script

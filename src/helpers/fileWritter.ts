@@ -53,6 +53,7 @@ export const createSiteMap = (
                 page !== '_document.tsx' &&
                 page !== 'blog' &&
                 page !== 'api' &&
+                page !== 'legal' &&
                 page !== '404.tsx'
         )
         .map((page) => {

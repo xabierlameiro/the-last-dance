@@ -6,6 +6,7 @@ import Head from 'next/head';
 type Props = {
     isBlog?: boolean;
     meta?: {
+        noindex?: boolean;
         title: string;
         author?: string;
         description?: string;
@@ -62,6 +63,17 @@ const SEO = ({ meta, isBlog }: Props) => {
             )}
 
             <title>{title}</title>
+            {meta?.noindex ? (
+                <>
+                    <meta name="robots" content="noindex" />
+                    <meta name="googlebot" content="noindex" />
+                </>
+            ) : (
+                <>
+                    <meta name="robots" content="index,follow" />
+                    <meta name="googlebot" content="index,follow" />
+                </>
+            )}
             <meta name="author" content={author} />
             <meta name="description" content={description} />
             <meta property="og:description" content={description} />

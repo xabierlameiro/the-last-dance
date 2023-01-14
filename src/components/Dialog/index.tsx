@@ -10,10 +10,11 @@ type Props = {
     header?: ReactNode;
     body?: ReactNode;
     footer?: ReactNode;
+    large?: boolean;
 };
 
 const Dialog = (props: Props) => {
-    const { dialogRef, open, withPadding, modalMode, header = <></>, body = <></>, footer = <></> } = props;
+    const { dialogRef, open, large, withPadding, modalMode, header = <></>, body = <></>, footer = <></> } = props;
 
     return (
         <div
@@ -23,7 +24,8 @@ const Dialog = (props: Props) => {
                 styles.dialog,
                 open ? styles.open : '',
                 withPadding ? styles.padding : '',
-                modalMode ? styles.modalMode : ''
+                modalMode ? styles.modalMode : '',
+                large ? styles.large : ''
             )}
         >
             <header data-testid="dialog-header">{header}</header>

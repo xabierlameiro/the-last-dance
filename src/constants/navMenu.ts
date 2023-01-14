@@ -25,6 +25,11 @@ export const menu: Array<Item> = [
         link: '/comments',
     },
     {
+        img: 'https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853481255c83c23a37ad_books.png',
+        alt: 'Legal documents',
+        link: '/legal/cookies-policy',
+    },
+    {
         img: 'https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853f10f5994a4d27b0aa_system-preferences.png',
         alt: 'Got to configuration page',
         link: '/settings',

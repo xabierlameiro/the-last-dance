@@ -44,6 +44,9 @@ const Route = () => {
         case '/blog/[category]/[slug]':
             route = f({ id: 'blog.breadcrumb' });
             break;
+        case '/legal/[slug]':
+            route = f({ id: 'legal.breadcrumb' });
+            break;
         case '/comments':
             route = f({ id: 'comments.breadcrumb' });
             break;
