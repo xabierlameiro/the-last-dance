@@ -68,6 +68,7 @@
         width: calc(100vw - 40px);
     }
 }
+
 @media screen and (min-width: 1400px) {
     .body {
         grid-template-columns: 1fr 250px;
@@ -80,7 +81,7 @@
     .verticalAd {
         display: block;
         width: 250px;
-        min-height: 400px;
+        height: 600px;
         position: absolute;
         right: 30px;
     }
@@ -128,9 +129,7 @@
     .squareAd {
         display: block;
         width: 250px;
-        min-height: 250px;
-        height: auto;
-        max-height: 400px;
+        height: 250px;
         position: absolute;
         bottom: 20px;
     }

@@ -36,5 +36,6 @@ export default withMDX({
     i18n: {
         locales: ['en', 'es', 'gl'],
         defaultLocale: 'en',
+        localeDetection: true,
     },
 });
