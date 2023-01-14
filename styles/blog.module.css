@@ -79,9 +79,9 @@
     }
     .verticalAd {
         display: block;
-        min-width: 250px;
+        width: 250px;
         min-height: 400px;
-        position: fixed;
+        position: absolute;
         right: 30px;
     }
 }
@@ -127,7 +127,8 @@
 @media screen and (max-width: 1400px) and (min-width: 900px) {
     .squareAd {
         display: block;
-        min-width: 250px;
+        width: 250px;
+        min-height: 250px;
         height: auto;
         max-height: 400px;
         position: absolute;

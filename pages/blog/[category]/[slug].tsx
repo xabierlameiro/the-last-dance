@@ -99,6 +99,19 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                             </div>
                             <div className={styles.squareAd}>
                                 <ins
+                                    style={{
+                                        display: 'block',
+                                        width: '100%',
+                                        height: '100%',
+                                        minHeight: '100%',
+                                        minWidth: '100%',
+                                        maxWidth: '100%',
+                                        maxHeight: '100%',
+                                        margin: '0 auto',
+                                        padding: '0',
+                                        border: '0',
+                                        overflow: 'hidden',
+                                    }}
                                     className="adsbygoogle"
                                     data-ad-client="ca-pub-3537017956623483"
                                     data-ad-slot="4572463963"
@@ -123,6 +136,19 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 </div>
                                 <div className={styles.verticalAd}>
                                     <ins
+                                        style={{
+                                            display: 'block',
+                                            width: '100%',
+                                            height: '100%',
+                                            minHeight: '100%',
+                                            minWidth: '100%',
+                                            maxWidth: '100%',
+                                            maxHeight: '100%',
+                                            margin: '0 auto',
+                                            padding: '0',
+                                            border: '0',
+                                            overflow: 'hidden',
+                                        }}
                                         className="adsbygoogle"
                                         data-ad-client="ca-pub-3537017956623483"
                                         data-ad-slot="3253844563"
