@@ -98,25 +98,17 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 />
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
-                            <div className={styles.squareAd}>
+                            <div
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                }}
+                            >
                                 <ins
-                                    style={{
-                                        display: 'block',
-                                        width: '100%',
-                                        height: '100%',
-                                        minHeight: '100%',
-                                        minWidth: '100%',
-                                        maxWidth: '100%',
-                                        maxHeight: '100%',
-                                        margin: '0 auto',
-                                        padding: '0',
-                                        border: '0',
-                                        overflow: 'hidden',
-                                    }}
                                     className="adsbygoogle"
                                     data-ad-client="ca-pub-3537017956623483"
                                     data-ad-slot="4572463963"
-                                    data-ad-format="auto"
+                                    data-ad-format="rectangle"
                                     data-full-width-responsive="true"
                                 />
                             </div>
@@ -135,25 +127,17 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 <div className={styles.mdx}>
                                     <MDXRemote {...post.content} components={components} />
                                 </div>
-                                <div className={styles.verticalAd}>
+                                <div
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                    }}
+                                >
                                     <ins
-                                        style={{
-                                            display: 'block',
-                                            width: '100%',
-                                            height: '100%',
-                                            minHeight: '100%',
-                                            minWidth: '100%',
-                                            maxWidth: '100%',
-                                            maxHeight: '100%',
-                                            margin: '0 auto',
-                                            padding: '0',
-                                            border: '0',
-                                            overflow: 'hidden',
-                                        }}
                                         className="adsbygoogle"
                                         data-ad-client="ca-pub-3537017956623483"
                                         data-ad-slot="3253844563"
-                                        data-ad-format="auto"
+                                        data-ad-format="rectangle"
                                         data-full-width-responsive="true"
                                     />
                                 </div>
