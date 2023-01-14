@@ -101,7 +101,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                         <article className={styles.article}>
                             <ArticlePanel readTime={post.meta.readTime} />
                             <div className={styles.body}>
-                                <div>
+                                <div className={styles.mdx}>
                                     <MDXRemote {...post.content} components={components} />
                                 </div>
                                 <div className={styles.ads}>
