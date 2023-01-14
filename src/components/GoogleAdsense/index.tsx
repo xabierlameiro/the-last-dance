@@ -1,13 +1,16 @@
+import { clx } from '@/helpers';
+import styles from './adsense.module.css';
+
 type Props = {
     client?: string;
     slot: string;
+    horizontal?: boolean;
 };
 
-const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot }: Props) => {
+const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }: Props) => {
     return (
         <ins
-            className="adsbygoogle"
-            style={{ display: 'block' }}
+            className={clx('adsbygoogle', horizontal ? styles.horizontal : '')}
             data-ad-client={client}
             data-ad-slot={slot}
             data-ad-format="auto"
