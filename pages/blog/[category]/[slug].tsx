@@ -86,7 +86,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 />
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
-                            <div className={styles.squareAd}>
+                            <div className={styles.verticalAd}>
                                 <GoogleAdsense slot="4572463963" />
                             </div>
                         </nav>
