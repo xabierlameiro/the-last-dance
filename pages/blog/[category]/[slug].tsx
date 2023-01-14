@@ -47,6 +47,11 @@ type Props = {
         };
     }[];
 };
+declare global {
+    interface Window {
+        adsbygoogle: { [key: string]: unknown }[];
+    }
+}
 
 const PostPage = ({ post, tags, categories, posts }: Props) => {
     const { formatMessage: f } = useIntl();
@@ -56,6 +61,10 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
         query: { category, slug },
     } = useRouter();
     const close = () => dispatch({ type: 'close' });
+
+    React.useEffect(() => {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+    }, []);
 
     return (
         <Layout meta={{ ...post.meta }} isBlog>
@@ -92,7 +101,19 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                         <article className={styles.article}>
                             <ArticlePanel readTime={post.meta.readTime} />
                             <div className={styles.body}>
-                                <MDXRemote {...post.content} components={components} />
+                                <div>
+                                    <MDXRemote {...post.content} components={components} />
+                                </div>
+                                <div>
+                                    <ins
+                                        className="adsbygoogle"
+                                        style={{ display: 'block', textAlign: 'center' }}
+                                        data-ad-layout="in-article"
+                                        data-ad-format="fluid"
+                                        data-ad-client="ca-pub-3537017956623483"
+                                        data-ad-slot="1888173459"
+                                    ></ins>
+                                </div>
                             </div>
                         </article>
                     </div>

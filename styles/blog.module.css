@@ -49,7 +49,11 @@
 .body {
     padding: 20px 60px 60px;
     height: calc(100vh - 120px);
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
 }
 @media screen and (max-width: 768px) {
     .body {
