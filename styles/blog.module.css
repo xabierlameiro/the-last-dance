@@ -53,7 +53,7 @@
     overflow-x: hidden;
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto 200px;
 }
 @media screen and (max-width: 768px) {
     .body {
