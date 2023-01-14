@@ -63,7 +63,13 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     const close = () => dispatch({ type: 'close' });
 
     React.useEffect(() => {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (err) {
+            console.log(
+                'Error while trying to load adsbygoogle. This is probably because you are not in production mode.'
+            );
+        }
     }, []);
 
     return (
@@ -89,6 +95,16 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 />
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
+                            <div className={styles.squareAd}>
+                                <ins
+                                    className="adsbygoogle"
+                                    style={{ display: 'block', textAlign: 'center', width: '100%' }}
+                                    data-ad-client="ca-pub-3537017956623483"
+                                    data-ad-slot="4572463963"
+                                    data-ad-format="auto"
+                                    data-full-width-responsive="true"
+                                />
+                            </div>
                         </nav>
                         <nav className={styles.secondNav} onTouchStart={onSideShiftRight}>
                             <AsidePanel />
@@ -108,11 +124,11 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                     <ins
                                         className="adsbygoogle"
                                         style={{ display: 'block', textAlign: 'center', width: '100%' }}
-                                        data-ad-layout="in-article"
-                                        data-ad-format="fluid"
                                         data-ad-client="ca-pub-3537017956623483"
-                                        data-ad-slot="1888173459"
-                                    ></ins>
+                                        data-ad-slot="3253844563"
+                                        data-ad-format="auto"
+                                        data-full-width-responsive="true"
+                                    />
                                 </div>
                             </div>
                         </article>
