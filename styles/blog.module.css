@@ -53,11 +53,13 @@
     overflow-x: hidden;
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 200px;
+    grid-template-columns: 1fr 250px;
 }
+
 .ads {
-    width: 200px;
+    width: 250px;
 }
+
 @media screen and (max-width: 768px) {
     .body {
         padding: 0px 10px 20px;
