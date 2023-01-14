@@ -1,6 +1,9 @@
 .horizontal {
     display: none;
 }
+.block {
+    display: block;
+}
 
 @media screen and (min-width: 300px) and (max-width: 900px) {
     .horizontal {
