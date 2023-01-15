@@ -5,5 +5,8 @@
 @media screen and (min-width: 300px) and (max-width: 900px) {
     .horizontal {
         display: block !important;
+        overflow: hidden;
+        width: 100% !important;
+        margin: 0 !important;
     }
 }

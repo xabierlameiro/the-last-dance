@@ -11,19 +11,7 @@ import type { AppProps } from 'next/app';
 type locales = 'en' | 'es' | 'gl';
 
 const App = ({ Component, pageProps }: AppProps) => {
-    const { locale = 'en', asPath } = useRouter();
-
-    React.useEffect(() => {
-        var ads = document.getElementsByClassName('adsbygoogle').length;
-        for (var i = 0; i < ads; i++) {
-            try {
-                // @ts-ignore
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            } catch (error) {
-                console.log('Error loading adsbygoogle', error);
-            }
-        }
-    }, [asPath]);
+    const { locale = 'en' } = useRouter();
 
     return (
         <>

@@ -1,3 +1,4 @@
+import React from 'react';
 import { clx } from '@/helpers';
 import styles from './adsense.module.css';
 
@@ -8,8 +9,21 @@ type Props = {
 };
 
 const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }: Props) => {
+    const adsbygoogle = React.useRef(null);
+
+    React.useEffect(() => {
+        if (adsbygoogle.current) {
+            try {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (error) {
+                console.error('Google Adsense error:', error);
+            }
+        }
+    }, [adsbygoogle]);
+
     return (
         <ins
+            ref={adsbygoogle}
             className={clx('adsbygoogle', horizontal ? styles.horizontal : styles.block)}
             style={{ display: 'block' }}
             data-ad-client={client}
