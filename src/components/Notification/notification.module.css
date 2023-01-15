@@ -14,14 +14,15 @@
     right: 20px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
     user-select: none;
-}
-
-.show {
-    animation: appear 0.3s ease-in-out forwards;
+    transform: translateX(120%);
 }
 
 .hide {
-    animation: disappear 0.3s ease-in-out forwards;
+    animation: disappear 0.5s ease-in-out forwards;
+}
+
+.show {
+    animation: appear 0.5s ease-in-out 2s forwards;
 }
 
 .hide:hover {

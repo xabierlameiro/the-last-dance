@@ -17,7 +17,7 @@ const Notification = ({ title, message, type = 'success', onClose }: Props) => {
         if (show) {
             const timeout = setTimeout(() => {
                 setShow(false);
-            }, 5000);
+            }, 7000);
 
             return () => clearTimeout(timeout);
         }

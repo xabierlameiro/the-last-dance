@@ -27,7 +27,7 @@ const SEO = ({ meta, isBlog }: Props) => {
     const title = meta?.title;
     const author = meta?.author || auth;
     const description = meta?.description;
-    const image = meta?.image;
+    const image = meta?.image ?? '/default.png';
 
     return (
         <Head>
