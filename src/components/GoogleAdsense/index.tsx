@@ -19,6 +19,14 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
                 console.error('Google Adsense error:', error);
             }
         }
+
+        return () => {
+            try {
+                (window.adsbygoogle = window.adsbygoogle || []).pop();
+            } catch (error) {
+                console.error('Google Adsense error:', error);
+            }
+        };
     }, [adsbygoogle]);
 
     return (
