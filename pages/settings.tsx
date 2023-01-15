@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from '@/styles/settings.module.css';
 import { useIntl } from 'react-intl';
-import { useDialog } from '@/context/dialog';
+import { useDialog, DialogProvider } from '@/context/dialog';
 import {
     Layout,
     Avatar,
@@ -75,7 +75,7 @@ const Content = () => {
     );
 };
 
-const Page = () => {
+const Settings = () => {
     const { formatMessage: f } = useIntl();
     const { open } = useDialog();
 
@@ -91,4 +91,10 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default function Page(props: any) {
+    return (
+        <DialogProvider>
+            <Settings {...props} />
+        </DialogProvider>
+    );
+}

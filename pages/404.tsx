@@ -1,5 +1,6 @@
 import { Layout, Dialog, ControlButtons } from '@/components';
 import { useDialog } from '@/context/dialog';
+import { DialogProvider } from '@/context/dialog';
 
 const Custom404 = () => {
     const { dispatch, open } = useDialog();
@@ -28,4 +29,10 @@ const Custom404 = () => {
     );
 };
 
-export default Custom404;
+export default function Page(props: any) {
+    return (
+        <DialogProvider>
+            <Custom404 {...props} />
+        </DialogProvider>
+    );
+}

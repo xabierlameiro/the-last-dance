@@ -9,6 +9,7 @@ import { clx } from '@/helpers';
 type StarCounterProps = {
     all?: boolean;
 };
+
 type Props = StarCounterProps & {
     children?: React.ReactNode;
 };
@@ -25,7 +26,7 @@ const Container = ({ children, all }: Props) => {
     );
 };
 
-const StarCounter = ({ all }: StarCounterProps) => {
+const ViewCounter = ({ all }: StarCounterProps) => {
     const [views, setViews] = React.useState(-1);
     const { asPath } = useRouter();
 
@@ -62,4 +63,4 @@ const StarCounter = ({ all }: StarCounterProps) => {
     );
 };
 
-export default StarCounter;
+export default ViewCounter;

@@ -14,13 +14,12 @@ import { BiCookie } from 'react-icons/bi';
 import { VscLaw } from 'react-icons/vsc';
 import { MdOutlinePrivacyTip } from 'react-icons/md';
 import matter from 'gray-matter';
-import { useDialog } from '@/context/dialog';
 import { useIntl } from 'react-intl';
+import { useDialog, DialogProvider } from '@/context/dialog';
 
 const LEGAL_PATH = path.join(process.cwd(), 'data/legal');
 
-// TODO: Move read mdx file logic outside page
-const Page = ({ source, meta }: any) => {
+const Legal = ({ source, meta }: any) => {
     const { open, dispatch } = useDialog();
     const { formatMessage: f } = useIntl();
     const [selected, setSelected] = React.useState(0);
@@ -115,4 +114,10 @@ export const getStaticPaths = () => {
     };
 };
 
-export default Page;
+export default function Page(props: any) {
+    return (
+        <DialogProvider>
+            <Legal {...props} />
+        </DialogProvider>
+    );
+}

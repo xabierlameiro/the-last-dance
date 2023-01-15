@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Layout, Dialog, VisibilityManager } from '@/components';
+import { useDialog, DialogProvider } from '@/context/dialog';
 import { useIntl } from 'react-intl';
 import { MDXRemote } from 'next-mdx-remote';
 import { components } from '@/helpers/mdxjs';
 import { serializePath } from '@/helpers/mdx';
-import { useDialog } from '@/context/dialog';
 
 type Props = {
     content: {
@@ -17,7 +17,7 @@ type Props = {
     };
 };
 
-const Page = ({ content }: Props) => {
+const Legal = ({ content }: Props) => {
     const { open } = useDialog();
     const { formatMessage: f } = useIntl();
 
@@ -63,4 +63,10 @@ export const getStaticProps = async (params: { locale: string }) => {
     };
 };
 
-export default Page;
+export default function Page(props: any) {
+    return (
+        <DialogProvider>
+            <Legal {...props} />
+        </DialogProvider>
+    );
+}

@@ -2,7 +2,6 @@ import React from 'react';
 import '../styles/globals.css';
 import '@xabierlameiro/code-hike/dist/index.css';
 import Script from 'next/script';
-import { DialogProvider } from '@/context/dialog';
 import { IntlProvider } from 'react-intl';
 import { useRouter } from 'next/router';
 import { messages } from '../src/intl/translations';
@@ -31,7 +30,6 @@ const App = ({ Component, pageProps }: AppProps) => {
             <IntlProvider
                 locale={locale}
                 messages={messages[locale as locales]}
-                defaultLocale="en"
                 onError={(err) => {
                     // if  Missing locale data for locale: "gl" in Intl.NumberFormat ignore it
                     if (err.message.includes('Missing locale data for locale: "gl"')) {
@@ -39,9 +37,7 @@ const App = ({ Component, pageProps }: AppProps) => {
                     }
                 }}
             >
-                <DialogProvider>
-                    <Component {...pageProps} />
-                </DialogProvider>
+                <Component {...pageProps} />
             </IntlProvider>
         </>
     );

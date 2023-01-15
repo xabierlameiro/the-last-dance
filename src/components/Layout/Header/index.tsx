@@ -3,12 +3,12 @@ import styles from './header.module.css';
 import { SiBitcoincash } from 'react-icons/si';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
-import StarCounter from '@/components/Blog/ViewCounter';
 import { socialLinks, translateRoute } from '@/constants/site';
 import CryptoPrice from '@/components/CryptoPrice';
+import ViewCounter from '@/components/Blog/ViewCounter';
 
 type Props = {
-    children: ReactNode;
+    children?: ReactNode;
 };
 
 const DateAndHour = () => {
@@ -62,7 +62,7 @@ const Header = ({ children }: Props) => {
             <Route />
             <NavLinks />
             <CryptoPrice />
-            <StarCounter all />
+            <ViewCounter all />
             <DateAndHour />
             {children}
         </header>

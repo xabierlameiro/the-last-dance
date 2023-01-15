@@ -1,6 +1,6 @@
 import React from 'react';
 import { MDXRemote } from 'next-mdx-remote';
-import { useDialog } from '@/context/dialog';
+import { useDialog, DialogProvider } from '@/context/dialog';
 import { Layout, Dialog, ControlButtons, SidesShift } from '@/components';
 import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCategory } from '@/helpers/fileReader';
 import { components } from '@/helpers/mdxjs';
@@ -201,4 +201,10 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
     };
 };
 
-export default PostPage;
+export default function Page(props: any) {
+    return (
+        <DialogProvider>
+            <PostPage {...props} />
+        </DialogProvider>
+    );
+}
