@@ -10,28 +10,35 @@ type Props = {
 
 const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }: Props) => {
     const adsbygoogle = React.useRef(null);
+    const isProduction = process.env.NODE_ENV === 'production';
 
     React.useEffect(() => {
-        if (adsbygoogle.current) {
-            try {
-                if (window.adsbygoogle && window.adsbygoogle.push) {
-                    window.adsbygoogle.push({});
+        if (isProduction) {
+            if (adsbygoogle.current) {
+                try {
+                    if (window.adsbygoogle && window.adsbygoogle.push) {
+                        window.adsbygoogle.push({});
+                    }
+                } catch (error) {
+                    console.error('Google Adsense error:', error);
                 }
-            } catch (error) {
-                console.error('Google Adsense error:', error);
             }
-        }
 
-        return () => {
-            try {
-                if (window.adsbygoogle && window.adsbygoogle.pop) {
-                    window.adsbygoogle.pop();
+            return () => {
+                try {
+                    if (window.adsbygoogle && window.adsbygoogle.pop) {
+                        window.adsbygoogle.pop();
+                    }
+                } catch (error) {
+                    console.error('Google Adsense error:', error);
                 }
-            } catch (error) {
-                console.error('Google Adsense error:', error);
-            }
-        };
-    }, [adsbygoogle]);
+            };
+        }
+    }, [isProduction, adsbygoogle]);
+
+    if (!isProduction) {
+        return null;
+    }
 
     return (
         <ins
