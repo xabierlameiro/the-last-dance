@@ -23,6 +23,16 @@ export const socialLinks = [
         title: 'Reddit profile',
         name: 'Reddit',
     },
+    {
+        href: 'https://storybook.xabierlameiro.com',
+        title: 'Storybook',
+        name: 'Storybook',
+    },
+    {
+        href: 'https://xabierlameiro.com/coverage',
+        title: 'Coverage',
+        name: 'Coverage',
+    },
 ];
 
 export const translateRoute = (pathname: string, f: Function) => {
