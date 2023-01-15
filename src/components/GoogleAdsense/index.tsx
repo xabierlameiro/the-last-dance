@@ -14,7 +14,9 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
     React.useEffect(() => {
         if (adsbygoogle.current) {
             try {
-                (window.adsbygoogle = window.adsbygoogle || []).push({});
+                if (window.adsbygoogle && window.adsbygoogle.push) {
+                    window.adsbygoogle.push({});
+                }
             } catch (error) {
                 console.error('Google Adsense error:', error);
             }
@@ -22,7 +24,9 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
 
         return () => {
             try {
-                (window.adsbygoogle = window.adsbygoogle || []).pop();
+                if (window.adsbygoogle && window.adsbygoogle.pop) {
+                    window.adsbygoogle.pop();
+                }
             } catch (error) {
                 console.error('Google Adsense error:', error);
             }
