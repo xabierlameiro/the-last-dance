@@ -3,6 +3,9 @@ import styles from './header.module.css';
 import { SiBitcoincash } from 'react-icons/si';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
+import StarCounter from '@/components/Blog/ViewCounter';
+import { socialLinks, translateRoute } from '@/constants/site';
+
 type Props = {
     children: ReactNode;
 };
@@ -34,52 +37,19 @@ const DateAndHour = () => {
 
 const Route = () => {
     const { pathname } = useRouter();
-    const { formatMessage: f } = useIntl();
-    let route = pathname;
-
-    switch (pathname) {
-        case '/':
-            route = f({ id: 'home.breadcrumb' });
-            break;
-        case '/blog/[category]/[slug]':
-            route = f({ id: 'blog.breadcrumb' });
-            break;
-        case '/legal/[slug]':
-            route = f({ id: 'legal.breadcrumb' });
-            break;
-        case '/comments':
-            route = f({ id: 'comments.breadcrumb' });
-            break;
-        case '/settings':
-            route = f({ id: 'settings.breadcrumb' });
-            break;
-    }
-
+    const { formatMessage } = useIntl();
+    let route = translateRoute(pathname, formatMessage);
     return <span className={styles.route}>{route}</span>;
 };
 
 const NavLinks = () => {
     return (
         <nav className={styles.navLinks}>
-            <a
-                href="https://www.linkedin.com/in/xlameiro/"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Linkedin profile"
-            >
-                Linkedin
-            </a>
-            <a href="https://github.com/xabierlameiro" target="_blank" rel="noopener noreferrer" title="Github profile">
-                Github
-            </a>
-            <a
-                href="https://www.reddit.com/user/xlameiro"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Reddit profile"
-            >
-                Reddit
-            </a>
+            {socialLinks.map((item) => (
+                <a key={item.href} target="_blank" rel="noopener noreferrer" title={item.title}>
+                    {item.name}
+                </a>
+            ))}
         </nav>
     );
 };
@@ -90,6 +60,7 @@ const Header = ({ children }: Props) => {
             <SiBitcoincash />
             <Route />
             <NavLinks />
+            <StarCounter all />
             <DateAndHour />
             {children}
         </header>
