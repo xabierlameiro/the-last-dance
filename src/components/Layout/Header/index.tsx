@@ -46,7 +46,7 @@ const NavLinks = () => {
     return (
         <nav className={styles.navLinks}>
             {socialLinks.map((item) => (
-                <a key={item.href} target="_blank" rel="noopener noreferrer" title={item.title}>
+                <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer" title={item.title}>
                     {item.name}
                 </a>
             ))}
