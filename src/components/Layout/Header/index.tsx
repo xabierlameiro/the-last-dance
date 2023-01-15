@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import StarCounter from '@/components/Blog/ViewCounter';
 import { socialLinks, translateRoute } from '@/constants/site';
+import CryptoPrice from '@/components/CryptoPrice';
 
 type Props = {
     children: ReactNode;
@@ -60,6 +61,7 @@ const Header = ({ children }: Props) => {
             <SiBitcoincash />
             <Route />
             <NavLinks />
+            <CryptoPrice />
             <StarCounter all />
             <DateAndHour />
             {children}
