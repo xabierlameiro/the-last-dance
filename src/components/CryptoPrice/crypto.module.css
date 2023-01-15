@@ -6,7 +6,7 @@
     user-select: none;
 }
 
-svg.xrp {
+.container svg.xrp {
     fill: none;
     font-size: 16px;
 }
