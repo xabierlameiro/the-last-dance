@@ -6,7 +6,13 @@ const Custom404 = () => {
     const close = () => dispatch({ type: 'close' });
 
     return (
-        <Layout>
+        <Layout
+            meta={{
+                title: '404',
+                description: "Oh! sorry, this page doesn't exist",
+                noindex: true,
+            }}
+        >
             <Dialog
                 modalMode
                 withPadding
