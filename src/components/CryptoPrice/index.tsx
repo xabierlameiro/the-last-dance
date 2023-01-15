@@ -50,7 +50,7 @@ const CryptoPrice = () => {
     return (
         <Container title={`The price today is ${xrp.todaySummary} ${xrp.todayPorcentage}`}>
             <FormattedNumber
-                value={typeof xrp.price === 'number' && !isNaN(xrp.price) ? xrp.price : 0}
+                value={!isNaN(xrp.price) ? xrp.price : 0}
                 style="currency"
                 currency="EUR"
                 minimumFractionDigits={2}
