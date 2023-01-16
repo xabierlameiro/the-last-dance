@@ -40,6 +40,10 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
                 '</title><link rel="icon" href="/favicon.svg" title="The favicon"><meta name="robots" content="noindex">'
             );
 
+            replaced = replaced.replace(/Global/g, 'Components');
+
+            replaced = replaced.replace(/<h3 class="subsection-title">Methods<\/h3>/g, '');
+
             writeFile(path, replaced, 'utf-8', function (err, a) {
                 if (err) {
                     console.log('err', err);
@@ -47,5 +51,22 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
                 }
             });
         });
+    });
+});
+
+readFile('public/docs/styles/jsdoc-default.css', 'utf8', (err, data) => {
+    if (err) {
+        console.log('err', err);
+        return;
+    }
+
+    let replaced = data.replace(/\s/g, '');
+    replaced = replaced.replace(/nav{/, 'nav{position:sticky;top:20px;');
+
+    writeFile('public/docs/styles/jsdoc-default.css', replaced, 'utf-8', function (err, a) {
+        if (err) {
+            console.log('err', err);
+            return;
+        }
     });
 });
