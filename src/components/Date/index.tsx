@@ -5,6 +5,14 @@ import styles from './date.module.css';
 type Props = {
     date: Date;
 };
+
+/**
+ * @example
+ *     <Date date={new Date()} />;
+ *
+ * @param {Date} date
+ * @returns {JSX.Element}
+ */
 const Date = ({ date }: Props) => {
     const { formatDate } = useIntl();
 

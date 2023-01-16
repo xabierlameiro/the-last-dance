@@ -12,7 +12,15 @@ type Props = {
     slug?: string | string[];
     category?: string | string[];
 };
-
+/**
+ * @example
+ *     <PostList posts={posts} slug={slug} category={category} />;
+ *
+ * @param {object[]} posts - The list of posts
+ * @param {string} slug - The slug is used to highlight the selected post
+ * @param {string} category - The category is used to highlight the selected post
+ * @returns {JSX.Element}
+ */
 const PostList = ({ posts, slug, category }: Props) => {
     if (!posts) return null;
 

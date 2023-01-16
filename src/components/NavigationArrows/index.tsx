@@ -8,6 +8,16 @@ type Props = {
     onClickLeft?: () => void;
 };
 
+/**
+ * @example
+ *     <NavigationArrows />;
+ *
+ * @param {boolean} disabledLeft - If true, the left arrow will be disabled
+ * @param {boolean} disabledRight - If true, the right arrow will be disabled
+ * @param {Function} onClickLeft - Callback function when left arrow is clicked
+ * @param {Function} onClickRight - Callback function when right arrow is clicked
+ * @returns {JSX.Element}
+ */
 const NavigationArrows = ({ disabledLeft, onClickLeft, disabledRight, onClickRight }: Props) => {
     return (
         <nav className={styles.nav}>

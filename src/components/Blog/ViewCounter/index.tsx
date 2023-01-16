@@ -14,6 +14,16 @@ type Props = StarCounterProps & {
     children?: React.ReactNode;
 };
 
+/**
+ * @example
+ *     <Container>
+ *         <span> 1 </span>
+ *     </Container>;
+ *
+ * @param {React.ReactNode} children
+ * @param {boolean} all - If true, show different icon
+ * @returns {JSX.Element}
+ */
 const Container = ({ children, all }: Props) => {
     return (
         <div
@@ -26,6 +36,14 @@ const Container = ({ children, all }: Props) => {
     );
 };
 
+/**
+ * @example
+ *     <ViewCounter />;
+ *     <ViewCounter all />;
+ *
+ * @param {boolean} all - If true, it will show the total views from GA
+ * @returns {JSX.Element}
+ */
 const ViewCounter = ({ all }: StarCounterProps) => {
     const [views, setViews] = React.useState(-1);
     const { asPath } = useRouter();

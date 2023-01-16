@@ -8,6 +8,15 @@ type Props = {
     horizontal?: boolean;
 };
 
+/**
+ * @example
+ *     <GoogleAdsense slot="1234567890" />;
+ *
+ * @param {string} client - The client id
+ * @param {string} slot - The slot id
+ * @param {boolean} horizontal - If true, the adsense will be horizontal
+ * @returns {JSX.Element}
+ */
 const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }: Props) => {
     const adsbygoogle = React.useRef(null);
     const isProduction = process.env.NODE_ENV === 'production';

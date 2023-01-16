@@ -7,6 +7,12 @@ import Link from 'next/link';
 import styles from './dock.module.css';
 import { clx } from '@/helpers';
 
+/**
+ * @example
+ *     <Dock />;
+ *
+ * @returns {JSX.Element}
+ */
 const Dock = () => {
     const { pathname, locale } = useRouter();
     const { dispatch } = useDialog();

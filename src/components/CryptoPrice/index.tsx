@@ -10,6 +10,16 @@ type Props = {
     title?: string;
 };
 
+/**
+ * @example
+ *     <Container title="XRP price">
+ *         <span> 1 </span>
+ *     </Container>;
+ *
+ * @param {React.ReactNode} children
+ * @param {string} title
+ * @returns {JSX.Element}
+ */
 const Container = ({ children, title }: Props) => {
     return (
         <div className={styles.container} title={title}>
@@ -19,6 +29,12 @@ const Container = ({ children, title }: Props) => {
     );
 };
 
+/**
+ * @example
+ *     <CryptoPrice />;
+ *
+ * @returns {JSX.Element}
+ */
 const CryptoPrice = () => {
     const [xrp, setXRP] = React.useState<{ price: number; todaySummary: string; todayPorcentage: string } | -1 | 0>(0);
 

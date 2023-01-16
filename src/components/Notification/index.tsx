@@ -10,6 +10,17 @@ type Props = {
     onClose?: () => void;
 };
 
+/**
+ * @example
+ *     <Notification title="Success" message="This is a success message" type="success" />;
+ *     <Notification title="Error" message="This is an error message" type="error" />;
+ *
+ * @param {string} title - The title of the notification
+ * @param {string} message - The message of the notification
+ * @param {string} type - The type of the notification
+ * @param {function} onClose - The function to be called when the notification is closed
+ * @returns {JSX.Element}
+ */
 const Notification = ({ title, message, type = 'success', onClose }: Props) => {
     const [show, setShow] = React.useState(true);
 

@@ -7,6 +7,14 @@ type Props = {
     leftPosition?: boolean;
 };
 
+/**
+ * @example
+ *     <SidesShift />;
+ *
+ * @param {function} handleClick - The function to be called when the button is clicked
+ * @param {boolean} leftPosition - If true, the button will be positioned on the left
+ * @returns {JSX.Element}
+ */
 const ShidesShift = ({ handleClick, leftPosition }: Props) => {
     return <TfiMinus className={clx(styles.swap, leftPosition ? styles.left : '')} onClick={handleClick} />;
 };

@@ -18,6 +18,14 @@ type Props = {
     };
 };
 
+/**
+ * @example
+ *     <SEO meta={meta} isBlog={true} />;
+ *
+ * @param {object} meta - The object containing the meta data for SEO
+ * @param {boolean} isBlog - Whether the page is a blog post the SEO changes
+ * @returns {JSX.Element}
+ */
 const SEO = ({ meta, isBlog }: Props) => {
     const { locale: l, pathname: path } = useRouter();
     const category = meta?.category?.toLowerCase();

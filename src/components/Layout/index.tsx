@@ -22,6 +22,18 @@ type Props = {
     };
 };
 
+/**
+ * @example
+ *     <Layout meta={meta} isBlog={true}>
+ *         <div>Content</div>
+ *     </Layout>;
+ *
+ * @param {object} meta - The object containing the meta data for SEO
+ * @param {boolean} isBlog - Whether the page is a blog post the SEO changes
+ * @param {string} className - The class name for the different pages
+ * @param {JSX.Element} children - Content to be rendered
+ * @returns {JSX.Element}
+ */
 const Layout = ({ meta, className, children, isBlog }: Props) => {
     return (
         <div className={styles.layout}>
