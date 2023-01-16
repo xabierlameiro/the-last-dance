@@ -25,6 +25,13 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
 
             replaced = replaced.replace(/href="index.html">Home/g, 'href="/docs">Home');
 
+            replaced = replaced.replace(
+                /<a href="docs\/https:\/\/github.com\/jsdoc\/jsdoc">JSDoc 3.6.11<\/a>/g,
+                '<a href="https://xabierlameiro.com">Xabier Lameiro</a>'
+            );
+
+            replaced = replaced.replace(/<\/title>/, '<link rel="icon" href="/favicon.svg" title="The favicon">');
+
             writeFile(path, replaced, 'utf-8', function (err, a) {
                 if (err) {
                     console.log('err', err);
