@@ -8,13 +8,10 @@
         "includePattern": ".+\\.tsx$",
         "excludePattern": "(node_modules/|docs)"
     },
-    "plugins": ["plugins/markdown", "node_modules/jsdoc-babel", "better-docs/component"],
+    "plugins": ["plugins/markdown", "node_modules/jsdoc-babel"],
     "templates": {
         "cleverLinks": false,
-        "monospaceLinks": false,
-        "better-docs": {
-            "name": "My React components"
-        }
+        "monospaceLinks": false
     },
     "babel": {
         "extensions": ["tsx"],

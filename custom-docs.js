@@ -37,7 +37,7 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
 
             replaced = replaced.replace(
                 /<\/title>/,
-                '</title><link rel="icon" href="/favicon.svg" title="The favicon">'
+                '</title><link rel="icon" href="/favicon.svg" title="The favicon"><meta name="robots" content="noindex">'
             );
 
             writeFile(path, replaced, 'utf-8', function (err, a) {

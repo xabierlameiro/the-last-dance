@@ -18,7 +18,6 @@ type Props = {
  * @example
  *     <TimeRead readTime="2" />;
  *
- * @class
  * @param {string} readTime - The read time of the article
  * @returns {JSX.Element}
  */

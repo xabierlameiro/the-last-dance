@@ -10,12 +10,7 @@ type Props = {
 
 /**
  * @example
- *     <Avatar
- *         name="John Doe"
- *         description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies ultricies, nisl nunc aliquet nisl, eget aliquet nunc nisl eget nisl. Donec auctor, nisl eget ultricies ultricies, nisl nunc aliquet nisl, eget aliquet nunc nisl eget nisl."
- *         img="/images/avatar.jpg"
- *         alt="John Doe"
- *     />;
+ *     <Avatar name="John Doe" description="Lorem ipsum" img="/images/avatar.jpg" alt="John Doe" />;
  *
  * @param {string} name - Name of the user
  * @param {string} description - Description of the user
