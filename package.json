@@ -18,7 +18,7 @@
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
         "prettier": "prettier --write .",
-        "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json"
+        "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json && node custom-docs.js"
     },
     "dependencies": {
         "@google-analytics/data": "^3.1.2",
