@@ -4,17 +4,20 @@
         "dictionaries": ["jsdoc", "closure"]
     },
     "source": {
-        "include": ["src"],
-        "includePattern": "src/helpers/fileReader.ts$",
+        "include": ["src/components/"],
+        "includePattern": ".+\\.tsx$",
         "excludePattern": "(node_modules/|docs)"
     },
-    "plugins": ["plugins/markdown", "node_modules/jsdoc-babel"],
+    "plugins": ["plugins/markdown", "node_modules/jsdoc-babel", "better-docs/component"],
     "templates": {
         "cleverLinks": false,
-        "monospaceLinks": false
+        "monospaceLinks": false,
+        "better-docs": {
+            "name": "My React components"
+        }
     },
     "babel": {
-        "extensions": ["ts", "tsx"],
+        "extensions": ["tsx"],
         "ignore": ["**/*.(test|spec).ts"],
         "babelrc": false,
         "presets": [["@babel/preset-env", { "targets": { "node": true } }], "@babel/preset-typescript"],

@@ -8,6 +8,21 @@ type Props = {
     alt: string;
 };
 
+/**
+ * @example
+ *     <Avatar
+ *         name="John Doe"
+ *         description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies ultricies, nisl nunc aliquet nisl, eget aliquet nunc nisl eget nisl. Donec auctor, nisl eget ultricies ultricies, nisl nunc aliquet nisl, eget aliquet nunc nisl eget nisl."
+ *         img="/images/avatar.jpg"
+ *         alt="John Doe"
+ *     />;
+ *
+ * @param {string} name - Name of the user
+ * @param {string} description - Description of the user
+ * @param {string} img - Image of the user
+ * @param {string} alt - Alt text for the image
+ * @returns {JSX.Element} - Avatar component
+ */
 const Avatar = ({ name, description, img, alt }: Props) => {
     return (
         <section data-testid="avatar" className={styles.userInfo}>
