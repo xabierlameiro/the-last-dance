@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'fs';
 import glob from 'glob';
 
-glob('public/docs/**/*.?(html|css|ts.html)', function (err, files) {
+glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
     if (err) {
         console.log('err', err);
         return;
