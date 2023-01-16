@@ -16,12 +16,10 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
 
             let replaced = data.replace(/<title>(.*)<\/title>/, '<title>Docs by Xabier Lameiro</title>');
 
-            // if (path === 'public/docs/index.html') {
-            //     replaced = replaced.replace(/src="/g, 'src="docs/');
-            //     replaced = replaced.replace(/href="/g, 'href="docs/');
-            //     // replaced = replaced.replace(/rel="stylesheet" href="/g, 'rel="stylesheet" href="docs/');
-            //     replaced = replaced.replace(/url\('/g, "url('docs/");
-            // }
+            if (path === 'public/docs/index.html') {
+                replaced = replaced.replace(/script src="/g, 'script src="docs/');
+                replaced = replaced.replace(/rel="stylesheet" href="/g, 'rel="stylesheet" href="docs/');
+            }
 
             writeFile(path, replaced, 'utf-8', function (err, a) {
                 if (err) {
