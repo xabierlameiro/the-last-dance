@@ -48,7 +48,7 @@ const CryptoPrice = () => {
         );
 
     return (
-        <Container title={`The price today is ${xrp.todaySummary} ${xrp.todayPorcentage}`}>
+        <Container title={`The Ripple Coin price today is ${xrp.todaySummary} ${xrp.todayPorcentage}`}>
             <FormattedNumber
                 value={!isNaN(xrp.price) ? xrp.price : 0}
                 style="currency"
