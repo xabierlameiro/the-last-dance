@@ -29,6 +29,11 @@ export const socialLinks = [
         name: 'Storybook',
     },
     {
+        href: 'https://xabierlameiro.com/docs',
+        title: 'Docs',
+        name: 'Docs',
+    },
+    {
         href: 'https://xabierlameiro.com/coverage',
         title: 'Coverage',
         name: 'Coverage',

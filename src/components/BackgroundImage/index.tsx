@@ -4,13 +4,10 @@ import backgroundImage from '../../../public/background-image.jpeg';
 import { useIntl } from 'react-intl';
 
 /**
- * @description BackgroundImage component
- *
  * @example
  *     <BackgroundImage />;
  *
- * @returns {JSX.Element} BackgroundImage component
- * @name BackgroundImage
+ * @returns {JSX.Element}
  */
 const BackgroundImage = () => {
     const { formatMessage: f } = useIntl();
