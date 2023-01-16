@@ -19,7 +19,7 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
             if (path === 'public/docs/index.html') {
                 replaced = replaced.replace(/src="/g, 'src="docs/');
                 replaced = replaced.replace(/href="/g, 'href="docs/');
-                // replaced = replaced.replace(/rel="stylesheet" href="/g, 'rel="stylesheet" href="docs/');
+                replaced = replaced.replace(/href="docs\/index.html"/g, 'href="/docs"');
                 replaced = replaced.replace(/url\('/g, "url('docs/");
             }
 
