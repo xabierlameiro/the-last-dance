@@ -30,7 +30,10 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
                 '<a href="https://xabierlameiro.com">Xabier Lameiro</a>'
             );
 
-            replaced = replaced.replace(/<\/title>/, '<link rel="icon" href="/favicon.svg" title="The favicon">');
+            replaced = replaced.replace(
+                /<\/title>/,
+                '</title><link rel="icon" href="/favicon.svg" title="The favicon">'
+            );
 
             writeFile(path, replaced, 'utf-8', function (err, a) {
                 if (err) {
