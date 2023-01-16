@@ -23,6 +23,10 @@ export default withMDX({
                 source: '/:coverage',
                 destination: '/:coverage/index.html',
             },
+            {
+                source: '/:docs',
+                destination: '/:docs/index.html',
+            },
         ];
     },
     // Append the default value with md extensions
