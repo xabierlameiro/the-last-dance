@@ -60,8 +60,7 @@ readFile('public/docs/styles/jsdoc-default.css', 'utf8', (err, data) => {
         return;
     }
 
-    let replaced = data.replace(/\s/g, '');
-    replaced = replaced.replace(/nav{/, 'nav{position:sticky;top:20px;');
+    let replaced = data.replace(/nav(?:\r\n|\r|\n){/g, 'nav { position:sticky; top:20px;');
 
     writeFile('public/docs/styles/jsdoc-default.css', replaced, 'utf-8', function (err, a) {
         if (err) {
