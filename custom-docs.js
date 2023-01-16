@@ -23,6 +23,8 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
                 replaced = replaced.replace(/url\('/g, "url('docs/");
             }
 
+            replaced = replaced.replace(/href="index.html">Home/g, 'href="/docs">Home');
+
             writeFile(path, replaced, 'utf-8', function (err, a) {
                 if (err) {
                     console.log('err', err);
