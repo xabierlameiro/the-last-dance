@@ -61,10 +61,6 @@
     width: calc(100vw - 460px);
 }
 
-.verticalAd {
-    display: none;
-}
-
 @media screen and (max-width: 900px) {
     .mdx {
         width: calc(100vw - 40px);
@@ -79,13 +75,6 @@
         display: block;
         padding: 0 30px 0 0;
         width: calc(100vw - 710px);
-    }
-    .verticalAd {
-        display: block;
-        width: 250px;
-        height: 100%;
-        position: fixed;
-        right: 30px;
     }
 }
 

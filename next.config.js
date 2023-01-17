@@ -35,16 +35,7 @@ export default withMDX({
         appDir: true,
     },
     images: {
-        domains: [
-            'www.googleadservices.com',
-            'www.googletagmanager.com',
-            'www.google-analytics.com',
-            'www.google.com',
-            'uploads-ssl.webflow.com',
-            'code.visualstudio.com',
-            'https://googlecm.hit.gemius.pl/',
-            'https://googlecm',
-        ],
+        domains: ['uploads-ssl.webflow.com', 'code.visualstudio.com', 'googlecm.hit.gemius.pl'],
     },
     i18n: {
         locales: ['en', 'es', 'gl'],
