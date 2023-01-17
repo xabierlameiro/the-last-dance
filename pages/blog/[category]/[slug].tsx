@@ -13,6 +13,7 @@ import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
 import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
 import GoogleAdsense from '@/components/GoogleAdsense';
+import useWindowResize from '@/hooks/useWidowResize';
 
 type Props = {
     post: {
@@ -57,6 +58,7 @@ declare global {
 const PostPage = ({ post, tags, categories, posts }: Props) => {
     const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
+    const { isMobile } = useWindowResize();
     const { left, onSideShiftLeft, right, onSideShiftRight } = useSideShift();
     const {
         query: { category, slug },
@@ -66,6 +68,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     return (
         <Layout meta={{ ...post.meta }} isBlog>
             <Dialog
+                modalMode={isMobile}
                 open={open}
                 body={
                     <div

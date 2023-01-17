@@ -2,10 +2,35 @@
     display: grid;
     grid-template-columns: 200px 1fr;
     height: 100%;
+    transition: all 0.5s ease;
+}
+
+@media screen and (max-width: 900px) {
+    .container {
+        grid-template-columns: 10px 1fr;
+    }
+    .container .nav > * {
+        visibility: hidden;
+    }
+    .container .nav {
+        padding: 0;
+    }
+
+    .open {
+        grid-template-columns: 200px 1fr;
+    }
+    .container .nav .shift,
+    .open .nav > * {
+        visibility: visible;
+    }
+    .open .nav {
+        padding: 20px;
+    }
 }
 
 .nav {
     background: rgba(235, 232, 238);
+    position: relative;
     padding: 20px 10px;
     display: grid;
     gap: 20px;
@@ -42,6 +67,12 @@
     margin-top: 50px;
     overflow: scroll;
     font-size: 14px;
+}
+
+@media screen and (max-width: 900px) {
+    .content {
+        margin-top: 0;
+    }
 }
 
 .content::-webkit-scrollbar {

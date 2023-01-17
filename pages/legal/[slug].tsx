@@ -16,12 +16,17 @@ import { MdOutlinePrivacyTip } from 'react-icons/md';
 import matter from 'gray-matter';
 import { useIntl } from 'react-intl';
 import { useDialog, DialogProvider } from '@/context/dialog';
+import SidesShift from '@/components/SidesShift';
+import useSideShift from '@/hooks/useSideShift';
+import { clx } from '@/helpers';
 
 const LEGAL_PATH = path.join(process.cwd(), 'data/legal');
 
 const Legal = ({ source, meta }: any) => {
     const { open, dispatch } = useDialog();
     const { formatMessage: f } = useIntl();
+    const { left, onSideShiftLeft } = useSideShift();
+
     const [selected, setSelected] = React.useState(0);
     const close = () => dispatch({ type: 'close' });
 
@@ -56,8 +61,9 @@ const Legal = ({ source, meta }: any) => {
                 modalMode
                 open={open}
                 body={
-                    <div className={styles.container}>
+                    <div className={clx(styles.container, left ? styles.open : '')} onTouchStart={onSideShiftLeft}>
                         <nav className={styles.nav}>
+                            <SidesShift className={styles.shift} />
                             <ControlButtons onClickClose={close} onClickMinimise={close} />
                             <SearchInput placeHolderText={f({ id: 'legal.search-placeholder' })} />
                             <span className={styles.title}>{f({ id: 'legal.title' })}</span>

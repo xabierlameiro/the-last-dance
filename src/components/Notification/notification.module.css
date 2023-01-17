@@ -4,17 +4,25 @@
     height: auto;
     min-height: 90px;
     z-index: 9999;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(var(--grey-color));
     padding: 15px;
     font-size: 14px;
-    color: #fff;
+    color: rgba(var(--font-color));
     overflow: visible;
     position: fixed;
     top: 42px;
     right: 20px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 32px 0 rgb(var(--grey-color) / 37%);
     user-select: none;
     transform: translateX(120%);
+}
+
+@media screen and (max-width: 768px) {
+    .notification {
+        top: 32.5px;
+        right: 10px;
+        font-size: 12px;
+    }
 }
 
 .hide {
