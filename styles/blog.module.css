@@ -67,6 +67,14 @@
     }
 }
 
+.verticalAd {
+    display: none;
+    width: 250px;
+    height: 100%;
+    position: fixed;
+    right: 30px;
+}
+
 @media screen and (min-width: 1400px) {
     .body {
         grid-template-columns: 1fr 250px;
@@ -75,6 +83,9 @@
         display: block;
         padding: 0 30px 0 0;
         width: calc(100vw - 710px);
+    }
+    .verticalAd {
+        display: block;
     }
 }
 
