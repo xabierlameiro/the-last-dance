@@ -3,8 +3,13 @@ import styles from './header.module.css';
 import { SiBitcoincash } from 'react-icons/si';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
+import { socialLinks, translateRoute } from '@/constants/site';
+import CryptoPrice from '@/components/CryptoPrice';
+import ViewCounter from '@/components/Blog/ViewCounter';
+import IndexedCounter from '@/components/IndexedCounter';
+
 type Props = {
-    children: ReactNode;
+    children?: ReactNode;
 };
 
 const DateAndHour = () => {
@@ -34,49 +39,19 @@ const DateAndHour = () => {
 
 const Route = () => {
     const { pathname } = useRouter();
-    const { formatMessage: f } = useIntl();
-    let route = pathname;
-
-    switch (pathname) {
-        case '/':
-            route = f({ id: 'home.breadcrumb' });
-            break;
-        case '/blog/[category]/[slug]':
-            route = f({ id: 'blog.breadcrumb' });
-            break;
-        case '/comments':
-            route = f({ id: 'comments.breadcrumb' });
-            break;
-        case '/settings':
-            route = f({ id: 'settings.breadcrumb' });
-            break;
-    }
-
+    const { formatMessage } = useIntl();
+    let route = translateRoute(pathname, formatMessage);
     return <span className={styles.route}>{route}</span>;
 };
 
 const NavLinks = () => {
     return (
         <nav className={styles.navLinks}>
-            <a
-                href="https://www.linkedin.com/in/xlameiro/"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Linkedin profile"
-            >
-                Linkedin
-            </a>
-            <a href="https://github.com/xabierlameiro" target="_blank" rel="noopener noreferrer" title="Github profile">
-                Github
-            </a>
-            <a
-                href="https://www.reddit.com/user/xlameiro"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Reddit profile"
-            >
-                Reddit
-            </a>
+            {socialLinks.map((item) => (
+                <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer" title={item.title}>
+                    {item.name}
+                </a>
+            ))}
         </nav>
     );
 };
@@ -87,6 +62,9 @@ const Header = ({ children }: Props) => {
             <SiBitcoincash />
             <Route />
             <NavLinks />
+            <CryptoPrice />
+            <IndexedCounter />
+            <ViewCounter all />
             <DateAndHour />
             {children}
         </header>

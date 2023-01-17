@@ -1,13 +1,14 @@
 import React from 'react';
 import Layout from '@/layout';
 import Dialog from '@/components/Dialog';
+import { DialogProvider } from '@/context/dialog';
 import ControlButtons from '@/components/ControlButtons';
 import { AiFillFolder } from 'react-icons/ai';
 import styles from '@/styles/comments.module.css';
 import Data from '../data/comments/index.mdx';
 import { useIntl } from 'react-intl';
 
-const Page = () => {
+const Comments = () => {
     const dialogRef = React.useRef<HTMLDivElement>(null);
     const { formatMessage: f } = useIntl();
     const [height, setHeight] = React.useState(0);
@@ -48,4 +49,10 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default function Page(props: any) {
+    return (
+        <DialogProvider>
+            <Comments {...props} />
+        </DialogProvider>
+    );
+}

@@ -10,6 +10,17 @@ type Props = {
     onClickMaximise?: () => Function | void;
 };
 
+/**
+ * @example
+ *     <ControlButtons />;
+ *
+ * @param {boolean} disabled - If true, the maximise button will be disabled
+ * @param {boolean} withPadding - If true, the container will have padding
+ * @param {Function} onClickClose - Callback function when close button is clicked
+ * @param {Function} onClickMinimise - Callback function when minimise button is clicked
+ * @param {Function} onClickMaximise - Callback function when maximise button is clicked
+ * @returns {JSX.Element}
+ */
 const ControlButtons = ({ disabled, withPadding, onClickClose, onClickMinimise, onClickMaximise }: Props) => {
     return (
         <div data-testid="controls" className={clx(styles.ch_frame_buttons, withPadding ? styles.withPadding : '')}>

@@ -14,6 +14,13 @@ type Props = {
     readTime?: string;
 };
 
+/**
+ * @example
+ *     <TimeRead readTime="2" />;
+ *
+ * @param {string} readTime - The read time of the article
+ * @returns {JSX.Element}
+ */
 const TimeRead = ({ readTime }: Props) => {
     const { formatMessage: f } = useIntl();
 
@@ -32,6 +39,15 @@ const TimeRead = ({ readTime }: Props) => {
     );
 };
 
+/**
+ * @example
+ *     <ArticlePanel readTime="2" />;
+ *
+ * @param {string} readTime - The read time of the article
+ * @returns {JSX.Element}
+ * @see {@link https://storybook.xabierlameiro.com/?path=/story/blog-articlepanel--primary Storybook}
+ * @see {@link https://xabierlameiro.com/coverage/Blog/ArticlePanel/index.tsx.html Test Coverage}
+ */
 const ArticlePanel = ({ readTime }: Props) => {
     return (
         <div className={styles.articleControls} data-testid="article-panel">

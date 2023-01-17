@@ -1,6 +1,6 @@
 import React from 'react';
 import { MDXRemote } from 'next-mdx-remote';
-import { useDialog } from '@/context/dialog';
+import { useDialog, DialogProvider } from '@/context/dialog';
 import { Layout, Dialog, ControlButtons, SidesShift } from '@/components';
 import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCategory } from '@/helpers/fileReader';
 import { components } from '@/helpers/mdxjs';
@@ -12,6 +12,8 @@ import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
 import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
+import GoogleAdsense from '@/components/GoogleAdsense';
+import useWindowResize from '@/hooks/useWidowResize';
 
 type Props = {
     post: {
@@ -47,10 +49,16 @@ type Props = {
         };
     }[];
 };
+declare global {
+    interface Window {
+        adsbygoogle: { [key: string]: unknown }[];
+    }
+}
 
 const PostPage = ({ post, tags, categories, posts }: Props) => {
     const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
+    const { isMobile } = useWindowResize();
     const { left, onSideShiftLeft, right, onSideShiftRight } = useSideShift();
     const {
         query: { category, slug },
@@ -60,6 +68,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     return (
         <Layout meta={{ ...post.meta }} isBlog>
             <Dialog
+                modalMode={isMobile}
                 open={open}
                 body={
                     <div
@@ -80,6 +89,9 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 />
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
+                            <aside className={styles.navAd}>
+                                <GoogleAdsense slot="4572463963" />
+                            </aside>
                         </nav>
                         <nav className={styles.secondNav} onTouchStart={onSideShiftRight}>
                             <AsidePanel />
@@ -92,7 +104,12 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                         <article className={styles.article}>
                             <ArticlePanel readTime={post.meta.readTime} />
                             <div className={styles.body}>
-                                <MDXRemote {...post.content} components={components} />
+                                <div className={styles.mdx}>
+                                    <MDXRemote {...post.content} components={components} />
+                                </div>
+                                <aside className={styles.verticalAd}>
+                                    <GoogleAdsense slot="3253844563" />
+                                </aside>
                             </div>
                         </article>
                     </div>
@@ -187,4 +204,10 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
     };
 };
 
-export default PostPage;
+export default function Page(props: any) {
+    return (
+        <DialogProvider>
+            <PostPage {...props} />
+        </DialogProvider>
+    );
+}

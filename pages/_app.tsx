@@ -1,16 +1,18 @@
+import React from 'react';
 import '../styles/globals.css';
 import '@xabierlameiro/code-hike/dist/index.css';
 import Script from 'next/script';
-import { DialogProvider } from '@/context/dialog';
 import { IntlProvider } from 'react-intl';
 import { useRouter } from 'next/router';
 import { messages } from '../src/intl/translations';
 import type { AppProps } from 'next/app';
+import Notification from '@/components/Notification';
 
 type locales = 'en' | 'es' | 'gl';
 
 const App = ({ Component, pageProps }: AppProps) => {
     const { locale = 'en' } = useRouter();
+
     return (
         <>
             <Script
@@ -29,7 +31,6 @@ const App = ({ Component, pageProps }: AppProps) => {
             <IntlProvider
                 locale={locale}
                 messages={messages[locale as locales]}
-                defaultLocale="en"
                 onError={(err) => {
                     // if  Missing locale data for locale: "gl" in Intl.NumberFormat ignore it
                     if (err.message.includes('Missing locale data for locale: "gl"')) {
@@ -37,9 +38,12 @@ const App = ({ Component, pageProps }: AppProps) => {
                     }
                 }}
             >
-                <DialogProvider>
-                    <Component {...pageProps} />
-                </DialogProvider>
+                {/* TODO: Int here */}
+                <Notification
+                    title="Cookies"
+                    message="This website uses cookies to improve the user experience, more information on the legal information path."
+                />
+                <Component {...pageProps} />
             </IntlProvider>
         </>
     );

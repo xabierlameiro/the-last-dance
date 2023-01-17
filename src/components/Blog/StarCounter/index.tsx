@@ -8,6 +8,15 @@ type Props = {
     children?: React.ReactNode;
 };
 
+/**
+ * @example
+ *     <Container>
+ *         <span> 1 </span>
+ *     </Container>;
+ *
+ * @param {React.ReactNode} children - The number of stars
+ * @returns {JSX.Element}
+ */
 const Container = ({ children }: Props) => {
     return (
         <a
@@ -23,6 +32,12 @@ const Container = ({ children }: Props) => {
     );
 };
 
+/**
+ * @example
+ *     <StarCounter />;
+ *
+ * @returns {JSX.Element}
+ */
 const StarCounter = () => {
     const [stars, setStars] = React.useState(0);
 

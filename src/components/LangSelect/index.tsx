@@ -3,6 +3,12 @@ import { useIntl } from 'react-intl';
 import styles from './langselect.module.css';
 import { messages } from '../../../src/intl/translations';
 
+/**
+ * @example
+ *     <LangSelect />;
+ *
+ * @returns {JSX.Element}
+ */
 const LangeSelect = () => {
     const { formatMessage: f } = useIntl();
     const router = useRouter();

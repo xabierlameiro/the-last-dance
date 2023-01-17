@@ -4,6 +4,7 @@ import { mobileMax, tabletMax, tabletMin, desktopMin } from '@/constants/devices
 type WindowTpe = {
     isMobile: boolean;
     isTablet: boolean;
+    isMobileOrTablet: boolean;
     isDesktop: boolean;
 };
 
@@ -34,6 +35,7 @@ function useWindowResize(): WindowTpe {
     return {
         isMobile: widowSize.isMobile,
         isTablet: widowSize.isTablet,
+        isMobileOrTablet: widowSize.isMobile || widowSize.isTablet,
         isDesktop: widowSize.isDesktop,
     };
 }

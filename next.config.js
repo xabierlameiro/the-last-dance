@@ -23,6 +23,10 @@ export default withMDX({
                 source: '/:coverage',
                 destination: '/:coverage/index.html',
             },
+            {
+                source: '/docs/:path*',
+                destination: '/docs/:path*',
+            },
         ];
     },
     // Append the default value with md extensions
@@ -31,10 +35,11 @@ export default withMDX({
         appDir: true,
     },
     images: {
-        domains: ['uploads-ssl.webflow.com', 'code.visualstudio.com'],
+        domains: ['uploads-ssl.webflow.com', 'code.visualstudio.com', 'googlecm.hit.gemius.pl'],
     },
     i18n: {
         locales: ['en', 'es', 'gl'],
         defaultLocale: 'en',
+        localeDetection: false,
     },
 });

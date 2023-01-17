@@ -5,6 +5,13 @@ type Props = {
     routeName?: string;
 };
 
+/**
+ * @example
+ *     <GridLayoutControl routeName="System Preferences" />;
+ *
+ * @param {string} routeName - The name of the route
+ * @returns {JSX.Element}
+ */
 const GridLayoutControl = ({ routeName = 'System Preferences' }: Props) => {
     return (
         <div data-testid="grid-layout-control" className={styles.container}>

@@ -27,6 +27,11 @@
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
 }
+
+.dialog.large {
+    width: 980px;
+}
+
 .dialog.modalMode.open {
     top: 45%;
     transform: translate(-50%, -50%) scale(1);
@@ -35,12 +40,16 @@
 @media screen and (max-width: 768px) {
     .dialog.modalMode {
         width: calc(100% - 20px);
-        height: calc(100% - 30px);
+        height: calc(100% - 90px);
     }
     .dialog.modalMode.open {
-        top: 24.5px;
+        top: 34.5px;
         left: 10px;
         transform: scale(1);
+    }
+
+    .dialog.open {
+        top: 34.5px;
     }
 }
 

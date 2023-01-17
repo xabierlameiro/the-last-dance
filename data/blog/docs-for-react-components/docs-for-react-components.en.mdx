@@ -1,0 +1,125 @@
+---
+title: 'How document my react components with JSDoc'
+slug: 'how-document-my-react-components-with-jsdoc'
+author: 'Xabier Lameiro'
+category: 'React'
+tags: ['node']
+locale: 'en'
+excerpt: 'Automatically create documentation of your react components with jsdoc and publish in your static site'
+description: 'Automatically create documentation of your react components with jsdoc and publish in your static site'
+image: '/posts/how-document-my-react-components-with-jsdoc.png'
+alternate:
+    [
+        { lang: 'es', url: 'documentar-mis-componentes-de-react' },
+        { lang: 'gl', url: 'documentar-os-meus-compoñentes-de-react' },
+    ]
+---
+
+# How document my react components with JSDoc
+
+<Date date="01-16-2023" />
+
+<GoogleAdsense slot="6618374506" horizontal />
+
+## Introduction
+
+It is necessary to have a good documentation about our components, so that other developers can understand how it works and how to use it. In this article we are going to see how we can document our react components with JSDoc and how to publish the documentation in our static site.
+
+With a few simple steps, the jsdoc library and the use of good programming practices when working with react, we will be able to have a documentation of our components automatically. There are different plugins to upgrade our jsdoc and support react, but as React is still javascript and the components functions the default lib is more than enough.
+
+The report we are going to generate is still an html file, so you can deploy it in any static site.
+
+> If you use typescript you will need to install jsdoc-babel
+
+## 1. Installation
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+
+yarn add jsdoc-babel -D
+
+```
+
+</CH.Code>
+
+## 2. Configuration
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```json jsdoc.json
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc", "closure"]
+    },
+    "source": {
+        "include": ["src/components/"],
+        "includePattern": ".+\\.tsx$",
+        "excludePattern": "(node_modules/|docs)"
+    },
+    "plugins": ["plugins/markdown", "node_modules/jsdoc-babel"],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false
+    },
+    "babel": {
+        "extensions": ["tsx"],
+        "ignore": ["**/*.(test|spec).ts"],
+        "babelrc": false,
+        "presets": [["@babel/preset-env", { "targets": { "node": true } }], "@babel/preset-typescript"],
+        "plugins": ["@babel/proposal-class-properties", "@babel/proposal-object-rest-spread"]
+    },
+    "opts": {
+        "encoding": "utf8",
+        "destination": "./public/docs/",
+        "recurse": true,
+        "verbose": true
+    }
+}
+```
+
+</CH.Code>
+
+## 3. Customise your report
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```js custom-docs.js mark=13
+
+import { readFile, writeFile } from 'fs';
+import glob from 'glob';
+
+glob('public/docs/**/*.?(html|css)', function (err, files) {
+    if (err) {
+        console.log('err', err);
+        return;
+    }
+
+    files.forEach((path) => {
+        readFile(path, 'utf8', (err, data) => {
+            ...code
+        });
+    });
+});
+
+
+```
+
+</CH.Code>
+
+> There you should find the code you need to modify your report and overwrite it.
+
+## 4. Generate your report
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+
+yarn jsdoc -c jsdoc.json
+
+```
+
+</CH.Code>
+
+To see an example of the output you can click above where it says Docs or via this [link](https://xabierlameiro.com/docs 'Link to my docs')

@@ -13,6 +13,17 @@ type Props = {
     category?: string | string[];
     isCategory?: boolean | boolean[];
 };
+
+/**
+ * @example
+ *     <NavList title="Categories" list={categories} category={category} isCategory={true} />;
+ *
+ * @param {string} title - The title of the list
+ * @param {object[]} list - The list of items
+ * @param {string} category - The category has other styles
+ * @param {boolean} isCategory - If is category the icon will be a folder
+ * @returns {JSX.Element}
+ */
 const NavList = ({ title, list, category, isCategory }: Props) => {
     if (!list) return null;
 

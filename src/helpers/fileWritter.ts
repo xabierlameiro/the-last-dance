@@ -47,7 +47,15 @@ export const createSiteMap = (
 
     const pages = fs
         .readdirSync(path.join(process.cwd(), '/pages'))
-        .filter((page) => page !== '_app.tsx' && page !== '_document.tsx' && page !== 'blog' && page !== 'api')
+        .filter(
+            (page) =>
+                page !== '_app.tsx' &&
+                page !== '_document.tsx' &&
+                page !== 'blog' &&
+                page !== 'api' &&
+                page !== 'legal' &&
+                page !== '404.tsx'
+        )
         .map((page) => {
             page = page.replace('.tsx', '');
             return {

@@ -46,3 +46,6 @@ data/blog.template.mdx
 
 # credentials
 src/credentials
+
+# docs
+public/docs

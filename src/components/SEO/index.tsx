@@ -6,6 +6,7 @@ import Head from 'next/head';
 type Props = {
     isBlog?: boolean;
     meta?: {
+        noindex?: boolean;
         title: string;
         author?: string;
         description?: string;
@@ -17,6 +18,14 @@ type Props = {
     };
 };
 
+/**
+ * @example
+ *     <SEO meta={meta} isBlog={true} />;
+ *
+ * @param {object} meta - The object containing the meta data for SEO
+ * @param {boolean} isBlog - Whether the page is a blog post the SEO changes
+ * @returns {JSX.Element}
+ */
 const SEO = ({ meta, isBlog }: Props) => {
     const { locale: l, pathname: path } = useRouter();
     const category = meta?.category?.toLowerCase();
@@ -26,7 +35,7 @@ const SEO = ({ meta, isBlog }: Props) => {
     const title = meta?.title;
     const author = meta?.author || auth;
     const description = meta?.description;
-    const image = meta?.image;
+    const image = meta?.image ?? '/default.png';
 
     return (
         <Head>
@@ -62,6 +71,17 @@ const SEO = ({ meta, isBlog }: Props) => {
             )}
 
             <title>{title}</title>
+            {meta?.noindex ? (
+                <>
+                    <meta name="robots" content="noindex" />
+                    <meta name="googlebot" content="noindex" />
+                </>
+            ) : (
+                <>
+                    <meta name="robots" content="index,follow" />
+                    <meta name="googlebot" content="index,follow" />
+                </>
+            )}
             <meta name="author" content={author} />
             <meta name="description" content={description} />
             <meta property="og:description" content={description} />

@@ -1,19 +1,12 @@
 <CH.Code lineNumbers={true} style={{ height: 'inherit'}} render={()=> <ControlButtons/>}>
 
-```tsx index.tsx box=9[23:38]
+```tsx index.tsx 
 import React from 'react';
 import styles from './knowledge.module.css';
 
 type Props = {
     name?: string;
-    // link[16:21] https://www.linkedin.com/in/xlameiro/
-    linkedin?: string;
-    // link[16:21] /coverage
-    coverage?: string;
-    // link[17:22] https://storybook.xabierlameiro.com
-    storybook?: string;
 };
-
 const name = 'Xabier Lameiro';
 
 const App = ({ name = name }: Props) => {

@@ -8,16 +8,17 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
-        "postbuild": "npm run coverage",
+        "postbuild": "npm run coverage && npm run jsdoc",
         "start": "next start",
         "lint": "next lint",
         "test": "NODE_ENV=test jest",
-        "coverage": "rm -rf public/coverage && NODE_ENV=test jest --coverage && node custom-reporter.js",
+        "coverage": "rm -rf public/coverage && NODE_ENV=test jest --coverage && node custom-reporter.js && node searchConsole.js",
         "watch": "jest --watchAll",
         "test:clear": "jest --clearCache",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
-        "prettier": "prettier --write ."
+        "prettier": "prettier --write .",
+        "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json && node custom-docs.js"
     },
     "dependencies": {
         "@google-analytics/data": "^3.1.2",
@@ -58,11 +59,17 @@
         "eslint-plugin-storybook": "^0.6.8",
         "jest": "^28.1.2",
         "jest-environment-jsdom": "^29.3.1",
+        "jsdoc-babel": "^0.5.0",
         "next-mdx-remote": "^4.2.0",
         "prettier-plugin-jsdoc": "^0.4.2",
         "react-icons": "^4.7.1",
         "storybook": "^7.0.0-beta.12",
         "storybook-react-intl": "^1.1.1",
         "typescript": "^4.9.4"
+    },
+    "browser": {
+        "fs": false,
+        "path": false,
+        "os": false
     }
 }

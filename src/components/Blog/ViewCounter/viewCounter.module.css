@@ -3,6 +3,7 @@
     align-items: center;
     justify-self: center;
     font-size: 15px;
+    user-select: none;
     gap: 8px;
 }
 
@@ -20,6 +21,10 @@ svg.error {
     animation: spin 1s linear infinite;
     width: 16px;
     height: 16px;
+}
+
+.all {
+    font-size: 14px;
 }
 
 @keyframes spin {
