@@ -63,7 +63,7 @@
 
 @media screen and (max-width: 900px) {
     .mdx {
-        width: calc(100vw - 40px);
+        width: calc(100vw - 70px);
     }
 }
 

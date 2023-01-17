@@ -15,7 +15,7 @@
     justify-content: center;
     color: rgba(var(--color-terminal-font));
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
     gap: 5px;
 }
 .header div svg {
