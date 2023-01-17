@@ -23,7 +23,6 @@ export default withMDX({
                 source: '/:coverage',
                 destination: '/:coverage/index.html',
             },
-            // rule for all entry points inside the docs folder
             {
                 source: '/docs/:path*',
                 destination: '/docs/:path*',
@@ -36,7 +35,16 @@ export default withMDX({
         appDir: true,
     },
     images: {
-        domains: ['uploads-ssl.webflow.com', 'code.visualstudio.com'],
+        domains: [
+            'www.googleadservices.com',
+            'www.googletagmanager.com',
+            'www.google-analytics.com',
+            'www.google.com',
+            'uploads-ssl.webflow.com',
+            'code.visualstudio.com',
+            'https://googlecm.hit.gemius.pl/',
+            'https://googlecm',
+        ],
     },
     i18n: {
         locales: ['en', 'es', 'gl'],

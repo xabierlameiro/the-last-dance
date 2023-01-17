@@ -25,7 +25,21 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
     const isProduction = process.env.NODE_ENV === 'production';
     const { isMobileOrTablet } = useWindowResize();
 
+    const clenup = () => {
+        if (adsbygoogle.current) {
+            try {
+                if (window.adsbygoogle && window.adsbygoogle.pop) {
+                    window.adsbygoogle.pop();
+                }
+            } catch (error) {
+                console.error('Google Adsense error:', error);
+            }
+        }
+    };
+
     React.useEffect(() => {
+        clenup();
+
         if ((isProduction && !horizontal) || (isProduction && horizontal && isMobileOrTablet)) {
             if (adsbygoogle.current) {
                 try {
@@ -37,15 +51,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
                 }
             }
 
-            return () => {
-                try {
-                    if (window.adsbygoogle && window.adsbygoogle.pop) {
-                        window.adsbygoogle.pop();
-                    }
-                } catch (error) {
-                    console.error('Google Adsense error:', error);
-                }
-            };
+            return () => clenup();
         }
     }, [isProduction, isMobileOrTablet, horizontal, adsbygoogle]);
 
