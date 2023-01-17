@@ -83,12 +83,12 @@ yarn add jsdoc-babel -D
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```js custom-reporter.js mark=13
+```js custom-docs.js mark=13
 
 import { readFile, writeFile } from 'fs';
 import glob from 'glob';
 
-glob('public/coverage/**/*.?(html|css)', function (err, files) {
+glob('public/docs/**/*.?(html|css)', function (err, files) {
     if (err) {
         console.log('err', err);
         return;
