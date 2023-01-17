@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl';
 import { socialLinks, translateRoute } from '@/constants/site';
 import CryptoPrice from '@/components/CryptoPrice';
 import ViewCounter from '@/components/Blog/ViewCounter';
+import IndexedCounter from '@/components/IndexedCounter';
 
 type Props = {
     children?: ReactNode;
@@ -62,6 +63,7 @@ const Header = ({ children }: Props) => {
             <Route />
             <NavLinks />
             <CryptoPrice />
+            <IndexedCounter />
             <ViewCounter all />
             <DateAndHour />
             {children}
