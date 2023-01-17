@@ -63,8 +63,8 @@ const Legal = ({ source, meta }: any) => {
                 body={
                     <div className={clx(styles.container, left ? styles.open : '')} onTouchStart={onSideShiftLeft}>
                         <nav className={styles.nav}>
-                            <SidesShift className={styles.shift} />
                             <ControlButtons onClickClose={close} onClickMinimise={close} />
+                            <SidesShift className={styles.shift} />
                             <SearchInput placeHolderText={f({ id: 'legal.search-placeholder' })} />
                             <span className={styles.title}>{f({ id: 'legal.title' })}</span>
                             <ul>

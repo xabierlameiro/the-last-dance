@@ -10,7 +10,7 @@
         grid-template-columns: 10px 1fr;
     }
     .container .nav > * {
-        visibility: hidden;
+        display: none;
     }
     .container .nav {
         padding: 0;
@@ -19,9 +19,11 @@
     .open {
         grid-template-columns: 200px 1fr;
     }
-    .container .nav .shift,
     .open .nav > * {
-        visibility: visible;
+        display: block;
+    }
+    .open .nav > div:first-child {
+        display: flex;
     }
     .open .nav {
         padding: 20px;
