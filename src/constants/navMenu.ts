@@ -14,9 +14,9 @@ export const menu: Array<Item> = [
         img: 'https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c849ec3735b52cef9_notes.png',
         alt: 'Go to blog',
         link: {
-            en: '/blog/react/publish-report-testing-react',
-            es: '/blog/react/publicar-reporte-pruebas-react',
-            gl: '/blog/react/publicar-informe-probas-react',
+            en: '/blog/react/how-document-my-react-components-with-jsdoc',
+            es: '/blog/react/documentar-mis-componentes-de-react',
+            gl: '/blog/react/documentar-os-meus-compoñentes-de-react',
         },
     },
     {
