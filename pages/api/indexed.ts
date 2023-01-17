@@ -6,18 +6,36 @@ const userAgent =
 /**
  * @description Get the number of indexed pages in Google
  *
- * @returns {number} Number of indexed pages
+ * @returns {Promise<{ num: string } | { error: string } | void>}
  */
-export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+    _req: NextApiRequest,
+    res: NextApiResponse
+): Promise<
+    | {
+          num: string;
+      }
+    | {
+          error: string;
+      }
+    | void
+> {
     const response = await fetch('https://www.google.com/search?q=site%3Axabierlameiro.com', {
         method: 'GET',
         headers: new Headers({
             'user-agent': userAgent,
         }),
-    });
-    const dataString = await response.text();
+    })
+        .then((res) => res.text())
+        .catch((err) => {
+            throw new Error(err);
+        });
 
-    const num = dataString.substring(dataString.indexOf('id="result-stats">') + 24, dataString.indexOf('<nobr>') - 8);
+    const num = response.substring(response.indexOf('id="result-stats">') + 24, response.indexOf('<nobr>') - 8);
+
+    if (isNaN(Number(num))) {
+        throw new Error('The number of indexed pages is not a number');
+    }
 
     try {
         res.status(200).json({ num });
