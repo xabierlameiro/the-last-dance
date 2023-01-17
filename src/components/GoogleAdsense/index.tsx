@@ -1,6 +1,7 @@
 import React from 'react';
 import { clx } from '@/helpers';
 import styles from './adsense.module.css';
+import useWindowResize from '@/hooks/useWidowResize';
 
 type Props = {
     client?: string;
@@ -22,9 +23,10 @@ type Props = {
 const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }: Props) => {
     const adsbygoogle = React.useRef(null);
     const isProduction = process.env.NODE_ENV === 'production';
+    const { isMobileOrTablet } = useWindowResize();
 
     React.useEffect(() => {
-        if (isProduction) {
+        if ((isProduction && !horizontal) || (isProduction && horizontal && isMobileOrTablet)) {
             if (adsbygoogle.current) {
                 try {
                     if (window.adsbygoogle && window.adsbygoogle.push) {
@@ -45,7 +47,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
                 }
             };
         }
-    }, [isProduction, adsbygoogle]);
+    }, [isProduction, isMobileOrTablet, horizontal, adsbygoogle]);
 
     if (!isProduction) {
         return null;
