@@ -15,19 +15,25 @@ const App = ({ Component, pageProps }: AppProps) => {
 
     return (
         <>
-            <Script
-                strategy="afterInteractive"
-                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA}`}
-            />
-            <Script id="ga-script" strategy="afterInteractive">
-                {`
-                    window.dataLayer = window.dataLayer || [];
-                    function gtag(){dataLayer.push(arguments);}
-                    gtag('js', new Date());
-                    gtag('config', '${process.env.NEXT_PUBLIC_GA}');    
-                  
-                  `}
-            </Script>
+            {process.env.NODE_ENV === 'production' && (
+                <>
+                    <Script
+                        strategy="afterInteractive"
+                        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA}`}
+                    />
+                    <Script id="ga-script" strategy="afterInteractive">
+                        {`
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            gtag('js', new Date());
+                            gtag('config', '${process.env.NEXT_PUBLIC_GA}');    
+                        
+                        `}
+                    </Script>
+                    <Script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" async />
+                </>
+            )}
+
             <IntlProvider
                 locale={locale}
                 messages={messages[locale as locales]}

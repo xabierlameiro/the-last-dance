@@ -24,11 +24,6 @@ const Document = (props: Props) => {
                 <meta name="google" content="notranslate" />
                 <link rel="icon" href="/favicon.svg" title="The favicon" />
                 <script
-                    async
-                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-                    crossOrigin="anonymous"
-                />
-                <script
                     type="application/ld+json"
                     key="website-jsonld"
                     dangerouslySetInnerHTML={{
