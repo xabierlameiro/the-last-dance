@@ -1,0 +1,12 @@
+ul {
+    list-style: none;
+}
+
+ul li {
+    padding: 10px 0;
+}
+
+ul a {
+    text-decoration: none;
+    color: #000;
+}
