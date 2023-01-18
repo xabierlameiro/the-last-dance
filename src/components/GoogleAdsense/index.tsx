@@ -60,6 +60,8 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
             data-ad-slot={slot}
             data-ad-format="auto"
             data-full-width-responsive="true"
+            title="Google Adsense"
+            aria-label="ad"
         />
     );
 };

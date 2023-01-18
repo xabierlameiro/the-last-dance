@@ -19,7 +19,7 @@
         "build-storybook": "storybook build",
         "prettier": "prettier --write .",
         "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json && node custom-docs.js",
-        "lightouse":  "node lighthouse.cjs"
+        "lighthouse-report": "node lighthouse.cjs"
     },
     "dependencies": {
         "@babel/preset-typescript": "^7.18.6",

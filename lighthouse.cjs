@@ -34,7 +34,7 @@ function launchChromeAndRunLighthouse(url, flags = {}, config = null) {
     const options = {
         logLevel: 'info',
         output: 'html',
-        onlyCategories: ['accessibility', 'seo'],
+        onlyCategories: ['performance', 'accessibility', 'seo'],
         chromeFlags: ['--headless'],
     };
 
@@ -79,7 +79,7 @@ function launchChromeAndRunLighthouse(url, flags = {}, config = null) {
             <meta name="robots" content="noindex">
             <title>LightHouse Report</title>
             <link rel="icon" href="/favicon.svg" title="The favicon">
-            <link href="lighthouse.css" rel="stylesheet"/>
+            <link href="/lighthouse/lighthouse.css" rel="stylesheet"/>
         </head>
         <body>
             <ul>
