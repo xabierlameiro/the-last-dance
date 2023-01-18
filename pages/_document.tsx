@@ -27,7 +27,7 @@ const Document = (props: Props) => {
                 {/* Necessary here for load when user reload the page */}
                 <Script
                     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-                    strategy="afterInteractive"
+                    strategy="beforeInteractive"
                 />
 
                 <script
