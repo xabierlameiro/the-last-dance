@@ -29,6 +29,7 @@ export const messages = {
         'comments.seo.description':
             'Web page for web application comments, allows users to leave comments on the content of the page',
         'comments.breadcrumb': 'Terminal',
+        'legal.title': 'Legal documents',
         'legal.breadcrumb': 'Legals',
         'legal.cookies-policy': 'Cookies Policy',
         'legal.legal-notice': 'Legal Notice',
@@ -66,6 +67,7 @@ export const messages = {
         'comments.seo.description':
             'Página web de comentarios de la aplicación web, permite a los usuarios dejar comentarios sobre el contenido de la página',
         'comments.breadcrumb': 'Terminal',
+        'legal.title': 'Documentos legales',
         'legal.breadcrumb': 'Legales',
         'legal.cookies-policy': 'Política de Cookies',
         'legal.legal-notice': 'Aviso Legal',
@@ -103,6 +105,7 @@ export const messages = {
         'comments.seo.description':
             'Páxina web de comentarios da aplicación web, permite aos usuarios deixar comentarios sobre o contido da páxina',
         'comments.breadcrumb': 'Terminal',
+        'legal.title': 'Documentos legais',
         'legal.breadcrumb': 'Legales',
         'legal.cookies-policy': 'Política de Cookies',
         'legal.legal-notice': 'Aviso Legal',
