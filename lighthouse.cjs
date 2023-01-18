@@ -23,21 +23,25 @@ urls = urls.sort((a, b) => {
     return aParts.length > bParts.length ? 1 : -1;
 });
 
-(async () => {
-    const chrome = await chromeLauncher.launch({
-        chromeFlags: ['--headless'],
+function launchChromeAndRunLighthouse(url, flags = {}, config = null) {
+    return chromeLauncher.launch(flags).then((chrome) => {
+        flags.port = chrome.port;
+        return lighthouse(url, flags, config).then((results) => chrome.kill().then(() => results));
     });
+}
+
+(async () => {
     const options = {
         logLevel: 'info',
         output: 'html',
         onlyCategories: ['accessibility', 'seo'],
-        port: chrome.port,
+        chromeFlags: ['--headless'],
     };
 
     const results = [];
 
     for (const url of urls) {
-        const result = await lighthouse(url, options);
+        const result = await launchChromeAndRunLighthouse(url, options);
         results.push({ url, ...result });
     }
 
@@ -85,6 +89,4 @@ urls = urls.sort((a, b) => {
         </html>
         `
     );
-
-    await chrome.kill();
 })();
