@@ -50,7 +50,6 @@ src/credentials
 public/docs
 
 # yarn
-yarn.lock
 
 # ignore all inside /public/lighthouse with exception of /public/lighthouse/lighthouse.css
 /public/lighthouse/*
