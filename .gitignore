@@ -38,7 +38,6 @@ next-env.d.ts
 
 .npmrc
 package-lock.json
-yarn.lock
 storybook-static
 
 public/sitemap.xml
