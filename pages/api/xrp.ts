@@ -23,7 +23,7 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
     const price = response.substring(response.indexOf('class="pclqee"') + 15, response.indexOf('class="dvZgKd"') - 13);
 
     if (isNaN(Number(price))) {
-        throw new Error('The price is not a number');
+        throw new Error(`The price is not a number ${price}`);
     }
 
     const todaySummary = response.substring(
