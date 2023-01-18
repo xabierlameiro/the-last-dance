@@ -48,9 +48,3 @@ src/credentials
 
 # docs
 public/docs
-
-# yarn
-
-# ignore all inside /public/lighthouse with exception of /public/lighthouse/lighthouse.css
-/public/lighthouse/*
-!/public/lighthouse/lighthouse.css
