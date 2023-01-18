@@ -21,7 +21,7 @@ type Props = {
  */
 const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }: Props) => {
     const adsbygoogle = React.useRef(null);
-    const isProduction = process.env.NODE_ENV === 'development';
+    const isProduction = process.env.NODE_ENV === 'production';
 
     React.useEffect(() => {
         if (isProduction) {

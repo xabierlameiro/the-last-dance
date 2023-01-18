@@ -24,6 +24,7 @@ const Document = (props: Props) => {
                 <meta name="twitter:creator" content="@xlameiro" />
                 <meta name="google" content="notranslate" />
                 <link rel="icon" href="/favicon.svg" title="The favicon" />
+                {/* Necessary here for load when user reload the page */}
                 <Script
                     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
                     strategy="afterInteractive"

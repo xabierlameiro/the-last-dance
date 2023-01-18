@@ -48,3 +48,6 @@ src/credentials
 
 # docs
 public/docs
+
+# yarn
+yarn.lock
