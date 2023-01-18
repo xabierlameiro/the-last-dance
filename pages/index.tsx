@@ -60,6 +60,7 @@ export const getStaticProps = async (params: { locale: string }) => {
                 mobile: mobile,
             },
         },
+        revalidate: 10,
     };
 };
 

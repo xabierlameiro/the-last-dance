@@ -145,6 +145,7 @@ export const getStaticProps = async (data: {
                 content: mdxSource,
             },
         },
+        revalidate: 10,
     };
 };
 
