@@ -33,6 +33,7 @@ export default withMDX({
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {
         appDir: true,
+        largePageDataBytes: 800 * 1000,
     },
     images: {
         domains: ['uploads-ssl.webflow.com', 'code.visualstudio.com', 'googlecm.hit.gemius.pl'],
