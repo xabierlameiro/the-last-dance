@@ -96,7 +96,7 @@ export const createSiteMap = (
         </urlset>
     `;
 
-    const formattedXml = prettier.format(xml, { parser: 'html' });
+    const formattedXml = prettier.format(xml, { parser: 'html', printWidth: 120 });
     const filePath = path.join(PUBLIC_DIR, 'sitemap.xml');
 
     fs.writeFileSync(filePath, formattedXml);

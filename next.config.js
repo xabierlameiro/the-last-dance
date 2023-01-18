@@ -27,6 +27,11 @@ export default withMDX({
                 source: '/docs/:path*',
                 destination: '/docs/:path*',
             },
+            // new rule for lighthouse folder in public index.html
+            {
+                source: '/:lighthouse',
+                destination: '/:lighthouse/index.html',
+            },
         ];
     },
     // Append the default value with md extensions
