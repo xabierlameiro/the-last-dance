@@ -32,7 +32,7 @@
 
 .readTime {
     font-size: 13px;
-    color: rgba(var(--dark-grey-color));
+    color: rgb(91, 87, 87);
     display: flex;
     align-items: center;
     gap: 10px;

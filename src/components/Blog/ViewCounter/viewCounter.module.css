@@ -5,6 +5,7 @@
     font-size: 15px;
     user-select: none;
     gap: 8px;
+    color: rgb(91, 87, 87);
 }
 
 .views svg {

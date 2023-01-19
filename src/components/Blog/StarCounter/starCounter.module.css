@@ -6,7 +6,7 @@
     gap: 5px;
     cursor: pointer;
     text-decoration: none;
-    color: rgba(var(--yellow-color));
+    color: rgb(91, 87, 87);
     font-weight: 400;
 }
 
