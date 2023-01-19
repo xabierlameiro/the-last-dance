@@ -12,8 +12,13 @@ import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
 import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
-import GoogleAdsense from '@/components/GoogleAdsense';
+import dynamic from 'next/dynamic';
 import useWindowResize from '@/hooks/useWidowResize';
+
+const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
+    loading: () => <p>...</p>,
+    ssr: false,
+});
 
 type Props = {
     post: {
