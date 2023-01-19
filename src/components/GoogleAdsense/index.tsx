@@ -53,6 +53,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
 
     return (
         <ins
+            aria-hidden="true"
             ref={adsbygoogle}
             className={clx('adsbygoogle', horizontal ? styles.horizontal : styles.block)}
             style={{ display: 'block' }}
@@ -61,7 +62,6 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
             data-ad-format="auto"
             data-full-width-responsive="true"
             title="Google Adsense"
-            aria-label="ad"
         />
     );
 };
