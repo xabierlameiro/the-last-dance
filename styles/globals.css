@@ -7,7 +7,7 @@
     --green-color: 98, 199, 86;
     --yellow-color: 245, 190, 79;
     --disable-color: 217, 212, 222;
-    --blue-color: 55, 148, 255;
+    --blue-color: 29, 88, 154;
     --white-color: 255, 255, 255;
     --color-terminal-header: 247, 240, 247;
     --color-terminal-font: 74, 72, 74;
@@ -85,4 +85,12 @@ a {
 
 .emoji {
     font-size: 2em;
+}
+
+div.ch-frame-title-bar > div > div {
+    color: rgb(172, 175, 180);
+}
+
+div.ch-frame-title-bar .ch-editor-tab-active > div {
+    color: rgb(220, 220, 220);
 }
