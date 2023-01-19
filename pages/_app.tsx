@@ -15,19 +15,26 @@ const App = ({ Component, pageProps }: AppProps) => {
 
     return (
         <>
-            <Script
-                strategy="afterInteractive"
-                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA}`}
-            />
-            <Script id="ga-script" strategy="afterInteractive">
-                {`
+            {process.env.NODE_ENV === 'production' && (
+                <>
+                    <Script
+                        defer
+                        id="gtag-manager"
+                        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA}`}
+                        strategy="afterInteractive"
+                    />
+
+                    <Script id="ga-script" strategy="afterInteractive">
+                        {`
                             window.dataLayer = window.dataLayer || [];
                             function gtag(){dataLayer.push(arguments);}
                             gtag('js', new Date());
                             gtag('config', '${process.env.NEXT_PUBLIC_GA}');    
                         
                         `}
-            </Script>
+                    </Script>
+                </>
+            )}
 
             <IntlProvider
                 locale={locale}
