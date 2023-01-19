@@ -1,6 +1,7 @@
 import React from 'react';
 import { clx } from '@/helpers';
 import styles from './adsense.module.css';
+import console from '@/helpers/console';
 
 type Props = {
     client?: string;
