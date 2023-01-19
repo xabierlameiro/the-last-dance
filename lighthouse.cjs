@@ -36,6 +36,9 @@ function launchChromeAndRunLighthouse(url, flags = {}, config = null) {
         output: 'html',
         onlyCategories: ['performance', 'accessibility', 'seo'],
         chromeFlags: ['--headless'],
+        settings: {
+            formFactor: 'desktop',
+        },
     };
 
     const results = [];
