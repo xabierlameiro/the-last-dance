@@ -62,8 +62,10 @@ const Header = ({ children }: Props) => {
             <SiBitcoincash />
             <Route />
             <NavLinks />
-            <CryptoPrice />
-            <IndexedCounter />
+            {/* <CryptoPrice /> */}
+            <div />
+            <div />
+            {/* <IndexedCounter /> */}
             <ViewCounter all />
             <DateAndHour />
             {children}

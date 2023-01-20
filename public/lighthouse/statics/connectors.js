@@ -39,7 +39,7 @@ var chart_config = {
                 text: { name: '/' },
 
                 link: {
-                    href: 'https://xabierlameiro.com/lighthouse/home.html',
+                    href: 'https://xabierlameiro.com/lighthouse/xabierlameiro.com.html',
                 },
                 stackChildren: true,
                 connectors: {
@@ -88,7 +88,7 @@ var chart_config = {
                                     {
                                         text: { name: '/solve-address-in-use-error' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/solve-address-in-use-error.html',
                                         },
                                     },
                                     {
@@ -96,13 +96,13 @@ var chart_config = {
                                             name: '/npm-token-solution-error',
                                         },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/npm-token-solution-error.html',
                                         },
                                     },
                                     {
                                         text: { name: '/uncaught-error-minified-react-error' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/uncaught-error-minified-react-error.html',
                                         },
                                     },
                                 ],
@@ -123,7 +123,7 @@ var chart_config = {
                                     {
                                         text: { name: '/how-document-my-react-components-with-jsdoc' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/how-document-my-react-components-with-jsdoc.html',
                                         },
                                     },
                                     {
@@ -131,13 +131,13 @@ var chart_config = {
                                             name: '/publish-report-testing-react',
                                         },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/publish-report-testing-react.html',
                                         },
                                     },
                                     {
                                         text: { name: '/deploying-my-storybook-is-very-simple' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/deploying-my-storybook-is-very-simple.html',
                                         },
                                     },
                                 ],
@@ -157,7 +157,7 @@ var chart_config = {
                                     {
                                         text: { name: '/counter-for-github-stars-repository' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/blog_error_listen_eaddrinuse_address_already_in_use_0_0_0_0_xxxx.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/counter-for-github-stars-repository.html',
                                         },
                                     },
                                     {
@@ -165,13 +165,13 @@ var chart_config = {
                                             name: '/make-a-views-counter-with-google-analytics',
                                         },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/make-a-views-counter-with-google-analytics.html',
                                         },
                                     },
                                     {
                                         text: { name: '/translate-slugs-web-pages' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/translate-slugs-web-pages.html',
                                         },
                                     },
                                 ],
@@ -203,7 +203,7 @@ var chart_config = {
                                     {
                                         text: { name: '/solve-address-in-use-error' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/solve-address-in-use-error.html',
                                         },
                                     },
                                     {
@@ -211,25 +211,25 @@ var chart_config = {
                                             name: '/how-document-my-react-components-with-jsdoc',
                                         },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/how-document-my-react-components-with-jsdoc.html',
                                         },
                                     },
                                     {
                                         text: { name: '/counter-for-github-stars-repository' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/counter-for-github-stars-repository.html',
                                         },
                                     },
                                     {
                                         text: { name: '/make-a-views-counter-with-google-analytics' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/make-a-views-counter-with-google-analytics.html',
                                         },
                                     },
                                     {
                                         text: { name: '/uncaught-error-minified-react-error' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/uncaught-error-minified-react-error.html',
                                         },
                                     },
                                 ],
@@ -249,7 +249,7 @@ var chart_config = {
                                     {
                                         text: { name: '/npm-token-solution-error' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/npm-token-solution-error.html',
                                         },
                                     },
                                 ],
@@ -268,7 +268,7 @@ var chart_config = {
                                     {
                                         text: { name: '/publish-report-testing-react' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/publish-report-testing-react.html',
                                         },
                                     },
                                 ],
@@ -287,7 +287,7 @@ var chart_config = {
                                     {
                                         text: { name: '/deploying-my-storybook-is-very-simple' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/deploying-my-storybook-is-very-simple.html',
                                         },
                                     },
                                 ],
@@ -306,7 +306,7 @@ var chart_config = {
                                     {
                                         text: { name: '/translate-slugs-web-pages' },
                                         link: {
-                                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                                            href: 'https://xabierlameiro.com/lighthouse/translate-slugs-web-pages.html',
                                         },
                                     },
                                 ],
@@ -319,7 +319,7 @@ var chart_config = {
             {
                 text: { name: '/comments' },
                 link: {
-                    href: 'https://xabierlameiro.com/lighthouse/home.html',
+                    href: 'https://xabierlameiro.com/lighthouse/comments.html',
                 },
                 stackChildren: true,
                 connectors: {
@@ -346,19 +346,19 @@ var chart_config = {
                     {
                         text: { name: '/cookies-policy' },
                         link: {
-                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                            href: 'https://xabierlameiro.com/lighthouse/cookies-policy.html',
                         },
                     },
                     {
                         text: { name: '/legal-notice' },
                         link: {
-                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                            href: 'https://xabierlameiro.com/lighthouse/legal-notice.html',
                         },
                     },
                     {
                         text: { name: '/privacy-policy' },
                         link: {
-                            href: 'https://xabierlameiro.com/lighthouse/home.html',
+                            href: 'https://xabierlameiro.com/lighthouse/privacy-policy.html',
                         },
                     },
                 ],
@@ -367,7 +367,7 @@ var chart_config = {
             {
                 text: { name: '/settings' },
                 link: {
-                    href: 'https://xabierlameiro.com/lighthouse/home.html',
+                    href: 'https://xabierlameiro.com/lighthouse/settings.html',
                 },
             },
         ],

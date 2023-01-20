@@ -2,27 +2,6 @@ const fs = require('fs');
 const lighthouse = require('lighthouse');
 const chromeLauncher = require('chrome-launcher');
 
-const sitemap = fs.readFileSync('public/sitemap.xml', 'utf8');
-let urls = sitemap
-    .match(/<loc>(.*?)<\/loc>/g)
-    .map((url) => url.replace(/<\/?loc>/g, ''))
-    .filter((url) => !url.match(/\/(es|gl)(\/|$)/));
-
-// remove the same pages in different languages and categories
-urls = urls.filter((url, index, self) => {
-    const lastPart = url.split('/').pop();
-    return self.findIndex((u) => u.split('/').pop() === lastPart) === index;
-});
-
-urls = urls.sort((a, b) => {
-    const aParts = a.split('/');
-    const bParts = b.split('/');
-    if (aParts.length === bParts.length) {
-        return aParts[aParts.length - 1] > bParts[bParts.length - 1] ? 1 : -1;
-    }
-    return aParts.length > bParts.length ? 1 : -1;
-});
-
 function launchChromeAndRunLighthouse(url, flags = {}, config = null) {
     return chromeLauncher.launch(flags).then((chrome) => {
         flags.port = chrome.port;
@@ -30,6 +9,32 @@ function launchChromeAndRunLighthouse(url, flags = {}, config = null) {
     });
 }
 
+const urls = [
+    'https://xabierlameiro.com',
+    'https://xabierlameiro.com/comments',
+    'https://xabierlameiro.com/settings',
+    'https://xabierlameiro.com/legal/cookies-policy',
+    'https://xabierlameiro.com/legal/legal-notice',
+    'https://xabierlameiro.com/legal/privacy-policy',
+    'https://xabierlameiro.com/blog/error/solve-address-in-use-error',
+    'https://xabierlameiro.com/blog/error/npm-token-solution-error',
+    'https://xabierlameiro.com/blog/error/uncaught-error-minified-react-error',
+    'https://xabierlameiro.com/blog/react/how-document-my-react-components-with-jsdoc',
+    'https://xabierlameiro.com/blog/react/publish-report-testing-react',
+    'https://xabierlameiro.com/blog/react/deploying-my-storybook-is-very-simple',
+    'https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository',
+    'https://xabierlameiro.com/blog/nextjs/make-a-views-counter-with-google-analytics',
+    'https://xabierlameiro.com/blog/nextjs/translate-slugs-web-pages',
+    'https://xabierlameiro.com/blog/node/solve-address-in-use-error',
+    'https://xabierlameiro.com/blog/node/how-document-my-react-components-with-jsdoc',
+    'https://xabierlameiro.com/blog/node/counter-for-github-stars-repository',
+    'https://xabierlameiro.com/blog/node/make-a-views-counter-with-google-analytics',
+    'https://xabierlameiro.com/blog/node/uncaught-error-minified-react-error',
+    'https://xabierlameiro.com/blog/npm/npm-token-solution-error',
+    'https://xabierlameiro.com/blog/jest/publish-report-testing-react',
+    'https://xabierlameiro.com/blog/storybook/deploying-my-storybook-is-very-simple',
+    'https://xabierlameiro.com/blog/intl/translate-slugs-web-pages',
+];
 (async () => {
     const options = {
         logLevel: 'info',
@@ -48,48 +53,43 @@ function launchChromeAndRunLighthouse(url, flags = {}, config = null) {
         results.push({ url, ...result });
     }
 
-    const html = results
-        .map((result) => {
-            const report = result.report;
-            const url = result.lhr.requestedUrl;
-            let filename = url
-                .replace(/https:\/\/xabierlameiro\.com\//, '')
-                .replace(/[^a-z0-9]/gi, '_')
-                .toLowerCase();
-            filename = filename === '' ? 'home' : filename;
-            fs.writeFileSync(`public/lighthouse/${filename}.html`, report);
-            return `<li><a href="/lighthouse/${filename}.html">${
-                url === ' '
-                    ? 'Home'
-                    : filename.includes('blog')
-                    ? filename
-                          .split('_')
-                          .slice(2)
-                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(' ')
-                    : filename.charAt(0).toUpperCase() + filename.slice(1)
-            }</a></li>`;
-        })
-        .join('');
+    // Write documents with the last part of the url for name and the html report
+    results.forEach((result) => {
+        const url = result.url;
+        const name = url.split('/').pop();
+        fs.writeFileSync(`public/lighthouse/${name}.html`, result.report);
+    });
 
     fs.writeFileSync(
         'public/lighthouse/index.html',
-        `<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <meta name="robots" content="noindex">
-            <title>LightHouse Report</title>
-            <link rel="icon" href="/favicon.svg" title="The favicon">
-            <link href="/lighthouse/lighthouse.css" rel="stylesheet"/>
-        </head>
-        <body>
-            <ul>
-                ${html}
-            </ul>
-        </body>
-        </html>
+        `
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <meta charset="utf-8" />
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+                    <meta name="viewport" content="width=device-width" />
+                    <title>Lighthouse reports</title>
+                    <link rel="stylesheet" href="/lighthouse/statics/connectors.css" />
+                    <meta name="robots" content="noindex" />
+                    <link rel="icon" href="/favicon.svg" title="The favicon" />
+                </head>
+                <body class="container">
+                    <h1>Lighthouse report</h1>
+                    <h2>More details in each link</h2>
+                    <a href="https://www.xabierlameiro.com">go back</a>
+                    <div class="chart" id="OrganiseChart-big-commpany"></div>
+            
+                    <script src="/lighthouse/statics/raphael.js"></script>
+                    <script src="/lighthouse/statics/Treant.js"></script>
+                    <script src="/lighthouse/statics/connectors.js"></script>
+            
+                    <script>
+                        new Treant(chart_config);
+                    </script>
+                </body>
+            </html>
+        
         `
     );
 })();
