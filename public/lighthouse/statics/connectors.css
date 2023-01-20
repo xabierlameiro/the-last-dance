@@ -68,7 +68,8 @@ td {
 
 body {
     background: #fff;
-    font-family: 'Droid Serif', Georgia, 'Times New Roman', Times, serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
     color: #444444;
 }
 
@@ -141,4 +142,8 @@ body {
     color: dodgerblue;
     text-decoration-style: dotted;
     text-underline-offset: 4px;
+}
+
+.notice {
+    font-size: 14px;
 }

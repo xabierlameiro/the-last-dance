@@ -75,9 +75,9 @@ const urls = [
                     <link rel="icon" href="/favicon.svg" title="The favicon" />
                 </head>
                 <body class="container">
-                    <h1>Lighthouse report</h1>
+                    <h1>Lighthouse reports</h1>
                     <h2>More details in each link</h2>
-                    <a href="https://www.xabierlameiro.com">go back</a>
+                    <p class="notice">These reports were generated via a script</p>
                     <div class="chart" id="OrganiseChart-big-commpany"></div>
             
                     <script src="/lighthouse/statics/raphael.js"></script>
