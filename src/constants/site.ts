@@ -38,6 +38,11 @@ export const socialLinks = [
         title: 'Coverage',
         name: 'Coverage',
     },
+    {
+        href: 'https://xabierlameiro.com/lighthouse',
+        title: 'Lighthouse',
+        name: 'Lighthouse',
+    },
 ];
 
 export const translateRoute = (pathname: string, f: Function) => {
