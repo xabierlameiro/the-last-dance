@@ -6,18 +6,13 @@ import { google } from 'googleapis';
 
 const customsearch = google.customsearch('v1');
 
-const API_KEY = 'AIzaSyASPnCLkPPePMnqPm6EhbM8k8tx5sZH4PQ';
-
-const CX = 'd4bc1db527ead4e71';
-
 // https://developers.google.com/custom-search/v1/reference/rest/v1/cse/list
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const response = await customsearch.cse
         .list({
-            cx: CX,
+            cx: process.env.GOOGLE_CLIENT_ID,
+            auth: process.env.GOOGLE_API_KEY,
             q: 'site:xabierlameiro.com',
-            auth: API_KEY,
-            start: 11,
         })
         .then((response) => response.data);
 
