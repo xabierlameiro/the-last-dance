@@ -26,7 +26,7 @@ export const createSiteMap = (
     }[],
     locales: string[]
 ) => {
-    const sitemap = routes.reduce(
+    let sitemap = routes.reduce(
         (
             acc: string[],
             path: {
@@ -53,6 +53,7 @@ export const createSiteMap = (
                 page !== '_document.tsx' &&
                 page !== 'blog' &&
                 page !== 'api' &&
+                page !== 'legal' &&
                 page !== '404.tsx'
         )
         .map((page) => {
@@ -62,6 +63,12 @@ export const createSiteMap = (
                 lastmod: new Date().toISOString(),
             };
         });
+
+    sitemap = sitemap.concat([
+        `${domain}/legal/cookies-policy`,
+        `${domain}/legal/legal-notice`,
+        `${domain}/legal/privacy-policy`,
+    ]);
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
         <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
