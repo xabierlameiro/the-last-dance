@@ -1,7 +1,7 @@
 import React from 'react';
 import { MDXRemote } from 'next-mdx-remote';
-import { useDialog, DialogProvider } from '@/context/dialog';
-import { Layout, Dialog, ControlButtons, SidesShift } from '@/components';
+import { useDialog } from '@/context/dialog';
+import { Dialog, ControlButtons, SidesShift } from '@/components';
 import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCategory } from '@/helpers/fileReader';
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
@@ -14,6 +14,7 @@ import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
 import dynamic from 'next/dynamic';
 import useWindowResize from '@/hooks/useWidowResize';
+import SEO from '@/components/SEO';
 
 const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
     loading: () => <p>...</p>,
@@ -54,11 +55,6 @@ type Props = {
         };
     }[];
 };
-declare global {
-    interface Window {
-        adsbygoogle: { [key: string]: unknown }[];
-    }
-}
 
 const PostPage = ({ post, tags, categories, posts }: Props) => {
     const { formatMessage: f } = useIntl();
@@ -71,7 +67,8 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     const close = () => dispatch({ type: 'close' });
 
     return (
-        <Layout meta={{ ...post.meta }} isBlog>
+        <>
+            <SEO meta={{ ...post.meta }} isBlog />
             <Dialog
                 modalMode={isMobile}
                 open={open}
@@ -120,7 +117,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                     </div>
                 }
             ></Dialog>
-        </Layout>
+        </>
     );
 };
 
@@ -210,10 +207,4 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
     };
 };
 
-export default function Page(props: any) {
-    return (
-        <DialogProvider>
-            <PostPage {...props} />
-        </DialogProvider>
-    );
-}
+export default PostPage;

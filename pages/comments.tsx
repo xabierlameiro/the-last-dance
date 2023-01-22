@@ -1,7 +1,6 @@
 import React from 'react';
-import Layout from '@/layout';
+import SEO from '@/components/SEO';
 import Dialog from '@/components/Dialog';
-import { DialogProvider } from '@/context/dialog';
 import ControlButtons from '@/components/ControlButtons';
 import { AiFillFolder } from 'react-icons/ai';
 import styles from '@/styles/comments.module.css';
@@ -22,16 +21,18 @@ const Comments = () => {
     }, [dialogRef]);
 
     return (
-        <Layout
-            className="comments"
-            meta={{
-                title: f({ id: 'comments.seo.title' }),
-                description: f({ id: 'comments.seo.description' }),
-            }}
-        >
+        <>
+            <SEO
+                meta={{
+                    title: f({ id: 'comments.seo.title' }),
+                    description: f({ id: 'comments.seo.description' }),
+                }}
+            />
+
             <Dialog
                 open
                 modalMode
+                className="comments"
                 dialogRef={dialogRef}
                 header={
                     <div className={styles.header}>
@@ -45,14 +46,8 @@ const Comments = () => {
                 }
                 body={<Data />}
             />
-        </Layout>
+        </>
     );
 };
 
-export default function Page(props: any) {
-    return (
-        <DialogProvider>
-            <Comments {...props} />
-        </DialogProvider>
-    );
-}
+export default Comments;

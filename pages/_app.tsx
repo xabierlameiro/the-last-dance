@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { messages } from '../src/intl/translations';
 import type { AppProps } from 'next/app';
 import Notification from '@/components/Notification';
+import Layout from '@/components/Layout';
 
 type locales = 'en' | 'es' | 'gl';
 
@@ -46,12 +47,13 @@ const App = ({ Component, pageProps }: AppProps) => {
                     }
                 }}
             >
-                {/* TODO: Int here */}
                 <Notification
                     title="Cookies"
                     message="This website uses cookies to improve the user experience, more information on the legal information path."
                 />
-                <Component {...pageProps} />
+                <Layout>
+                    <Component {...pageProps} />
+                </Layout>
             </IntlProvider>
         </>
     );

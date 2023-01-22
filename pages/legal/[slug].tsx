@@ -1,5 +1,5 @@
 import React from 'react';
-import Layout from '@/layout';
+import SEO from '@/components/SEO';
 import Dialog from '@/components/Dialog';
 import ControlButtons from '@/components/ControlButtons';
 import { MDXRemote } from 'next-mdx-remote';
@@ -15,7 +15,7 @@ import { VscLaw } from 'react-icons/vsc';
 import { MdOutlinePrivacyTip } from 'react-icons/md';
 import matter from 'gray-matter';
 import { useIntl } from 'react-intl';
-import { useDialog, DialogProvider } from '@/context/dialog';
+import { useDialog } from '@/context/dialog';
 import SidesShift from '@/components/SidesShift';
 import useSideShift from '@/hooks/useSideShift';
 import { clx } from '@/helpers';
@@ -49,13 +49,8 @@ const Legal = ({ source, meta }: any) => {
     ];
 
     return (
-        <Layout
-            className="comments"
-            meta={{
-                title: meta.title,
-                noindex: meta.noindex,
-            }}
-        >
+        <>
+            <SEO meta={meta} />
             <Dialog
                 large
                 modalMode
@@ -86,7 +81,7 @@ const Legal = ({ source, meta }: any) => {
                     </div>
                 }
             />
-        </Layout>
+        </>
     );
 };
 
@@ -120,10 +115,4 @@ export const getStaticPaths = () => {
     };
 };
 
-export default function Page(props: any) {
-    return (
-        <DialogProvider>
-            <Legal {...props} />
-        </DialogProvider>
-    );
-}
+export default Legal;

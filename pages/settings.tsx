@@ -1,9 +1,10 @@
 import React from 'react';
 import styles from '@/styles/settings.module.css';
 import { useIntl } from 'react-intl';
-import { useDialog, DialogProvider } from '@/context/dialog';
+import { useDialog } from '@/context/dialog';
+import SEO from '@/components/SEO';
+
 import {
-    Layout,
     Avatar,
     Dialog,
     LangeSelect,
@@ -80,21 +81,16 @@ const Settings = () => {
     const { open } = useDialog();
 
     return (
-        <Layout
-            meta={{
-                title: f({ id: 'settings.seo.title' }),
-                description: f({ id: 'settings.seo.description' }),
-            }}
-        >
+        <>
+            <SEO
+                meta={{
+                    title: f({ id: 'settings.seo.title' }),
+                    description: f({ id: 'settings.seo.description' }),
+                }}
+            />
             <Dialog modalMode open={open} body={<Content />} header={<Header />} />
-        </Layout>
+        </>
     );
 };
 
-export default function Page(props: any) {
-    return (
-        <DialogProvider>
-            <Settings {...props} />
-        </DialogProvider>
-    );
-}
+export default Settings;

@@ -4,6 +4,7 @@ import { clx } from '@/helpers';
 
 type Props = {
     dialogRef?: React.RefObject<HTMLDivElement>;
+    className?: string;
     open?: boolean;
     withPadding?: boolean;
     modalMode?: boolean;
@@ -38,13 +39,24 @@ type Props = {
  */
 
 const Dialog = (props: Props) => {
-    const { dialogRef, open, large, withPadding, modalMode, header = <></>, body = <></>, footer = <></> } = props;
+    const {
+        dialogRef,
+        className,
+        open,
+        large,
+        withPadding,
+        modalMode,
+        header = <></>,
+        body = <></>,
+        footer = <></>,
+    } = props;
 
     return (
         <div
             ref={dialogRef}
             data-testid="dialog"
             className={clx(
+                className,
                 styles.dialog,
                 open ? styles.open : '',
                 withPadding ? styles.padding : '',
