@@ -9,6 +9,12 @@ type Props = {
     horizontal?: boolean;
 };
 
+declare global {
+    interface Window {
+        adsbygoogle: { [key: string]: unknown }[];
+    }
+}
+
 /**
  * @description - The adsense will be rendered only in production mode and horizontal only on mobile
  *

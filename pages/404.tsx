@@ -1,19 +1,20 @@
-import { Layout, Dialog, ControlButtons } from '@/components';
+import { Dialog, ControlButtons } from '@/components';
 import { useDialog } from '@/context/dialog';
-import { DialogProvider } from '@/context/dialog';
+import SEO from '@/components/SEO';
 
 const Custom404 = () => {
     const { dispatch, open } = useDialog();
     const close = () => dispatch({ type: 'close' });
 
     return (
-        <Layout
-            meta={{
-                title: '404',
-                description: "Oh! sorry, this page doesn't exist",
-                noindex: true,
-            }}
-        >
+        <>
+            <SEO
+                meta={{
+                    title: '404',
+                    description: "Oh! sorry, this page doesn't exist",
+                    noindex: true,
+                }}
+            />
             <Dialog
                 modalMode
                 withPadding
@@ -25,14 +26,8 @@ const Custom404 = () => {
                     </div>
                 }
             />
-        </Layout>
+        </>
     );
 };
 
-export default function Page(props: any) {
-    return (
-        <DialogProvider>
-            <Custom404 {...props} />
-        </DialogProvider>
-    );
-}
+export default Custom404;

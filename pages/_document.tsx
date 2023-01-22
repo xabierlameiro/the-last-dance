@@ -20,8 +20,8 @@ const Document = (props: Props) => {
                 <meta property="og:image:height" content="300" />
                 <meta property="og:url" content={domain} />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:site" content="@xlameiro" />
-                <meta name="twitter:creator" content="@xlameiro" />
+                <meta name="twitter:site" content="@xlameirodev" />
+                <meta name="twitter:creator" content="@xlameirodev" />
                 <meta name="google" content="notranslate" />
                 <link rel="icon" href="/favicon.svg" title="The favicon" />
                 <Script
