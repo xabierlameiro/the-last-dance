@@ -33,6 +33,7 @@
         "@testing-library/user-event": "^14.4.3",
         "@xabierlameiro/code-hike": "2.0.5",
         "dotenv-load": "^2.0.1",
+        "googleapis": "^110.0.0",
         "gray-matter": "^4.0.3",
         "jest": "^28.1.2",
         "jest-environment-jsdom": "^29.3.1",
@@ -65,10 +66,10 @@
         "eslint-config-next": "^13.0.7",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-storybook": "^0.6.8",
+        "lighthouse": "^9.6.8",
         "storybook": "^7.0.0-beta.12",
         "storybook-react-intl": "^1.1.1",
-        "typescript": "^4.9.4",
-        "lighthouse": "^9.6.8"
+        "typescript": "^4.9.4"
     },
     "browser": {
         "fs": false,
