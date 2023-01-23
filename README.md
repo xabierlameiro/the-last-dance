@@ -30,3 +30,11 @@ git clone https://github.com/xabierlameiro/the-last-dance.git
 npm i
 npm run dev
 ```
+
+## Pending tasks
+
+-   Complete coverage
+-   Complete storybook
+-   Move storybook to a separate repo
+-   Move lighthouse to a separate repo
+-   Dark/light mode
