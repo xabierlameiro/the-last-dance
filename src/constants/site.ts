@@ -39,7 +39,7 @@ export const socialLinks = [
         name: 'Coverage',
     },
     {
-        href: 'https://xabierlameiro.com/lighthouse',
+        href: 'https://lighthouse.xabierlameiro.com',
         title: 'Lighthouse',
         name: 'Lighthouse',
     },
