@@ -24,6 +24,7 @@ export default async function handler(
         method: 'GET',
         headers: new Headers({
             'user-agent': userAgent,
+            'cache-control': 'no-cache',
         }),
     })
         .then((res) => res.text())

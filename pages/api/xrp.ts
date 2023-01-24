@@ -13,6 +13,7 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
         method: 'GET',
         headers: new Headers({
             'user-agent': userAgent,
+            'cache-control': 'no-cache',
         }),
     })
         .then((res) => res.text())
