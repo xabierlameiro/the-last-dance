@@ -32,14 +32,10 @@ const SEO = ({ meta, isBlog }: Props) => {
     const url = isBlog
         ? `${domain}${getLang(l)}/blog/${category}/${meta?.slug}`
         : `${domain}${getLang(l)}${cleanTrailingSlash(path)}`;
-    const ogUrl = isBlog
-        ? `//xabierlameiro.com${getLang(l)}/blog/${category}/${meta?.slug}`
-        : `//xabierlameiro.com${getLang(l)}${path}`;
     const title = meta?.title;
     const author = meta?.author || auth;
     const description = meta?.description;
     const image = meta?.image ?? '/default.png';
-    const ogImage = meta?.image ? `//xabierlameiro.com${meta?.image}` : `//xabierlameiro.com/default.png`;
 
     return (
         <Head>
@@ -93,8 +89,8 @@ const SEO = ({ meta, isBlog }: Props) => {
             <meta property="og:title" content={title} />
             <meta name="twitter:title" content={title} />
             <meta name="image" content={image} />
-            <meta property="og:image" content={ogImage} />
-            <meta property="og:url" content={ogUrl} />
+            <meta property="og:image" content={`${domain}${image}`} />
+            <meta property="og:url" content={url} />
             <link rel="canonical" href={url} title="Canonical url" />
             {meta?.alternate?.map(({ lang, url }, index) => (
                 <link
