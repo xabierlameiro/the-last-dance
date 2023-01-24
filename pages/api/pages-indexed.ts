@@ -33,6 +33,8 @@ export default async function handler(
 
     const num = response.substring(response.indexOf('id="result-stats">') + 24, response.indexOf('<nobr>') - 8);
 
+    console.log('num', num);
+
     if (isNaN(Number(num))) {
         throw new Error(`The number of indexed pages is not a number ${response}`);
     }
