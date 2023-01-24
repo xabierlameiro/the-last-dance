@@ -42,8 +42,8 @@ const IndexedCounter = () => {
     React.useEffect(() => {
         (async () => {
             try {
-                const { totalResults } = await fetch(`${domain}/api/search`).then((res) => res.json());
-                setPages(totalResults);
+                const { num } = await fetch(`${domain}/api/indexed`).then((res) => res.json());
+                setPages(num);
             } catch (e) {
                 setPages(-1);
             }

@@ -63,7 +63,7 @@ const Header = ({ children }: Props) => {
             <Route />
             <NavLinks />
             <CryptoPrice />
-            <div />
+            <IndexedCounter />
             <ViewCounter all />
             <DateAndHour />
             {children}
