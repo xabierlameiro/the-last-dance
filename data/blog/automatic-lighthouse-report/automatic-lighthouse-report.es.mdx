@@ -1,0 +1,135 @@
+---
+title: 'Automatización de informes de Lighthouse'
+slug: 'automatizacion-de-informes-de-lighthouse'
+author: 'Xabier Lameiro'
+category: 'Javascript'
+tags: ['node']
+locale: 'es'
+excerpt: 'Automatización de informes de Lighthouse usando playwright y la api de lightouse en una web desplegada en un ejemplo real'
+description: 'Automatización de informes de Lighthouse usando playwright y la api de lightouse en una web desplegada en un ejemplo real'
+image: '/posts/automatic-lighthouse-report.png'
+alternate:
+    [
+        { lang: 'en', url: 'lighthouse-reporting-automation' },
+        { lang: 'gl', url: 'automatizacion-dos-informes-de-lighthouse' },
+    ]
+---
+
+# Automatización de informes de Lighthouse
+
+<Date date="01-24-2023" />
+
+<GoogleAdsense slot="6618374506" horizontal />
+
+Una manera fácil de tener automatizados los informes de Lighthouse es usando la herramienta de Google llamada [Lighthouse CI](https://github.com/GoogleChrome/lighthouse) que nos permite pasar el test de ligthouse a una web y guardar los resultados en un servidor para poder compararlos con los resultados de otras ejecuciones.
+
+Puedes ir viendo las mejoras en performance, accesibilidad, SEO, etc. de tu web. Inclusive puedes añadir reglas nuevas con plugins personalizados, por ejemplo, para comprobar que no se ha añadido html que no cumpla con las reglas de accesibilidad.
+
+En un próximo post la idea es crear un plugin para lighthouse desde cero pra comprobar algunas "normas" no escritas de SEO en cada uno de mis post.
+
+Para tener siempre una foto actual del sitemap de mi web utilizo playwright para revisar el sitemap, tener el arbol de enlaces y crear un organigrama usando Treant.js como puedes ver [aquí](https://lighthouse.xabierlameiro.com/)
+
+## ¿Cómo lo hice?
+
+## 1. Consigue todas las urls de tu sitemap
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```js main.js
+const browser = await chromium.launch();
+const page = await browser.newPage();
+await page.goto('https://xabierlameiro.com/sitemap.xml');
+// get site map inside a body
+const sitemap = await page.$eval('body', (el) => el.innerHTML);
+// get all urls inside sitemap
+const urls = sitemap.match(/<loc>(.*?)<\/loc>/g).map((url) => url.replace(/<\/?loc>/g, ''));
+// split urls in locales bearing in mind that 'en' is the default locale and it's not included in the url
+let locales = urls.reduce((acc, url) => {
+    let locale = url.split('/')[3];
+    if (locale !== 'gl' && locale !== 'es') {
+        locale = 'en';
+    }
+    if (!acc[locale]) {
+        acc[locale] = [];
+    }
+    acc[locale].push(url);
+    return acc;
+}, {});
+
+const index = locales.en.indexOf('https://xabierlameiro.com');
+locales.en[index] = 'https://xabierlameiro.com/home';
+
+await browser.close();
+```
+
+</CH.Code>
+
+## 2. Ejecuta lighthouse en cada una de las urls y guarda el reporte
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```js main.js
+for (const url of locales[lang]) {
+    // Report
+    const result = await launchChromeAndRunLighthouse(
+        url === 'https://xabierlameiro.com/home' ? 'https://xabierlameiro.com' : url,
+        options
+    );
+    let fileName = url.split('/').pop();
+
+    if (fileName === 'es' || fileName === 'gl') {
+        fileName = 'home';
+    }
+    // write report in output folder
+    fs.writeFileSync(lang === 'en' ? `output/${fileName}.html` : `output/${lang}/${fileName}.html`, result.report);
+}
+```
+
+</CH.Code>
+
+## 3. Crea un organigrama usando Treant.js
+
+> Ejemplo solo del primer nivel del arbol
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```js main.js
+const chart = {
+    chart: {
+        container: '#OrganiseChart-big-commpany',
+        levelSeparation: 40,
+        siblingSeparation: 20,
+        subTeeSeparation: 30,
+        rootOrientation: 'NORTH',
+        nodeAlign: 'BOTTOM',
+
+        connectors: {
+            type: 'step',
+            style: {
+                'stroke-width': 2,
+            },
+        },
+        node: {
+            HTMLclass: 'big-commpany',
+        },
+    },
+};
+```
+
+</CH.Code>
+
+> Todo el código esta disponible en mi respositoro de [github](https://github.com/xabierlameiro/lighthouse-report/blob/master/main.js 'Enlace a repostorio de github')
+
+## 4. Ejecuta tu script y despliega los archivos en un servidor estático como Vercel
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+
+node main.js
+
+```
+
+</CH.Code>
+
+Si quieres ver los resultados solo haz click en "Lightouse" en la barra de navegación superior.
