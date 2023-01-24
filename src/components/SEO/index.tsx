@@ -35,7 +35,7 @@ const SEO = ({ meta, isBlog }: Props) => {
     const title = meta?.title;
     const author = meta?.author || auth;
     const description = meta?.description;
-    const image = meta?.image ?? '/default.png';
+    const image = `${domain}${meta?.image ?? '/default.png'}`;
 
     return (
         <Head>
@@ -90,6 +90,7 @@ const SEO = ({ meta, isBlog }: Props) => {
             <meta name="twitter:title" content={title} />
             <meta name="image" content={image} />
             <meta property="og:image" itemProp="image" content={image} />
+            <meta property="og:url" content={url} />
             <link rel="canonical" href={url} title="Canonical url" />
             {meta?.alternate?.map(({ lang, url }, index) => (
                 <link

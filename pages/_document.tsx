@@ -18,7 +18,6 @@ const Document = (props: Props) => {
                 <meta property="og:image:type" content="image/png" />
                 <meta property="og:image:width" content="300" />
                 <meta property="og:image:height" content="300" />
-                <meta property="og:url" content={domain} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@xlameirodev" />
                 <meta name="twitter:creator" content="@xlameirodev" />
