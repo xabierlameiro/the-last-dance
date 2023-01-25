@@ -1,5 +1,3 @@
-import { AiFillGithub, AiFillRedditCircle } from 'react-icons/ai';
-import { BsLinkedin } from 'react-icons/bs';
 import styles from './footer.module.css';
 import Dock from '@/components/Dock';
 

@@ -7,6 +7,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
+        "prod": "yarn --prod",
         "build": "next build",
         "postbuild": "npm run coverage && npm run jsdoc",
         "start": "next start",
@@ -37,6 +38,7 @@
         "gray-matter": "^4.0.3",
         "jest": "^28.1.2",
         "jest-environment-jsdom": "^29.3.1",
+        "jest-fetch-mock": "^3.0.3",
         "jsdoc-babel": "^0.5.0",
         "next": "^13.0.7",
         "next-env": "^1.1.1",
@@ -66,7 +68,6 @@
         "eslint-config-next": "^13.0.7",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-storybook": "^0.6.8",
-        "jest-fetch-mock": "^3.0.3",
         "lighthouse": "^9.6.8",
         "storybook": "^7.0.0-beta.12",
         "storybook-react-intl": "^1.1.1",
