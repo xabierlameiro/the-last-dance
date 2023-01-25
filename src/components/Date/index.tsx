@@ -3,21 +3,21 @@ import { useIntl } from 'react-intl';
 import styles from './date.module.css';
 
 type Props = {
-    date: Date;
+    date: string;
 };
 
 /**
  * @example
- *     <Date date={new Date()} />;
+ *    <Date date="01-02-2023" />
  *
- * @param {Date} date
+ * @param {Date} string
  * @returns {JSX.Element}
  */
 const Date = ({ date }: Props) => {
     const { formatDate } = useIntl();
 
     return (
-        <div className={styles.date} suppressHydrationWarning>
+        <div data-testid="date" className={styles.date} suppressHydrationWarning>
             {formatDate(date, {
                 weekday: 'short',
                 day: 'numeric',

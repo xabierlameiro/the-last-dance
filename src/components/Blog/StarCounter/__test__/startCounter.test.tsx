@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { waitFor, render, screen } from '@/test';
 import StarCounter from '..';
 
