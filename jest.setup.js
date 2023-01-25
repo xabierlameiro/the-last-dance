@@ -1,5 +1,8 @@
 import { render } from '@testing-library/react';
+import fetchMock from 'jest-fetch-mock';
 import '@testing-library/jest-dom';
+
+fetchMock.enableMocks();
 
 const AllTheProviders = ({ children }) => {
     return <>{children}</>;

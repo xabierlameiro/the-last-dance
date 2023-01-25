@@ -1,5 +1,5 @@
 import PostList from '..';
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@/test';
 
 describe('PostList', () => {
     it('should not render because dont have posts', () => {

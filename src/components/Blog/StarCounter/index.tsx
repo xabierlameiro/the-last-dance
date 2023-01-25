@@ -1,11 +1,12 @@
 import React from 'react';
 import styles from './starCounter.module.css';
-import { AiOutlineStar, AiFillStar } from 'react-icons/ai';
+import { AiOutlineStar } from 'react-icons/ai';
 import { FaSpinner } from 'react-icons/fa';
 import { RxCross2 } from 'react-icons/rx';
 
 type Props = {
     children?: React.ReactNode;
+    dataTetsId: string;
 };
 
 /**
@@ -17,9 +18,10 @@ type Props = {
  * @param {React.ReactNode} children - The number of stars
  * @returns {JSX.Element}
  */
-const Container = ({ children }: Props) => {
+const Container = ({ children, dataTetsId }: Props) => {
     return (
         <a
+            data-testid={dataTetsId}
             className={styles.stars}
             href="https://github.com/xabierlameiro/the-last-dance"
             title="Go to the repository to give my star"
@@ -52,29 +54,22 @@ const StarCounter = () => {
         })();
     }, []);
 
-    if (stars === -2)
-        return (
-            <Container>
-                <AiFillStar className={styles.starred} title="Starred" />
-            </Container>
-        );
-
     if (stars === -1)
         return (
-            <Container>
+            <Container dataTetsId="error">
                 <RxCross2 className={styles.error} title="Error endpoint" />
             </Container>
         );
 
     if (stars === 0)
         return (
-            <Container>
+            <Container dataTetsId="loading">
                 <FaSpinner className={styles.spinner} title="Loading stars" />
             </Container>
         );
 
     return (
-        <Container>
+        <Container dataTetsId="star-counter">
             <span>{stars}</span>
         </Container>
     );

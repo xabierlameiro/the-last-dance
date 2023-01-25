@@ -1,5 +1,5 @@
 import AsidePanel from '..';
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@/test';
 
 describe('AsidePanel', () => {
     it('should render the aside panel', () => {

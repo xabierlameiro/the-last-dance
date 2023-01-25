@@ -1,5 +1,5 @@
 import LangeSelect from '..';
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@/test';
 
 describe('LangeSelect', () => {
     it('should render the lang select', () => {

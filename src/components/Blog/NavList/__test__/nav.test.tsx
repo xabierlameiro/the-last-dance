@@ -1,5 +1,5 @@
 import NavList from '..';
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@/test';
 
 describe('NavList', () => {
     it('should not render because dont have list', () => {

@@ -1,6 +1,6 @@
 import Layout from '@/layout';
 import { DialogProvider } from '@/context/dialog';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen } from '@/test';
 
 jest.mock('@/components/CryptoPrice', () => {
     const CryptoPrice = () => <div />;

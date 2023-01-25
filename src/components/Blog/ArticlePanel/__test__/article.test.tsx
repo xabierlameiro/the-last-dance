@@ -1,5 +1,5 @@
 import ArticlePanel from '..';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen } from '@/test';
 
 jest.mock('../../ViewCounter', () => {
     const ViewCounter = () => <div />;
