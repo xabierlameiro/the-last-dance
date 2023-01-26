@@ -68,14 +68,14 @@ const ViewCounter = ({ all }: StarCounterProps) => {
 
     if (views === -2)
         return (
-            <Container>
+            <Container all={all}>
                 <RxCross2 className={styles.error} title="Error on endpoint" />
             </Container>
         );
 
     if (views === -1)
         return (
-            <Container>
+            <Container all={all}>
                 <FaSpinner className={styles.spinner} title="Loading views" />
             </Container>
         );

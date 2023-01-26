@@ -7,6 +7,7 @@ import { socialLinks, translateRoute } from '@/constants/site';
 import CryptoPrice from '@/components/CryptoPrice';
 import ViewCounter from '@/components/Blog/ViewCounter';
 import IndexedCounter from '@/components/IndexedCounter';
+import CountDown from '@/components/CountDown';
 
 type Props = {
     children?: ReactNode;
@@ -62,6 +63,7 @@ const Header = ({ children }: Props) => {
             <SiBitcoincash />
             <Route />
             <NavLinks />
+            <CountDown date="2023-05-06T00:00:00+00:00" />
             <CryptoPrice />
             <IndexedCounter />
             <ViewCounter all />
