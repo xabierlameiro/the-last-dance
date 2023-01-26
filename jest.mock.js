@@ -25,6 +25,14 @@ jest.mock('next/router', () => ({
     },
 }));
 
+jest.mock(
+    'next/head',
+    () =>
+        function Head(props) {
+            return <>{props.children}</>;
+        }
+);
+
 global.fetch = jest.fn(() =>
     Promise.resolve({
         json: () => Promise.resolve({}),

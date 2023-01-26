@@ -41,6 +41,7 @@ const SEO = ({ meta, isBlog }: Props) => {
         <Head>
             {isBlog ? (
                 <script
+                    data-testid="json-ld"
                     type="application/ld+json"
                     key="item-jsonld"
                     dangerouslySetInnerHTML={{
@@ -94,6 +95,7 @@ const SEO = ({ meta, isBlog }: Props) => {
             <link rel="canonical" href={url} title="Canonical url" />
             {meta?.alternate?.map(({ lang, url }, index) => (
                 <link
+                    data-testid="blog-alternate"
                     key={index}
                     rel="alternate"
                     href={`${domain}${getLang(lang)}/blog/${category}/${url}`}
