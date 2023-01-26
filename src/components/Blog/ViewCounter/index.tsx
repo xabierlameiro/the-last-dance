@@ -83,10 +83,12 @@ const ViewCounter = ({ all }: StarCounterProps) => {
     return (
         <Container all={all}>
             <span title="Nº of page views">{views.pageViews}</span>
-            <span className={styles.users} title="Nº of new users">
-                <FiUsers />
-                {views.newUsers}
-            </span>
+            {all && (
+                <span className={styles.users} title="Nº of new users">
+                    <FiUsers />
+                    {views.newUsers}
+                </span>
+            )}
         </Container>
     );
 };

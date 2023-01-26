@@ -36,7 +36,7 @@ svg.error {
     color: rgb(91, 87, 87);
 }
 
-.users svg {
+.views .users svg {
     width: 15px;
     fill: transparent;
 }
