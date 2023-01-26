@@ -36,6 +36,7 @@ const Notification = ({ title, message, type = 'success', onClose }: Props) => {
 
     return (
         <div
+            data-testid={show ? 'notification' : 'notification-hidden'}
             className={clx(
                 styles.notification,
                 type === 'success' ? styles.success : styles.error,

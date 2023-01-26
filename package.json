@@ -12,7 +12,7 @@
         "postbuild": "npm run coverage && npm run jsdoc",
         "start": "next start",
         "lint": "next lint",
-        "test": "NODE_ENV=test jest",
+        "test": "NODE_ENV=test jest --silent",
         "coverage": "rm -rf public/coverage && NODE_ENV=test jest --coverage && node custom-reporter.js && node searchConsole.js",
         "watch": "jest --watchAll",
         "test:clear": "jest --clearCache",
