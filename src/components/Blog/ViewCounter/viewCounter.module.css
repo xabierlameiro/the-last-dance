@@ -5,14 +5,14 @@
     font-size: 15px;
     user-select: none;
     gap: 8px;
-    color: rgb(91, 87, 87);
+    color: rgba(var(--color-font));
 }
 
 .views svg {
     width: 19px;
 }
 
-svg.error {
+.views svg.error {
     width: 16px;
     height: 16px;
     color: rgba(var(--red-color));
@@ -29,15 +29,16 @@ svg.error {
 }
 
 .users {
+    padding-left: 12px;
     display: flex;
     font-size: 14px;
     user-select: none;
     gap: 8px;
-    color: rgb(91, 87, 87);
+    color: rgba(var(--color-font));
 }
 
 .views .users svg {
-    width: 15px;
+    width: 14px;
     fill: transparent;
 }
 
