@@ -2,11 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 
-type Data = {
-    error?: string;
-    total?: number;
-};
-
 /**
  * @description This function is used to get the total number of page views for a given page. It uses the Google
  * Analytics Data API to get the data.
@@ -18,11 +13,12 @@ type Data = {
  *     total?: number;
  * }>}
  * @throws {Error: Error while parsing analytics data}
+ * @see https://developers.google.com/analytics/devguides/reporting/data/v1/api-schema
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { query } = req;
     const { slug } = query;
-    let total = 0;
+    let data = null;
     const analyticsDataClient = new BetaAnalyticsDataClient({
         credentials: {
             client_email: process.env.ANALYTICS_CLIENT_EMAIL,
@@ -39,21 +35,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     endDate: 'today',
                 },
             ],
-            dimensions: [
-                {
-                    name: 'pagePath',
-                },
-            ],
             metrics: [
                 {
                     name: 'screenPageViews',
                 },
-            ],
-            orderBys: [
                 {
-                    metric: {
-                        metricName: 'screenPageViews',
-                    },
+                    name: 'newUsers',
                 },
             ],
         });
@@ -62,10 +49,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             res.status(500).json({ error: 'No data' });
             return;
         }
-
-        total = response.rows.reduce((prev: any, curr: any) => {
-            return prev + parseInt(curr.metricValues[0].value, 0);
-        }, 0);
+        data = {
+            pageViews: response?.rows?.[0].metricValues?.[0].value,
+            newUsers: response?.rows?.[0].metricValues?.[1].value,
+        };
     } else {
         const [response] = await analyticsDataClient.runReport({
             property: `properties/348472560`,
@@ -75,17 +62,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     endDate: 'today',
                 },
             ],
-            dimensions: [
-                {
-                    name: 'date',
-                },
-                {
-                    name: 'pagePath',
-                },
-            ],
+
             metrics: [
                 {
                     name: 'screenPageViews',
+                },
+                {
+                    name: 'newUsers',
                 },
             ],
             dimensionFilter: {
@@ -97,26 +80,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     },
                 },
             },
-            orderBys: [
-                {
-                    dimension: {
-                        dimensionName: 'date',
-                    },
-                },
-            ],
         });
 
         if (!response || !response.rows) {
             res.status(500).json({ error: 'Error while parsing analytics data' });
             return;
         }
-
-        total = response.rows.reduce((prev: any, curr: any) => {
-            return prev + parseInt(curr.metricValues[0].value, 0);
-        }, 0);
+        data = {
+            pageViews: response?.rows?.[0].metricValues?.[0].value,
+            newUsers: response?.rows?.[0].metricValues?.[1].value,
+        };
     }
     try {
-        res.status(200).json({ total });
+        res.status(200).json({
+            pageViews: data.pageViews,
+            newUsers: data.newUsers,
+        });
     } catch (err: any) {
         res.status(500).json({ error: err });
     }

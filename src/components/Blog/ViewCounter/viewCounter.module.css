@@ -28,6 +28,19 @@ svg.error {
     font-size: 14px;
 }
 
+.users {
+    display: flex;
+    font-size: 14px;
+    user-select: none;
+    gap: 8px;
+    color: rgb(91, 87, 87);
+}
+
+.users svg {
+    width: 15px;
+    fill: transparent;
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg);
