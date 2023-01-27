@@ -199,7 +199,7 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
         })
     );
 
-    // createSiteMap([...tags, ...categories], locales);
+    createSiteMap([...tags, ...categories], locales);
 
     return {
         paths: [...tags, ...categories],
