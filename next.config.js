@@ -36,7 +36,7 @@ export default withMDX({
         largePageDataBytes: 800 * 1000,
     },
     images: {
-        domains: ['uploads-ssl.webflow.com', 'code.visualstudio.com', 'googlecm.hit.gemius.pl'],
+        domains: ['gstatic.com', 'uploads-ssl.webflow.com', 'code.visualstudio.com', 'googlecm.hit.gemius.pl'],
     },
     i18n: {
         locales: ['en', 'es', 'gl'],
