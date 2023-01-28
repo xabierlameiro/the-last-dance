@@ -1,4 +1,3 @@
-export const domain = 'https://xabierlameiro.com';
 export const defaultLocale = 'en';
 export const author = 'Xabier Lameiro Cardama';
 export const socialNetworks = [

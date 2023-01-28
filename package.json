@@ -48,7 +48,8 @@
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-icons": "^4.7.1",
-        "react-intl": "^6.2.5"
+        "react-intl": "^6.2.5",
+        "swr": "^2.0.2"
     },
     "devDependencies": {
         "@storybook/addon-essentials": "^7.0.0-beta.12",

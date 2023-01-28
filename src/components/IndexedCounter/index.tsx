@@ -3,7 +3,6 @@ import { GiCheckboxTree } from 'react-icons/gi';
 import { RxCross2 } from 'react-icons/rx';
 import { FaSpinner } from 'react-icons/fa';
 import styles from './indexed.module.css';
-import { domain } from '@/constants/site';
 
 type Props = {
     children?: React.ReactNode;
@@ -42,7 +41,9 @@ const IndexedCounter = () => {
     React.useEffect(() => {
         (async () => {
             try {
-                const { num } = await fetch(`${domain}/api/pages-indexed`).then((res) => res.json());
+                const { num } = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}/api/pages-indexed`).then((res) =>
+                    res.json()
+                );
                 setPages(num);
             } catch (e) {
                 setPages(-1);

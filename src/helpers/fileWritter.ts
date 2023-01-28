@@ -1,4 +1,4 @@
-import { domain, defaultLocale } from '@/constants/site';
+import { defaultLocale } from '@/constants/site';
 import { removeTrailingSlash } from '@/helpers';
 import fs from 'fs';
 import path from 'path';
@@ -39,7 +39,9 @@ export const createSiteMap = (
         ) => {
             const { locale, params } = path;
             const { category, slug } = params;
-            const url = `${domain}${locale !== defaultLocale ? `/${locale}` : ''}/blog/${category}/${slug}`;
+            const url = `${process.env.NEXT_PUBLIC_DOMAIN}${
+                locale !== defaultLocale ? `/${locale}` : ''
+            }/blog/${category}/${slug}`;
             return [...acc, url];
         },
         []
@@ -65,9 +67,9 @@ export const createSiteMap = (
         });
 
     sitemap = sitemap.concat([
-        `${domain}/legal/cookies-policy`,
-        `${domain}/legal/legal-notice`,
-        `${domain}/legal/privacy-policy`,
+        `${process.env.NEXT_PUBLIC_DOMAIN}/legal/cookies-policy`,
+        `${process.env.NEXT_PUBLIC_DOMAIN}/legal/legal-notice`,
+        `${process.env.NEXT_PUBLIC_DOMAIN}/legal/privacy-policy`,
     ]);
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -89,7 +91,9 @@ export const createSiteMap = (
                         return `
                         <url>
                             <loc>${removeTrailingSlash(
-                                locale === defaultLocale ? `${domain}/${page.url}` : `${domain}/${locale}/${page.url}`
+                                locale === defaultLocale
+                                    ? `${process.env.NEXT_PUBLIC_DOMAIN}/${page.url}`
+                                    : `${process.env.NEXT_PUBLIC_DOMAIN}/${locale}/${page.url}`
                             )}</loc>
                             <lastmod>${page.lastmod}</lastmod>
                         </url>

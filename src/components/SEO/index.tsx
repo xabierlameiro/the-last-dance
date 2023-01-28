@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { domain, author as auth } from '@/constants/site';
+import { author as auth } from '@/constants/site';
 import { getLang, cleanTrailingSlash } from '@/helpers';
 import Head from 'next/head';
 
@@ -30,8 +30,8 @@ const SEO = ({ meta, isBlog }: Props) => {
     const { locale: l, pathname: path } = useRouter();
     const category = meta?.category?.toLowerCase();
     const url = isBlog
-        ? `${domain}${getLang(l)}/blog/${category}/${meta?.slug}`
-        : `${domain}${getLang(l)}${cleanTrailingSlash(path)}`;
+        ? `${process.env.NEXT_PUBLIC_DOMAIN}${getLang(l)}/blog/${category}/${meta?.slug}`
+        : `${process.env.NEXT_PUBLIC_DOMAIN}${getLang(l)}${cleanTrailingSlash(path)}`;
     const title = meta?.title;
     const author = meta?.author || auth;
     const description = meta?.description;
@@ -51,14 +51,14 @@ const SEO = ({ meta, isBlog }: Props) => {
                             headline: title,
                             description: description,
                             url: url,
-                            image: [`${domain}/${image}`],
+                            image: [`${process.env.NEXT_PUBLIC_DOMAIN}/${image}`],
                             datePublished: new Date().toISOString(),
                             dateModified: new Date().toISOString(),
                             author: [
                                 {
                                     '@type': 'Person',
                                     name: author,
-                                    url: domain,
+                                    url: process.env.NEXT_PUBLIC_DOMAIN,
                                 },
                             ],
                         }),
@@ -66,8 +66,16 @@ const SEO = ({ meta, isBlog }: Props) => {
                 />
             ) : (
                 <>
-                    <link hrefLang="es" rel="alternate" href={`${domain}/es${cleanTrailingSlash(path)}`} />
-                    <link hrefLang="gl" rel="alternate" href={`${domain}/gl${cleanTrailingSlash(path)}`} />
+                    <link
+                        hrefLang="es"
+                        rel="alternate"
+                        href={`${process.env.NEXT_PUBLIC_DOMAIN}/es${cleanTrailingSlash(path)}`}
+                    />
+                    <link
+                        hrefLang="gl"
+                        rel="alternate"
+                        href={`${process.env.NEXT_PUBLIC_DOMAIN}/gl${cleanTrailingSlash(path)}`}
+                    />
                 </>
             )}
 
@@ -90,7 +98,7 @@ const SEO = ({ meta, isBlog }: Props) => {
             <meta property="og:title" content={title} />
             <meta name="twitter:title" content={title} />
             <meta name="image" content={image} />
-            <meta property="og:image" content={`${domain}${image}`} />
+            <meta property="og:image" content={`${process.env.NEXT_PUBLIC_DOMAIN}${image}`} />
             <meta property="og:url" content={url} />
             <link rel="canonical" href={url} title="Canonical url" />
             {meta?.alternate?.map(({ lang, url }, index) => (
@@ -98,7 +106,7 @@ const SEO = ({ meta, isBlog }: Props) => {
                     data-testid="blog-alternate"
                     key={index}
                     rel="alternate"
-                    href={`${domain}${getLang(lang)}/blog/${category}/${url}`}
+                    href={`${process.env.NEXT_PUBLIC_DOMAIN}${getLang(lang)}/blog/${category}/${url}`}
                     hrefLang={lang}
                     title={`Alternate url for langueage ${lang}`}
                 />

@@ -4,7 +4,6 @@ import { RxCross2 } from 'react-icons/rx';
 import { FaSpinner } from 'react-icons/fa';
 import styles from './crypto.module.css';
 import { FormattedNumber } from 'react-intl';
-import { domain } from '@/constants/site';
 
 type Props = {
     children?: React.ReactNode;
@@ -42,7 +41,7 @@ const CryptoPrice = () => {
     React.useEffect(() => {
         (async () => {
             try {
-                const xrp = await fetch(`${domain}/api/xrp`).then((res) => res.json());
+                const xrp = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}/api/xrp`).then((res) => res.json());
                 setXRP(xrp);
             } catch (e) {
                 setXRP(-1);

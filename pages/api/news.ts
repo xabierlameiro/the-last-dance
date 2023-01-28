@@ -1,0 +1,69 @@
+// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next';
+import jsdom from 'jsdom';
+
+const getWeatherData = async (city: string) => {
+    const { JSDOM } = jsdom;
+    var requestOptions: any = {
+        method: 'GET',
+        headers: {
+            authority: 'www.google.com',
+            'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+            'cache-control': 'no-cache',
+            'user-agent':
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+        },
+        redirect: 'follow',
+    };
+
+    const response = await fetch(`https://www.google.com/search?q=${city}&tbm=nws&tbs=sbd:1`, requestOptions);
+    const raw = await response.text();
+    const dom = new JSDOM(raw);
+    const elements = dom.window.document.querySelectorAll('.SoaBEf');
+
+    const news = Array.from(elements).map((element) => {
+        return {
+            title: element.querySelector('[role="heading"]')?.textContent,
+            description: element.querySelector('.GI74Re.nDgy9d')?.textContent,
+            link: element.querySelector('a')?.href,
+            published: element.querySelector('.OSrXXb.ZE0LJd.YsWzw')?.textContent,
+        };
+    });
+
+    return {
+        city: city,
+        news,
+    };
+};
+
+/**
+ *
+ * @description Get news for a city
+ * @param req {NextApiRequest}
+ * @param res {NextApiResponse}
+ * @returns Promise<void>
+ * @example http://localhost:3000/api/news?city=London
+ */
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+    const { query } = req;
+    const { city } = query;
+
+    if (!city || typeof city !== 'string') {
+        res.status(500).json({ error: 'City must be a string' });
+        return;
+    }
+
+    const data = await getWeatherData(city);
+
+    if (!data) {
+        res.status(500).json({ error: 'Error getting weather data' });
+        return;
+    }
+
+    const response = {
+        city: data.city,
+        news: data.news,
+    };
+
+    res.status(200).json(response);
+}

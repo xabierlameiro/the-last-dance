@@ -1,5 +1,5 @@
 import { Html, Head, Main, NextScript } from 'next/document';
-import { domain, author, socialNetworks } from '@/constants/site';
+import { author, socialNetworks } from '@/constants/site';
 import Script from 'next/script';
 
 type Props = {
@@ -33,7 +33,7 @@ const Document = (props: Props) => {
                         __html: JSON.stringify({
                             '@context': 'https://schema.org',
                             '@type': 'WebSite',
-                            url: domain,
+                            url: process.env.NEXT_PUBLIC_DOMAIN,
                             name: author,
                             alternateName: author,
                         }),
@@ -46,7 +46,7 @@ const Document = (props: Props) => {
                             '@context': 'http://schema.org',
                             '@type': 'Person',
                             name: author,
-                            url: domain,
+                            url: process.env.NEXT_PUBLIC_DOMAIN,
                             sameAs: socialNetworks,
                             email: 'mailto:xabier.lameiro@gmail.com',
                             image: '/profile.png',

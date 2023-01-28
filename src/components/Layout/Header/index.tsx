@@ -8,18 +8,20 @@ import CryptoPrice from '@/components/CryptoPrice';
 import ViewCounter from '@/components/Blog/ViewCounter';
 import IndexedCounter from '@/components/IndexedCounter';
 import CountDown from '@/components/CountDown';
+import Weather from '@/components/Weather';
 
 type Props = {
     children?: ReactNode;
 };
 
-const DateAndHour = () => {
+const DateAndHour = ({ children }: Props) => {
     const { locale } = useRouter();
     const [date, setDate] = React.useState(new Date());
     const day = date.toLocaleDateString(locale, { weekday: 'short' });
     const dayNumber = date.toLocaleDateString(locale, { day: 'numeric' });
     const month = date.toLocaleDateString(locale, { month: 'short' });
     const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
+    const [open, setOpen] = React.useState(false);
 
     React.useEffect(() => {
         const interval = setInterval(() => {
@@ -29,11 +31,12 @@ const DateAndHour = () => {
     }, []);
 
     return (
-        <div className={styles.dateAndHour}>
+        <div className={styles.dateAndHour} onClick={() => setOpen(!open)}>
             <span suppressHydrationWarning>{day}</span>
             <span suppressHydrationWarning>{dayNumber}</span>
             <span suppressHydrationWarning>{month}</span>
             <span suppressHydrationWarning>{hour}</span>
+            {children && React.cloneElement(children as React.ReactElement, { open })}
         </div>
     );
 };
@@ -67,7 +70,9 @@ const Header = ({ children }: Props) => {
             <CryptoPrice />
             <IndexedCounter />
             <ViewCounter all />
-            <DateAndHour />
+            <DateAndHour>
+                <Weather cities={['limerick+ireland', 'moraña+galicia', 'vilagarcía+galicia']} />
+            </DateAndHour>
             {children}
         </header>
     );
