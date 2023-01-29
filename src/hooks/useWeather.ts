@@ -1,8 +1,6 @@
 import useSWR from 'swr';
 import React from 'react';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 const useWeather = (cities: string[]) => {
     const url = React.useMemo(() => {
         const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/weather`);
@@ -10,11 +8,11 @@ const useWeather = (cities: string[]) => {
         return url;
     }, [cities]);
 
-    const { data, error } = useSWR(url, fetcher, {
+    const { data, error } = useSWR(url, (url: string) => fetch(url).then((res) => res.json()), {
         keepPreviousData: true,
         // refresh interval 1 minute
-        refreshInterval: 1000 * 60,
-        // remove auto revalidate
+        refreshInterval: 5000 * 60,
+        revalidateIfStale: false,
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
     });
