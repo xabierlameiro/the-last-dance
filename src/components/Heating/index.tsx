@@ -1,21 +1,27 @@
 import useHeating from '@/hooks/useHeating';
 import styles from './heating.module.css';
-import { FaSpinner } from 'react-icons/fa';
+import RenderManager from '@/components/RenderManager';
 
+/**
+ * @description - Heating component
+ * @returns {JSX.Element} - News component
+ * @todo - Pending internalization
+ */
 const Heating = () => {
-    const { data, error } = useHeating();
-
-    if (error) {
-        return <div>Failed to load</div>;
-    }
-
-    if (!data) return <FaSpinner className={styles.spinner} title="Loading stars" />;
+    const { data, error, loading } = useHeating();
 
     return (
-        <div className={styles.container}>
-            <div title="Actual temperature outside the house">{`${data.outsideTemp} º`}</div>|
-            <div title="Indoor temperature of the dwelling, information collected from the thermostat">{`${data.zoneMeasuredTemp} º`}</div>
-        </div>
+        <RenderManager
+            loading={loading}
+            error={error}
+            loadingTitle="Loading heating data"
+            errorTitle="Error loading heating data"
+        >
+            <div className={styles.container}>
+                <div title="Actual temperature outside the house">{`${data.outsideTemp} º`}</div>|
+                <div title="Indoor temperature of the dwelling, information collected from the thermostat">{`${data.zoneMeasuredTemp} º`}</div>
+            </div>
+        </RenderManager>
     );
 };
 

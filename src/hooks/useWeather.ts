@@ -10,17 +10,24 @@ const useWeather = (cities: string[]) => {
         return url;
     }, [cities]);
 
-    const { data, error } = useSWR(url, fetcher, {
-        keepPreviousData: true,
-        refreshInterval: 5000 * 60,
-        revalidateIfStale: false,
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
+    const { data, error, isLoading } = useSWR(url, fetcher, {
+        fallbackData: [
+            {
+                city: '',
+                name: '',
+                precipitation: 0,
+                humidity: 0,
+                windSpeed: 0,
+                grades: 0,
+                imageUrl: '',
+            },
+        ],
     });
 
     return {
         data,
         error,
+        loading: isLoading,
     };
 };
 

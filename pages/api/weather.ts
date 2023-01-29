@@ -55,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const { cities = '' } = query;
 
     if (!cities) {
-        res.status(500).json({ error: 'query param citys must be a strings with comma' });
+        res.status(500).json({ error: 'query param citites must be a strings with comma' });
     }
     try {
         const citiesArray = String(cities).split(',');

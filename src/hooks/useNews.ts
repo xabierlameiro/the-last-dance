@@ -10,17 +10,24 @@ const useNews = (city: string) => {
         return url;
     }, [city]);
 
-    const { data, error } = useSWR(url, fetcher, {
+    const { data, error, isLoading } = useSWR(url, fetcher, {
         keepPreviousData: true,
-        refreshInterval: 5000 * 60,
-        revalidateIfStale: false,
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
+        fallbackData: {
+            news: [
+                {
+                    link: '',
+                    title: '',
+                    published: '',
+                    description: '',
+                },
+            ],
+        },
     });
 
     return {
         data,
         error,
+        loading: isLoading,
     };
 };
 

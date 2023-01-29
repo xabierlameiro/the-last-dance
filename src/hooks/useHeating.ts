@@ -8,18 +8,21 @@ const useHeating = (): {
         outsideTemp: number;
         zoneMeasuredTemp: number;
     };
-    error: {
-        statusCode: number;
-        message: string;
-    };
+    error: boolean;
+    loading: boolean;
 } => {
-    const { data, error } = useSWR(url, fetcher, {
+    const { data, error, isLoading } = useSWR(url, fetcher, {
         keepPreviousData: true,
+        fallbackData: {
+            outsideTemp: 0,
+            zoneMeasuredTemp: 0,
+        },
     });
 
     return {
         data,
         error,
+        loading: isLoading,
     };
 };
 
