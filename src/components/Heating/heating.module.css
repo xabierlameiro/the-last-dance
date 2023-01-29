@@ -1,0 +1,9 @@
+.container {
+    display: grid;
+    grid-auto-flow: column;
+    font-size: 14px;
+    gap: 2px;
+    align-items: center;
+    justify-items: center;
+    user-select: none;
+}

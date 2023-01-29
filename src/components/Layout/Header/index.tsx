@@ -8,6 +8,7 @@ import CryptoPrice from '@/components/CryptoPrice';
 import ViewCounter from '@/components/Blog/ViewCounter';
 import IndexedCounter from '@/components/IndexedCounter';
 import CountDown from '@/components/CountDown';
+import Heating from '@/components/Heating';
 import dynamic from 'next/dynamic';
 
 const Weather = dynamic(() => import('@/components/Weather'), {
@@ -74,6 +75,7 @@ const Header = ({ children }: Props) => {
             <CryptoPrice />
             <IndexedCounter />
             <ViewCounter all />
+            <Heating />
             <DateAndHour>
                 <Weather cities={['limerick+ireland', 'moraña+galicia', 'vilagarcía+galicia']} />
             </DateAndHour>

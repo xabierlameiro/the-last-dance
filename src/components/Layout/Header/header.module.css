@@ -2,7 +2,7 @@
     height: 24px;
     background: linear-gradient(to right, rgba(227, 168, 208, 1), rgba(228, 217, 234, 1), rgba(230, 194, 220, 1));
     display: grid;
-    grid-template-columns: auto max-content 1fr repeat(5, auto);
+    grid-template-columns: auto max-content 1fr repeat(6, auto);
     gap: 20px;
     align-items: center;
     padding: 0 18px;
