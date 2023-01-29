@@ -1,52 +1,18 @@
 import React from 'react';
 import styles from './news.module.css';
+import useNews from '@/hooks/useNews';
 import { FaSpinner } from 'react-icons/fa';
-import useSWR from 'swr';
+import { setInverval } from '@/helpers';
 
 type WeatherProps = {
     city: string;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
-const MAX_STEPS = 10;
-
-function setInverval(ref: React.RefObject<HTMLDivElement>) {
-    let step = 0;
-    const interval = setInterval(() => {
-        if (ref.current) {
-            step += 1;
-            if (step < MAX_STEPS) {
-                ref.current.scrollBy({
-                    top: ref.current.clientHeight,
-                    behavior: 'smooth',
-                });
-            } else {
-                step = 0;
-                ref.current.scrollTo({
-                    top: 0,
-                    behavior: 'smooth',
-                });
-            }
-        }
-    }, 15000);
-
-    return interval;
-}
-
 const News = ({ city }: WeatherProps) => {
     const ref = React.useRef<HTMLDivElement>(null);
     const handleMouseEnter = React.useRef<() => void>();
     const handleMouseLeave = React.useRef<() => void>();
-    const url = React.useMemo(() => {
-        const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/news`);
-        url.searchParams.set('city', city);
-        return url;
-    }, [city]);
-
-    const { data, error } = useSWR(url, fetcher, {
-        keepPreviousData: true,
-    });
+    const { data, error } = useNews(city);
 
     React.useEffect(() => {
         let interval = setInverval(ref);

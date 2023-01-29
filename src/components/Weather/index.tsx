@@ -2,11 +2,9 @@ import React from 'react';
 import styles from './weather.module.css';
 import Img from 'next/image';
 import News from '@/components/News';
-import useSWR from 'swr';
+import useWeather from '@/hooks/useWeather';
 import { FaSpinner } from 'react-icons/fa';
 import { clx } from '@/helpers';
-// TODO: move to custom useSWR hook
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Container = ({ children, open }: { children: React.ReactNode; open?: boolean }) => {
     return (
@@ -17,17 +15,8 @@ const Container = ({ children, open }: { children: React.ReactNode; open?: boole
 };
 
 // TODO: Pending internationalization
-
 const Weather = ({ cities, open }: { cities: string[]; open?: boolean }) => {
-    const url = React.useMemo(() => {
-        const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/weather`);
-        url.searchParams.append('cities', cities.join(','));
-        return url;
-    }, [cities]);
-
-    const { data, error } = useSWR(url, fetcher, {
-        keepPreviousData: true,
-    });
+    const { data, error } = useWeather(cities);
 
     if (error) return <Container open={open}>error</Container>;
 

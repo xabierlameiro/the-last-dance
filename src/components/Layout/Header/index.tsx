@@ -8,7 +8,11 @@ import CryptoPrice from '@/components/CryptoPrice';
 import ViewCounter from '@/components/Blog/ViewCounter';
 import IndexedCounter from '@/components/IndexedCounter';
 import CountDown from '@/components/CountDown';
-import Weather from '@/components/Weather';
+import dynamic from 'next/dynamic';
+
+const Weather = dynamic(() => import('@/components/Weather'), {
+    ssr: false,
+});
 
 type Props = {
     children?: ReactNode;

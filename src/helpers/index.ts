@@ -1,4 +1,4 @@
-import { defaultLocale } from '@/constants/site';
+import { defaultLocale, MAX_STEPS } from '@/constants/site';
 /**
  * @description Utility function to concatenate classes.
  *
@@ -73,3 +73,31 @@ export const removeTrailingSlash = (str: string) => {
  * @param {string | undefined} lang
  */
 export const getLang = (lang: string | undefined) => (isNotEng(lang) ? `/${lang}` : '');
+
+/**
+ *
+ * @param ref  React.RefObject<HTMLDivElement>
+ * @returns  interval
+ */
+export const setInverval = (ref: React.RefObject<HTMLDivElement>) => {
+    let step = 0;
+    const interval = setInterval(() => {
+        if (ref.current) {
+            step += 1;
+            if (step < MAX_STEPS) {
+                ref.current.scrollBy({
+                    top: ref.current.clientHeight,
+                    behavior: 'smooth',
+                });
+            } else {
+                step = 0;
+                ref.current.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                });
+            }
+        }
+    }, 15000);
+
+    return interval;
+};

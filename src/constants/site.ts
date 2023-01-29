@@ -1,3 +1,4 @@
+export const MAX_STEPS = 10;
 export const defaultLocale = 'en';
 export const author = 'Xabier Lameiro Cardama';
 export const socialNetworks = [
