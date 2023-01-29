@@ -12,6 +12,11 @@ const useWeather = (cities: string[]) => {
 
     const { data, error } = useSWR(url, fetcher, {
         keepPreviousData: true,
+        // refresh interval 1 minute
+        refreshInterval: 1000 * 60,
+        // remove auto revalidate
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
     });
 
     return {
