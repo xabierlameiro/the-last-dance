@@ -1,7 +1,13 @@
 import { google } from 'googleapis';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-//https://developers.google.com/webmaster-tools/v1/searchanalytics/query
+/**
+ * @description This is a test to get the data from the Google Search Console API
+ * @param _req NextApiRequest
+ * @param res NextApiResponse
+ * @returns Promise<void>
+ * @see https://developers.google.com/webmaster-tools/v1/searchanalytics/query
+ */
 export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
     const auth = new google.auth.GoogleAuth({
         credentials: {

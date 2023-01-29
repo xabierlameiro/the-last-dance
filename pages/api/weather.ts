@@ -57,13 +57,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     if (!cities) {
         res.status(500).json({ error: 'query param citys must be a strings with comma' });
     }
+    try {
+        const citiesArray = String(cities).split(',');
 
-    const citiesArray = String(cities).split(',');
-
-    await Promise.allSettled(citiesArray.map((city) => getWeatherData(city)))
-        .then((raw) => {
-            const results = raw.map((result: any) => result.value);
-            res.status(200).json(results);
-        })
-        .catch((err) => res.status(500).json({ error: err.message }));
+        await Promise.allSettled(citiesArray.map((city) => getWeatherData(city)))
+            .then((raw) => {
+                const results = raw.map((result: any) => result.value);
+                res.status(200).json(results);
+            })
+            .catch((err) => res.status(500).json({ error: err.message }));
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
 }

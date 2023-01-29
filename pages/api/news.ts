@@ -2,6 +2,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import jsdom from 'jsdom';
 
+/**
+ * @description Get weather data for a city
+ * @param city {string}
+ * @returns Promise<{city: string, news: {title: string, description: string, link: string, published: string}[]}>
+ * @example getWeatherData('London')
+ * @example getWeatherData('Madrid')
+ */
 const getWeatherData = async (city: string) => {
     const { JSDOM } = jsdom;
     var requestOptions: any = {
