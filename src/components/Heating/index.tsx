@@ -1,19 +1,15 @@
 import useHeating from '@/hooks/useHeating';
 import styles from './heating.module.css';
+import { FaSpinner } from 'react-icons/fa';
 
 const Heating = () => {
     const { data, error } = useHeating();
-
-    console.log('data', data);
-    console.log('error', error);
 
     if (error) {
         return <div>Failed to load</div>;
     }
 
-    if (!data) {
-        return <div>Loading...</div>;
-    }
+    if (!data) return <FaSpinner className={styles.spinner} title="Loading stars" />;
 
     return (
         <div className={styles.container}>
