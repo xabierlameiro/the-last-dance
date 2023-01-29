@@ -17,8 +17,6 @@ const useHeating = (): {
         keepPreviousData: true,
     });
 
-    console.log('useHeating', data, error);
-
     return {
         data,
         error,
