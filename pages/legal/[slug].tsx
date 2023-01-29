@@ -22,7 +22,13 @@ import { clx } from '@/helpers';
 
 const LEGAL_PATH = path.join(process.cwd(), 'data/legal');
 
-const Legal = ({ source, meta }: any) => {
+type Props = {
+    // TODO: fix type
+    source: any;
+    meta: any;
+};
+
+const Legal = ({ source, meta }: Props) => {
     const { open, dispatch } = useDialog();
     const { formatMessage: f } = useIntl();
     const { left, onSideShiftLeft } = useSideShift();
@@ -85,7 +91,13 @@ const Legal = ({ source, meta }: any) => {
     );
 };
 
-export const getStaticProps = async ({ params }: any) => {
+export const getStaticProps = async ({
+    params,
+}: {
+    params: {
+        slug: string;
+    };
+}) => {
     const { slug } = params;
     const fullPath = path.join(LEGAL_PATH, `${slug}.mdx`);
     const mdx = fs.readFileSync(fullPath, 'utf8');

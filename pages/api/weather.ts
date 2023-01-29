@@ -4,7 +4,7 @@ import jsdom from 'jsdom';
 
 const getWeatherData = async (city: string) => {
     const { JSDOM } = jsdom;
-    var requestOptions: any = {
+    const response = await fetch(`https://www.google.com/search?q=tiempo+${city}`, {
         method: 'GET',
         headers: {
             authority: 'www.google.com',
@@ -14,9 +14,7 @@ const getWeatherData = async (city: string) => {
                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
         },
         redirect: 'follow',
-    };
-
-    const response = await fetch(`https://www.google.com/search?q=tiempo+${city}`, requestOptions);
+    });
     const raw = await response.text();
     const dom = new JSDOM(raw);
     const weatherBox = dom.window.document.querySelector('#wob_wc') as HTMLImageElement;
@@ -38,8 +36,10 @@ const getWeatherData = async (city: string) => {
             grades,
             imageUrl,
         };
-    } catch (err: any) {
-        throw new Error('Error getting weather data', err);
+    } catch (err: Error | unknown) {
+        if (err instanceof Error) {
+            throw new Error(err.message);
+        }
     }
 };
 
@@ -66,7 +66,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 res.status(200).json(results);
             })
             .catch((err) => res.status(500).json({ error: err.message }));
-    } catch (err: any) {
-        res.status(500).json({ error: err.message });
+    } catch (err: Error | unknown) {
+        if (err instanceof Error) {
+            res.status(500).json({ error: err.message });
+        }
     }
 }

@@ -25,7 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             data: { stargazers_count },
         } = await octokit.rest.repos.get(REPOSITORY);
         res.status(200).json(stargazers_count);
-    } catch (err: any) {
-        res.status(500).json({ statusCode: 500, message: err.message });
+    } catch (err: Error | unknown) {
+        if (err instanceof Error) {
+            res.status(500).json({ statusCode: 500, message: err.message });
+        }
     }
 }

@@ -3,5 +3,5 @@ declare module 'glob' {
 }
 
 declare module 'prettier' {
-    export function format(content: string, options?: any): string;
+    export function format(content: string, options?: Object): string;
 }

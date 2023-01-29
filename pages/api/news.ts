@@ -11,7 +11,8 @@ import jsdom from 'jsdom';
  */
 const getWeatherData = async (city: string) => {
     const { JSDOM } = jsdom;
-    var requestOptions: any = {
+
+    const response = await fetch(`https://www.google.com/search?q=${city}&tbm=nws&tbs=sbd:1`, {
         method: 'GET',
         headers: {
             authority: 'www.google.com',
@@ -21,9 +22,7 @@ const getWeatherData = async (city: string) => {
                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
         },
         redirect: 'follow',
-    };
-
-    const response = await fetch(`https://www.google.com/search?q=${city}&tbm=nws&tbs=sbd:1`, requestOptions);
+    });
     const raw = await response.text();
     const dom = new JSDOM(raw);
     const elements = dom.window.document.querySelectorAll('.SoaBEf');

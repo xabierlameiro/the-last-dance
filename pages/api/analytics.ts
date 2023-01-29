@@ -96,7 +96,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             pageViews: data.pageViews,
             newUsers: data.newUsers,
         });
-    } catch (err: any) {
-        res.status(500).json({ error: err });
+    } catch (err: Error | unknown) {
+        if (err instanceof Error) {
+            res.status(500).json({ error: err.message });
+        }
     }
 }

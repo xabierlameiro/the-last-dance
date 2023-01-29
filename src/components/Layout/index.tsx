@@ -35,7 +35,7 @@ const Layout = ({ className, children, isBlog }: Props) => {
     );
 };
 
-export default function Page(props: any) {
+export default function Page(props: { children: ReactElement }) {
     return (
         <DialogProvider>
             <Layout {...props} />

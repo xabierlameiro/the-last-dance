@@ -1,49 +1,42 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-
-const userAgent =
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36';
+import jsdom from 'jsdom';
 
 /**
  * @description Get the price of XRP in EUR
  *
- * @returns {Promise<{ price: string; todaySummary: string; todayPorcentage: string } | { error: string } | void>}
+ * @returns {Promise<{ price: string; todaySummary: string; todayPorcentage: string } | { error: string }>}
+ * @example https://xabierlameiro.com/api/xrp
  */
 export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
+    const { JSDOM } = jsdom;
     const response = await fetch('https://www.google.com/search?q=xrp+eur+price', {
         method: 'GET',
         headers: new Headers({
-            'user-agent': userAgent,
+            'user-agent':
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
             'cache-control': 'no-cache',
         }),
-    })
-        .then((res) => res.text())
-        .catch((err) => {
-            throw new Error(err);
-        });
-
-    const price = response.substring(response.indexOf('class="pclqee"') + 15, response.indexOf('class="dvZgKd"') - 13);
-
-    if (isNaN(Number(price))) {
-        throw new Error(`The price is not a number ${response}`);
-    }
-
-    const todaySummary = response.substring(
-        response.indexOf('jsname="SwWl3d"') + 16,
-        response.indexOf('jsname="rfaVEf"') - 14
-    );
-
-    const todayPorcentage = response.substring(
-        response.indexOf('jsname="rfaVEf"') + 17,
-        response.indexOf('class="LQY0Hc"') - 33
-    );
+    }).catch((err: Error | unknown) => {
+        if (err instanceof Error) {
+            res.status(500).json({ error: err.message });
+        }
+    });
 
     try {
+        const raw = await response?.text();
+        const dom = new JSDOM(raw);
+        const price = dom.window.document.querySelector('.pclqee')?.textContent;
+        const todaySummary = dom.window.document.querySelector('[jsname="SwWl3d"]')?.textContent;
+        const todayPorcentage = dom.window.document.querySelector('[jsname="rfaVEf"]')?.textContent;
+
         res.status(200).json({
             price,
             todaySummary,
             todayPorcentage,
         });
-    } catch (e) {
-        res.status(500).json({ error: 'Something went wrong', e });
+    } catch (err: Error | unknown) {
+        if (err instanceof Error) {
+            res.status(500).json({ error: err.message });
+        }
     }
 }
