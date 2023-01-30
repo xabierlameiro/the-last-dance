@@ -34,8 +34,6 @@ const News = ({ city }: WeatherProps) => {
         return () => clearInterval(interval);
     }, []);
 
-    if (!city) return null;
-
     return (
         <RenderManager error={error} loading={!data} errorTitle="News" loadingTitle="News">
             <div
