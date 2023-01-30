@@ -9,6 +9,7 @@ import ViewCounter from '@/components/Blog/ViewCounter';
 import IndexedCounter from '@/components/IndexedCounter';
 import CountDown from '@/components/CountDown';
 import Heating from '@/components/Heating';
+import Tooltip from '@/components/Tooltip';
 import dynamic from 'next/dynamic';
 
 const Weather = dynamic(() => import('@/components/Weather'), {
@@ -36,13 +37,18 @@ const DateAndHour = ({ children }: Props) => {
     }, []);
 
     return (
-        <div className={styles.dateAndHour} onClick={() => setOpen(!open)}>
-            <span suppressHydrationWarning>{day}</span>
-            <span suppressHydrationWarning>{dayNumber}</span>
-            <span suppressHydrationWarning>{month}</span>
-            <span suppressHydrationWarning>{hour}</span>
-            {children && React.cloneElement(children as React.ReactElement, { open })}
-        </div>
+        <Tooltip>
+            <Tooltip.Trigger>
+                <div className={styles.dateAndHour} onClick={() => setOpen(!open)}>
+                    <span suppressHydrationWarning>{day}</span>
+                    <span suppressHydrationWarning>{dayNumber}</span>
+                    <span suppressHydrationWarning>{month}</span>
+                    <span suppressHydrationWarning>{hour}</span>
+                    {children && React.cloneElement(children as React.ReactElement, { open })}
+                </div>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Click above for weather and news updates</Tooltip.Content>
+        </Tooltip>
     );
 };
 
@@ -71,7 +77,7 @@ const Header = ({ children }: Props) => {
             <SiBitcoincash />
             <Route />
             <NavLinks />
-            <CountDown date="2023-05-06T00:00:00+00:00" />
+            <CountDown date="2023-05-06T00:00:00+00:00" caption="The time to finish my English course in Limerick" />
             <CryptoPrice />
             <IndexedCounter />
             <ViewCounter all />

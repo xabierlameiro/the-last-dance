@@ -4,6 +4,7 @@ import useAnalytics from '@/hooks/useAnalytics';
 import RenderManager from '@/components/RenderManager';
 import { FiUsers } from 'react-icons/fi';
 import { BsBook, BsEye } from 'react-icons/bs';
+import Tooltip from '@/components/Tooltip';
 
 /**
  * @description Component that shows the number of views of the current page or the totally of website, include de new users
@@ -17,29 +18,41 @@ const ViewCounter = ({ all }: { all?: boolean }) => {
 
     return (
         <div className={styles.views}>
-            <span className={styles.views} title="Nº of new users">
-                {all ? <BsEye /> : <BsBook />}
-                <RenderManager
-                    loading={all ? !data : loading}
-                    error={error}
-                    errorTitle="Error loading views"
-                    loadingTitle="Loading views"
-                >
-                    <span title="Nº of page views">{data.pageViews}</span>
-                </RenderManager>
-            </span>
+            <Tooltip>
+                <Tooltip.Trigger>
+                    <span className={styles.views}>
+                        {all ? <BsEye /> : <BsBook />}
+                        <RenderManager
+                            loading={all ? !data : loading}
+                            error={error}
+                            errorTitle="Error loading views"
+                            loadingTitle="Loading views"
+                        >
+                            <span title="Nº of page views">{data.pageViews}</span>
+                        </RenderManager>
+                    </span>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                    {all ? 'Number of total website visits from GA' : 'Number of views of this post from GA'}
+                </Tooltip.Content>
+            </Tooltip>
             {all && (
-                <span className={styles.users} title="Nº of new users">
-                    <FiUsers />
-                    <RenderManager
-                        loading={!data}
-                        error={error}
-                        errorTitle="Error loading views"
-                        loadingTitle="Loading views"
-                    >
-                        {data.newUsers}
-                    </RenderManager>
-                </span>
+                <Tooltip>
+                    <Tooltip.Trigger>
+                        <span className={styles.users}>
+                            <FiUsers />
+                            <RenderManager
+                                loading={!data}
+                                error={error}
+                                errorTitle="Error loading views"
+                                loadingTitle="Loading views"
+                            >
+                                {data.newUsers}
+                            </RenderManager>
+                        </span>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content>Number of new users from GA</Tooltip.Content>
+                </Tooltip>
             )}
         </div>
     );

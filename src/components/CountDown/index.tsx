@@ -1,8 +1,10 @@
 import React from 'react';
 import styles from './countdown.module.css';
+import Tooltip from '@/components/Tooltip';
 
 type Props = {
     date: string;
+    caption?: string;
 };
 
 const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {}) => {
@@ -31,7 +33,7 @@ const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {
  * @param {string} date - date to countdown to
  * @returns {JSX.Element}
  */
-const CountDown = ({ date: dateProvided }: Props) => {
+const CountDown = ({ date: dateProvided, caption }: Props) => {
     const [time, setTime] = React.useState({
         months: 0,
         days: 0,
@@ -49,39 +51,43 @@ const CountDown = ({ date: dateProvided }: Props) => {
     }, [dateProvided, time]);
 
     return (
-        <div className={styles.countdown} data-testid="countdown">
-            <div className={styles.countdown__item}>
-                <div suppressHydrationWarning className={styles.countdown__item__number}>
-                    {time.months}
+        <Tooltip>
+            <Tooltip.Trigger>
+                <div className={styles.countdown} data-testid="countdown">
+                    <div className={styles.countdown__item}>
+                        <div suppressHydrationWarning className={styles.countdown__item__number}>
+                            {time.months}
+                        </div>
+                        <div className={styles.countdown__item__text}>Mons</div>
+                    </div>
+                    <div className={styles.countdown__item}>
+                        <div suppressHydrationWarning className={styles.countdown__item__number}>
+                            {time.days}
+                        </div>
+                        <div className={styles.countdown__item__text}>Days</div>
+                    </div>
+                    <div className={styles.countdown__item}>
+                        <div suppressHydrationWarning className={styles.countdown__item__number}>
+                            {time.hours}
+                        </div>
+                        <div className={styles.countdown__item__text}>Hour</div>
+                    </div>
+                    <div className={styles.countdown__item}>
+                        <div suppressHydrationWarning className={styles.countdown__item__number}>
+                            {time.minutes}
+                        </div>
+                        <div className={styles.countdown__item__text}>Mins</div>
+                    </div>
+                    <div className={styles.countdown__item}>
+                        <div suppressHydrationWarning className={styles.countdown__item__number}>
+                            {time.seconds}
+                        </div>
+                        <div className={styles.countdown__item__text}>Secs</div>
+                    </div>
                 </div>
-                <div className={styles.countdown__item__text}>Mons</div>
-            </div>
-
-            <div className={styles.countdown__item}>
-                <div suppressHydrationWarning className={styles.countdown__item__number}>
-                    {time.days}
-                </div>
-                <div className={styles.countdown__item__text}>Days</div>
-            </div>
-            <div className={styles.countdown__item}>
-                <div suppressHydrationWarning className={styles.countdown__item__number}>
-                    {time.hours}
-                </div>
-                <div className={styles.countdown__item__text}>Hour</div>
-            </div>
-            <div className={styles.countdown__item}>
-                <div suppressHydrationWarning className={styles.countdown__item__number}>
-                    {time.minutes}
-                </div>
-                <div className={styles.countdown__item__text}>Mins</div>
-            </div>
-            <div className={styles.countdown__item}>
-                <div suppressHydrationWarning className={styles.countdown__item__number}>
-                    {time.seconds}
-                </div>
-                <div className={styles.countdown__item__text}>Secs</div>
-            </div>
-        </div>
+            </Tooltip.Trigger>
+            {caption && <Tooltip.Content>{caption}</Tooltip.Content>}
+        </Tooltip>
     );
 };
 

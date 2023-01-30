@@ -9,6 +9,7 @@ import { useIntl } from 'react-intl';
 import styles from './panel.module.css';
 import StarCounter from '../StarCounter';
 import ViewCounter from '../ViewCounter';
+import Tooltip from '@/components/Tooltip';
 
 type Props = {
     readTime?: string;
@@ -25,17 +26,17 @@ const TimeRead = ({ readTime }: Props) => {
     const { formatMessage: f } = useIntl();
 
     return (
-        <div
-            className={styles.readContainer}
-            {...(readTime &&
-                Number(readTime) >= 0 && {
-                    title: f({ id: 'blog.readtime', description: 'read time' }, { readTime }),
-                })}
-            data-testid="read-time"
-        >
-            <RxStopwatch size={20} />
-            <span>{readTime}</span>
-        </div>
+        <Tooltip>
+            <Tooltip.Trigger>
+                <div className={styles.readContainer} data-testid="read-time">
+                    <RxStopwatch size={20} />
+                    <span>{readTime}</span>
+                </div>
+            </Tooltip.Trigger>
+            <Tooltip.Content>
+                <span>{f({ id: 'blog.readtime', description: 'read time' }, { readTime })}</span>
+            </Tooltip.Content>
+        </Tooltip>
     );
 };
 
