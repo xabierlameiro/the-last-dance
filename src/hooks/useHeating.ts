@@ -3,6 +3,11 @@ import { fetcher } from '@/helpers';
 
 const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/heating`);
 
+const initialValues = {
+    outsideTemp: 0,
+    zoneMeasuredTemp: 0,
+};
+
 const useHeating = (): {
     data: {
         outsideTemp: number;
@@ -12,10 +17,9 @@ const useHeating = (): {
     loading: boolean;
 } => {
     const { data, error, isLoading } = useSWR(url, fetcher, {
-        fallbackData: {
-            outsideTemp: 0,
-            zoneMeasuredTemp: 0,
-        },
+        keepPreviousData: true,
+        fallback: initialValues,
+        fallbackData: initialValues,
     });
 
     return {
