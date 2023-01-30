@@ -16,7 +16,7 @@ const Container = ({ children, open }: { children: React.ReactNode; open?: boole
 
 /**
  *
- * @description -  Weather component
+ * @description -  Show the weather of array of cities and the last news of each city
  * @param {string[]} cities - Cities to get weather
  * @param {boolean} open - Open or close the component
  * @returns {JSX.Element} - News component
@@ -30,19 +30,19 @@ const Weather = ({ cities, open }: { cities: string[]; open?: boolean }) => {
             <RenderManager loading={!data} error={error} errorTitle="" loadingTitle="Loading weather...">
                 <>
                     {data.map((city: any, index: any) => (
-                        <div className={styles.city} key={`${city.city}+${index}`}>
+                        <div className={styles.city} key={`${city?.city}+${index}`}>
                             <div className={styles.weather}>
                                 <div className={styles.cityName}>{city?.city?.replace(/\+/g, ' ')}</div>
-                                <div className={styles.cityGrade}>{`${city.grades} ºC | ºF`}</div>
-                                {city.imageUrl && (
-                                    <Img src={`https:${city.imageUrl}`} width={70} height={70} alt={city.name} />
+                                <div className={styles.cityGrade}>{`${city?.grades} ºC | ºF`}</div>
+                                {city?.imageUrl && (
+                                    <Img src={`https:${city?.imageUrl}`} width={70} height={70} alt={city?.name} />
                                 )}
                                 <div className={styles.info}>
                                     <div
                                         className={styles.cityPrecipitation}
-                                    >{`Precipitation: ${city.precipitation}`}</div>
-                                    <div className={styles.cityHumidity}>{`Humidity: ${city.humidity}`}</div>
-                                    <div className={styles.cityWindSpeed}>{`Wind Speed: ${city.windSpeed}`}</div>
+                                    >{`Precipitation: ${city?.precipitation}`}</div>
+                                    <div className={styles.cityHumidity}>{`Humidity: ${city?.humidity}`}</div>
+                                    <div className={styles.cityWindSpeed}>{`Wind Speed: ${city?.windSpeed}`}</div>
                                 </div>
                             </div>
                             <News city={city.city} />

@@ -4,7 +4,7 @@ import RenderManager from '@/components/RenderManager';
 import { FaTemperatureHigh } from 'react-icons/fa';
 
 /**
- * @description - Heating component
+ * @description - Shows the current temperature of the house and the outside temperature
  * @returns {JSX.Element} - News component
  * @todo - Pending internalization
  */

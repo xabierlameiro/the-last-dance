@@ -9,7 +9,7 @@ type WeatherProps = {
 };
 
 /**
- * @description - News component
+ * @description - Show the latest news about the city
  * @param {city} string - City name
  * @returns {JSX.Element} - News component
  * @todo - Pending internalization
