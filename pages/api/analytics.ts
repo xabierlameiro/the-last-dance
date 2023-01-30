@@ -26,72 +26,73 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         },
         projectId: process.env.ANALYTICS_PROJECT_ID,
     });
-    if (!slug) {
-        const [response] = await analyticsDataClient.runReport({
-            property: `properties/348472560`,
-            dateRanges: [
-                {
-                    startDate: '2023-01-01',
-                    endDate: 'today',
-                },
-            ],
-            metrics: [
-                {
-                    name: 'screenPageViews',
-                },
-                {
-                    name: 'newUsers',
-                },
-            ],
-        });
+    try {
+        if (!slug) {
+            const [response] = await analyticsDataClient.runReport({
+                property: `properties/348472560`,
+                dateRanges: [
+                    {
+                        startDate: '2023-01-01',
+                        endDate: 'today',
+                    },
+                ],
+                metrics: [
+                    {
+                        name: 'screenPageViews',
+                    },
+                    {
+                        name: 'newUsers',
+                    },
+                ],
+            });
 
-        if (!response || !response.rows) {
-            res.status(500).json({ error: 'No data' });
-            return;
-        }
-        data = {
-            pageViews: response?.rows?.[0].metricValues?.[0].value,
-            newUsers: response?.rows?.[0].metricValues?.[1].value,
-        };
-    } else {
-        const [response] = await analyticsDataClient.runReport({
-            property: `properties/348472560`,
-            dateRanges: [
-                {
-                    startDate: '2023-01-01',
-                    endDate: 'today',
-                },
-            ],
+            if (!response || !response.rows) {
+                res.status(500).json({ error: 'No data' });
+                return;
+            }
+            data = {
+                pageViews: response?.rows?.[0].metricValues?.[0].value,
+                newUsers: response?.rows?.[0].metricValues?.[1].value,
+            };
+        } else {
+            const [response] = await analyticsDataClient.runReport({
+                property: `properties/348472560`,
+                dateRanges: [
+                    {
+                        startDate: '2023-01-01',
+                        endDate: 'today',
+                    },
+                ],
 
-            metrics: [
-                {
-                    name: 'screenPageViews',
-                },
-                {
-                    name: 'newUsers',
-                },
-            ],
-            dimensionFilter: {
-                filter: {
-                    fieldName: 'pagePath',
-                    stringFilter: {
-                        matchType: 'EXACT',
-                        value: slug.toString(),
+                metrics: [
+                    {
+                        name: 'screenPageViews',
+                    },
+                    {
+                        name: 'newUsers',
+                    },
+                ],
+                dimensionFilter: {
+                    filter: {
+                        fieldName: 'pagePath',
+                        stringFilter: {
+                            matchType: 'EXACT',
+                            value: slug.toString(),
+                        },
                     },
                 },
-            },
-        });
+            });
 
-        if (!response || !response.rows) {
-            res.status(500).json({ error: 'Error while parsing analytics data' });
-            return;
+            if (!response || !response.rows) {
+                res.status(500).json({ error: 'Error while parsing analytics data' });
+                return;
+            }
+            data = {
+                pageViews: response?.rows?.[0].metricValues?.[0].value,
+                newUsers: response?.rows?.[0].metricValues?.[1].value,
+            };
         }
-        data = {
-            pageViews: response?.rows?.[0].metricValues?.[0].value,
-            newUsers: response?.rows?.[0].metricValues?.[1].value,
-        };
-    }
-    try {
+
         res.status(200).json({
             pageViews: data.pageViews,
             newUsers: data.newUsers,
