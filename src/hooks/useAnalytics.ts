@@ -5,11 +5,16 @@ import { useRouter } from 'next/router';
 
 const initialValues = {};
 
-type Props = {
-    all?: boolean;
+type ReturnType = {
+    data: {
+        pageViews: number;
+        newUsers: number;
+    };
+    error: boolean;
+    loading: boolean;
 };
 
-const useAnalytics = ({ all }: Props) => {
+const useAnalytics = (all?: boolean): ReturnType => {
     const { asPath } = useRouter();
     const memoUrl = React.useMemo(() => {
         const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/analytics`);

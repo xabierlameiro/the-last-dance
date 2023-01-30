@@ -1,95 +1,47 @@
 import React from 'react';
 import styles from './viewCounter.module.css';
-import { FaSpinner } from 'react-icons/fa';
-import { RxCross2 } from 'react-icons/rx';
-import { useRouter } from 'next/router';
-import { BsBook, BsEye } from 'react-icons/bs';
+import useAnalytics from '@/hooks/useAnalytics';
+import RenderManager from '@/components/RenderManager';
 import { FiUsers } from 'react-icons/fi';
-import { clx } from '@/helpers';
-
-type StarCounterProps = {
-    all?: boolean;
-};
-
-type Props = StarCounterProps & {
-    children?: React.ReactNode;
-};
+import { BsBook, BsEye } from 'react-icons/bs';
 
 /**
- * @example
- *     <Container>
- *         <span> 1 </span>
- *     </Container>;
- *
- * @param {React.ReactNode} children
- * @param {boolean} all - If true, show different icon
+ * @description Component that shows the number of views of the current page or the totally of website, include de new users
+ * @param all If true, shows the total of views and new users
+ * @expample <ViewCounter all />
  * @returns {JSX.Element}
+ * @todo Pending internationalization
  */
-const Container = ({ children, all }: Props) => {
-    return (
-        <div className={clx(styles.views, all ? styles.all : '')}>
-            {all ? <BsEye /> : <BsBook />}
-            {children}
-        </div>
-    );
-};
-
-/**
- * @example
- *     <ViewCounter />;
- *     <ViewCounter all />;
- *
- * @param {boolean} all - If true, it will show the total views from GA
- * @returns {JSX.Element}
- */
-const ViewCounter = ({ all }: StarCounterProps) => {
-    const [views, setViews] = React.useState<
-        | {
-              pageViews: number;
-              newUsers: number;
-          }
-        | -1
-        | -2
-    >(-1);
-    const { asPath } = useRouter();
-
-    React.useEffect(() => {
-        (async () => {
-            try {
-                if (!all) setViews(-1);
-                const data = await fetch(`/api/analytics?slug=${all ? '' : asPath}`).then((res) => res.json());
-
-                setViews(data);
-            } catch (e) {
-                setViews(-2);
-            }
-        })();
-    }, [all, asPath]);
-
-    if (views === -2)
-        return (
-            <Container all={all}>
-                <RxCross2 className={styles.error} title="Error on endpoint" />
-            </Container>
-        );
-
-    if (views === -1)
-        return (
-            <Container all={all}>
-                <FaSpinner className={styles.spinner} title="Loading views" />
-            </Container>
-        );
+const ViewCounter = ({ all }: { all?: boolean }) => {
+    const { data, error, loading } = useAnalytics(all);
 
     return (
-        <Container all={all}>
-            <span title="Nº of page views">{views.pageViews}</span>
+        <div className={styles.views}>
+            <span className={styles.views} title="Nº of new users">
+                {all ? <BsEye /> : <BsBook />}
+                <RenderManager
+                    loading={all ? !data : loading}
+                    error={error}
+                    errorTitle="Error loading views"
+                    loadingTitle="Loading views"
+                >
+                    <span title="Nº of page views">{data.pageViews}</span>
+                </RenderManager>
+            </span>
             {all && (
                 <span className={styles.users} title="Nº of new users">
                     <FiUsers />
-                    {views.newUsers}
+                    <RenderManager
+                        loading={!data}
+                        error={error}
+                        errorTitle="Error loading views"
+                        loadingTitle="Loading views"
+                    >
+                        {data.newUsers}
+                    </RenderManager>
                 </span>
             )}
-        </Container>
+        </div>
     );
 };
 
