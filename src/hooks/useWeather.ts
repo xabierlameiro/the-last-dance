@@ -10,6 +10,7 @@ const useWeather = (cities: string[]) => {
     }, [cities]);
 
     const { data, error, isLoading } = useSWR(url, fetcher, {
+        keepPreviousData: true,
         fallbackData: [
             {
                 city: '',
