@@ -29,25 +29,26 @@ const Weather = ({ cities, open }: { cities: string[]; open?: boolean }) => {
         <Container open={open}>
             <RenderManager loading={!data} error={error} errorTitle="" loadingTitle="Loading weather...">
                 <>
-                    {data.map((city: any, index: any) => (
-                        <div className={styles.city} key={`${city?.city}+${index}`}>
-                            <div className={styles.weather}>
-                                <div className={styles.cityName}>{city?.city?.replace(/\+/g, ' ')}</div>
-                                <div className={styles.cityGrade}>{`${city?.grades} ºC | ºF`}</div>
-                                {city?.imageUrl && (
-                                    <Img src={`https:${city?.imageUrl}`} width={70} height={70} alt={city?.name} />
-                                )}
-                                <div className={styles.info}>
-                                    <div
-                                        className={styles.cityPrecipitation}
-                                    >{`Precipitation: ${city?.precipitation}`}</div>
-                                    <div className={styles.cityHumidity}>{`Humidity: ${city?.humidity}`}</div>
-                                    <div className={styles.cityWindSpeed}>{`Wind Speed: ${city?.windSpeed}`}</div>
+                    {data &&
+                        data?.map((city: any, index: any) => (
+                            <div className={styles.city} key={`${city?.city}+${index}`}>
+                                <div className={styles.weather}>
+                                    <div className={styles.cityName}>{city?.city?.replace(/\+/g, ' ')}</div>
+                                    <div className={styles.cityGrade}>{`${city?.grades} ºC | ºF`}</div>
+                                    {city?.imageUrl && (
+                                        <Img src={`https:${city?.imageUrl}`} width={70} height={70} alt={city?.name} />
+                                    )}
+                                    <div className={styles.info}>
+                                        <div
+                                            className={styles.cityPrecipitation}
+                                        >{`Precipitation: ${city?.precipitation}`}</div>
+                                        <div className={styles.cityHumidity}>{`Humidity: ${city?.humidity}`}</div>
+                                        <div className={styles.cityWindSpeed}>{`Wind Speed: ${city?.windSpeed}`}</div>
+                                    </div>
                                 </div>
+                                <News city={city.city} />
                             </div>
-                            <News city={city.city} />
-                        </div>
-                    ))}
+                        ))}
                 </>
             </RenderManager>
         </Container>
