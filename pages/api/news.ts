@@ -61,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     const data = await getWeatherData(city);
 
-    if (!data) {
+    if (!data || !data.city || !data.news) {
         res.status(500).json({ error: 'Error getting weather data' });
         return;
     }
