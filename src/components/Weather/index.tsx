@@ -23,11 +23,11 @@ const Container = ({ children, open }: { children: React.ReactNode; open?: boole
  * @todo - Pending internalization
  */
 const Weather = ({ cities, open }: { cities: string[]; open?: boolean }) => {
-    const { data, error, loading } = useWeather(cities);
+    const { data, error } = useWeather(cities);
 
     return (
         <Container open={open}>
-            <RenderManager loading={loading} error={error} errorTitle="" loadingTitle="Loading weather...">
+            <RenderManager loading={!data} error={error} errorTitle="" loadingTitle="Loading weather...">
                 <>
                     {data.map(
                         (

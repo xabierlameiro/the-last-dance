@@ -13,7 +13,7 @@ const useWeather = (cities: string[]) => {
         keepPreviousData: true,
         fallbackData: [
             {
-                city: '',
+                city: 'moraña',
                 name: '',
                 precipitation: 0,
                 humidity: 0,

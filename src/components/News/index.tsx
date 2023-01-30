@@ -18,7 +18,7 @@ const News = ({ city }: WeatherProps) => {
     const ref = React.useRef<HTMLDivElement>(null);
     const handleMouseEnter = React.useRef<() => void>();
     const handleMouseLeave = React.useRef<() => void>();
-    const { data, error, loading } = useNews(city);
+    const { data, error } = useNews(city);
 
     React.useEffect(() => {
         let interval = setInverval(ref);
@@ -35,7 +35,7 @@ const News = ({ city }: WeatherProps) => {
     }, []);
 
     return (
-        <RenderManager error={error} loading={loading} errorTitle="News" loadingTitle="News">
+        <RenderManager error={error} loading={!data} errorTitle="News" loadingTitle="News">
             <div
                 className={styles.container}
                 ref={ref}
