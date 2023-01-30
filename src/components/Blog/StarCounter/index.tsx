@@ -1,27 +1,20 @@
 import React from 'react';
 import styles from './starCounter.module.css';
 import { AiOutlineStar } from 'react-icons/ai';
-import { FaSpinner } from 'react-icons/fa';
-import { RxCross2 } from 'react-icons/rx';
-
-type Props = {
-    children?: React.ReactNode;
-    dataTetsId: string;
-};
+import useGithubStars from '@/hooks/useGithubStars';
+import RenderManager from '@/components/RenderManager';
 
 /**
- * @example
- *     <Container>
- *         <span> 1 </span>
- *     </Container>;
- *
- * @param {React.ReactNode} children - The number of stars
- * @returns {JSX.Element}
+ * @description Component that shows the number of stars of the repository
+ * @returns {JSX.Element} Component
+ * @exapmle <StarCounter />
+ * @todo Pending internationalization
  */
-const Container = ({ children, dataTetsId }: Props) => {
+const StarCounter = () => {
+    const { data, error, loading } = useGithubStars();
+
     return (
         <a
-            data-testid={dataTetsId}
             className={styles.stars}
             href="https://github.com/xabierlameiro/the-last-dance"
             title="Go to the repository to give my star"
@@ -29,49 +22,15 @@ const Container = ({ children, dataTetsId }: Props) => {
             rel="noopener noreferrer"
         >
             <AiOutlineStar />
-            {children}
+            <RenderManager
+                loading={loading}
+                error={error}
+                errorTitle="Error getting stars"
+                loadingTitle="Loading stars"
+            >
+                <span data-testId="star-counter">{data}</span>
+            </RenderManager>
         </a>
-    );
-};
-
-/**
- * @example
- *     <StarCounter />;
- *
- * @returns {JSX.Element}
- */
-const StarCounter = () => {
-    const [stars, setStars] = React.useState(0);
-
-    React.useEffect(() => {
-        (async () => {
-            try {
-                const stars = await fetch('/api/github').then((res) => res.json());
-                setStars(stars);
-            } catch (e) {
-                setStars(-1);
-            }
-        })();
-    }, []);
-
-    if (stars === -1)
-        return (
-            <Container dataTetsId="error">
-                <RxCross2 className={styles.error} title="Error endpoint" />
-            </Container>
-        );
-
-    if (stars === 0)
-        return (
-            <Container dataTetsId="loading">
-                <FaSpinner className={styles.spinner} title="Loading stars" />
-            </Container>
-        );
-
-    return (
-        <Container dataTetsId="star-counter">
-            <span>{stars}</span>
-        </Container>
     );
 };
 

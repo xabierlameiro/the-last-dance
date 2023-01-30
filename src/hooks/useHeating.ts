@@ -1,6 +1,6 @@
 import useSWR from 'swr';
+import { fetcher } from '@/helpers';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/heating`);
 
 const useHeating = (): {

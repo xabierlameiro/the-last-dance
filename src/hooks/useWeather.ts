@@ -1,7 +1,6 @@
 import useSWR from 'swr';
 import React from 'react';
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { fetcher } from '@/helpers';
 
 const useWeather = (cities: string[]) => {
     const url = React.useMemo(() => {

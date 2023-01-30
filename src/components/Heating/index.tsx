@@ -1,6 +1,7 @@
 import useHeating from '@/hooks/useHeating';
 import styles from './heating.module.css';
 import RenderManager from '@/components/RenderManager';
+import { FaTemperatureHigh } from 'react-icons/fa';
 
 /**
  * @description - Heating component
@@ -11,17 +12,18 @@ const Heating = () => {
     const { data, error, loading } = useHeating();
 
     return (
-        <RenderManager
-            loading={loading}
-            error={error}
-            loadingTitle="Loading heating data"
-            errorTitle="Error loading heating data"
-        >
-            <div className={styles.container}>
-                <div title="Actual temperature outside the house">{`${data.outsideTemp} º`}</div>|
-                <div title="Indoor temperature of the dwelling, information collected from the thermostat">{`${data.zoneMeasuredTemp} º`}</div>
-            </div>
-        </RenderManager>
+        <div className={styles.container}>
+            <FaTemperatureHigh className={styles.icon} />
+            <RenderManager
+                loading={loading}
+                error={error}
+                loadingTitle="Loading heating data"
+                errorTitle="Error loading heating data"
+            >
+                <div title="Actual temperature outside the house">{`${data.outsideTemp}`}</div>|
+                <div title="Indoor temperature of the dwelling, information collected from the thermostat">{`${data.zoneMeasuredTemp}`}</div>
+            </RenderManager>
+        </div>
     );
 };
 

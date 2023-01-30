@@ -30,6 +30,7 @@ export default async function handler(
         const dom = new JSDOM(raw);
         const numPagesString = dom.window.document.getElementById('result-stats')?.textContent;
         const num = parseInt(numPagesString?.split(' ')[1].replace(/,/g, '') || '0', 10);
+
         res.status(200).json({ num });
     } catch (err: Error | unknown) {
         if (err instanceof Error) {

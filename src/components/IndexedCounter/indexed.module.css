@@ -9,26 +9,3 @@
 .container svg.xrp {
     width: 23px;
 }
-
-svg.error {
-    width: 16px;
-    height: 16px;
-    color: rgba(var(--red-color));
-    display: flex;
-    align-items: center;
-}
-
-.spinner {
-    animation: spin 1s linear infinite;
-    width: 16px;
-    height: 16px;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}

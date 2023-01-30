@@ -101,3 +101,12 @@ export const setInverval = (ref: React.RefObject<HTMLDivElement>) => {
 
     return interval;
 };
+
+/**
+ * @description Utility function to use SWR with fetcher.
+ * @example const { data, error } = useSWR('/api/weather', fetcher);
+ * @param {string} url
+ * @returns {Promise<any>}
+ * @see https://swr.vercel.app/docs/data-fetching
+ */
+export const fetcher = (url: string) => fetch(url).then((res) => res.json());

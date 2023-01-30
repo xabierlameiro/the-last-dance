@@ -23,10 +23,10 @@ type Props = {
  */
 const RenderManager = ({ error, loading, errorTitle, loadingTitle, children }: Props) => {
     if (error) {
-        return <RxCross2 className={styles.error} title={errorTitle} />;
+        return <RxCross2 className={styles.error} title={errorTitle} data-testid="error-render" />;
     }
     if (loading) {
-        return <FaSpinner className={styles.spinner} title={loadingTitle} />;
+        return <FaSpinner className={styles.spinner} title={loadingTitle} data-testid="loading-render" />;
     }
     return <>{children}</>;
 };
