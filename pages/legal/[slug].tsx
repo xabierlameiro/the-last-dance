@@ -18,14 +18,25 @@ import { useIntl } from 'react-intl';
 import { useDialog } from '@/context/dialog';
 import SidesShift from '@/components/SidesShift';
 import useSideShift from '@/hooks/useSideShift';
+import { MDXRemoteSerializeResult } from 'next-mdx-remote';
+
 import { clx } from '@/helpers';
 
 const LEGAL_PATH = path.join(process.cwd(), 'data/legal');
 
 type Props = {
-    // TODO: fix type
-    source: any;
-    meta: any;
+    source: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, string>>;
+    meta?: {
+        noindex?: boolean;
+        title: string;
+        author?: string;
+        description?: string;
+        image?: string;
+        category?: string;
+        alternate?: Array<{ lang: string; url: string }>;
+        slug?: string;
+        url?: string;
+    };
 };
 
 const Legal = ({ source, meta }: Props) => {

@@ -3,6 +3,7 @@ import styles from './news.module.css';
 import useNews from '@/hooks/useNews';
 import RenderManager from '@/components/RenderManager';
 import { setInverval } from '@/helpers';
+import { useIntl } from 'react-intl';
 
 type WeatherProps = {
     city: string;
@@ -12,13 +13,13 @@ type WeatherProps = {
  * @description - Show the latest news about the city
  * @param {city} string - City name
  * @returns {JSX.Element} - News component
- * @todo - Pending internalization
  */
 const News = ({ city }: WeatherProps) => {
     const ref = React.useRef<HTMLDivElement>(null);
     const handleMouseEnter = React.useRef<() => void>();
     const handleMouseLeave = React.useRef<() => void>();
     const { data, error } = useNews(city);
+    const { formatMessage: f } = useIntl();
 
     React.useEffect(() => {
         let interval = setInverval(ref);
@@ -35,10 +36,15 @@ const News = ({ city }: WeatherProps) => {
     }, []);
 
     return (
-        <RenderManager error={error} loading={!data} errorTitle="News" loadingTitle="News">
+        <RenderManager
+            error={error}
+            loading={!data}
+            errorTitle={f({ id: 'news.error' })}
+            loadingTitle={f({ id: 'news.loading' })}
+        >
             <div
-                className={styles.container}
                 ref={ref}
+                className={styles.container}
                 onMouseEnter={handleMouseEnter.current}
                 onMouseLeave={handleMouseLeave.current}
             >

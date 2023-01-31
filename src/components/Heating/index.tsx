@@ -1,16 +1,17 @@
 import useHeating from '@/hooks/useHeating';
 import styles from './heating.module.css';
 import RenderManager from '@/components/RenderManager';
-import { FaTemperatureHigh } from 'react-icons/fa';
 import Tooltip from '@/components/Tooltip';
+import { FaTemperatureHigh } from 'react-icons/fa';
+import { useIntl } from 'react-intl';
 
 /**
  * @description - Shows the current temperature of the house and the outside temperature
  * @returns {JSX.Element} - News component
- * @todo - Pending internalization
  */
 const Heating = () => {
     const { data, error, loading } = useHeating();
+    const { formatMessage: f } = useIntl();
 
     return (
         <Tooltip>
@@ -18,16 +19,21 @@ const Heating = () => {
                 <div className={styles.container}>
                     <FaTemperatureHigh className={styles.icon} />
                     <RenderManager
-                        loading={loading}
                         error={error}
-                        loadingTitle="Loading heating data"
-                        errorTitle="Error loading heating data"
+                        loading={loading}
+                        errorTitle={f({ id: 'heating.error' })}
+                        loadingTitle={f({ id: 'heating.loading' })}
                     >
                         <div>{data.outsideTemp ?? 0}</div>|<div>{data.zoneMeasuredTemp ?? 0}</div>
                     </RenderManager>
                 </div>
             </Tooltip.Trigger>
-            <Tooltip.Content>Outside and inside temperature of my house</Tooltip.Content>
+            <Tooltip.Content>
+                {f(
+                    { id: 'heating.tooltip' },
+                    { outsideTemp: data.outsideTemp, zoneMeasuredTemp: data.zoneMeasuredTemp }
+                )}
+            </Tooltip.Content>
         </Tooltip>
     );
 };

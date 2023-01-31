@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './renderManager.module.css';
 import { FaSpinner } from 'react-icons/fa';
 import { RxCross2 } from 'react-icons/rx';
+import Tooltip from '@/components/Tooltip';
 
 type Props = {
     error: boolean;
@@ -23,10 +24,24 @@ type Props = {
  */
 const RenderManager = ({ error, loading, errorTitle, loadingTitle, children }: Props) => {
     if (error) {
-        return <RxCross2 className={styles.error} title={errorTitle} data-testid="error-render" />;
+        return (
+            <Tooltip>
+                <Tooltip.Trigger>
+                    <RxCross2 className={styles.error} data-testid="error-render" />
+                </Tooltip.Trigger>
+                <Tooltip.Content>{errorTitle}</Tooltip.Content>
+            </Tooltip>
+        );
     }
     if (loading) {
-        return <FaSpinner className={styles.spinner} title={loadingTitle} data-testid="loading-render" />;
+        return (
+            <Tooltip>
+                <Tooltip.Trigger>
+                    <FaSpinner className={styles.spinner} data-testid="loading-render" />
+                </Tooltip.Trigger>
+                <Tooltip.Content>{loadingTitle}</Tooltip.Content>
+            </Tooltip>
+        );
     }
     return <>{children}</>;
 };

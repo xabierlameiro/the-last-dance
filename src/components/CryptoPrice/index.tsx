@@ -3,17 +3,17 @@ import { TbCurrencyRipple } from 'react-icons/tb';
 import useXRP from '@/hooks/useXRP';
 import RenderManager from '@/components/RenderManager';
 import styles from './crypto.module.css';
-import { FormattedNumber } from 'react-intl';
+import { FormattedNumber, useIntl } from 'react-intl';
 import Tooltip from '@/components/Tooltip';
 
 /**
  * @description Show the current price of XRP in EUR
  * @returns {JSX.Element}
  * @example <CryptoPrice />
- * @todo Pending internationalization
  */
 const CryptoPrice = () => {
     const { data, error, loading } = useXRP();
+    const { formatMessage: f } = useIntl();
 
     return (
         <Tooltip>
@@ -23,8 +23,8 @@ const CryptoPrice = () => {
                     <RenderManager
                         loading={loading}
                         error={error}
-                        errorTitle="Error loading XRP price"
-                        loadingTitle="Loading XRP price"
+                        errorTitle={f({ id: 'cryptoPrice.error' })}
+                        loadingTitle={f({ id: 'cryptoPrice.loading' })}
                     >
                         <FormattedNumber
                             value={!isNaN(data.price) ? data.price : 0}
@@ -36,7 +36,14 @@ const CryptoPrice = () => {
                     </RenderManager>
                 </div>
             </Tooltip.Trigger>
-            <Tooltip.Content>{`Ripple coin price today, todayPorcentage ${data.todayPorcentage}`}</Tooltip.Content>
+            <Tooltip.Content>
+                {f(
+                    { id: 'cryptoPrice.tooltip' },
+                    {
+                        todayPorcentage: data.todayPorcentage,
+                    }
+                )}
+            </Tooltip.Content>
         </Tooltip>
     );
 };

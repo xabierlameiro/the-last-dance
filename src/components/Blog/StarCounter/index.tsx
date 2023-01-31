@@ -1,18 +1,19 @@
 import React from 'react';
-import styles from './starCounter.module.css';
 import { AiOutlineStar } from 'react-icons/ai';
+import { useIntl } from 'react-intl';
 import useGithubStars from '@/hooks/useGithubStars';
 import RenderManager from '@/components/RenderManager';
 import Tooltip from '@/components/Tooltip';
+import styles from './starCounter.module.css';
 
 /**
  * @description Component that shows the number of stars of the repository
  * @returns {JSX.Element} Component
  * @exapmle <StarCounter />
- * @todo Pending internationalization
  */
 const StarCounter = () => {
     const { data, error, loading } = useGithubStars();
+    const { formatMessage: f } = useIntl();
 
     return (
         <Tooltip>
@@ -27,14 +28,14 @@ const StarCounter = () => {
                     <RenderManager
                         loading={loading}
                         error={error}
-                        errorTitle="Error getting stars"
-                        loadingTitle="Loading stars"
+                        errorTitle={f({ id: 'starCounter.error' })}
+                        loadingTitle={f({ id: 'starCounter.loading' })}
                     >
                         <span data-testid="star-counter">{data}</span>
                     </RenderManager>
                 </a>
             </Tooltip.Trigger>
-            <Tooltip.Content>Come on, give me a star!</Tooltip.Content>
+            <Tooltip.Content>{f({ id: 'starCounter.tooltip' })}</Tooltip.Content>
         </Tooltip>
     );
 };

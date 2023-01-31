@@ -4,6 +4,7 @@ import useAnalytics from '@/hooks/useAnalytics';
 import RenderManager from '@/components/RenderManager';
 import { FiUsers } from 'react-icons/fi';
 import { BsBook, BsEye } from 'react-icons/bs';
+import { useIntl } from 'react-intl';
 import Tooltip from '@/components/Tooltip';
 
 /**
@@ -11,10 +12,10 @@ import Tooltip from '@/components/Tooltip';
  * @param all If true, shows the total of views and new users
  * @expample <ViewCounter all />
  * @returns {JSX.Element}
- * @todo Pending internationalization
  */
 const ViewCounter = ({ all }: { all?: boolean }) => {
     const { data, error, loading } = useAnalytics(all);
+    const { formatMessage: f } = useIntl();
 
     return (
         <div className={styles.views}>
@@ -25,15 +26,15 @@ const ViewCounter = ({ all }: { all?: boolean }) => {
                         <RenderManager
                             loading={all ? !data : loading}
                             error={error}
-                            errorTitle="Error loading views"
-                            loadingTitle="Loading views"
+                            errorTitle={f({ id: 'viewCounter.error' })}
+                            loadingTitle={f({ id: 'viewCounter.loading' })}
                         >
                             <span>{data.pageViews}</span>
                         </RenderManager>
                     </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content>
-                    {all ? 'Number of total website visits from GA' : 'Number of views of this post from GA'}
+                    {all ? f({ id: 'viewCounter.tooltipAll' }) : f({ id: 'viewCounter.tooltipPage' })}
                 </Tooltip.Content>
             </Tooltip>
             {all && (
@@ -44,14 +45,14 @@ const ViewCounter = ({ all }: { all?: boolean }) => {
                             <RenderManager
                                 loading={!data}
                                 error={error}
-                                errorTitle="Error loading views"
-                                loadingTitle="Loading views"
+                                errorTitle={f({ id: 'viewCounter.users.error' })}
+                                loadingTitle={f({ id: 'viewCounter.users.loading' })}
                             >
                                 {data.newUsers}
                             </RenderManager>
                         </span>
                     </Tooltip.Trigger>
-                    <Tooltip.Content>Number of new users from GA</Tooltip.Content>
+                    <Tooltip.Content>{f({ id: 'viewCounter.users.tooltip' })}</Tooltip.Content>
                 </Tooltip>
             )}
         </div>

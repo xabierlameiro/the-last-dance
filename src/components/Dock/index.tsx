@@ -8,10 +8,8 @@ import styles from './dock.module.css';
 import { clx } from '@/helpers';
 
 /**
- * @example
- *     <Dock />;
- *
- * @returns {JSX.Element}
+ * @description This component is the dock that appears on the bottom of the screen
+ * @returns JSX.Element
  */
 const Dock = () => {
     const { pathname, locale } = useRouter();
@@ -23,10 +21,11 @@ const Dock = () => {
             <nav className={styles.dock} data-testid="dock">
                 <ul>
                     {menu.map(({ link, img, alt }, index) => {
-                        // TODO : Refactor this
                         const path = pathname.split('/')[1];
-                        /* @ts-ignore */
-                        const term = typeof link === 'object' ? link[locale]?.split('/')[1] : link.split('/')[1];
+                        const term =
+                            typeof link === 'object'
+                                ? link[locale as keyof typeof link]?.split('/')[1]
+                                : link.split('/')[1];
                         const check = term ? path.includes(term) : false;
                         return (
                             <li
@@ -34,8 +33,7 @@ const Dock = () => {
                                 onClick={clickHandler}
                                 className={clx(pathname === link || check ? styles.selected : '')}
                             >
-                                {/* @ts-ignore */}
-                                <Link href={link?.[locale] ?? link} title={alt}>
+                                <Link href={link?.[locale as keyof typeof link] ?? link} title={alt}>
                                     <Icon src={img} alt={alt} />
                                 </Link>
                             </li>
