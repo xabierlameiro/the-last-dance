@@ -18,7 +18,7 @@ const IndexedCounter = () => {
     return (
         <Tooltip>
             <Tooltip.Trigger>
-                <div className={styles.container}>
+                <div className={styles.container} data-testid="indexed-counter">
                     <GiCheckboxTree className={styles.xrp} />
                     <RenderManager
                         error={error}

@@ -17,7 +17,13 @@ type Props = {
  * @returns {JSX.Element}
  */
 const ShidesShift = ({ handleClick, leftPosition, className }: Props) => {
-    return <TfiMinus className={clx(styles.swap, className, leftPosition ? styles.left : '')} onClick={handleClick} />;
+    return (
+        <TfiMinus
+            data-testid="sides-shift"
+            className={clx(styles.swap, className, leftPosition ? styles.left : '')}
+            onClick={handleClick}
+        />
+    );
 };
 
 export default ShidesShift;

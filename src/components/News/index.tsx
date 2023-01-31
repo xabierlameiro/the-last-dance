@@ -44,6 +44,7 @@ const News = ({ city }: WeatherProps) => {
         >
             <div
                 ref={ref}
+                data-testid="news"
                 className={styles.container}
                 onMouseEnter={handleMouseEnter.current}
                 onMouseLeave={handleMouseLeave.current}

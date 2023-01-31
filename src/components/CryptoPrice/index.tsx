@@ -3,7 +3,7 @@ import { TbCurrencyRipple } from 'react-icons/tb';
 import useXRP from '@/hooks/useXRP';
 import RenderManager from '@/components/RenderManager';
 import styles from './crypto.module.css';
-import { FormattedNumber, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import Tooltip from '@/components/Tooltip';
 
 /**
@@ -13,12 +13,12 @@ import Tooltip from '@/components/Tooltip';
  */
 const CryptoPrice = () => {
     const { data, error, loading } = useXRP();
-    const { formatMessage: f } = useIntl();
+    const { formatMessage: f, formatNumber } = useIntl();
 
     return (
         <Tooltip>
             <Tooltip.Trigger>
-                <div className={styles.container}>
+                <div className={styles.container} data-testid="crypto-price">
                     <TbCurrencyRipple className={styles.xrp} />
                     <RenderManager
                         loading={loading}
@@ -26,13 +26,12 @@ const CryptoPrice = () => {
                         errorTitle={f({ id: 'cryptoPrice.error' })}
                         loadingTitle={f({ id: 'cryptoPrice.loading' })}
                     >
-                        <FormattedNumber
-                            value={!isNaN(data.price) ? data.price : 0}
-                            style="currency"
-                            currency="EUR"
-                            minimumFractionDigits={2}
-                            maximumFractionDigits={2}
-                        />
+                        {formatNumber(!isNaN(data.price) ? data.price : 0, {
+                            style: 'currency',
+                            currency: 'EUR',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        })}
                     </RenderManager>
                 </div>
             </Tooltip.Trigger>

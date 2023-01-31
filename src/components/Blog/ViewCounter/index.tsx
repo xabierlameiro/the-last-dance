@@ -18,10 +18,10 @@ const ViewCounter = ({ all }: { all?: boolean }) => {
     const { formatMessage: f } = useIntl();
 
     return (
-        <div className={styles.views}>
+        <div className={styles.views} data-testid="view-counter">
             <Tooltip>
                 <Tooltip.Trigger>
-                    <span className={styles.views}>
+                    <span className={styles.views} data-testid="views">
                         {all ? <BsEye /> : <BsBook />}
                         <RenderManager
                             loading={all ? !data : loading}
@@ -40,7 +40,7 @@ const ViewCounter = ({ all }: { all?: boolean }) => {
             {all && (
                 <Tooltip>
                     <Tooltip.Trigger>
-                        <span className={styles.users}>
+                        <span className={styles.users} data-testid="new-users">
                             <FiUsers />
                             <RenderManager
                                 loading={!data}

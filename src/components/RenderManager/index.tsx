@@ -1,14 +1,13 @@
 import React from 'react';
-import styles from './renderManager.module.css';
 import Loading from './Loading';
-import { RxCross2 } from 'react-icons/rx';
+import Error from './Error';
 import Tooltip from '@/components/Tooltip';
 
 type Props = {
     error: boolean;
     loading: boolean;
-    errorTitle: string;
-    loadingTitle: string;
+    errorTitle?: string;
+    loadingTitle?: string;
     children: React.ReactNode;
 };
 
@@ -27,7 +26,7 @@ const RenderManager = ({ error, loading, errorTitle, loadingTitle, children }: P
         return (
             <Tooltip>
                 <Tooltip.Trigger>
-                    <RxCross2 className={styles.error} data-testid="error-render" />
+                    <Error />
                 </Tooltip.Trigger>
                 <Tooltip.Content>{errorTitle}</Tooltip.Content>
             </Tooltip>

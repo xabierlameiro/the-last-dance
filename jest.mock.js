@@ -4,6 +4,7 @@ jest.mock('react-intl', () => ({
     useIntl: () => ({
         formatMessage: (object) => object.id,
         formatDate: (date) => date,
+        formatNumber: (number) => number,
     }),
 }));
 
@@ -38,3 +39,11 @@ global.fetch = jest.fn(() =>
         json: () => Promise.resolve({}),
     })
 );
+
+window.ResizeObserver =
+    window.ResizeObserver ||
+    jest.fn().mockImplementation(() => ({
+        disconnect: jest.fn(),
+        observe: jest.fn(),
+        unobserve: jest.fn(),
+    }));

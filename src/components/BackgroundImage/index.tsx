@@ -16,6 +16,7 @@ const BackgroundImage = () => {
             <Image
                 fill
                 loading="eager"
+                data-testid="background-image"
                 sizes="100vw"
                 quality={100}
                 placeholder="blur"

@@ -16,7 +16,7 @@ const Heating = () => {
     return (
         <Tooltip>
             <Tooltip.Trigger>
-                <div className={styles.container}>
+                <div className={styles.container} data-testid="heating">
                     <FaTemperatureHigh className={styles.icon} />
                     <RenderManager
                         error={error}

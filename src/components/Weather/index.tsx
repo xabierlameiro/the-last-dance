@@ -10,7 +10,7 @@ import { useIntl } from 'react-intl';
 
 const Container = ({ children, open }: { children: React.ReactNode; open?: boolean }) => {
     return (
-        <div className={clx(styles.container, open ? styles.open : styles.close)}>
+        <div className={clx(styles.container, open ? styles.open : styles.close)} data-testid="weather">
             <div className={styles.cities}>{children}</div>
         </div>
     );
