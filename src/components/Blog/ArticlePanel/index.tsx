@@ -46,8 +46,6 @@ const TimeRead = ({ readTime }: Props) => {
  *
  * @param {string} readTime - The read time of the article
  * @returns {JSX.Element}
- * @see {@link https://storybook.xabierlameiro.com/?path=/story/blog-articlepanel--primary Storybook}
- * @see {@link https://xabierlameiro.com/coverage/Blog/ArticlePanel/index.tsx.html Test Coverage}
  */
 const ArticlePanel = ({ readTime }: Props) => {
     return (
