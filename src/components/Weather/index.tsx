@@ -20,7 +20,7 @@ const Container = ({ children, open }: { children: React.ReactNode; open?: boole
  * @description -  Show the weather of array of cities and the last news of each city
  * @param {string[]} cities - Cities to get weather
  * @param {boolean} open - Open or close the component
- * @param {() => void} handleClose - Function to close the Weather widget
+ * @param {Function} handleClose - Function to close the component
  * @returns {JSX.Element} - News component
  * @todo - Pending internalization
  */
