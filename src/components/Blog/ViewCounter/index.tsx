@@ -28,7 +28,7 @@ const ViewCounter = ({ all }: { all?: boolean }) => {
                             errorTitle="Error loading views"
                             loadingTitle="Loading views"
                         >
-                            <span title="Nº of page views">{data.pageViews}</span>
+                            <span>{data.pageViews}</span>
                         </RenderManager>
                     </span>
                 </Tooltip.Trigger>
