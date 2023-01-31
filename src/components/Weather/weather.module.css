@@ -64,3 +64,20 @@
 .close {
     transform: translateX(450px);
 }
+
+.iconClose {
+    display: none;
+    position: absolute;
+    cursor: pointer;
+    height: 20px;
+    width: 20px;
+    left: -7px;
+    top: -7px;
+    background-color: lightgrey;
+    clip-path: circle(50%);
+    transition: all 0.2s ease-in;
+}
+
+.open:hover .cities .iconClose {
+    display: block;
+}

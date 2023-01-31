@@ -20,6 +20,7 @@ type Props = {
     children?: ReactNode;
 };
 
+// TODO: Move to component and internationalize
 const DateAndHour = ({ children }: Props) => {
     const { locale } = useRouter();
     const [date, setDate] = React.useState(new Date());
@@ -27,28 +28,34 @@ const DateAndHour = ({ children }: Props) => {
     const dayNumber = date.toLocaleDateString(locale, { day: 'numeric' });
     const month = date.toLocaleDateString(locale, { month: 'short' });
     const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
-    const [open, setOpen] = React.useState(false);
+    const [openWeatherWidget, setOpenWeatherWidget] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         const interval = setInterval(() => {
             setDate(new Date());
-        }, 60000);
+        }, 60000); // This is a minute
         return () => clearInterval(interval);
     }, []);
 
     return (
-        <Tooltip>
-            <Tooltip.Trigger>
-                <div className={styles.dateAndHour} onClick={() => setOpen(!open)}>
-                    <span suppressHydrationWarning>{day}</span>
-                    <span suppressHydrationWarning>{dayNumber}</span>
-                    <span suppressHydrationWarning>{month}</span>
-                    <span suppressHydrationWarning>{hour}</span>
-                    {children && React.cloneElement(children as React.ReactElement, { open })}
-                </div>
-            </Tooltip.Trigger>
-            <Tooltip.Content>Click above for weather and news updates</Tooltip.Content>
-        </Tooltip>
+        <div>
+            <Tooltip>
+                <Tooltip.Trigger>
+                    <div className={styles.dateAndHour} onClick={() => setOpenWeatherWidget(true)}>
+                        <span suppressHydrationWarning>{day}</span>
+                        <span suppressHydrationWarning>{dayNumber}</span>
+                        <span suppressHydrationWarning>{month}</span>
+                        <span suppressHydrationWarning>{hour}</span>
+                    </div>{' '}
+                </Tooltip.Trigger>
+                <Tooltip.Content>Click above for weather and news updates</Tooltip.Content>
+            </Tooltip>
+            {children &&
+                React.cloneElement(children as React.ReactElement, {
+                    open: openWeatherWidget,
+                    handleClose: () => setOpenWeatherWidget(false),
+                })}
+        </div>
     );
 };
 

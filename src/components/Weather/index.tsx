@@ -4,6 +4,7 @@ import Img from 'next/image';
 import News from '@/components/News';
 import useWeather from '@/hooks/useWeather';
 import RenderManager from '@/components/RenderManager';
+import { GrFormClose } from 'react-icons/gr';
 import { clx } from '@/helpers';
 
 const Container = ({ children, open }: { children: React.ReactNode; open?: boolean }) => {
@@ -19,14 +20,16 @@ const Container = ({ children, open }: { children: React.ReactNode; open?: boole
  * @description -  Show the weather of array of cities and the last news of each city
  * @param {string[]} cities - Cities to get weather
  * @param {boolean} open - Open or close the component
+ * @param {() => void} handleClose - Function to close the Weather widget
  * @returns {JSX.Element} - News component
  * @todo - Pending internalization
  */
-const Weather = ({ cities, open }: { cities: string[]; open?: boolean }) => {
+const Weather = ({ cities, open, handleClose }: { cities: string[]; open?: boolean; handleClose?: () => void }) => {
     const { data, error } = useWeather(cities);
 
     return (
         <Container open={open}>
+            {handleClose && <GrFormClose className={styles.iconClose} onClick={handleClose} />}
             <RenderManager loading={!data} error={error} errorTitle="" loadingTitle="Loading weather...">
                 <>
                     {data &&
@@ -46,7 +49,7 @@ const Weather = ({ cities, open }: { cities: string[]; open?: boolean }) => {
                                         <div className={styles.cityWindSpeed}>{`Wind Speed: ${city?.windSpeed}`}</div>
                                     </div>
                                 </div>
-                                <News city={city.city} />
+                                {city?.city && <News city={city.city} />}
                             </div>
                         ))}
                 </>
