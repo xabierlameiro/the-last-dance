@@ -91,7 +91,7 @@
 
 @media screen and (max-width: 900px) {
     .body {
-        padding: 0px 15px 20px 10px;
+        padding: 0px 15px 60px 10px;
         width: calc(100vw - 15px);
     }
     .navListContainer {

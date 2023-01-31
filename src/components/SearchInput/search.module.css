@@ -10,6 +10,7 @@
     background-position: 8px;
     opacity: 0.5;
     background-repeat: no-repeat;
+    background-color: rgba(var(---white-color));
     background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg');
 }
 
