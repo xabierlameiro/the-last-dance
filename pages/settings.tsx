@@ -3,17 +3,14 @@ import styles from '@/styles/settings.module.css';
 import { useIntl } from 'react-intl';
 import { useDialog } from '@/context/dialog';
 import SEO from '@/components/SEO';
-
-import {
-    Avatar,
-    Dialog,
-    LangeSelect,
-    SearchInput,
-    IconWithName,
-    ControlButtons,
-    NavigationArrows,
-    GridLayoutControl,
-} from '@/components';
+import Avatar from '@/components/Avatar';
+import Dialog from '@/components/Dialog';
+import LangeSelect from '@/components/LangSelect';
+import SearchInput from '@/components/SearchInput';
+import IconWithName from '@/components/IconWithName';
+import ControlButtons from '@/components/ControlButtons';
+import NavigationArrows from '@/components/NavigationArrows';
+import GridLayoutControl from '@/components/GridLayoutControl';
 
 const toggleHandler = (dispatch: Function) => () => dispatch({ type: 'toggleLang' });
 

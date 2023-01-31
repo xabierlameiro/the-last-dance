@@ -1,7 +1,9 @@
 import React from 'react';
 import { MDXRemote } from 'next-mdx-remote';
 import { useDialog } from '@/context/dialog';
-import { Dialog, ControlButtons, SidesShift } from '@/components';
+import Dialog from '@/components/Dialog';
+import ControlButtons from '@/components/ControlButtons';
+import SidesShift from '@/components/SidesShift';
 import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCategory } from '@/helpers/fileReader';
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
@@ -10,6 +12,7 @@ import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
+import Loading from '@/components/RenderManager/Loading';
 import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
 import dynamic from 'next/dynamic';
@@ -17,7 +20,7 @@ import useWindowResize from '@/hooks/useWidowResize';
 import SEO from '@/components/SEO';
 
 const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
-    loading: () => <p>...</p>,
+    loading: () => <Loading />,
     ssr: false,
 });
 

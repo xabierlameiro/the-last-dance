@@ -1,0 +1,16 @@
+.spinner {
+    animation: spin 1s linear infinite;
+    width: 16px;
+    height: 16px;
+    align-self: center;
+    justify-self: center;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

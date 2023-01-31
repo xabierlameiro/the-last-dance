@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Dialog, VisibilityManager } from '@/components';
+import Dialog from '@/components/Dialog';
+import VisibilityManager from '@/components/VisibilityManager';
 import { useDialog } from '@/context/dialog';
 import { useIntl } from 'react-intl';
 import { MDXRemote } from 'next-mdx-remote';

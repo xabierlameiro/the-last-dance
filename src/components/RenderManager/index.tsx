@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './renderManager.module.css';
-import { FaSpinner } from 'react-icons/fa';
+import Loading from './Loading';
 import { RxCross2 } from 'react-icons/rx';
 import Tooltip from '@/components/Tooltip';
 
@@ -37,7 +37,7 @@ const RenderManager = ({ error, loading, errorTitle, loadingTitle, children }: P
         return (
             <Tooltip>
                 <Tooltip.Trigger>
-                    <FaSpinner className={styles.spinner} data-testid="loading-render" />
+                    <Loading />
                 </Tooltip.Trigger>
                 <Tooltip.Content>{loadingTitle}</Tooltip.Content>
             </Tooltip>

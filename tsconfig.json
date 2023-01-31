@@ -18,7 +18,6 @@
         "baseUrl": ".",
         "paths": {
             "@/components/*": ["src/components/*"],
-            "@/components": ["src/components/index.tsx"],
             "@/context/*": ["src/context/*"],
             "@/styles/*": ["styles/*"],
             "@/helpers": ["src/helpers/index.ts"],

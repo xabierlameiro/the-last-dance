@@ -1,4 +1,5 @@
-import { Dialog, ControlButtons } from '@/components';
+import Dialog from '@/components/Dialog';
+import ControlButtons from '@/components/ControlButtons';
 import { useDialog } from '@/context/dialog';
 import SEO from '@/components/SEO';
 

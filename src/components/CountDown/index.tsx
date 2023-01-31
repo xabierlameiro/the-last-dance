@@ -1,12 +1,21 @@
 import React from 'react';
 import styles from './countdown.module.css';
 import Tooltip from '@/components/Tooltip';
+import { useIntl } from 'react-intl';
 
 type Props = {
     date: string;
     caption?: string;
 };
 
+/**
+ * @description This function is used to calculate the time left until the date
+ * @param {string} date - The date to calculate the time left
+ * @param {Function} setTime - The function to set the time left
+ * @param {Object} timeLeft - The time left object
+ * @returns {Object} - The time left object
+ * @example calculateTimeLeft('2021-12-31', setTime)
+ */
 const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {}) => {
     const difference = +new Date(date) - +new Date();
     const months = Math.floor((difference / (1000 * 60 * 60 * 24 * 30)) % 12);
@@ -31,9 +40,11 @@ const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {
 /**
  * @description Countdown to date provided in months, days, hours, minutes and seconds
  * @param {string} date - date to countdown to
+ * @param {string} caption - caption to display
  * @returns {JSX.Element}
  */
 const CountDown = ({ date: dateProvided, caption }: Props) => {
+    const { formatMessage: f } = useIntl();
     const [time, setTime] = React.useState({
         months: 0,
         days: 0,
@@ -55,34 +66,24 @@ const CountDown = ({ date: dateProvided, caption }: Props) => {
             <Tooltip.Trigger>
                 <div className={styles.countdown} data-testid="countdown">
                     <div className={styles.countdown__item}>
-                        <div suppressHydrationWarning className={styles.countdown__item__number}>
-                            {time.months}
-                        </div>
-                        <div className={styles.countdown__item__text}>Mons</div>
+                        <div suppressHydrationWarning>{time.months}</div>
+                        <div className={styles.countdown__item__text}>{f({ id: 'countdown.months' })}</div>
                     </div>
                     <div className={styles.countdown__item}>
-                        <div suppressHydrationWarning className={styles.countdown__item__number}>
-                            {time.days}
-                        </div>
-                        <div className={styles.countdown__item__text}>Days</div>
+                        <div suppressHydrationWarning>{time.days}</div>
+                        <div className={styles.countdown__item__text}>{f({ id: 'countdown.days' })}</div>
                     </div>
                     <div className={styles.countdown__item}>
-                        <div suppressHydrationWarning className={styles.countdown__item__number}>
-                            {time.hours}
-                        </div>
-                        <div className={styles.countdown__item__text}>Hour</div>
+                        <div suppressHydrationWarning>{time.hours}</div>
+                        <div className={styles.countdown__item__text}>{f({ id: 'countdown.hours' })}</div>
                     </div>
                     <div className={styles.countdown__item}>
-                        <div suppressHydrationWarning className={styles.countdown__item__number}>
-                            {time.minutes}
-                        </div>
-                        <div className={styles.countdown__item__text}>Mins</div>
+                        <div suppressHydrationWarning>{time.minutes}</div>
+                        <div className={styles.countdown__item__text}>{f({ id: 'countdown.minutes' })}</div>
                     </div>
                     <div className={styles.countdown__item}>
-                        <div suppressHydrationWarning className={styles.countdown__item__number}>
-                            {time.seconds}
-                        </div>
-                        <div className={styles.countdown__item__text}>Secs</div>
+                        <div suppressHydrationWarning>{time.seconds}</div>
+                        <div className={styles.countdown__item__text}>{f({ id: 'countdown.seconds' })}</div>
                     </div>
                 </div>
             </Tooltip.Trigger>
