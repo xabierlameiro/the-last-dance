@@ -38,6 +38,9 @@
     --blog-icons: 160, 157, 162;
     --blog-border: 30, 30, 30;
     --input-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="490" height="490"><path fill="none" stroke="rgba(160, 157, 162)" stroke-width="36" stroke-linecap="round" d="m280,278a153,153 0 1,0-2,2l170,170m-91-117 110,110-26,26-110-110" /></svg>');
+    --header-background: linear-gradient(to right, rgba(47, 41, 51, 1), rgba(30, 30, 30, 1));
+    --terminal-header: 62, 54, 63;
+    --termianl-header-font: 185, 177, 187;
 }
 
 [data-theme='light'] {
@@ -47,9 +50,17 @@
     --blog-font: 39, 39, 39;
     --blog-font-selected: 255, 255, 255;
     --blog-font-description: 141, 141, 141;
-    --blog-icons: 101, 99, 102;
+    --blog-icons: 0, 0, 0;
     --blog-border: 141, 141, 141, 0.2;
     --input-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="490" height="490"><path fill="none" stroke="rgba( 101, 99, 102)" stroke-width="36" stroke-linecap="round" d="m280,278a153,153 0 1,0-2,2l170,170m-91-117 110,110-26,26-110-110" /></svg>');
+    --header-background: linear-gradient(
+        to right,
+        rgba(227, 168, 208, 1),
+        rgba(228, 217, 234, 1),
+        rgba(230, 194, 220, 1)
+    );
+    --terminal-header: 245, 238, 247;
+    --termianl-header-font: 73, 71, 74;
 }
 
 * {

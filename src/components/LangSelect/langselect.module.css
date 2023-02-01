@@ -1,5 +1,6 @@
 .lang_container {
-    background-color: rgba(var(--grey-color));
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
     border-radius: 5px;
     width: inherit;
     margin: 10px 0;
@@ -12,6 +13,7 @@
     font-size: 13px;
     padding-bottom: 5px;
 }
+
 .lang_select {
     width: 200px;
     height: 100%;
@@ -19,7 +21,10 @@
     font-size: 13px;
     outline: none;
     height: 360px;
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
 }
+
 .lang_select option {
     outline: none;
     padding: 10px;

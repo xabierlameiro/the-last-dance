@@ -1,13 +1,28 @@
+.container {
+    background-color: rgba(var(--blog-background));
+    height: 100%;
+    color: rgba(var(--blog-font));
+}
+
 .content {
     padding: 18px 24px 54px;
     border-bottom: 1px solid rgba(108, 108, 112, 0.3);
 }
+
 .lang {
     padding: 18px 24px 14px;
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
+    height: 100%;
 }
+
 .confg {
     padding: 18px 24px 99px;
     border-bottom: 1px solid rgba(108, 108, 112, 0.3);
+    color: rgba(var(--blog-font));
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 25px;
 }
 
 .header {
@@ -18,6 +33,12 @@
     align-items: center;
     border-bottom: 1px solid rgba(108, 108, 112, 0.3);
     padding: 10px;
+    background-color: rgba(var(--blog-header));
+    color: rgba(var(--blog-font));
+}
+.header svg {
+    fill: rgba(var(--blog-icons));
+    stroke: rgba(var(--blog-icons));
 }
 
 @media screen and (max-width: 768px) {

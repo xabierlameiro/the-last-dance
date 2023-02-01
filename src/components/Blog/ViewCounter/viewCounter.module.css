@@ -5,7 +5,7 @@
     font-size: 15px;
     user-select: none;
     gap: 8px;
-    color: rgba(var(--color-font));
+    color: rgba(var(--blog-icons));
 }
 
 .views svg {
@@ -34,7 +34,6 @@
     font-size: 14px;
     user-select: none;
     gap: 8px;
-    color: rgba(var(--color-font));
 }
 
 .views .users svg {

@@ -11,6 +11,7 @@ import IconWithName from '@/components/IconWithName';
 import ControlButtons from '@/components/ControlButtons';
 import NavigationArrows from '@/components/NavigationArrows';
 import GridLayoutControl from '@/components/GridLayoutControl';
+import useDarkMode from '@/hooks/useDarkMode';
 
 const toggleHandler = (dispatch: Function) => () => dispatch({ type: 'toggleLang' });
 
@@ -36,6 +37,7 @@ const Header = () => {
 const Content = () => {
     const { formatMessage: f } = useIntl();
     const { lang, dispatch } = useDialog();
+    const { theme, toggleTheme } = useDarkMode();
 
     if (lang)
         return (
@@ -43,7 +45,7 @@ const Content = () => {
                 <div className={styles.lang}>
                     <IconWithName
                         horizontal
-                        icon="/language.jpeg"
+                        icon="/lang.png"
                         alt={f({ id: 'settings.langAlt' })}
                         name={f({ id: 'settings.lang.description' })}
                     />
@@ -53,7 +55,7 @@ const Content = () => {
         );
 
     return (
-        <>
+        <div className={styles.container}>
             <div className={styles.content}>
                 <Avatar
                     img="/avatar.png"
@@ -62,14 +64,22 @@ const Content = () => {
                     description={f({ id: 'settings.desc' })}
                 />
             </div>
-            <section className={styles.confg} onClick={toggleHandler(dispatch)}>
+            <section className={styles.confg}>
                 <IconWithName
-                    icon="/language.jpeg"
+                    icon="/lang.png"
                     alt={f({ id: 'settings.langAlt' })}
                     name={f({ id: 'settings.lang' })}
+                    onClick={toggleHandler(dispatch)}
+                />
+                <IconWithName
+                    icon="/theme.png"
+                    alt={f({ id: 'settings.langAlt' })}
+                    name={f({ id: theme === 'dark' ? 'settings.dark' : 'settings.light' })}
+                    onClick={toggleTheme}
                 />
             </section>
-        </>
+            <section className={styles.confg}></section>
+        </div>
     );
 };
 

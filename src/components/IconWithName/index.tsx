@@ -7,6 +7,7 @@ type Props = {
     alt: string;
     name: string;
     horizontal?: boolean;
+    onClick?: () => void;
 };
 
 /**
@@ -20,9 +21,13 @@ type Props = {
  * @param {boolean} horizontal - If true, the icon will be displayed horizontally
  * @returns {JSX.Element}
  */
-const IconWithName = ({ icon, alt, name, horizontal }: Props) => {
+const IconWithName = ({ icon, alt, name, horizontal, onClick }: Props) => {
     return (
-        <div data-testid="icon-with-name" className={clx(styles.option, horizontal ? styles.horizontal : '')}>
+        <div
+            data-testid="icon-with-name"
+            className={clx(styles.option, horizontal ? styles.horizontal : '')}
+            onClick={onClick}
+        >
             <Image src={icon} alt={alt} width={44} height={42} />
             <p className={styles.optionText}>{name}</p>
         </div>

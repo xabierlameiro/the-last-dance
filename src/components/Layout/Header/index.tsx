@@ -11,7 +11,6 @@ import CountDown from '@/components/CountDown';
 import Heating from '@/components/Heating';
 import Tooltip from '@/components/Tooltip';
 import dynamic from 'next/dynamic';
-import useDarkMode from '@/hooks/useDarkMode';
 
 const Weather = dynamic(() => import('@/components/Weather'), {
     ssr: false,
@@ -106,7 +105,6 @@ const NavLinks = () => {
  */
 const Header = ({ children }: { children?: ReactNode }) => {
     const { formatMessage: f } = useIntl();
-    const { theme, toggleTheme } = useDarkMode();
 
     return (
         <header data-testid="header" className={styles.header}>
@@ -114,9 +112,6 @@ const Header = ({ children }: { children?: ReactNode }) => {
             <Route />
             <NavLinks />
             <CountDown date="2023-05-06T00:00:00+00:00" caption={f({ id: 'countdown.caption' })} />
-            <span className={styles.button} onClick={toggleTheme}>
-                {theme === 'dark' ? '🌞' : '🌚'}
-            </span>
             <CryptoPrice />
             <IndexedCounter />
             <ViewCounter all />

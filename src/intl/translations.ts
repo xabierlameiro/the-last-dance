@@ -68,6 +68,8 @@ export const messages = {
         'countdown.hours': 'hour',
         'countdown.minutes': 'mins',
         'countdown.seconds': 'secs',
+        'settings.dark': 'Theme (Dark)',
+        'settings.light': 'Theme (Light)',
     },
     es: {
         'blog.title': 'Esta es la página de blog',
@@ -139,6 +141,8 @@ export const messages = {
         'countdown.hours': 'horas',
         'countdown.minutes': 'minus',
         'countdown.seconds': 'segus',
+        'settings.dark': 'Tema (Oscuro)',
+        'settings.light': 'Tema (Claro)',
     },
     gl: {
         'blog.title': 'Esta é a páxina de blog',
@@ -208,5 +212,7 @@ export const messages = {
         'countdown.hours': 'horas',
         'countdown.minutes': 'minus',
         'countdown.seconds': 'segus',
+        'settings.dark': 'Tema (Escuro)',
+        'settings.light': 'Tema (Claro)',
     },
 };

@@ -22,8 +22,7 @@
         width: calc(100vw - 40px);
         grid-template-columns: 200px repeat(2, max-content) 1fr repeat(5, max-content) 220px;
         overflow: scroll;
-        margin: 0 10px;
-        padding: 0;
+        padding: 0 10px;
     }
     .articleControls::-webkit-scrollbar {
         display: none;

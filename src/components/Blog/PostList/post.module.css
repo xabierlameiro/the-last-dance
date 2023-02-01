@@ -18,7 +18,7 @@
 
 .list li a::after {
     content: '';
-    background-color: rgba(var(--blog-font-description));
+    background-color: rgba(var(--blog-border));
     position: absolute;
     bottom: 0;
     right: 0;

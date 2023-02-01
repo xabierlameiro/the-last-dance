@@ -1,8 +1,9 @@
 .header {
     height: 24px;
-    background: linear-gradient(to right, rgba(227, 168, 208, 1), rgba(228, 217, 234, 1), rgba(230, 194, 220, 1));
+    background: var(--header-background);
+    color: rgba(var(--blog-icons));
     display: grid;
-    grid-template-columns: auto max-content auto 1fr repeat(6, auto);
+    grid-template-columns: auto max-content auto 1fr repeat(5, auto);
     gap: 20px;
     align-items: center;
     padding: 0 18px;
@@ -13,16 +14,19 @@
 .header::-webkit-scrollbar {
     display: none;
 }
+
 .header svg {
     height: 18px;
     width: 18px;
-    fill: rgba(34, 25, 31, 1);
+    fill: rgba(var(--blog-icons));
+    stroke: rgba(var(--blog-icons));
 }
 
 .route {
     font-size: 14px;
     font-weight: 700;
     user-select: none;
+    color: rgba(var(--blog-icons));
 }
 
 .dateAndHour {
@@ -32,7 +36,7 @@
     grid-auto-flow: column;
     gap: 5px;
     font-size: 14px;
-    color: rgba(var(--color-font));
+    color: rgba(var(--blog-icons));
     text-transform: capitalize;
 }
 
@@ -42,10 +46,11 @@
     gap: 20px;
     width: max-content;
 }
+
 .navLinks a {
     font-size: 14px;
     font-weight: 400;
-    color: rgba(var(--color-font));
+    color: rgba(var(--blog-icons));
     text-decoration: none;
 }
 

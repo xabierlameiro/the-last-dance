@@ -3,6 +3,7 @@
     grid-template-columns: 200px 1fr;
     height: 100%;
     transition: all 0.5s ease;
+    background: rgba(var(--blog-background));
 }
 
 @media screen and (max-width: 900px) {
@@ -31,7 +32,7 @@
 }
 
 .nav {
-    background: rgba(235, 232, 238);
+    background-color: rgba(var(--blog-nav));
     position: relative;
     padding: 20px 10px;
     display: grid;
@@ -44,7 +45,7 @@
 }
 
 .nav ul li a {
-    color: rgba(var(--color-font));
+    color: rgba(var(--blog-font));
     font-size: 13px;
     font-weight: 300;
     text-decoration: none;
@@ -69,6 +70,7 @@
     margin-top: 50px;
     overflow: scroll;
     font-size: 14px;
+    color: rgba(var(--blog-font));
 }
 
 @media screen and (max-width: 900px) {
@@ -103,11 +105,11 @@
 .title {
     font-size: 14px;
     font-weight: 700;
-    color: rgba(var(--dark-grey-color));
+    color: rgba(var(--blog-font));
 }
 
 .selected {
-    background-color: rgba(var(--grey-shadow));
+    background-color: rgba(var(--blog-background));
     border-radius: 5px;
     padding: 0 2px;
 }

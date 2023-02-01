@@ -5,7 +5,6 @@
 .nav svg {
     width: 32px;
     height: 32px;
-    fill: #000;
     cursor: pointer;
     transition: all 0.3s ease-in;
     fill-opacity: 0.3;
