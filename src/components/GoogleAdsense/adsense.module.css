@@ -1,3 +1,7 @@
+.adsbygoogle {
+    background-color: rgba(var(--blog-background));
+}
+
 .horizontal {
     visibility: hidden;
     height: 0 !important;

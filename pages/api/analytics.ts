@@ -83,14 +83,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 },
             });
 
-            if (!response || !response.rows) {
+            if (!response || !response.rows || typeof response.rowCount !== 'number') {
                 res.status(500).json({ error: 'Error while parsing analytics data' });
                 return;
             }
-            data = {
-                pageViews: response?.rows?.[0].metricValues?.[0].value,
-                newUsers: response?.rows?.[0].metricValues?.[1].value,
-            };
+
+            if (response.rowCount > 0) {
+                data = {
+                    pageViews: response?.rows?.[0].metricValues?.[0].value,
+                    newUsers: response?.rows?.[0].metricValues?.[1].value,
+                };
+            } else {
+                data = {
+                    pageViews: 0,
+                    newUsers: 0,
+                };
+            }
         }
 
         res.status(200).json({
