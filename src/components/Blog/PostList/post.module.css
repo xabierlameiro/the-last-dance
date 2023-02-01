@@ -12,9 +12,13 @@
     color: rgba(var(--color-font));
 }
 
+.list li:has(+ .selected) a::after {
+    content: unset;
+}
+
 .list li a::after {
     content: '';
-    background: rgba(var(--grey-color));
+    background-color: rgba(var(--blog-font-description));
     position: absolute;
     bottom: 0;
     right: 0;
@@ -39,6 +43,11 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: rgba(var(--blog-font));
+}
+.selected .title,
+.selected .excerpt {
+    color: rgba(var(--blog-font-selected));
 }
 .excerpt {
     font-size: 11px;
@@ -47,13 +56,14 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: rgba(var(--blog-font-description));
 }
 .selected {
     background-color: rgba(var(--blue-color));
-
     border-radius: 5px;
+    color: rgba(var(--blog-font-selected));
 }
 
 li.selected > a {
-    color: rgba(var(--white-color));
+    color: rgba(var(--blog-font-selected));
 }

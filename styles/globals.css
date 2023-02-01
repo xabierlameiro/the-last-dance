@@ -17,7 +17,6 @@
     --grey-light-background: 240, 236, 243;
     --grey-dark-background: 232, 229, 235;
     --grey-shadow: 210, 207, 213;
-
     /* fonts */
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
@@ -29,9 +28,28 @@
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-    }
+[data-theme='dark'] {
+    --blog-nav: 48, 41, 51;
+    --blog-header: 53, 45, 55;
+    --blog-background: 30, 30, 30;
+    --blog-font: 223, 222, 223;
+    --blog-font-selected: 255, 255, 255;
+    --blog-font-description: 160, 156, 161;
+    --blog-icons: 160, 157, 162;
+    --blog-border: 30, 30, 30;
+    --input-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="490" height="490"><path fill="none" stroke="rgba(160, 157, 162)" stroke-width="36" stroke-linecap="round" d="m280,278a153,153 0 1,0-2,2l170,170m-91-117 110,110-26,26-110-110" /></svg>');
+}
+
+[data-theme='light'] {
+    --blog-nav: 204, 202, 219;
+    --blog-header: 255, 255, 255;
+    --blog-background: 255, 255, 255;
+    --blog-font: 39, 39, 39;
+    --blog-font-selected: 255, 255, 255;
+    --blog-font-description: 141, 141, 141;
+    --blog-icons: 101, 99, 102;
+    --blog-border: 141, 141, 141, 0.2;
+    --input-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="490" height="490"><path fill="none" stroke="rgba( 101, 99, 102)" stroke-width="36" stroke-linecap="round" d="m280,278a153,153 0 1,0-2,2l170,170m-91-117 110,110-26,26-110-110" /></svg>');
 }
 
 * {

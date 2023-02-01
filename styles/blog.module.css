@@ -18,13 +18,14 @@
 }
 
 .nav {
-    background-color: rgba(var(--grey-color));
+    background-color: rgba(var(--blog-nav));
     padding: 20px 12px;
     display: grid;
     grid-template-rows: 40px auto auto 1fr;
     overflow: hidden;
     transition: all 0.5s ease-in-out;
-    max-height: calc(100vh - 64px);
+    max-height: calc(100vh - 50px);
+    color: rgba(var(--blog-font-description));
 }
 
 @media screen and (max-width: 900px) {
@@ -42,14 +43,14 @@
 
 .secondNav {
     position: relative;
-    border-right: 1px solid rgba(var(--grey-color));
+    border-right: 1px solid rgba(var(--blog-border));
     display: grid;
     grid-template-rows: 50px 1fr;
     overflow: hidden;
 }
 .body {
     padding: 20px 30px 60px;
-    height: calc(100vh - 120px);
+    height: calc(100vh - 100px);
     overflow-y: scroll;
     overflow-x: hidden;
     width: 100%;

@@ -1,8 +1,17 @@
 .controls {
-    border-bottom: 1px solid rgba(var(--grey-color));
+    background-color: rgba(var(--blog-header));
+    border-bottom: 1px solid rgba(var(--blog-border));
     display: grid;
     padding: 0 15px 0 20px;
     grid-template-columns: 35px 1fr auto;
     align-items: center;
     color: rgba(var(--dark-grey-color));
+}
+
+.controls + div {
+    background-color: rgba(var(--blog-header));
+}
+
+.controls svg {
+    color: rgba(var(--blog-icons));
 }

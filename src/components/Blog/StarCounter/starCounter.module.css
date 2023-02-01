@@ -13,3 +13,7 @@
 .stars svg {
     fill: rgba(var(--yellow-color));
 }
+
+.stars span {
+    color: rgba(var(--blog-icons));
+}

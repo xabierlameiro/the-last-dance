@@ -1,11 +1,22 @@
 .articleControls {
-    border-bottom: 1px solid rgba(var(--grey-color));
+    background-color: rgba(var(--blog-header));
+    border-bottom: 1px solid rgba(var(--blog-border));
     display: grid;
     padding: 0 20px;
     grid-template-columns: 1fr repeat(2, max-content) 1fr repeat(5, max-content) 220px;
     align-items: center;
     gap: 20px;
 }
+
+.articleControls + div {
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
+}
+
+.articleControls svg {
+    color: rgba(var(--blog-icons));
+}
+
 @media screen and (max-width: 768px) {
     .articleControls {
         width: calc(100vw - 40px);
@@ -19,7 +30,6 @@
     }
 }
 .articleControls svg {
-    color: rgba(var(--dark-grey-color));
     font-size: 21.5px;
     stroke-width: 0%;
 }
@@ -48,4 +58,7 @@
     justify-self: center;
     font-size: 15px;
     gap: 5px;
+}
+.readContainer span {
+    color: rgba(var(--blog-icons));
 }

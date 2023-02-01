@@ -8,13 +8,14 @@
     text-indent: 24px;
     background-size: 15px;
     background-position: 8px;
-    opacity: 0.5;
     background-repeat: no-repeat;
-    background-color: rgba(var(---white-color));
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg');
+    background-image: var(--input-icon);
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
 }
 
 .input::placeholder {
     text-indent: 24px;
     font-size: 12px;
+    color: rgba(var(--blog-icons));
 }
