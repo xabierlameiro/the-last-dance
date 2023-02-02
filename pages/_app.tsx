@@ -14,6 +14,8 @@ type locales = 'en' | 'es' | 'gl';
 const App = ({ Component, pageProps }: AppProps) => {
     const { locale = 'en' } = useRouter();
 
+    React.useEffect(() => document.documentElement.setAttribute('data-theme', 'light'), []);
+
     return (
         <>
             {process.env.NODE_ENV === 'production' && (
