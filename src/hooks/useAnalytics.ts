@@ -15,12 +15,14 @@ type ReturnType = {
 };
 
 const useAnalytics = (all?: boolean): ReturnType => {
-    const { asPath } = useRouter();
+    const { asPath, locale } = useRouter();
+    let slug = locale === 'en' ? asPath : `/${locale}${asPath}`;
+
     const memoUrl = React.useMemo(() => {
         const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/analytics`);
-        url.searchParams.set('slug', all ? '' : asPath);
+        url.searchParams.set('slug', all ? '' : slug);
         return url;
-    }, [all, asPath]);
+    }, [all, slug]);
 
     const { data, error, isLoading } = useSWR(memoUrl, fetcher, {
         keepPreviousData: all ? true : false,
