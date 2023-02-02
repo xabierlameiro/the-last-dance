@@ -9,7 +9,7 @@ type Props = {
 };
 const Document = (props: Props) => {
     return (
-        <Html lang={props.__NEXT_DATA__.locale}>
+        <Html lang={props.__NEXT_DATA__.locale} data-theme="light">
             <Head>
                 <meta charSet="utf-8" />
                 <meta name="theme-color" content="#FFF" />
