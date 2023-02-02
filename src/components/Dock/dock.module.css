@@ -55,7 +55,7 @@
 
 .selected::after {
     transform: translate(-50%, 20px);
-    color: rgba(var(--color-font));
+    color: rgba(var(--blog-font));
     content: '.';
     font-size: 40px;
     position: absolute;

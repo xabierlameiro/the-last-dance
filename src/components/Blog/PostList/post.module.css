@@ -9,7 +9,7 @@
     padding: 10px 20px;
     position: relative;
     text-decoration: none;
-    color: rgba(var(--color-font));
+    color: rgba(var(--blog-font));
 }
 
 .list li:has(+ .selected) a::after {

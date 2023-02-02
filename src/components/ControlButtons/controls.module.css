@@ -20,7 +20,7 @@
 }
 
 .ch_frame_button svg {
-    color: rgba(var(--color-font));
+    color: rgba(var(--blog-font));
     transform: scale(0.7);
     opacity: 0;
 }

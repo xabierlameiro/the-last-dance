@@ -4,10 +4,10 @@
     height: auto;
     min-height: 90px;
     z-index: 9999;
-    background-color: rgba(var(--grey-color));
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
     padding: 15px;
     font-size: 14px;
-    color: rgba(var(--font-color));
     overflow: visible;
     position: fixed;
     top: 42px;
