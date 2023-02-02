@@ -30,7 +30,8 @@
 
 .city {
     box-sizing: border-box;
-    background-color: #fff;
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
     width: auto;
     height: auto;
     max-height: 200px;

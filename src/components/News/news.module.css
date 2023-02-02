@@ -27,6 +27,8 @@
     scroll-snap-type: y mandatory;
     height: inherit;
     transition: all 1s ease-in;
+    color: rgba(var(--blog-font));
+    background-color: rgba(var(--blog-background));
 }
 
 .container::-webkit-scrollbar {
@@ -44,7 +46,8 @@
 
 .link {
     text-decoration: none;
-    color: rgba(var(--font-color));
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
     scroll-snap-align: start;
     height: inherit;
     display: grid;
@@ -52,7 +55,6 @@
     padding: 0 10px 0 0;
     gap: 5px;
     grid-template-rows: auto auto 1fr;
-    background-color: #fff;
     overflow: hidden;
     transition: all 1s ease-in;
     overflow: hidden;
