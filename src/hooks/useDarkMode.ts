@@ -5,7 +5,7 @@ const scheme = {
     dark: 'dark' as const,
 };
 
-const useDarkMode = (): { theme: null | 'dark' | 'light'; toggleTheme: () => void } => {
+const useDarkMode = (): { theme: null | 'dark' | 'light'; toggleTheme: () => void; scheme: typeof scheme } => {
     const [theme, setTheme] = React.useState<null | 'dark' | 'light'>(null);
 
     React.useEffect(() => {
@@ -29,7 +29,7 @@ const useDarkMode = (): { theme: null | 'dark' | 'light'; toggleTheme: () => voi
         setTheme(theme === scheme.dark ? scheme.light : scheme.dark);
     };
 
-    return { theme, toggleTheme };
+    return { theme, scheme, toggleTheme };
 };
 
 export default useDarkMode;

@@ -37,7 +37,11 @@ const Header = () => {
 const Content = () => {
     const { formatMessage: f } = useIntl();
     const { lang, dispatch } = useDialog();
-    const { theme, toggleTheme } = useDarkMode();
+    const {
+        theme,
+        scheme: { dark },
+        toggleTheme,
+    } = useDarkMode();
 
     if (lang)
         return (
@@ -74,7 +78,7 @@ const Content = () => {
                 <IconWithName
                     icon="/theme.png"
                     alt={f({ id: 'settings.langAlt' })}
-                    name={f({ id: theme === 'dark' ? 'settings.dark' : 'settings.light' })}
+                    name={f({ id: theme === dark ? 'settings.dark' : 'settings.light' })}
                     onClick={toggleTheme}
                 />
             </section>
