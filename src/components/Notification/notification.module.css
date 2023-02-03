@@ -12,7 +12,7 @@
     position: fixed;
     top: 42px;
     right: 20px;
-    box-shadow: 0 8px 32px 0 rgb(var(--grey-color) / 37%);
+    box-shadow: 0 8px 32px 0 rgb(31 38 135 / 37%);
     user-select: none;
     transform: translateX(120%);
 }
