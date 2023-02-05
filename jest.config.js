@@ -26,6 +26,7 @@ const customJestConfig = {
         '^@/layout(.*)$': '<rootDir>src/components/Layout/index.tsx$1',
         '^@/test$': '<rootDir>/jest.setup.js',
         '^@/components(.*)$': '<rootDir>src/components/$1',
+        '^@/ssrcomponents(.*)$': '<rootDir>app/components/$1',
         '^@/context(.*)$': '<rootDir>src/context/$1',
         '^@/hooks(.*)$': '<rootDir>src/hooks/$1',
         '^@/constants(.*)$': '<rootDir>src/constants/$1',

@@ -18,6 +18,7 @@
         "baseUrl": ".",
         "paths": {
             "@/components/*": ["src/components/*"],
+            "@/ssrcomponents/*": ["app/components/*"],
             "@/context/*": ["src/context/*"],
             "@/styles/*": ["styles/*"],
             "@/helpers": ["src/helpers/index.ts"],

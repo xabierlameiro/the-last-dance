@@ -10,7 +10,7 @@ import { createSiteMap } from '@/helpers/fileWritter';
 import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
-import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
+import { AsidePanel, ArticlePanel, NavList, PostList } from '@/ssrcomponents/Blog';
 import { MDXRemote } from 'next-mdx-remote';
 import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
