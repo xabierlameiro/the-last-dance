@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
+import { MDXRemote } from 'next-mdx-remote';
 import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
 import dynamic from 'next/dynamic';
@@ -18,7 +19,6 @@ import useWindowResize from '@/hooks/useWidowResize';
 import SEO from '@/components/SEO';
 
 const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'));
-const MDXRemote = dynamic(() => import('next-mdx-remote').then((mod) => mod.MDXRemote));
 
 type Props = {
     post: {
