@@ -21,7 +21,7 @@ import SEO from '@/components/SEO';
 
 const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
     loading: () => <Loading />,
-    ssr: false,
+    ssr: true,
 });
 
 type Props = {

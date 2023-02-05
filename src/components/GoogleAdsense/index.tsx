@@ -29,11 +29,8 @@ declare global {
 const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }: Props) => {
     const adsbygoogle = React.useRef(null);
     const isProduction = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test';
-    const isBot =
-        typeof navigator !== 'undefined' && /googlebot|bingbot|yandexbot|duckduckbot/i.test(navigator.userAgent);
-
     React.useEffect(() => {
-        if (isProduction && !isBot) {
+        if (isProduction) {
             if (adsbygoogle.current) {
                 try {
                     if (window.adsbygoogle && window.adsbygoogle.push) {
@@ -54,7 +51,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
                 }
             };
         }
-    }, [isProduction, isBot, horizontal]);
+    }, [isProduction, horizontal]);
 
     if (!isProduction) {
         return null;

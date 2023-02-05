@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic';
 
 const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
     loading: () => <Loading />,
-    ssr: false,
+    ssr: true,
 });
 const Date = dynamic(() => import('@/components/Date'), { loading: () => <Loading />, ssr: false });
 

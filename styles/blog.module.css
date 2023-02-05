@@ -21,7 +21,7 @@
     background-color: rgba(var(--blog-nav));
     padding: 20px 12px;
     display: grid;
-    grid-template-rows: 40px auto auto 1fr;
+    grid-template-rows: 40px auto 1fr;
     overflow: hidden;
     transition: all 0.5s ease-in-out;
     max-height: calc(100vh - 50px);
@@ -86,7 +86,7 @@
         width: calc(100vw - 710px);
     }
     .verticalAd {
-        display: block;
+        display: grid;
     }
 }
 
@@ -127,4 +127,5 @@
 
 .navAd {
     overflow: hidden;
+    display: grid;
 }
