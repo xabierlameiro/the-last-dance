@@ -3,10 +3,11 @@ import Dialog from '@/components/Dialog';
 import VisibilityManager from '@/components/VisibilityManager';
 import { useDialog } from '@/context/dialog';
 import { useIntl } from 'react-intl';
-import { MDXRemote } from 'next-mdx-remote';
 import { components } from '@/helpers/mdxjs';
 import { serializePath } from '@/helpers/mdx';
 import SEO from '@/components/SEO';
+import dynamic from 'next/dynamic';
+const MDXRemote = dynamic(() => import('next-mdx-remote').then((mod) => mod.MDXRemote));
 
 type Props = {
     content: {
