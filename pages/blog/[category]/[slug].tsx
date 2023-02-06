@@ -95,7 +95,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
                             <aside className={styles.navAd}>
-                                <GoogleAdsense slot="4572463963" />
+                                <GoogleAdsense slot="6992048050" />
                             </aside>
                         </nav>
                         <nav className={styles.secondNav} onTouchStart={onSideShiftRight}>
