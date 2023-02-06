@@ -12,17 +12,10 @@ import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/ssrcomponents/Blog';
-import Loading from '@/components/RenderManager/Loading';
 import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
-import dynamic from 'next/dynamic';
 import useWindowResize from '@/hooks/useWidowResize';
 import SEO from '@/components/SEO';
-
-const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
-    loading: () => <Loading />,
-    ssr: true,
-});
 
 type Props = {
     post: {
@@ -94,6 +87,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 />
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
+                            <aside className={styles.navAd}></aside>
                         </nav>
                         <nav className={styles.secondNav} onTouchStart={onSideShiftRight}>
                             <AsidePanel />
@@ -109,6 +103,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 <div className={styles.mdx}>
                                     <MDXRemote {...post.content} components={components} />
                                 </div>
+                                <aside className={styles.verticalAd}></aside>
                             </div>
                         </article>
                     </div>
