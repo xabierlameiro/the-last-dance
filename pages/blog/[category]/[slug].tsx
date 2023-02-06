@@ -17,8 +17,12 @@ import { clx } from '@/helpers';
 import dynamic from 'next/dynamic';
 import useWindowResize from '@/hooks/useWidowResize';
 import SEO from '@/components/SEO';
+import Loading from '@/components/RenderManager/Loading';
 
-const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'));
+const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
+    loading: () => <Loading />,
+    ssr: false,
+});
 
 type Props = {
     post: {
