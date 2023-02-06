@@ -94,9 +94,6 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 />
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
-                            <aside className={styles.navAd}>
-                                <GoogleAdsense slot="6992048050" />
-                            </aside>
                         </nav>
                         <nav className={styles.secondNav} onTouchStart={onSideShiftRight}>
                             <AsidePanel />
@@ -112,9 +109,6 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 <div className={styles.mdx}>
                                     <MDXRemote {...post.content} components={components} />
                                 </div>
-                                <aside className={styles.verticalAd}>
-                                    <GoogleAdsense slot="3707409168" />
-                                </aside>
                             </div>
                         </article>
                     </div>
