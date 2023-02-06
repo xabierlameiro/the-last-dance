@@ -21,7 +21,7 @@
     background-color: rgba(var(--blog-nav));
     padding: 20px 12px;
     display: grid;
-    grid-template-rows: 40px auto auto 1fr;
+    grid-template-rows: 40px auto 1fr;
     overflow: hidden;
     transition: all 0.5s ease-in-out;
     max-height: calc(100vh - 50px);
@@ -43,7 +43,7 @@
 
 .secondNav {
     position: relative;
-    border-right: 1px solid rgba(var(--blog-background));
+    border-right: 1px solid rgba(var(--blog-border));
     display: grid;
     grid-template-rows: 50px 1fr;
     overflow: hidden;
@@ -69,7 +69,7 @@
 }
 
 .verticalAd {
-    display: none;
+    visibility: hidden;
     width: 250px;
     height: 100%;
     position: fixed;
@@ -86,7 +86,8 @@
         width: calc(100vw - 710px);
     }
     .verticalAd {
-        display: block;
+        display: grid;
+        visibility: visible;
     }
 }
 
@@ -127,4 +128,5 @@
 
 .navAd {
     overflow: hidden;
+    display: grid;
 }
