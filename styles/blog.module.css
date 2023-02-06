@@ -86,7 +86,7 @@
         width: calc(100vw - 710px);
     }
     .verticalAd {
-        display: grid;
+        display: block;
     }
 }
 
@@ -127,5 +127,4 @@
 
 .navAd {
     overflow: hidden;
-    display: grid;
 }
