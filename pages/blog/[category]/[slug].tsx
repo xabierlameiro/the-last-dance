@@ -113,7 +113,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                     <MDXRemote {...post.content} components={components} />
                                 </div>
                                 <aside className={styles.verticalAd}>
-                                    <GoogleAdsense slot="3253844563" />
+                                    <GoogleAdsense slot="3707409168" />
                                 </aside>
                             </div>
                         </article>
