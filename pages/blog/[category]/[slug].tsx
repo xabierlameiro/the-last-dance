@@ -21,7 +21,7 @@ import Loading from '@/components/RenderManager/Loading';
 
 const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
     loading: () => <Loading />,
-    ssr: false,
+    ssr: true,
 });
 
 type Props = {
