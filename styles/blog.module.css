@@ -69,11 +69,12 @@
 }
 
 .verticalAd {
-    display: none;
+    z-index: -1;
     width: 250px;
     height: 100%;
     position: fixed;
     right: 30px;
+    display: grid;
 }
 
 @media screen and (min-width: 1400px) {
@@ -86,7 +87,7 @@
         width: calc(100vw - 710px);
     }
     .verticalAd {
-        display: grid;
+        z-index: 1;
     }
 }
 
