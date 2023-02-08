@@ -11,6 +11,10 @@ import Layout from '@/components/Layout';
 
 type locales = 'en' | 'es' | 'gl';
 
+// export function reportWebVitals(metric) {
+//     console.log(metric);
+// }
+
 const App = ({ Component, pageProps }: AppProps) => {
     const { locale = 'en' } = useRouter();
 
