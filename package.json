@@ -64,7 +64,7 @@
         "@storybook/testing-library": "^0.0.13",
         "@storybook/theming": "^6.5.14",
         "@types/glob": "^8.0.0",
-        "@types/node": "18.11.18",
+        "@types/node": "^18.13.0",
         "@types/react": "18.0.27",
         "@types/react-dom": "18.0.9",
         "@types/react-icons": "^3.0.0",
