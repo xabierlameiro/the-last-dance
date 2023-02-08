@@ -1,10 +1,10 @@
 import React from 'react';
-import '../styles/globals.css';
+import '../../styles/globals.css';
 import '@xabierlameiro/code-hike/dist/index.css';
 import Script from 'next/script';
 import { IntlProvider } from 'react-intl';
 import { useRouter } from 'next/router';
-import { messages } from '../src/intl/translations';
+import { messages } from '../intl/translations';
 import type { AppProps } from 'next/app';
 import Notification from '@/components/Notification';
 import Layout from '@/components/Layout';

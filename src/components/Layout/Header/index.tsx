@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import { socialLinks, translateRoute } from '@/constants/site';
 import CryptoPrice from '@/components/CryptoPrice';
-import ViewCounter from '@/ssrcomponents/Blog/ViewCounter';
+import ViewCounter from '@/components/Blog/ViewCounter';
 import IndexedCounter from '@/components/IndexedCounter';
 import CountDown from '@/components/CountDown';
 import Heating from '@/components/Heating';

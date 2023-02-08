@@ -48,7 +48,7 @@ export const createSiteMap = (
     );
 
     const pages = fs
-        .readdirSync(path.join(process.cwd(), '/pages'))
+        .readdirSync(path.join(process.cwd(), '/src/pages'))
         .filter(
             (page) =>
                 page !== '_app.tsx' &&

@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import BackgroundImage from '@/ssrcomponents/BackgroundImage';
+import BackgroundImage from '@/components/BackgroundImage';
 import { DialogProvider } from '@/context/dialog';
 import styles from './layout.module.css';
 import Footer from './Footer';

@@ -4,7 +4,7 @@ import Dialog from '@/components/Dialog';
 import ControlButtons from '@/components/ControlButtons';
 import { AiFillFolder } from 'react-icons/ai';
 import styles from '@/styles/comments.module.css';
-import Data from '../data/comments/index.mdx';
+import Data from '../../data/comments/index.mdx';
 import { useIntl } from 'react-intl';
 
 const Comments = () => {

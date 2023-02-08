@@ -3,7 +3,7 @@ import styles from '@/styles/settings.module.css';
 import { useIntl } from 'react-intl';
 import { useDialog } from '@/context/dialog';
 import SEO from '@/components/SEO';
-import Avatar from '@/ssrcomponents/Avatar';
+import Avatar from '@/components/Avatar';
 import Dialog from '@/components/Dialog';
 import LangeSelect from '@/components/LangSelect';
 import SearchInput from '@/components/SearchInput';

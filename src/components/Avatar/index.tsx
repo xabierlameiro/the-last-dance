@@ -1,5 +1,6 @@
 import styles from './avatar.module.css';
 import Image from 'next/image';
+import React from 'react';
 
 type Props = {
     name: string;
@@ -19,6 +20,10 @@ type Props = {
  * @returns {JSX.Element} - Avatar component
  */
 const Avatar = ({ name, description, img, alt }: Props) => {
+    React.useEffect(() => {
+        console.log('Avatar component mounted');
+    }, []);
+
     return (
         <section data-testid="avatar" className={styles.userInfo}>
             <Image className={styles.avatar} src={img} alt={alt} width={71} height={71} />
