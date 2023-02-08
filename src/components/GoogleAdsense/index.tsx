@@ -1,6 +1,7 @@
 import React from 'react';
 import { clx } from '@/helpers';
 import styles from './adsense.module.css';
+import console from '@/helpers/console';
 
 type Props = {
     client?: string;
@@ -51,7 +52,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
                 }
             };
         }
-    }, [isProduction, , horizontal]);
+    }, [isProduction, horizontal]);
 
     if (!isProduction) {
         return null;
