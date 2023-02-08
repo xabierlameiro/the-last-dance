@@ -5,15 +5,25 @@ import Script from 'next/script';
 import { IntlProvider } from 'react-intl';
 import { useRouter } from 'next/router';
 import { messages } from '../intl/translations';
-import type { AppProps } from 'next/app';
+import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import Notification from '@/components/Notification';
 import Layout from '@/components/Layout';
 
 type locales = 'en' | 'es' | 'gl';
+declare global {
+    interface Window {
+        gtag: (event: string, name: any, obj: object) => void;
+    }
+}
 
-// export function reportWebVitals(metric) {
-//     console.log(metric);
-// }
+export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
+    window.gtag?.('event', name, {
+        event_category: label === 'web-vital' ? 'Web Vitals' : 'Next.js metric',
+        value: Math.round(name === 'CLS' ? value * 1000 : value),
+        event_label: id,
+        non_interaction: true,
+    });
+}
 
 const App = ({ Component, pageProps }: AppProps) => {
     const { locale = 'en' } = useRouter();
