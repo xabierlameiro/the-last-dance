@@ -52,7 +52,7 @@ export const messages = {
         'cryptoPrice.tooltip': 'Ripple coin price today, porcentage {todayPorcentage}',
         'heating.error': 'Error getting the temperature',
         'heating.loading': 'Loading... temperature',
-        'heating.tooltip': 'Temperature outside {outsideTemp}º and inside {zoneMeasuredTemp}º',
+        'heating.tooltip': 'Temperature outside {outsideTemp}º and inside {zoneMeasuredTemp}º of my house',
         'indexedCounter.error': 'Error getting the number of indexed pages',
         'indexedCounter.loading': 'Loading... indexed pages',
         'indexedCounter.tooltip': '{num} pages indexed in Google',
