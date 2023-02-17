@@ -11,12 +11,12 @@
 ## Overview
 
 -   `data/*` - The folder when contain all of my blog posts and other data in mdx format.
--   `pages/*` - The folder where all of my pages live.
 -   `public/*` - The folder where all of my static assets live.
 -   `public/coverage/*` - The folder where all of my coverage reports live.
 -   `public/docs/*` - The folder where all of my documentation live.
 -   `public/posts/*` - The folder where all pictures for my blog posts live.
 -   `src/components/*` - The folder where all of my components live.
+-   `src/pages/*` - The folder where all of my pages live.
 -   `src/constants/*` - The folder where all of my constants live.
 -   `src/context/*` - The folder where all of my context providers live.
 -   `src/helpers/*` - The folder where all of my helper functions live.
