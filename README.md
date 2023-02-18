@@ -17,6 +17,7 @@
 -   `public/posts/*` - The folder where all pictures for my blog posts live.
 -   `src/components/*` - The folder where all of my components live.
 -   `src/pages/*` - The folder where all of my pages live.
+-   `src/pages/api - The folder for API.
 -   `src/constants/*` - The folder where all of my constants live.
 -   `src/context/*` - The folder where all of my context providers live.
 -   `src/helpers/*` - The folder where all of my helper functions live.
