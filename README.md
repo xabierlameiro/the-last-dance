@@ -18,6 +18,8 @@
 -   `src/components/*` - The folder where all of my components live.
 -   `src/pages/*` - The folder where all of my pages live.
 -   `src/pages/api - The folder for API.
+-   `src/pages/_app.tsx` - Global configuration for the application.
+-   `src/pages/_document.tsx` - Global configuration for the document.
 -   `src/constants/*` - The folder where all of my constants live.
 -   `src/context/*` - The folder where all of my context providers live.
 -   `src/helpers/*` - The folder where all of my helper functions live.
