@@ -1,5 +1,5 @@
 .container,
 .adsbygoogle {
-    background-color: red;
+    background-color: inherit;
     display: block;
 }
