@@ -70,8 +70,8 @@
 
 .verticalAd {
     z-index: -1;
-    width: inherit;
-    height: inherit;
+    width: 250px;
+    height: 700px;
     position: fixed;
     right: 30px;
     display: grid;
@@ -127,7 +127,6 @@
 }
 
 .navAd {
-    height: inherit;
     overflow: hidden;
     display: grid;
 }
