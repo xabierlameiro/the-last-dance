@@ -1,7 +1,7 @@
 import React from 'react';
 import { clx } from '@/helpers';
 import styles from './adsense.module.css';
-import console from '@/helpers/console';
+// import console from '@/helpers/console';
 
 type Props = {
     client?: string;
@@ -68,7 +68,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
     }
 
     return (
-        <div ref={addContainer}>
+        <div ref={addContainer} className={styles.container}>
             {sizes.width && sizes.height && (
                 <ins
                     aria-hidden="true"

@@ -1,5 +1,6 @@
+.container,
 .adsbygoogle {
-    background-color: rgba(var(--blog-background));
+    background-color: inherit;
     display: block;
 }
 
