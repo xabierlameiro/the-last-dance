@@ -71,8 +71,8 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
         <ins
             aria-hidden="true"
             ref={adsbygoogle}
-            className={clx('adsbygoogle', horizontal ? styles.horizontal : styles.block)}
-            style={{ display: 'block', ...sizes }}
+            className={clx(styles.adsbygoogle, horizontal ? styles.horizontal : styles.block)}
+            style={{ ...sizes }}
             data-ad-client={client}
             data-ad-slot={slot}
             data-ad-format="auto"

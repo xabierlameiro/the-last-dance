@@ -1,5 +1,6 @@
 .adsbygoogle {
     background-color: rgba(var(--blog-background));
+    display: block;
 }
 
 .horizontal {
@@ -10,10 +11,7 @@
 
 @media screen and (min-width: 300px) and (max-width: 900px) {
     .horizontal {
-        height: auto !important;
         visibility: visible;
         overflow: hidden;
-        width: 100% !important;
-        margin: 0 !important;
     }
 }
