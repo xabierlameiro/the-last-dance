@@ -59,14 +59,14 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot }: Props) => {
                         className={clx('adsbygoogle', styles.adsbygoogle)}
                         style={{ ...sizes }}
                         data-ad-slot={slot}
-                        data-ad-client={client}
                         data-ad-format="auto"
                         data-full-width-responsive="true"
                         title="Google Adsense"
                     />
                     <Script
-                        async
+                        data-ad-client={client}
                         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+                        strategy="lazyOnload"
                         onReady={() => {
                             try {
                                 if (window.adsbygoogle && window.adsbygoogle.push) {
