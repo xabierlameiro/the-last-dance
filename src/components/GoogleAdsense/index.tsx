@@ -1,7 +1,7 @@
 import React from 'react';
 import { clx } from '@/helpers';
 import styles from './adsense.module.css';
-// import console from '@/helpers/console';
+import console from '@/helpers/console';
 
 type Props = {
     client?: string;
@@ -41,7 +41,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
 
     React.useEffect(() => {
         if (isProduction) {
-            if (adsbygoogle.current) {
+            if (adsbygoogle.current && sizes.width && sizes.height) {
                 try {
                     if (window.adsbygoogle && window.adsbygoogle.push) {
                         window.adsbygoogle.push({});
@@ -61,7 +61,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
                 }
             };
         }
-    }, [isProduction, horizontal]);
+    }, [isProduction, horizontal, sizes]);
 
     if (!isProduction) {
         return null;
