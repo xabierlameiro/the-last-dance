@@ -1,18 +1,5 @@
 .container,
 .adsbygoogle {
-    background-color: inherit;
+    background-color: red;
     display: block;
-}
-
-.horizontal {
-    visibility: hidden;
-    height: 0 !important;
-    overflow: hidden;
-}
-
-@media screen and (min-width: 300px) and (max-width: 900px) {
-    .horizontal {
-        visibility: visible;
-        overflow: hidden;
-    }
 }

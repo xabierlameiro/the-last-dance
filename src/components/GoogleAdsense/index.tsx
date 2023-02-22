@@ -7,7 +7,6 @@ import Script from 'next/script';
 type Props = {
     client?: string;
     slot: string;
-    horizontal?: boolean;
 };
 
 declare global {
@@ -24,10 +23,9 @@ declare global {
  *
  * @param {string} client - The client id
  * @param {string} slot - The slot id
- * @param {boolean} horizontal - If true, the adsense will be horizontal
  * @returns {JSX.Element}
  */
-const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }: Props) => {
+const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot }: Props) => {
     const adsbygoogle = React.useRef(null);
     const addContainer = React.useRef(null);
     const [sizes, setSizes] = React.useState({ width: '', height: '' });
@@ -58,11 +56,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
                     <ins
                         aria-hidden="true"
                         ref={adsbygoogle}
-                        className={clx(
-                            'adsbygoogle',
-                            styles.adsbygoogle,
-                            horizontal ? styles.horizontal : styles.block
-                        )}
+                        className={clx('adsbygoogle', styles.adsbygoogle)}
                         style={{ ...sizes }}
                         data-ad-slot={slot}
                         data-ad-format="auto"

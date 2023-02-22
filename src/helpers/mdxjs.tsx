@@ -1,15 +1,18 @@
 import { useDialog } from '@/context/dialog';
 import { default as CButtons } from '@/components/ControlButtons';
-import Loading from '@/components/RenderManager/Loading';
-
 // @ts-ignore
 import { CH } from '@xabierlameiro/code-hike/dist/components.cjs.js';
 import dynamic from 'next/dynamic';
+import Adsense from '@/components/GoogleAdsense';
+import VisibilityManager from '@/components/VisibilityManager';
 
-const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
-    loading: () => <Loading />,
-    ssr: true,
-});
+const GoogleAdsense = () => {
+    return (
+        <VisibilityManager hideOnDesktop hideOnTablet>
+            <Adsense slot="6172794554" />
+        </VisibilityManager>
+    );
+};
 
 const Date = dynamic(() => import('@/components/Date'));
 
