@@ -28,7 +28,7 @@ declare global {
 const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot }: Props) => {
     const adsbygoogle = React.useRef(null);
     const addContainer = React.useRef(null);
-    const [sizes, setSizes] = React.useState({ width: '', height: '' });
+    const [sizes, setSizes] = React.useState({ width: '', height: '100%' });
 
     React.useEffect(() => {
         if (addContainer.current) {
