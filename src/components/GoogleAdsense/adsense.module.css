@@ -2,4 +2,5 @@
 .adsbygoogle {
     background-color: inherit;
     display: block;
+    min-height: 280px;
 }
