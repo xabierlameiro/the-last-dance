@@ -39,6 +39,18 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
         }
     }, [addContainer]);
 
+    React.useEffect(() => {
+        return () => {
+            try {
+                if (window.adsbygoogle && window.adsbygoogle.pop) {
+                    window.adsbygoogle.pop();
+                }
+            } catch (error) {
+                console.error('Google Adsense error:', error);
+            }
+        };
+    }, []);
+
     return (
         <div ref={addContainer} className={styles.container}>
             {sizes.width && sizes.height && (
@@ -61,7 +73,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
                         data-ad-client={client}
                         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
                         strategy="lazyOnload"
-                        onLoad={() => {
+                        onReady={() => {
                             try {
                                 if (window.adsbygoogle && window.adsbygoogle.push) {
                                     window.adsbygoogle.push({});
