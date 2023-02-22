@@ -28,6 +28,7 @@ declare global {
  */
 const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }: Props) => {
     const adsbygoogle = React.useRef(null);
+    const addContainer = React.useRef(null);
     const isProduction = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test';
     const [sizes, setSizes] = React.useState({ width: '100%', height: '100%' });
 
@@ -38,11 +39,15 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
                     if (window.adsbygoogle && window.adsbygoogle.push) {
                         window.adsbygoogle.push({});
 
-                        const { width, height } = (adsbygoogle.current as HTMLElement).getBoundingClientRect();
-                        if (width && height) {
+                        if (addContainer.current) {
+                            const { width: containerWidth, height: containerHeight } = (
+                                addContainer.current as HTMLElement
+                            ).getBoundingClientRect();
+                            console.log('containerWidth', containerWidth);
+                            console.log('containerHeight', containerHeight);
                             setSizes({
-                                width: width + 'px',
-                                height: height + 'px',
+                                width: containerWidth + 'px',
+                                height: containerHeight + 'px',
                             });
                         }
                     }
@@ -68,17 +73,19 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
     }
 
     return (
-        <ins
-            aria-hidden="true"
-            ref={adsbygoogle}
-            className={clx(styles.adsbygoogle, horizontal ? styles.horizontal : styles.block)}
-            style={{ ...sizes }}
-            data-ad-client={client}
-            data-ad-slot={slot}
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-            title="Google Adsense"
-        />
+        <div ref={addContainer}>
+            <ins
+                aria-hidden="true"
+                ref={adsbygoogle}
+                className={clx(styles.adsbygoogle, horizontal ? styles.horizontal : styles.block)}
+                style={{ ...sizes }}
+                data-ad-client={client}
+                data-ad-slot={slot}
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+                title="Google Adsense"
+            />
+        </div>
     );
 };
 
