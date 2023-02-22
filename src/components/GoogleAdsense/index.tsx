@@ -29,6 +29,7 @@ declare global {
 const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }: Props) => {
     const adsbygoogle = React.useRef(null);
     const isProduction = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test';
+    const [sizes, setSizes] = React.useState({ width: '100%', height: '100%' });
 
     React.useEffect(() => {
         if (isProduction) {
@@ -36,6 +37,14 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
                 try {
                     if (window.adsbygoogle && window.adsbygoogle.push) {
                         window.adsbygoogle.push({});
+
+                        const { width, height } = (adsbygoogle.current as HTMLElement).getBoundingClientRect();
+                        if (width && height) {
+                            setSizes({
+                                width: width + 'px',
+                                height: height + 'px',
+                            });
+                        }
                     }
                 } catch (error) {
                     console.error('Google Adsense error:', error);
@@ -59,19 +68,17 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
     }
 
     return (
-        <div style={{ textAlign: 'center', margin: '10px 0 10px 0' }}>
-            <ins
-                aria-hidden="true"
-                ref={adsbygoogle}
-                className={clx('adsbygoogle', horizontal ? styles.horizontal : styles.block)}
-                style={{ display: 'block', width: '100%', height: '100%' }}
-                data-ad-client={client}
-                data-ad-slot={slot}
-                data-ad-format="auto"
-                data-full-width-responsive="true"
-                title="Google Adsense"
-            />
-        </div>
+        <ins
+            aria-hidden="true"
+            ref={adsbygoogle}
+            className={clx('adsbygoogle', horizontal ? styles.horizontal : styles.block)}
+            style={{ display: 'block', ...sizes }}
+            data-ad-client={client}
+            data-ad-slot={slot}
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+            title="Google Adsense"
+        />
     );
 };
 
