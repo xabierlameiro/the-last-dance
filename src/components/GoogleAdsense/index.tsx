@@ -33,23 +33,18 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot, horizontal }:
     const [sizes, setSizes] = React.useState({ width: '100%', height: '100%' });
 
     React.useEffect(() => {
+        if (addContainer.current) {
+            const { clientWidth, clientHeight } = addContainer.current;
+            setSizes({ width: clientWidth + 'px', height: clientHeight + 'px' });
+        }
+    }, [addContainer]);
+
+    React.useEffect(() => {
         if (isProduction) {
             if (adsbygoogle.current) {
                 try {
                     if (window.adsbygoogle && window.adsbygoogle.push) {
                         window.adsbygoogle.push({});
-
-                        if (addContainer.current) {
-                            const { width: containerWidth, height: containerHeight } = (
-                                addContainer.current as HTMLElement
-                            ).getBoundingClientRect();
-                            console.log('containerWidth', containerWidth);
-                            console.log('containerHeight', containerHeight);
-                            setSizes({
-                                width: containerWidth + 'px',
-                                height: containerHeight + 'px',
-                            });
-                        }
                     }
                 } catch (error) {
                     console.error('Google Adsense error:', error);
