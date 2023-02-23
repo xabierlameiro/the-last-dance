@@ -2,7 +2,6 @@ import React from 'react';
 import { clx } from '@/helpers';
 import styles from './adsense.module.css';
 import console from '@/helpers/console';
-import Script from 'next/script';
 
 type Props = {
     client?: string;
@@ -38,6 +37,16 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot }: Props) => {
     }, [addContainer]);
 
     React.useEffect(() => {
+        if (adsbygoogle.current) {
+            try {
+                if (window.adsbygoogle && window.adsbygoogle.push) {
+                    window.adsbygoogle.push({});
+                }
+            } catch (error) {
+                console.error('Google Adsense error:', error);
+            }
+        }
+
         return () => {
             try {
                 if (window.adsbygoogle && window.adsbygoogle.pop) {
@@ -63,19 +72,6 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot }: Props) => {
                         data-ad-format="auto"
                         data-full-width-responsive="true"
                         title="Google Adsense"
-                    />
-                    <Script
-                        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-                        strategy="worker"
-                        onReady={() => {
-                            try {
-                                if (window.adsbygoogle && window.adsbygoogle.push) {
-                                    window.adsbygoogle.push({});
-                                }
-                            } catch (err) {
-                                console.error(err);
-                            }
-                        }}
                     />
                 </>
             )}

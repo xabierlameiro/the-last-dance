@@ -18,6 +18,7 @@ import { clx } from '@/helpers';
 import dynamic from 'next/dynamic';
 import useWindowResize from '@/hooks/useWidowResize';
 import SEO from '@/components/SEO';
+import Script from 'next/script';
 
 const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
     loading: () => <Loading />,
@@ -71,6 +72,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
 
     return (
         <>
+            <Script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" async />
             <SEO meta={{ ...post.meta }} isBlog />
             <Dialog
                 modalMode={isMobile}
