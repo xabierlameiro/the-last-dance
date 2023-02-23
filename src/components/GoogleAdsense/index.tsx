@@ -66,7 +66,7 @@ const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot }: Props) => {
                     />
                     <Script
                         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-                        strategy="lazyOnload"
+                        strategy="worker"
                         onReady={() => {
                             try {
                                 if (window.adsbygoogle && window.adsbygoogle.push) {
