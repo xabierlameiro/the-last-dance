@@ -111,8 +111,8 @@ export const setInverval = (ref: React.RefObject<HTMLDivElement>) => {
  */
 export const fetcher = (url: string): Promise<any> =>
     fetch(url).then((res) => {
-        if (!res.ok) {
-            throw new Error(res.statusText);
+        if (res.ok) {
+            return res.json();
         }
-        res.json();
+        throw new Error(res.statusText);
     });
