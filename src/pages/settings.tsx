@@ -49,7 +49,7 @@ const Content = () => {
                 <div className={styles.lang}>
                     <IconWithName
                         horizontal
-                        icon="/lang.png"
+                        icon="/settings/lang.png"
                         alt={f({ id: 'settings.langAlt' })}
                         name={f({ id: 'settings.lang.description' })}
                     />
@@ -62,7 +62,7 @@ const Content = () => {
         <div className={styles.container}>
             <div className={styles.content}>
                 <Avatar
-                    img="/avatar.png"
+                    img="/settings/avatar.png"
                     name="Xabier Lameiro Cardama"
                     alt={f({ id: 'settings.avatar' })}
                     description={f({ id: 'settings.desc' })}
@@ -70,13 +70,13 @@ const Content = () => {
             </div>
             <section className={styles.confg}>
                 <IconWithName
-                    icon="/lang.png"
+                    icon="/settings/lang.png"
                     alt={f({ id: 'settings.langAlt' })}
                     name={f({ id: 'settings.lang' })}
                     onClick={toggleHandler(dispatch)}
                 />
                 <IconWithName
-                    icon="/theme.png"
+                    icon="/settings/theme.png"
                     alt={f({ id: 'settings.langAlt' })}
                     name={f({ id: theme === dark ? 'settings.dark' : 'settings.light' })}
                     onClick={toggleTheme}

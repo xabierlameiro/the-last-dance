@@ -6,12 +6,12 @@ type Item = {
 
 export const menu: Array<Item> = [
     {
-        img: 'https://code.visualstudio.com/assets/branding/app-icon.png',
+        img: '/menu/vscode.png',
         alt: 'Go to home page',
         link: '/',
     },
     {
-        img: 'https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c849ec3735b52cef9_notes.png',
+        img: '/menu/notes.png',
         alt: 'Go to blog',
         link: {
             en: '/blog/react/how-document-my-react-components-with-jsdoc',
@@ -20,17 +20,17 @@ export const menu: Array<Item> = [
         },
     },
     {
-        img: 'https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853ff487808618142bfa_terminal.png',
+        img: '/menu/terminal.png',
         alt: 'Go to terminal',
         link: '/comments',
     },
     {
-        img: 'https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853481255c83c23a37ad_books.png',
+        img: '/menu/books.png',
         alt: 'Legal documents',
         link: '/legal/cookies-policy',
     },
     {
-        img: 'https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853f10f5994a4d27b0aa_system-preferences.png',
+        img: '/menu/settings.png',
         alt: 'Got to configuration page',
         link: '/settings',
     },

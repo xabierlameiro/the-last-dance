@@ -26,7 +26,7 @@ const Template: ComponentStory<typeof IconWithName> = (args) => <IconWithName {.
 export const Primary = Template.bind({});
 
 Primary.args = {
-    icon: '/lang.png',
+    icon: '/settings/lang.png',
     alt: 'This is an icon',
     name: 'Settings',
     horizontal: true,

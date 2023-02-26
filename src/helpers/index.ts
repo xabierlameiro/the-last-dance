@@ -109,4 +109,10 @@ export const setInverval = (ref: React.RefObject<HTMLDivElement>) => {
  * @returns {Promise<any>}
  * @see https://swr.vercel.app/docs/data-fetching
  */
-export const fetcher = (url: string) => fetch(url).then((res) => res.json());
+export const fetcher = (url: string): Promise<any> =>
+    fetch(url).then((res) => {
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+        res.json();
+    });
