@@ -20,6 +20,6 @@ export const Primary = Template.bind({});
 Primary.args = {
     name: 'Juan Carlos de Borbón',
     description: 'Rey emérito de España',
-    img: '/avatar.png',
+    img: '/settings/avatar.png',
     alt: 'Quien bien se vive!',
 };
