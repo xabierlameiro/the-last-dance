@@ -30,7 +30,9 @@ export const GoogleAdsense: AdComponent = ({ client = 'ca-pub-3537017956623483',
                 data-full-width-responsive="true"
             />
             <Script
+                async
                 id={id + '#' + slot}
+                onError={(e) => {}}
                 dangerouslySetInnerHTML={{
                     __html: `
                         try {
