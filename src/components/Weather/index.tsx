@@ -45,7 +45,7 @@ const Weather = ({ cities, open, handleClose }: { cities: string[]; open?: boole
                                     <div className={styles.cityName}>{city?.city?.replace(/\+/g, ' ')}</div>
                                     <div className={styles.cityGrade}>{`${city?.grades} ºC | ºF`}</div>
                                     {city?.imageUrl && (
-                                        <Img src={`https:${city?.imageUrl}`} width={70} height={70} alt={city?.name} />
+                                        <Img src={city?.imageUrl} width={70} height={70} alt={city?.name} />
                                     )}
                                     <div className={styles.info}>
                                         <div className={styles.cityPrecipitation}>

@@ -72,7 +72,11 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
 
     return (
         <>
-            <Script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" async />
+            <Script
+                async
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+                crossOrigin="anonymous"
+            />
             <SEO meta={{ ...post.meta }} isBlog />
             <Dialog
                 modalMode={isMobile}
