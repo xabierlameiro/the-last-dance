@@ -1,18 +1,10 @@
-import React from 'react';
-import { clx } from '@/helpers';
-import styles from './adsense.module.css';
-import console from '@/helpers/console';
+import Script from 'next/script';
+import { FC, useId } from 'react';
 
-type Props = {
-    client?: string;
+type AdComponent = FC<{
     slot: string;
-};
-
-declare global {
-    interface Window {
-        adsbygoogle: { [key: string]: unknown }[];
-    }
-}
+    client?: string;
+}>;
 
 /**
  * @description - The adsense will be rendered only in production mode and horizontal only on mobile
@@ -24,59 +16,26 @@ declare global {
  * @param {string} slot - The slot id
  * @returns {JSX.Element}
  */
-const GoogleAdsense = ({ client = 'ca-pub-3537017956623483', slot }: Props) => {
-    const adsbygoogle = React.useRef(null);
-    const addContainer = React.useRef(null);
-    const [sizes, setSizes] = React.useState({ width: '', height: '100%' });
 
-    React.useEffect(() => {
-        if (addContainer.current) {
-            const { clientWidth, clientHeight } = addContainer.current;
-            setSizes({ width: clientWidth + 'px', height: clientHeight + 'px' });
-        }
-    }, [addContainer]);
-
-    React.useEffect(() => {
-        if (adsbygoogle.current) {
-            try {
-                if (window.adsbygoogle && window.adsbygoogle.push) {
-                    window.adsbygoogle.push({});
-                }
-            } catch (error) {
-                console.error('Google Adsense error:', error);
-            }
-        }
-
-        return () => {
-            try {
-                if (window.adsbygoogle && window.adsbygoogle.pop) {
-                    window.adsbygoogle.pop();
-                }
-            } catch (error) {
-                console.error('Google Adsense error:', error);
-            }
-        };
-    }, []);
-
+export const GoogleAdsense: AdComponent = ({ client = 'ca-pub-3537017956623483', slot }) => {
+    const id = useId();
     return (
-        <div ref={addContainer} className={styles.container}>
-            {sizes.width && sizes.height && (
-                <>
-                    <ins
-                        aria-hidden="true"
-                        ref={adsbygoogle}
-                        className={clx('adsbygoogle', styles.adsbygoogle)}
-                        style={{ ...sizes }}
-                        data-ad-slot={slot}
-                        data-ad-client={client}
-                        data-ad-format="auto"
-                        data-full-width-responsive="true"
-                        title="Google Adsense"
-                    />
-                </>
-            )}
-        </div>
+        <>
+            <ins
+                className="adsbygoogle"
+                style={{ display: 'block' }}
+                data-ad-client={client}
+                data-ad-slot={slot}
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+            />
+            <Script
+                id={id + '#' + slot}
+                dangerouslySetInnerHTML={{
+                    __html: `(adsbygoogle = window.adsbygoogle || []).push({});`,
+                }}
+            />
+        </>
     );
 };
-
 export default GoogleAdsense;
