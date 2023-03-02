@@ -1,7 +1,5 @@
 // jest.config.js
 import nextJest from 'next/jest.js';
-import pkg from '@next/env';
-const { loadEnvConfig } = pkg;
 
 const createJestConfig = nextJest({
     // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
@@ -33,10 +31,6 @@ const customJestConfig = {
         '^@/hooks(.*)$': '<rootDir>src/hooks/$1',
         '^@/constants(.*)$': '<rootDir>src/constants/$1',
     },
-
-    // Load environment variables from .env.test.local and .env.test
-    // https://nextjs.org/docs/basic-features/environment-variables#test-environment-variables
-    ...loadEnvConfig(process.cwd(), true).combinedEnv,
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
