@@ -32,14 +32,9 @@ export const GoogleAdsense: AdComponent = ({ client = 'ca-pub-3537017956623483',
             <Script
                 async
                 id={id + '#' + slot}
-                onError={(e) => {}}
                 dangerouslySetInnerHTML={{
                     __html: `
-                        try {
                             (adsbygoogle = window.adsbygoogle || []).push({});
-                        } finally {
-                            console.log('Adsense loaded');
-                        }
                     `,
                 }}
             />
