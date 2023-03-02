@@ -25,7 +25,7 @@ const getWeatherData = async (city: string) => {
         const precipitation = weatherBox.querySelector('#wob_pp')?.textContent;
         const humidity = weatherBox.querySelector('#wob_hm')?.textContent;
         const windSpeed = weatherBox.querySelector('#wob_ws')?.textContent;
-        const imageUrl = (weatherBox.querySelector('#wob_tci') as HTMLImageElement)?.src;
+        const imageUrl = (weatherBox.querySelector('#dimg_1') as HTMLImageElement)?.src;
 
         return {
             city,
