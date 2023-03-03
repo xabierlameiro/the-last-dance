@@ -40,6 +40,10 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
             }
         });
 
+        if (!data || !data.data) {
+            res.status(204).json({ statusCode: 204, message: 'No content' });
+        }
+
         const outsideTemp = data.data.items?.find((item: any) => item.id === 'OutsideTemp').value;
 
         const zoneMeasuredTemp = data.data.items?.find((item: any) => item.id === 'ZoneMeasuredTemp').value;

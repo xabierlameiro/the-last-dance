@@ -28,6 +28,7 @@ const useAnalytics = (all?: boolean): ReturnType => {
         keepPreviousData: all ? true : false,
         fallback: initialValues,
         fallbackData: initialValues,
+        dedupingInterval: 5000,
     });
 
     return {

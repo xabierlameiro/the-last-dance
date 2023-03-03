@@ -20,6 +20,7 @@ const useHeating = (): {
         keepPreviousData: true,
         fallback: initialValues,
         fallbackData: initialValues,
+        dedupingInterval: 5000,
     });
 
     return {
