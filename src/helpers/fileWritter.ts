@@ -56,7 +56,8 @@ export const createSiteMap = (
                 page !== 'blog' &&
                 page !== 'api' &&
                 page !== 'legal' &&
-                page !== '404.tsx'
+                page !== '404.tsx' &&
+                page !== '500.tsx'
         )
         .map((page) => {
             page = page.replace('.tsx', '');
