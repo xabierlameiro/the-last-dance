@@ -16,6 +16,7 @@ const GoogleAdsense = () => {
                     display: 'grid',
                     margin: '0 auto',
                     minHeight: '321px',
+                    overflow: 'hidden',
                 }}
             >
                 <Adsense slot="6172794554" />
