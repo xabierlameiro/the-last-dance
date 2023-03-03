@@ -17,7 +17,7 @@
 -   `public/posts/*` - The folder where all pictures for my blog posts live.
 -   `src/components/*` - The folder where all of my components live.
 -   `src/pages/*` - The folder where all of my pages live.
--   `src/pages/api - The folder for API.
+-   `src/pages/api` - The folder for API.
 -   `src/pages/_app.tsx` - Global configuration for the application.
 -   `src/pages/_document.tsx` - Global configuration for the document.
 -   `src/constants/*` - The folder where all of my constants live.
