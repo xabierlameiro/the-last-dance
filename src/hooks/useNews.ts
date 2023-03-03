@@ -11,6 +11,7 @@ const useNews = (city: string) => {
 
     const { data, error, isLoading } = useSWR(memoUrl, fetcher, {
         keepPreviousData: true,
+        dedupingInterval: 5000,
         fallbackData: {
             news: [
                 {
