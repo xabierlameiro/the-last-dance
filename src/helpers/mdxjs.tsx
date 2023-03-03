@@ -11,7 +11,14 @@ const Adsense = dynamic(() => import('@/components/GoogleAdsense'), { ssr: false
 const GoogleAdsense = () => {
     return (
         <VisibilityManager hideOnDesktop hideOnTablet>
-            <Adsense slot="6172794554" />
+            <div
+                style={{
+                    display: 'grid',
+                    margin: '0 10px',
+                }}
+            >
+                <Adsense slot="6172794554" />
+            </div>
         </VisibilityManager>
     );
 };
