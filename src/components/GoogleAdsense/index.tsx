@@ -27,8 +27,6 @@ export const GoogleAdsense: AdComponent = ({ client = 'ca-pub-3537017956623483',
                 className="adsbygoogle"
                 style={{
                     display: 'block',
-                    width: '100%',
-                    margin: '0 auto',
                 }}
                 data-ad-client={client}
                 data-ad-slot={slot}
