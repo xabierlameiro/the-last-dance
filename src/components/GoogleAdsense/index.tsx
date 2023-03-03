@@ -33,12 +33,11 @@ export const GoogleAdsense: AdComponent = ({ client = 'ca-pub-3537017956623483',
                 async
                 id={id + '#' + slot}
                 dangerouslySetInnerHTML={{
-                    __html: `
-                            (adsbygoogle = window.adsbygoogle || []).push({});
-                    `,
+                    __html: `(adsbygoogle = window.adsbygoogle || []).push({});`,
                 }}
             />
         </>
     );
 };
+
 export default GoogleAdsense;
