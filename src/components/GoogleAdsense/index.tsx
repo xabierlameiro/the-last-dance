@@ -22,6 +22,8 @@ export const GoogleAdsense: AdComponent = ({ client = 'ca-pub-3537017956623483',
     return (
         <>
             <ins
+                aria-hidden="true"
+                title="Google Adsense"
                 className="adsbygoogle"
                 style={{ display: 'block' }}
                 data-ad-client={client}
