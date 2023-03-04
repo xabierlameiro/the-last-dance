@@ -1,0 +1,64 @@
+.container h1 {
+    font-size: clamp(24px, 2vw, 26px);
+    margin: 20px 0;
+    user-select: none;
+}
+
+.container img {
+    max-width: 400px;
+    display: block;
+    margin: 20px auto;
+    box-shadow: 0 0 10px 0 rgb(0 0 0 / 50%);
+    border-radius: 5px;
+}
+
+.container h2 {
+    font-size: clamp(18px, 1.5vw, 20px);
+}
+
+.container p {
+    font-size: clamp(20px, 1.5vw, 20px);
+    line-height: 1.3;
+    padding-bottom: 20px;
+}
+
+.container label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: clamp(20px, 1.5vw, 20px);
+}
+.container label:hover {
+    font-weight: 700;
+}
+.container input[type='radio'] {
+    margin: 5px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 0 10px 0 0;
+}
+
+.question {
+    display: grid;
+    gap: 8px;
+}
+
+.questionHtml {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding-bottom: 20px;
+}
+
+.buttons svg {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}

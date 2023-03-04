@@ -12,6 +12,8 @@
     transition: all 0.3s ease-in;
     overflow: hidden;
     border-radius: 10px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
 }
 
 .dialog.open {
@@ -55,9 +57,4 @@
 
 .padding {
     padding: 20px;
-}
-
-.body {
-    height: 100%;
-    max-height: 100%;
 }

@@ -6,6 +6,8 @@ type WindowTpe = {
     isTablet: boolean;
     isMobileOrTablet: boolean;
     isDesktop: boolean;
+    width: number;
+    height: number;
 };
 
 function useWindowResize(): WindowTpe {
@@ -13,6 +15,8 @@ function useWindowResize(): WindowTpe {
         isMobile: false,
         isTablet: false,
         isDesktop: false,
+        width: 0,
+        height: 0,
     });
 
     React.useEffect(() => {
@@ -21,6 +25,8 @@ function useWindowResize(): WindowTpe {
                 isMobile: window.innerWidth <= mobileMax,
                 isTablet: window.innerWidth <= tabletMax && window.innerWidth >= tabletMin,
                 isDesktop: window.innerWidth >= desktopMin,
+                width: window.innerWidth,
+                height: window.innerHeight,
             });
         };
         window.addEventListener('resize', handleResize);
@@ -37,6 +43,8 @@ function useWindowResize(): WindowTpe {
         isTablet: widowSize.isTablet,
         isMobileOrTablet: widowSize.isMobile || widowSize.isTablet,
         isDesktop: widowSize.isDesktop,
+        width: widowSize.width,
+        height: widowSize.height,
     };
 }
 export default useWindowResize;
