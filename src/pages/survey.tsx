@@ -19,7 +19,7 @@ const Survey = () => {
         answers: [],
     };
     // reducer
-    const reducer = (state, action) => {
+    const reducer = (state: any, action: any) => {
         switch (action.type) {
             case 'NEXT_QUESTION':
                 return {
@@ -62,7 +62,7 @@ const Survey = () => {
         {
             questionText: '¿ Continuamos ?',
             questionHtml: `
-                <h1>Hola ${name.charAt(0).toUpperCase() + name.slice(1)}, gracias por ponerte en contanto!</h1>
+                <h1>Hola ${(name as any).charAt(0).toUpperCase() + name.slice(1)}, gracias por ponerte en contanto!</h1>
                 <p>
                     Si has llegado hasta aquí, seguro que es por que tienes una posición increíble y me lo
                     quieres contar!! Pero antes de conocernos y que me hagas muchas preguntas, a mi también me
