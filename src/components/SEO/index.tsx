@@ -63,7 +63,7 @@ const SEO = ({ meta, isBlog, cookies = true, noimage = true }: Props) => {
                                 headline: title,
                                 description: description,
                                 url: url,
-                                image: [`${process.env.NEXT_PUBLIC_DOMAIN}/${image}`],
+                                ...(image && { image: [`${process.env.NEXT_PUBLIC_DOMAIN}/${image}`] }),
                                 datePublished: new Date().toISOString(),
                                 dateModified: new Date().toISOString(),
                                 author: [
