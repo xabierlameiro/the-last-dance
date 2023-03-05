@@ -5,3 +5,7 @@ declare module 'glob' {
 declare module 'prettier' {
     export function format(content: string, options?: Object): string;
 }
+
+declare module 'nodemailer' {
+    export function createTransport(options?: Object): Object;
+}
