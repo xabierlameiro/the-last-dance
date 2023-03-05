@@ -6,6 +6,8 @@ import ControlButtons from '@/components/ControlButtons';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import Confetti from 'react-confetti';
 import useWindowResize from '@/hooks/useWidowResize';
+import SEO from '@/components/SEO';
+
 const Survey = () => {
     // get name for query params
     const { query } = useRouter();
@@ -237,11 +239,11 @@ const Survey = () => {
                             message: `
                                 <h1> ${name} </h1>
                                 <code> ${navigator.userAgent} </code>
-                                <ul> 
+                                <ol> 
                                     ${state.answers.map(
                                         (answer: any) => `<li> ${answer.question} : ${answer.answer} </li>`
                                     )}
-                                    </ul>
+                                </ol>
                                 `.replace(/,/g, ''),
                         }),
                     });
@@ -256,6 +258,15 @@ const Survey = () => {
     return (
         <>
             <Confetti width={width} height={height} numberOfPieces={100} run={state.success} />
+            <SEO
+                cookies={false}
+                meta={{
+                    title: `Hola ${name}!`,
+                    description:
+                        'Gracias por ponerte en contacto conmigo, si quieres saber si soy compatible con tu posición en solo 1 minuto, click aquí. ',
+                    noindex: true,
+                }}
+            />
             <Dialog
                 open
                 modalMode
