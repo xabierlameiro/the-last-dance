@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useReducer } from 'react';
+import { useReducer, useEffect, useRef } from 'react';
 import Dialog from '@/components/Dialog';
 import styles from '@/styles/survey.module.css';
 import ControlButtons from '@/components/ControlButtons';
@@ -11,6 +11,7 @@ const Survey = () => {
     const { query } = useRouter();
     const { name = '&#128075;' } = query;
     const { width, height } = useWindowResize();
+    const emailRef = useRef<boolean>(false);
     // initial state
     const initialState = {
         currentQuestion: 0,
@@ -211,7 +212,7 @@ const Survey = () => {
                         <li> Descárgate mi  <a href="/xabierlameiro.com.pdf" download> currículum </a></li>
                     </ul>`
                         : `
-                    <h1> Lo siento mucho ${name}!  </h1>
+                    <h1> Lo siento mucho </h1>
                     <img src="/disappointed.gif" alt="celebration" width="100%" />
                     <p> Pero parece que la posición y yo no somos compatibles en estos momentos! </p>
                     <p> Te agradezco mucho tu tiempo y espero que encuentres lo que buscas muy pronto. </p>
@@ -221,6 +222,35 @@ const Survey = () => {
             </section>`,
         },
     ];
+
+    useEffect(() => {
+        if (state.currentQuestion === questions.length - 1 && !emailRef.current) {
+            (async () => {
+                try {
+                    await fetch('/api/email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            subject: `Job survey - ${name} - ${new Date().toLocaleString()}`,
+                            message: JSON.stringify({
+                                userAgent: navigator.userAgent,
+                                ...state.answers.map((answer: any) => ({
+                                    question: answer.question,
+                                    answer: answer.answer,
+                                    isCorrect: answer.isCorrect,
+                                })),
+                            }),
+                        }),
+                    });
+                    emailRef.current = true;
+                } catch (e) {
+                    console.log(e);
+                }
+            })();
+        }
+    }, [state, name, questions.length]);
 
     return (
         <>
