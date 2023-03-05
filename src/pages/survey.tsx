@@ -263,8 +263,7 @@ const Survey = () => {
                 noimage={false}
                 meta={{
                     title: 'Averigua si hago match con la posición en 1 minuto',
-                    description:
-                        'Si has llegado hasta aquí, seguro que es por que tienes una posición increíble y me lo quieres contar!! Pero antes de conocernos y que me hagas muchas preguntas, a mi también me gustaría verificar algunas cosas primero, para saber si la posición y yo, somos compatibles.',
+                    description: 'Click aquí',
                     noindex: true,
                 }}
             />
