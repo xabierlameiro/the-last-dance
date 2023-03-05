@@ -233,15 +233,16 @@ const Survey = () => {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            subject: `Job survey - ${name} - ${new Date().toLocaleString()}`,
-                            message: JSON.stringify({
-                                userAgent: navigator.userAgent,
-                                ...state.answers.map((answer: any) => ({
-                                    question: answer.question,
-                                    answer: answer.answer,
-                                    isCorrect: answer.isCorrect,
-                                })),
-                            }),
+                            subject: `Job survey from ${name} - ${new Date().toLocaleString()}`,
+                            message: `
+                                <h1> ${name} </h1>
+                                <code> ${navigator.userAgent} </code>
+                                <ul> 
+                                    ${state.answers.map(
+                                        (answer: any) => `<li> ${answer.question} : ${answer.answer} </li>`
+                                    )}
+                                    </ul>
+                                `.replace(/,/g, ''),
                         }),
                     });
                     emailRef.current = true;

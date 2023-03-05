@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         from: process.env.EMAIL,
         to: process.env.EMAIL,
         subject: subject,
-        text: message,
+        html: message,
     };
 
     try {
