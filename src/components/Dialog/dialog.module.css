@@ -58,3 +58,7 @@
 .padding {
     padding: 20px;
 }
+
+.body {
+    height: 100%;
+}

@@ -66,7 +66,7 @@ const Survey = () => {
                 <p>
                     Si has llegado hasta aquí, seguro que es por que tienes una posición increíble y me lo
                     quieres contar!! Pero antes de conocernos y que me hagas muchas preguntas, a mi también me
-                    gustaría verificar algunas cosas primero, para saber si yo y la posición somos compatibles.
+                    gustaría verificar algunas cosas primero, para saber si la posición y yo, somos compatibles.
                 </p> 
                 <p>
                     Si lo somos... te mostraré mi <strong>número de teléfono</strong>, 
@@ -89,7 +89,7 @@ const Survey = () => {
         },
         {
             questionText: 'Tipo de contrato:',
-            questionHtml: '<h1>La contrato será :</h1>',
+            questionHtml: '<h1>El contrato será :</h1>',
             answerOptions: [
                 { answerText: 'Remoto 100% pero solo en España', isCorrect: true },
                 { answerText: 'Remoto 100% en todo el mundo', isCorrect: true },
@@ -125,7 +125,7 @@ const Survey = () => {
         },
         {
             questionText: 'Días de vacaciones:',
-            questionHtml: '<h1>La cantidad de días de vacaciones son :</h1>',
+            questionHtml: '<h1>Los días de vacaciones son :</h1>',
             answerOptions: [
                 { answerText: '22 - 23', isCorrect: false },
                 { answerText: '24 - 26', isCorrect: true },
@@ -171,41 +171,54 @@ const Survey = () => {
         {
             questionHtml: `
             <section>
+                <h1>¡¡¡ OMG !!! Somos compatibles</h1>
                 <img src="${state.success ? '/celebration.gif' : '/disappointed.gif'}" alt="celebration" width="100%" />
+                <h2> ¿ Quieres contarme más ? <a href="tel:+34603018268'" >603018268</a></h2>
                 ${
                     state.success
                         ? `
-                    <p> Mi teléfono es: <strong> +34 603 018 268 </strong></p>
-                    <p> Mi correo es: <strong> xabier.lameiro@gmail.com </strong></p>
+                    
                     <table>
+                      
                         <tr>
-                            <th> L </th>
-                            <th> M </th>
-                            <th> M </th>
-                            <th> J </th>    
-                            <th> V </th>
+                            <td> Lunes </td>
+                            <td> 10:00 - 14:00 </td>
+                            <td> 18:00 - 21:00 </td>
+                         
                         </tr>
                         <tr>
-                            <td> 10-13 </td>
-                            <td> 10-13 </td>
-                            <td> 10-13 </td>
-                            <td> 10-13 </td>
-                            <td> 10-13 </td>
+                            <td> Martes </td>
+                            <td> 10:00 - 14:00 </td>
+                            <td> 18:00 - 21:00 </td>
                         </tr>
                         <tr>
-                            <td> 18-21 </td>
-                            <td> 18-21 </td>
-                            <td> 18-21 </td>
-                            <td> 18-21 </td>
-                            <td> 18-21 </td>
+                            <td> Miércoles </td>
+                            <td> 10:00 - 14:00 </td>
+                            <td> 18:00 - 21:00 </td>
                         </tr>
+                        <tr>
+                            <td> Jueves </td>
+                            <td> 10:00 - 14:00 </td>
+                            <td> 18:00 - 21:00 </td>
+                        </tr>
+                        <tr>
+                            <td> Viernes </td>
+                            <td> 10:00 - 14:00 </td>
+                            <td> 18:00 - 21:00 </td>
+                        </tr>
+
                     </table>
-                    <p> Descarga mi  <a href="/xabierlameiro.com.pdf" download> curriculum </a></p>
-                    <p> Enlace a mi <a href="https://github.com/xabierlameiro" target="_blank"> github </a></p>
+                    <ul>
+                        <li> Escríbeme a <a href="mailto:xabier.lameiro@gmail.cm" target="_blank">xabier.lameiro@gmail.com</a></li>
+                        <li> Enlace a mi <a href="https://github.com/xabierlameiro" target="_blank"> github </a></li>
+                        <li> Enlace a mi <a href="https://www.linkedin.com/in/xlameiro/" target="_blank"> linkedin </a></li>
+                        <li> Descargate mi  <a href="/xabierlameiro.com.pdf" download> curriculum </a></li>
+                    </ul>
                 `
                         : `
                     <h1> Lo siento mucho ${name} </h1>
-                    <p> Pero parece que yo y la posición no somos compatibles en estos momentos, te agradezco mucho tu tiempo y espero que encuentres lo que buscas. </p>
+                    <p> Pero parece que yo y la posición no somos compatibles en estos momentos!</p>
+                    <p> Te agradezco mucho tu tiempo y espero que encuentres lo que buscas pronto. </p>
                     <p> Un saludo. Xabier! </p>
                 `
                 }

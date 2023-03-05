@@ -1,6 +1,7 @@
 .container h1 {
     font-size: clamp(24px, 2vw, 26px);
     margin: 20px 0;
+    text-align: center;
     user-select: none;
 }
 
@@ -61,4 +62,22 @@
     width: 20px;
     height: 20px;
     cursor: pointer;
+}
+
+.container table {
+    width: 100%;
+    max-width: 400px;
+    margin: 10px 0;
+    font-size: clamp(18px, 1.5vw, 20px);
+}
+
+.container ul {
+    padding: 10px 0;
+    margin: 0;
+    list-style: none;
+}
+
+.container ul li {
+    padding: 5px 0;
+    font-size: clamp(18px, 1.5vw, 20px);
 }
