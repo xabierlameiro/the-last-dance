@@ -7,5 +7,7 @@ declare module 'prettier' {
 }
 
 declare module 'nodemailer' {
-    export function createTransport(options?: Object): Object;
+    export function createTransport(options?: Object): {
+        sendMail(options: Object): Promise<any>;
+    };
 }
