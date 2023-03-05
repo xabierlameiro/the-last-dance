@@ -1,0 +1,111 @@
+.container section {
+    display: grid;
+    place-content: center;
+}
+.container h1 {
+    font-size: clamp(24px, 1.2vw, 26px);
+    margin: 20px 0;
+    user-select: none;
+}
+
+@media (min-width: 768px) {
+    .container section h1 {
+        margin: 0;
+        text-align: center;
+    }
+}
+
+.container img {
+    max-width: 350px;
+    display: block;
+    margin: 20px auto;
+    box-shadow: 0 0 10px 0 rgb(0 0 0 / 50%);
+    border-radius: 5px;
+}
+
+.container h2 {
+    font-size: clamp(18px, 1.2vw, 18px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container p {
+    font-size: clamp(20px, 1.2vw, 20px);
+    line-height: 1.3;
+    padding-bottom: 20px;
+}
+
+.container section p {
+    max-width: 350px;
+}
+
+.container label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: clamp(20px, 1.2vw, 20px);
+}
+
+.container label:hover {
+    font-weight: 700;
+}
+
+.container input[type='radio'] {
+    margin: 5px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 0 10px 0 0;
+}
+
+.question {
+    display: grid;
+    gap: 12px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding-bottom: 20px;
+}
+
+.buttons svg {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.container table {
+    width: 100%;
+    max-width: 400px;
+    margin: 10px 0;
+    font-size: clamp(15px, 1.2vw, 15px);
+}
+
+.container table td:nth-child(2) {
+    text-align: center;
+}
+
+.container table td:nth-child(3) {
+    text-align: right;
+}
+
+.container ul {
+    padding: 10px 0;
+    margin: 0;
+    list-style: none;
+}
+
+@media (min-width: 768px) {
+    .container ul {
+        padding: 0;
+    }
+}
+
+.container ul li {
+    padding: 5px 0;
+    font-size: clamp(15px, 1.2vw, 18px);
+}

@@ -116,7 +116,12 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                             <ArticlePanel readTime={post.meta.readTime} />
                             <div className={styles.body}>
                                 <div className={styles.mdx}>
-                                    <MDXRemote {...post.content} components={components} />
+                                    <MDXRemote
+                                        frontmatter={undefined}
+                                        {...post.content}
+                                        components={components}
+                                        scope={{}}
+                                    />
                                 </div>
                                 <aside className={styles.verticalAd}>
                                     <GoogleAdsense slot="2425121235" />
