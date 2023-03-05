@@ -151,8 +151,8 @@ const Survey = () => {
             ],
         },
         {
-            questionText: 'Promedio de antiguedad:',
-            questionHtml: '<h1>La media de antiguedad de los compañeros es de :</h1>',
+            questionText: 'Promedio de antigüedad:',
+            questionHtml: '<h1>La media de antigüedad de los compañeros es de :</h1>',
             answerOptions: [
                 { answerText: 'Menos de 1 año', isCorrect: false },
                 { answerText: 'Menos de 2 años', isCorrect: true },
@@ -161,7 +161,7 @@ const Survey = () => {
         },
         {
             questionText: 'Proceso de selección:',
-            questionHtml: '<h1>El proceso de seleccion consta de :</h1>',
+            questionHtml: '<h1>El proceso de selección consta de :</h1>',
             answerOptions: [
                 { answerText: 'Entrevistas', isCorrect: true },
                 { answerText: 'Entrevistas y prueba técnica larga', isCorrect: true },
@@ -171,15 +171,13 @@ const Survey = () => {
         {
             questionHtml: `
             <section>
-                <h1>¡¡¡ OMG !!! Somos compatibles</h1>
-                <img src="${state.success ? '/celebration.gif' : '/disappointed.gif'}" alt="celebration" width="100%" />
-                <h2> ¿ Quieres contarme más ? <a href="tel:+34603018268'" >603018268</a></h2>
                 ${
                     state.success
                         ? `
-                    
+                    <h1>¡¡¡ OMG !!! Somos compatibles</h1>
+                    <img src="/celebration.gif" alt="celebration" width="100%" />
+                    <h2> ¿ Quieres contarme más ? <a href="tel:+34603018268'" >603018268</a> </h2>
                     <table>
-                      
                         <tr>
                             <td> Lunes </td>
                             <td> 10:00 - 14:15 </td>
@@ -204,26 +202,22 @@ const Survey = () => {
                         <tr>
                             <td> Viernes </td>
                             <td> 10:00 - 14:15 </td>
-                            
-                            
                         </tr>
-
                     </table>
                     <ul>
                         <li> Escríbeme a <a href="mailto:xabier.lameiro@gmail.cm" target="_blank">xabier.lameiro@gmail.com</a></li>
                         <li> Enlace a mi <a href="https://github.com/xabierlameiro" target="_blank"> github </a></li>
                         <li> Enlace a mi <a href="https://www.linkedin.com/in/xlameiro/" target="_blank"> linkedin </a></li>
-                        <li> Descargate mi  <a href="/xabierlameiro.com.pdf" download> curriculum </a></li>
-                    </ul>
-                `
+                        <li> Descárgate mi  <a href="/xabierlameiro.com.pdf" download> currículum </a></li>
+                    </ul>`
                         : `
-                    <h1> Lo siento mucho ${name} </h1>
-                    <p> Pero parece que yo y la posición no somos compatibles en estos momentos!</p>
-                    <p> Te agradezco mucho tu tiempo y espero que encuentres lo que buscas pronto. </p>
-                    <p> Un saludo. Xabier! </p>
+                    <h1> Lo siento mucho ${name}!  </h1>
+                    <img src="/disappointed.gif" alt="celebration" width="100%" />
+                    <p> Pero parece que la posición y yo no somos compatibles en estos momentos! </p>
+                    <p> Te agradezco mucho tu tiempo y espero que encuentres lo que buscas muy pronto. </p>
+                    <p> Un saludo. Xabier! &#128075; </p>
                 `
                 }
-            
             </section>`,
         },
     ];
