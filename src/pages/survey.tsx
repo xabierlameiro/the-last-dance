@@ -260,10 +260,10 @@ const Survey = () => {
             <Confetti width={width} height={height} numberOfPieces={100} run={state.success} />
             <SEO
                 cookies={false}
+                noimage={false}
                 meta={{
-                    title: `Hola ${name}!`,
-                    description:
-                        'Gracias por ponerte en contacto conmigo, si quieres saber si soy compatible con tu posición en solo 1 minuto, click aquí. ',
+                    image: 'https://xabierlameiro.com/og-image.png',
+                    title: 'Averigua si hago match con la posición en 1 minuto',
                     noindex: true,
                 }}
             />

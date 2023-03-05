@@ -7,6 +7,7 @@ import Head from 'next/head';
 type Props = {
     isBlog?: boolean;
     cookies?: boolean;
+    noimage?: boolean;
     meta?: {
         noindex?: boolean;
         title: string;
@@ -26,9 +27,11 @@ type Props = {
  *
  * @param {object} meta - The object containing the meta data for SEO
  * @param {boolean} isBlog - Whether the page is a blog post the SEO changes
+ * @param {boolean} cookies - Whether to show the cookies notification
+ * @param {boolean} noimage - Whether to show the image in the SEO
  * @returns {JSX.Element}
  */
-const SEO = ({ meta, isBlog, cookies = true }: Props) => {
+const SEO = ({ meta, isBlog, cookies = true, noimage = true }: Props) => {
     const { locale: l, pathname: path } = useRouter();
     const category = meta?.category?.toLowerCase();
     const url = isBlog
@@ -106,8 +109,12 @@ const SEO = ({ meta, isBlog, cookies = true }: Props) => {
                 <meta name="twitter:description" content={description} />
                 <meta property="og:title" content={title} />
                 <meta name="twitter:title" content={title} />
-                <meta name="image" content={image} />
-                <meta property="og:image" content={`${process.env.NEXT_PUBLIC_DOMAIN}${image}`} />
+                {noimage && (
+                    <>
+                        <meta name="image" content={image} />
+                        <meta property="og:image" content={`${process.env.NEXT_PUBLIC_DOMAIN}${image}`} />
+                    </>
+                )}
                 <meta property="og:url" content={url} />
                 <link rel="canonical" href={url} title="Canonical url" />
                 {meta?.alternate?.map(({ lang, url }, index) => (
