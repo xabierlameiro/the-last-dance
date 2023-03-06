@@ -1,15 +1,16 @@
 .nav {
     display: flex;
     align-items: center;
+    gap: 20px;
 }
+
 .nav svg {
-    width: 32px;
-    height: 32px;
+    width: 18px;
+    height: 18px;
     cursor: pointer;
     transition: all 0.3s ease-in;
-    fill-opacity: 0.3;
-    stroke: none;
 }
+
 .disabled {
     pointer-events: none;
     cursor: default;
