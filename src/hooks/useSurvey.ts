@@ -229,7 +229,10 @@ const useSurvey = () => {
                                     <code> ${navigator.userAgent} </code>
                                     <ol> 
                                         ${state.answers.map(
-                                            (answer: any) => `<li> ${answer.question} : ${answer.answer} </li>`
+                                            (answer: any) =>
+                                                `<li> ${answer.question} : ${answer.answer} - ${
+                                                    answer.isCorrect ? '✅' : '🚫'
+                                                } </li>`
                                         )}
                                     </ol>
                                     `.replace(/,/g, ''),
