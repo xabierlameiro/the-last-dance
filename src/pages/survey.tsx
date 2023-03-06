@@ -25,7 +25,6 @@ const Survey = () => {
         <>
             <Confetti width={width} height={height} numberOfPieces={100} run={surveySuccess} />
             <SEO
-                cookies={false}
                 noimage={false}
                 meta={{
                     title: 'Averigua si hago match con la posición en 1 minuto',
