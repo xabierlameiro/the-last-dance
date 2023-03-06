@@ -6,6 +6,7 @@ import { IntlProvider } from 'react-intl';
 import { useRouter } from 'next/router';
 import { messages } from '../intl/translations';
 import type { AppProps, NextWebVitalsMetric } from 'next/app';
+import Notification from '@/components/Notification';
 import Layout from '@/components/Layout';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
@@ -62,6 +63,10 @@ const App = ({ Component, pageProps }: AppProps) => {
                 }}
             >
                 <ErrorBoundary>
+                    <Notification
+                        title="Cookies"
+                        message="This website uses cookies to improve the user experience, more information on the legal information path."
+                    />
                     <Layout>
                         <Component {...pageProps} />
                     </Layout>

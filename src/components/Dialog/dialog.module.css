@@ -61,4 +61,5 @@
 
 .body {
     height: 100%;
+    overflow: scroll;
 }

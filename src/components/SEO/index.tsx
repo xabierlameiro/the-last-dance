@@ -1,12 +1,11 @@
 import { useRouter } from 'next/router';
+import React from 'react';
 import { author as auth } from '@/constants/site';
 import { getLang, cleanTrailingSlash } from '@/helpers';
-import Notification from '@/components/Notification';
 import Head from 'next/head';
 
 type Props = {
     isBlog?: boolean;
-    cookies?: boolean;
     noimage?: boolean;
     meta?: {
         noindex?: boolean;
@@ -27,11 +26,10 @@ type Props = {
  *
  * @param {object} meta - The object containing the meta data for SEO
  * @param {boolean} isBlog - Whether the page is a blog post the SEO changes
- * @param {boolean} cookies - Whether to show the cookies notification
  * @param {boolean} noimage - Whether to show the image in the SEO
  * @returns {JSX.Element}
  */
-const SEO = ({ meta, isBlog, cookies = true, noimage = true }: Props) => {
+const SEO = ({ meta, isBlog, noimage = true }: Props) => {
     const { locale: l, pathname: path } = useRouter();
     const category = meta?.category?.toLowerCase();
     const url = isBlog
@@ -44,12 +42,6 @@ const SEO = ({ meta, isBlog, cookies = true, noimage = true }: Props) => {
 
     return (
         <>
-            {cookies && (
-                <Notification
-                    title="Cookies"
-                    message="This website uses cookies to improve the user experience, more information on the legal information path."
-                />
-            )}
             <Head>
                 {isBlog ? (
                     <script

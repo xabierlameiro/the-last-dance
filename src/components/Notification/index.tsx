@@ -18,10 +18,9 @@ type Props = {
  * @param {string} title - The title of the notification
  * @param {string} message - The message of the notification
  * @param {string} type - The type of the notification
- * @param {function} onClose - The function to be called when the notification is closed
  * @returns {JSX.Element}
  */
-const Notification = ({ title, message, type = 'success', onClose }: Props) => {
+const Notification = ({ title, message, type = 'success' }: Props) => {
     const [show, setShow] = React.useState(true);
 
     React.useEffect(() => {
