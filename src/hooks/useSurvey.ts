@@ -117,7 +117,7 @@ const useSurvey = () => {
             questionText: 'Días de vacaciones:',
             questionHtml: '<h1>Los días de vacaciones son :</h1>',
             answerOptions: [
-                { answerText: '22 - 23', isCorrect: false },
+                { answerText: '22 - 23', isCorrect: true },
                 { answerText: '24 - 26', isCorrect: true },
                 { answerText: '27 o más', isCorrect: true },
             ],
@@ -126,16 +126,16 @@ const useSurvey = () => {
             questionText: 'Horario de trabajo:',
             questionHtml: '<h1>¿ El horario de trabajo es flexible ?</h1>',
             answerOptions: [
-                { answerText: 'Si, pero con peros.', isCorrect: false },
+                { answerText: 'Si, pero con peros.', isCorrect: true },
                 { answerText: 'Si, totalmente.', isCorrect: true },
                 { answerText: 'No', isCorrect: false },
             ],
         },
         {
-            questionText: 'Tipo de equipo:',
-            questionHtml: '<h1>El equipo de trabajo será :',
+            questionText: 'Tipo de hardware:',
+            questionHtml: '<h1>El hardware de trabajo será :',
             answerOptions: [
-                { answerText: 'Windows', isCorrect: false },
+                { answerText: 'Windows', isCorrect: true },
                 { answerText: 'Mac/Linux', isCorrect: true },
                 { answerText: 'A escoger', isCorrect: true },
             ],
