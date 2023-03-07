@@ -21,7 +21,6 @@ const reducer = (state: any, action: any) => {
                 currentQuestion: state.currentQuestion - 1,
             };
         case 'ADD_ANSWER':
-            console.log('action.payload', action.payload);
             const { questionNum } = action.payload;
             const { answers } = state;
             const newAnswers = [...answers];
