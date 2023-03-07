@@ -27,6 +27,8 @@ const getWeatherData = async (city: string) => {
     const dom = new JSDOM(raw);
     const elements = dom.window.document.querySelectorAll('.SoaBEf');
 
+    if (!elements) return null;
+
     const news = Array.from(elements).map((element) => {
         return {
             title: element.querySelector('[role="heading"]')?.textContent,

@@ -10,12 +10,11 @@ import jsdom from 'jsdom';
 export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
     const { JSDOM } = jsdom;
     const response = await fetch('https://www.google.com/search?q=xrp+eur+price', {
-        redirect: 'follow',
         method: 'GET',
         headers: new Headers({
             'user-agent':
                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
-            'cache-control': 'no-cache',
+            'cache-control': 'max-age=0',
         }),
     })
         .then((response) => {
