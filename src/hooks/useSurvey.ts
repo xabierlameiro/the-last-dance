@@ -123,7 +123,7 @@ const useSurvey = () => {
             ],
         },
         {
-            questionText: 'Horario de trabajo:',
+            questionText: 'Horario de trabajo flexible:',
             questionHtml: '<h1>¿ El horario de trabajo es flexible ?</h1>',
             answerOptions: [
                 { answerText: 'Si, pero con peros.', isCorrect: true },
