@@ -1,0 +1,311 @@
+---
+title: 'Filtro para posicións, enquisa para comprobar compatibilidade'
+slug: 'filtro-para-posicions'
+author: 'Xabier Lameiro'
+category: 'React'
+tags: ['node']
+locale: 'gl'
+excerpt: 'Enquisa para que os recruiters poidan saber se son compatible cunha posición de traballo concreta'
+description: 'Enquisa para que os recruiters poidan saber se son compatible cunha posición de traballo concreta'
+image: '/posts/filter-for-positions.png'
+alternate: [{ lang: 'en', url: 'filter-for-positions' }, { lang: 'es', url: 'filtro-para-posiciones' }]
+---
+
+# Filtro para posicións, enquisa para comprobar compatibilidade
+
+<Date date="03-07-2023" />
+
+<GoogleAdsense slot="6618374506" horizontal />
+
+## Motivación
+
+Aínda que pareza mentira, debido á alta demanda de desarrolladores de todo tipo no mercado por parte das empresas, moitos recruiters e headhunters volvéronse máquinas do copy paste. Non sei a cifra ou a cantidade diaria de mensaxes que envían a todos os perfís da súa rede que fan "match" coa posición nova que teñen dispoñible, pero apostaría que non son poucos. E non é que non me guste que me envíen mensaxes, pero gustaríame que me enviasen mensaxes que realmente me interesen e que me fagan pensar que viron o meu perfil, o meu código ou algún dos meus traballos e que realmente me queren contratar polas miñas habilidades.
+
+Non adoita ser así, moitos usan programas para automatizar o proceso de procura de perfís como [Hiretual](https://hiretual.com/ 'Hiretual') ou [Jobvite](https://www.jobvite.com/ 'Jobvite'), envían mensaxes a todos os usuarios "que fan match" e en ocasións isto non funciona moi ben. Xa que no teu perfil pon claramente desarrollador Frontend, a túa experiencia di o mesmo... pero, eles teñen unha posición Xava con microservicios incrible para ti.
+
+Outras veces métese a pata e envíanche unha mensaxe co nome do teu compañeiro de equipo:
+
+<Image src="/coincidence.png" alt="Coincidencia" width="1024" height="726" layout="responsive" />
+
+## A idea
+
+Cantas veces tiveches unha chamada con preguntas como:
+
+-   Por que buscas un cambio ?
+-   Coñeces os principios SOLID ?
+-   Cuantos anos dirías que has traballo con React ? E Typescript ?
+-   Sabes o que é a integración continua ?
+
+> Para que despues ofrézanche un salario inferior ao que tes, ou que che pidan o CV para non volver dicirche nunca nada.
+
+How many estafes bro ?
+
+**_A idea é filtrar ti antes que che filtren a ti._**
+
+## Solución
+
+10 simples preguntas sobre puntos que consideres importantes, requisitos, valores.. ou basicamente o que che de a gana e se se cumpren, o recruiter obterá información de contacto para poder entrar en detalle de todo o proceso.
+
+É un win win, ambos aforramos tempo, non ?
+
+## Código
+
+Cunha compoñente contedora ou páxina, un par de botóns, radiobuttons e un array de objectos tes máis que suficiente, no meu caso:
+
+Teño a miña páxina:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```tsx survey.tsx
+import Dialog from '@/components/Dialog';
+import styles from '@/styles/survey.module.css';
+import ControlButtons from '@/components/ControlButtons';
+import Confetti from 'react-confetti';
+import SEO from '@/components/SEO';
+import useWindowResize from '@/hooks/useWidowResize';
+import useSurvey from '@/hooks/useSurvey';
+import NavigationArrows from '@/components/NavigationArrows';
+
+const Survey = () => {
+    const { width, height } = useWindowResize();
+    const {
+        questions,
+        answers,
+        surveySuccess,
+        totalQuestions,
+        currentQuestionNum,
+        questionsDoneNum,
+        handleNextQuestion,
+        handlePreviousQuestion,
+        handleAnswerOptionClick,
+    } = useSurvey();
+
+    return (
+        <>
+            <Confetti width={width} height={height} numberOfPieces={100} run={surveySuccess} />
+            <SEO
+                noimage={false}
+                meta={{
+                    title: 'Averigua si hago match con la posición en 1 minuto',
+                    description: 'Click para continuar',
+                    noindex: true,
+                }}
+            />
+            <Dialog
+                open
+                modalMode
+                withPadding
+                header={
+                    <div className={styles.header}>
+                        <ControlButtons />
+                        <span>
+                            {currentQuestionNum > 0 && currentQuestionNum < 11 && (
+                                <span>
+                                    {currentQuestionNum} / {totalQuestions - 2}
+                                </span>
+                            )}
+                        </span>
+                    </div>
+                }
+                body={
+                    // TODO: Move to a component
+                    <div className={styles.container}>
+                        {questions.map(
+                            (question: any, index: number) =>
+                                currentQuestionNum === index && (
+                                    <div key={index} className={styles.question}>
+                                        <div
+                                            dangerouslySetInnerHTML={{ __html: question.questionHtml }}
+                                            className={styles.questionHtml}
+                                        />
+                                        {question.answerOptions?.map((answerOption: any) => (
+                                            <label htmlFor={answerOption.answerText} key={answerOption.answerText}>
+                                                <input
+                                                    onChange={(e) =>
+                                                        handleAnswerOptionClick({
+                                                            question: question.questionText,
+                                                            answer: e.target.value,
+                                                            isCorrect: answerOption.isCorrect,
+                                                            questionNum: index,
+                                                        })
+                                                    }
+                                                    type="radio"
+                                                    id={answerOption.answerText}
+                                                    name={String(index)}
+                                                    value={answerOption.answerText}
+                                                    checked={answers[index]?.answer === answerOption.answerText}
+                                                />
+                                                {answerOption.answerText}
+                                            </label>
+                                        ))}
+                                    </div>
+                                )
+                        )}
+                    </div>
+                }
+                footer={
+                    <div className={styles.buttons}>
+                        <NavigationArrows
+                            hidden={currentQuestionNum < 1 || currentQuestionNum > 10}
+                            disabledLeft={currentQuestionNum < 2}
+                            disabledRight={questionsDoneNum < currentQuestionNum}
+                            onClickLeft={handlePreviousQuestion}
+                            onClickRight={handleNextQuestion}
+                        />
+                    </div>
+                }
+            />
+        </>
+    );
+};
+
+export default Survey;
+```
+
+</CH.Code>
+
+Meu hook con loxica de negocio:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```ts useSurvey.ts
+import { useRouter } from 'next/router';
+import { useReducer, useEffect, useRef } from 'react';
+
+const initialState = {
+    currentQuestion: 0,
+    questionsDone: 0,
+    success: false,
+    answers: [],
+};
+
+const reducer = (state: any, action: any) => {
+    ...ya sabes como funciona un switch no?
+};
+
+const useSurvey = () => {
+    const { query } = useRouter();
+    const { name = '&#128075;' } = query;
+    const emailRef = useRef<boolean>(false);
+
+    const [state, dispatch] = useReducer(reducer, initialState);
+
+    // Prepotencia here!
+    const questions = [
+        {
+            questionText: '¿ Que chegou antes o ovo ou a galiña ?',
+            questionHtml: `<h2>¿ Que chegou antes o ovo ou a galiña ?</h2>`,
+            answerOptions: [{ answerText: 'Ovo', isCorrect: true, }, { answerText: 'Galiña', isCorrect: false }],
+        },
+    ];
+
+    useEffect(() => {
+        if (state.currentQuestion === questions.length - 1 && !emailRef.current) {
+            (async () => {
+                try {
+                    await fetch('/api/email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            subject: `Job survey from ${name} - ${new Date().toLocaleString()}`,
+                            message: `
+                                    <h1> ${name} </h1>
+                                    <code> ${navigator.userAgent} </code>
+                                    <ol>
+                                        ${state.answers.map(
+                                            (answer: any) =>
+                                                `<li> ${answer.question} : ${answer.answer} - ${
+                                                    answer.isCorrect ? '✅' : '🚫'
+                                                } </li>`
+                                        )}
+                                    </ol>
+                                    `.replace(/,/g, ''),
+                        }),
+                    });
+                    emailRef.current = true;
+                } catch (e) {
+                    console.log(e);
+                }
+            })();
+        }
+    }, [state, name, questions.length]);
+
+    const handlePreviousQuestion = () => {
+        if (state.currentQuestion > 1) dispatch({ type: 'PREVIOUS_QUESTION' });
+    };
+
+    const handleNextQuestion = () => {
+        if (state.currentQuestion != 0 && state.questionsDone >= state.currentQuestion)
+            dispatch({ type: 'NEXT_QUESTION' });
+    };
+
+    const handleAnswerOptionClick = (payload: {
+        question: string;
+        answer: string;
+        isCorrect: boolean;
+        questionNum: number;
+    }) => dispatch({ type: 'ADD_ANSWER', payload });
+
+    return {
+        questions,
+        answers: state.answers,
+        surveySuccess: state.success,
+        currentQuestionNum: state.currentQuestion,
+        questionsDoneNum: state.questionsDone,
+        totalQuestions: questions.length,
+        handleAnswerOptionClick,
+        handleNextQuestion,
+        handlePreviousQuestion,
+    };
+};
+
+export default useSurvey;
+```
+
+</CH.Code>
+
+Meu backend
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```ts email.ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nodemailer from 'nodemailer';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+    const transporter = nodemailer.createTransport({
+        service: process.env.EMAIL_HOST,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.EMAIL_PASSWORD,
+        },
+    });
+
+    const { subject, message } = req.body;
+
+    const mailOptions = {
+        from: process.env.EMAIL,
+        to: process.env.EMAIL,
+        subject: subject,
+        html: message,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: error });
+    }
+}
+```
+
+</CH.Code>
+
+## Resultado
+
+<Image src="/survey-success.png" alt="Caso de éxito" width="544" height="452" />
+<Image src="/survey-email.png" alt="Correo coas respostas" width="822" height="491" />
+
+Proba ti mesmo: [Ligazón ao resultado](https://xabierlameiro.com/survey?name=Lector/a 'Ligazón á enquisa')
