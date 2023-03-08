@@ -14,9 +14,9 @@ export const menu: Array<Item> = [
         img: '/menu/notes.png',
         alt: 'Go to blog',
         link: {
-            en: '/blog/react/how-document-my-react-components-with-jsdoc',
-            es: '/blog/react/documentar-mis-componentes-de-react',
-            gl: '/blog/react/documentar-os-meus-compoñentes-de-react',
+            en: '/blog/react/filter-for-positions',
+            es: '/blog/react/filtro-para-posiciones',
+            gl: '/blog/react/filtro-para-posicions',
         },
     },
     {
