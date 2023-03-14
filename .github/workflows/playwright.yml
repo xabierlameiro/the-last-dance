@@ -12,10 +12,9 @@ jobs:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
-                  allways-auth: true
-                  registry-url: '@xabierlameiro:registry=https://npm.pkg.github.com/'
-                  auth: ${{ secrets.AUTH_TOKEN }}
                   node-version: 18
+            - name: Authenticate with private NPM package
+              run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
             - name: Install dependencies
               run: yarn install
             - name: Install Playwright Browsers
