@@ -16,9 +16,12 @@ jobs:
                   node-version: 18
                   registry-url: '@xabierlameiro:registry=https://npm.pkg.github.com/'
             - name: Install dependencies
-              run: yarn install
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  yarn install
               env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps
             - name: Run Playwright tests
