@@ -20,7 +20,8 @@
         "build-storybook": "storybook build",
         "prettier": "prettier --write .",
         "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json && node custom-docs.js",
-        "lighthouse-report": "node lighthouse.cjs"
+        "lighthouse-report": "node lighthouse.cjs",
+        "test:e2e": "playwright test"
     },
     "dependencies": {
         "@babel/preset-typescript": "^7.18.6",
@@ -56,6 +57,7 @@
         "swr": "^2.0.2"
     },
     "devDependencies": {
+        "@playwright/test": "^1.31.2",
         "@storybook/addon-essentials": "^7.0.0-beta.12",
         "@storybook/addon-interactions": "^7.0.0-beta.12",
         "@storybook/addon-links": "^7.0.0-beta.12",

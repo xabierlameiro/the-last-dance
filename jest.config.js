@@ -16,6 +16,7 @@ const customJestConfig = {
         'src/components/index.tsx',
         'src/components/Blog/index.tsx',
     ],
+    testPathIgnorePatterns: ['e2e'],
     coverageDirectory: 'public/coverage',
     testEnvironment: 'jest-environment-jsdom',
     coverageReporters: ['html'],

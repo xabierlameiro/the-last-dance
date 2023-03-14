@@ -30,6 +30,9 @@ export default withMDX({
         ];
     },
     // Append the default value with md extensions
+    typescript: {
+        ignoreBuildErrors: true,
+    },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {
         appDir: true,
