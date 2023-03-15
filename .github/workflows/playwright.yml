@@ -1,9 +1,9 @@
 name: Test end-to-end with Playwright
 on:
     push:
-        branches: [dev]
-    # pull_request:
-    #     branches: [dev, master]
+        branches:
+    pull_request:
+        branches:
 jobs:
     wait-for-vercel-deployment:
         runs-on: ubuntu-22.04
@@ -11,7 +11,7 @@ jobs:
             vercel-deployment-url: pre.xabierlameiro.com
         steps:
             - name: Sleep to wait for new deployment is created
-              run: sleep 10
+              run: sleep 20
             - name: Wait for Vercel deployment
               uses: UnlyEd/github-action-await-vercel@v1.2.39
               id: await-vercel
