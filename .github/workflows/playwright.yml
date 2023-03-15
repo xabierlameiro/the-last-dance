@@ -13,8 +13,8 @@ jobs:
               env:
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
               with:
-                  deployment-url: the-last-dance-git-dev-xlameiro.vercel.app
-                  timeout: 10 # Wait for 10 seconds before failing
+                  deployment-url: pre.xabierlameiro.com
+                  timeout: 600
 
             - name: Display deployment status
               run: 'echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}'
