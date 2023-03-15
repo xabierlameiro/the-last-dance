@@ -7,6 +7,8 @@ on:
 jobs:
     wait-for-vercel-deployment:
         runs-on: ubuntu-22.04
+        outputs:
+        vercel-deployment-url: pre.xabierlameiro.com
         steps:
             - name: Sleep to wait for new deployment is created
               run: sleep 10
@@ -16,7 +18,7 @@ jobs:
               env:
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
               with:
-                  deployment-url: the-last-dance-git-dev-xlameiro.vercel.app
+                  deployment-url: pre.xabierlameiro.com
                   timeout: 600
 
             - name: Display deployment status
