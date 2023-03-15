@@ -4,7 +4,7 @@ on:
     workflow_call:
         outputs:
             vercel-deployment-url:
-                description: 'The vercel deployment url'
+                description: 'The vercel deployment url2'
                 value: ${{ jobs.wait-for-vercel-deployment.outputs.vercel-deployment-url }}
         secrets:
             VERCEL_TOKEN:
