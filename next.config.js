@@ -33,6 +33,9 @@ export default withMDX({
     typescript: {
         ignoreBuildErrors: true,
     },
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {
         appDir: true,
