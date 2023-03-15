@@ -1,11 +1,6 @@
 name: Testing end to end with Playwright
-on:
-    push:
-        branches: [dev]
-    pull_request:
-
 jobs:
-    test:
+    wait-for-vercel-deployment:
         timeout-minutes: 60
         runs-on: ubuntu-latest
         steps:
