@@ -1,29 +1,29 @@
 name: Test end-to-end with Playwright
 on:
     push:
-        branches:
-    pull_request:
-        branches:
+        branches: [dev]
+    # pull_request:
+    #     branches: [dev, master]
 jobs:
     wait-for-vercel-deployment:
         runs-on: ubuntu-22.04
         outputs:
-            vercel-deployment-url: the-last-dance-git-dev-xlameiro.vercel.app
+            vercel-deployment-url: pre.xabierlameiro.com
         steps:
             - name: Sleep to wait for new deployment is created
-              run: sleep 20
+              run: sleep 10
             - name: Wait for Vercel deployment
               uses: UnlyEd/github-action-await-vercel@v1.2.39
               id: await-vercel
               env:
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
               with:
-                  deployment-url: the-last-dance-git-dev-xlameiro.vercel.app
+                  deployment-url: pre.xabierlameiro.com
                   timeout: 600
 
             - name: Display deployment status
               run: 'echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}'
-    testing-end-to-end:
+    test:
         timeout-minutes: 60
         needs: wait-for-vercel-deployment
         runs-on: ubuntu-latest
