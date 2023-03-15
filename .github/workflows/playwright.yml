@@ -1,14 +1,14 @@
 name: Test end-to-end with Playwright
 on:
     push:
-        branches: [dev]
-    # pull_request:
-    #     branches: [dev, master]
+        branches:
+            - dev
+    pull_request:
+        branches:
+            - dev
 jobs:
     wait-for-vercel-deployment:
         runs-on: ubuntu-22.04
-        outputs:
-            vercel-deployment-url: pre.xabierlameiro.com
         steps:
             - name: Sleep to wait for new deployment is created
               run: sleep 10
@@ -17,7 +17,7 @@ jobs:
               env:
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
               with:
-                  deployment-url: pre.xabierlameiro.com
+                  deployment-url: ${{ steps.deployment.outputs.deployment }}
                   timeout: 600
 
             - name: Display deployment status
