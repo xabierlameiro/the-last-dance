@@ -8,7 +8,7 @@ jobs:
     wait-for-vercel-deployment:
         runs-on: ubuntu-22.04
         outputs:
-        vercel-deployment-url: pre.xabierlameiro.com
+            vercel-deployment-url: pre.xabierlameiro.com
         steps:
             - name: Sleep to wait for new deployment is created
               run: sleep 10
