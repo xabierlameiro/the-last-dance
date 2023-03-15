@@ -1,20 +1,27 @@
-name: Testing end to end with Playwright
+name: Test end-to-end with Playwright
 on:
     push:
-    pull_request:
-
+        branches: [dev]
+    # pull_request:
+    #     branches: [dev, master]
 jobs:
     wait-for-vercel-deployment:
-        timeout-minutes: 60
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
-            - uses: UnlyEd/github-action-await-vercel@v1
+            - name: Wait for Vercel deployment
+              uses: UnlyEd/github-action-await-vercel@v1.2.39
               id: await-vercel
               env:
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
               with:
                   deployment-url: pre.xabierlameiro.com
                   timeout: 10 # Wait for 10 seconds before failing
+            - name: Display deployment status
+              run: 'echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}'
+    test:
+        timeout-minutes: 60
+        runs-on: ubuntu-latest
+        steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
