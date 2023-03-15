@@ -1,14 +1,21 @@
-name: Playwright Tests
+name: Testing end to end with Playwright
 on:
     push:
         branches: [dev]
-    # pull_request:
-    #     branches: [dev, master]
+    pull_request:
+
 jobs:
     test:
         timeout-minutes: 60
         runs-on: ubuntu-latest
         steps:
+            - uses: UnlyEd/github-action-await-vercel@v1
+              id: await-vercel
+              env:
+                  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+              with:
+                  deployment-url: pre.xabierlameiro.com
+                  timeout: 10 # Wait for 10 seconds before failing
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
