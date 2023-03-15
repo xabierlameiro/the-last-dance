@@ -6,14 +6,14 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
         ignoreHTTPSErrors: true,
         video: 'on-first-retry',
-        baseURL: 'https://pre.xabierlameiro.com',
+        baseURL: 'http://localhost:3000',
     },
     testDir: './e2e',
     reporter: process.env.CI
         ? 'github'
         : [
               ['list', { printSteps: true }],
-              ['html', { outputFile: 'test-results.html' }],
+              //   ['html', { outputFile: 'test-results.html' }],
               // ['json', { outputFile: 'test-results.json' }]
           ],
 });

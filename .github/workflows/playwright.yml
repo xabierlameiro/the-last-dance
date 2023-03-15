@@ -23,7 +23,7 @@ jobs:
 
             - name: Display deployment status
               run: 'echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}'
-    test:
+    testing-end-to-end:
         timeout-minutes: 60
         needs: wait-for-vercel-deployment
         runs-on: ubuntu-latest
