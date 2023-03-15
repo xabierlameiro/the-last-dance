@@ -8,14 +8,14 @@ jobs:
     wait-for-vercel-deployment:
         runs-on: ubuntu-22.04
         steps:
-            - name: Wait for Vercel deployment
-              uses: UnlyEd/github-action-await-vercel@v1.2.39
+            - uses: UnlyEd/github-action-await-vercel@v1.2.39
               id: await-vercel
               env:
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
               with:
                   deployment-url: the-last-dance-git-dev-xlameiro.vercel.app
                   timeout: 10 # Wait for 10 seconds before failing
+
             - name: Display deployment status
               run: 'echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}'
     test:
