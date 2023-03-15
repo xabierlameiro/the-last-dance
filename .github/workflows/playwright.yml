@@ -12,8 +12,7 @@ jobs:
         steps:
             - name: Sleep to wait for new deployment is created
               run: sleep 10
-            - name: Wait for Vercel deployment
-              uses: UnlyEd/github-action-await-vercel@v1.2.39
+            - uses: UnlyEd/github-action-await-vercel@v1.2.39
               id: await-vercel
               env:
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
