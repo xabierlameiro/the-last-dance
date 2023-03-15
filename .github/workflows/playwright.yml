@@ -1,4 +1,8 @@
 name: Testing end to end with Playwright
+on:
+    push:
+    pull_request:
+
 jobs:
     wait-for-vercel-deployment:
         timeout-minutes: 60
