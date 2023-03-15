@@ -8,12 +8,15 @@ jobs:
     wait-for-vercel-deployment:
         runs-on: ubuntu-22.04
         steps:
-            - uses: UnlyEd/github-action-await-vercel@v1.2.39
+            - name: Sleep to wait for new deployment is created
+              run: sleep 10
+            - name: Wait for Vercel deployment
+              uses: UnlyEd/github-action-await-vercel@v1.2.39
               id: await-vercel
               env:
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
               with:
-                  deployment-url: pre.xabierlameiro.com
+                  deployment-url: the-last-dance-git-dev-xlameiro.vercel.app
                   timeout: 600
 
             - name: Display deployment status
