@@ -1,0 +1,49 @@
+name: Wait for Vercel Deployment
+
+on:
+    workflow_call:
+        outputs:
+            vercel-deployment-url:
+                description: 'The vercel deployment url'
+                value: ${{ jobs.wait-for-vercel-deployment.outputs.vercel-deployment-url }}
+        secrets:
+            VERCEL_TOKEN:
+                required: true
+
+env:
+    VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT: https://api.vercel.com/v6/deployments
+
+jobs:
+    wait-for-vercel-deployment:
+        name: Wait for current Vercel deployment to be ready
+        runs-on: ubuntu-latest
+        outputs:
+            vercel-deployment-url: ${{ steps.expose-vercel-deployment.outputs.vercel-deployment-url }}
+        steps:
+            - name: Sleep to wait for new deployment is created
+              run: sleep 10
+            - name: Resolving the latest deployment url from Vercel
+              run: |
+                  apt update -y >/dev/null && apt install -y jq >/dev/null
+                  echo "Fetching Vercel deployments using API endpoint: " $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT
+
+                  # Fetch all Vercel deployment from this project
+                  ALL_VERCEL_DEPLOYMENTS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT`
+                  echo "Vercel deployments: " $ALL_VERCEL_DEPLOYMENTS
+
+                  # Parse the deployments (as json) to find the latest deployment url, while stripping the double quotes
+                  VERCEL_DEPLOYMENT_URL=`echo $ALL_VERCEL_DEPLOYMENTS | jq '.deployments [0].url' | tr -d \"`
+                  echo "VERCEL_DEPLOYMENT_URL=$VERCEL_DEPLOYMENT_URL" >> $GITHUB_ENV
+            - name: Wait for Vercel deployment to be ready
+              uses: UnlyEd/github-action-await-vercel@v1
+              id: await-vercel
+              env:
+                  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+              with:
+                  deployment-url: ${{ env.VERCEL_DEPLOYMENT_URL }} # Must only contain the domain name (no http prefix, etc.)
+                  timeout: 240 # Wait for 4 mins before failing
+            - name: Expose Vercel deployment info
+              id: expose-vercel-deployment
+              run: echo "::set-output name=vercel-deployment-url::${{ env.VERCEL_DEPLOYMENT_URL }}"
+            - name: Display Vercel deployment status
+              run: 'echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}'
