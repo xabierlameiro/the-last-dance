@@ -8,7 +8,7 @@ on:
             - dev
 jobs:
     wait-for-deployment:
-        uses: ./vercel-deployment.yml
+        uses: ./.github/workflows/vercel-deployment.yml
         if: (github.event_name == 'push' || github.event_name == 'pull_request') && (github.actor != 'dependabot[bot]')
         secrets:
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
