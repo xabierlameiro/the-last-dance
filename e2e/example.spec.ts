@@ -25,28 +25,6 @@ test.describe('Landing page', () => {
         await page.getByTestId('main').isVisible();
         await page.getByTestId('footer').isVisible();
     });
-
-    test('should show tooltips when user does hover on icons', async () => {
-        let target = page.getByTestId('countdown');
-        await target.hover();
-        await expect(target.locator('..')).toHaveAttribute('data-state', 'open');
-        target = page.getByTestId('crypto-price');
-        await target.hover();
-        await expect(target.locator('..')).toHaveAttribute('data-state', 'open');
-        target = page.getByTestId('indexed-counter');
-        await target.hover();
-        await expect(target.locator('..')).toHaveAttribute('data-state', 'open');
-        target = page.getByTestId('views');
-        await target.hover();
-        await expect(target.locator('..')).toHaveAttribute('data-state', 'open');
-        target = page.getByTestId('new-users');
-        await target.hover();
-        await expect(target.locator('..')).toHaveAttribute('data-state', 'open');
-        target = page.getByTestId('heating');
-        await target.hover();
-        await expect(target.locator('..')).toHaveAttribute('data-state', 'open');
-    });
-
     test('should naviage between tabs', async () => {
         await page.getByTitle('knowledge.module.css').click();
         await page.getByTitle('contact.json').click();

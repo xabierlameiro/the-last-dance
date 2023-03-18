@@ -24,7 +24,7 @@ jobs:
               run: 'echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}'
     test:
         timeout-minutes: 60
-        needs: wait-for-vercel-deployment
+        needs: vercel-deployment
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
