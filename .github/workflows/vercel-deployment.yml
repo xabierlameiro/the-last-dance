@@ -8,7 +8,7 @@ on:
         secrets:
             VERCEL_TOKEN:
                 required: true
-env: VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT: https://api.vercel.com/v6/deployments
+env: VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT:https://api.vercel.com/v6/deployments
 jobs:
     wait-for-vercel-deployment:
         name: Wait for current Vercel deployment to be ready
