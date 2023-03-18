@@ -8,9 +8,7 @@ on:
         secrets:
             VERCEL_TOKEN:
                 required: true
-env:
-    - VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
-    - VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT: https://api.vercel.com/v6/deployments?teamId=$VERCEL_TEAM_ID
+env: VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT: https://api.vercel.com/v6/deployments
 jobs:
     wait-for-vercel-deployment:
         name: Wait for current Vercel deployment to be ready
@@ -26,7 +24,7 @@ jobs:
                   echo "Fetching Vercel deployments using API endpoint: " $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT
 
                   # Fetch all Vercel deployment from this project
-                  ALL_VERCEL_DEPLOYMENTS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT`
+                  ALL_VERCEL_DEPLOYMENTS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' $VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT?teamId=${{ secrets.VERCEL_TEAM_ID }}`
                   echo "Vercel deployments: " $ALL_VERCEL_DEPLOYMENTS
 
                   # Parse the deployments (as json) to find the latest deployment url, while stripping the double quotes
