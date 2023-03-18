@@ -8,25 +8,10 @@ on:
             - dev
 jobs:
     wait-for-deployment:
-        uses: ./.github/workflows/vercel-deployment.yml
+        uses: ./vercel-deployment.yml
         if: (github.event_name == 'push' || github.event_name == 'pull_request') && (github.actor != 'dependabot[bot]')
         secrets:
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        # wait-for-vercel-deployment:
-        #     runs-on: ubuntu-22.04
-        #     steps:
-        #         - name: Sleep to wait for new deployment is created
-        #           run: sleep 10
-        #         - uses: UnlyEd/github-action-await-vercel@v1.2.39
-        #           id: await-vercel
-        #           env:
-        #               VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        #           with:
-        #               deployment-url: ${{ steps.deployment.outputs.deployment }}
-        #               timeout: 600
-
-        #         - name: Display deployment status
-        #           run: 'echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}'
         test:
             timeout-minutes: 60
             needs: wait-for-deployment
