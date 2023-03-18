@@ -20,7 +20,7 @@ const Dock = () => {
         <>
             <nav className={styles.dock} data-testid="dock">
                 <ul>
-                    {menu.map(({ link, img, alt }, index) => {
+                    {menu.map(({ link, img, alt, testId }, index) => {
                         const path = pathname.split('/')[1];
                         const term =
                             typeof link === 'object'
@@ -32,6 +32,7 @@ const Dock = () => {
                                 key={index}
                                 onClick={clickHandler}
                                 className={clx(pathname === link || check ? styles.selected : '')}
+                                data-testid={testId}
                             >
                                 <Link href={link?.[locale as keyof typeof link] ?? link} title={alt}>
                                     <Icon src={img} alt={alt} />

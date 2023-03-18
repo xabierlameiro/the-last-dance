@@ -12,36 +12,43 @@ export const socialLinks = [
         href: 'https://www.linkedin.com/in/xlameiro',
         title: 'Linkedin profile',
         name: 'Linkedin',
+        testId: 'linkedin-link',
     },
     {
         href: 'https://github.com/xabierlameiro',
         title: 'Github profile',
         name: 'Github',
+        testId: 'github-link',
     },
     {
         href: 'https://www.reddit.com/user/xlameiro',
         title: 'Reddit profile',
         name: 'Reddit',
+        testId: 'reddit-link',
     },
     {
         href: 'https://storybook.xabierlameiro.com',
         title: 'Storybook',
         name: 'Storybook',
+        testId: 'storybook-link',
     },
     {
         href: 'https://xabierlameiro.com/docs',
         title: 'Docs',
         name: 'Docs',
+        testId: 'docs-link',
     },
     {
         href: 'https://xabierlameiro.com/coverage',
         title: 'Coverage',
         name: 'Coverage',
+        testId: 'coverage-link',
     },
     {
         href: 'https://lighthouse.xabierlameiro.com',
         title: 'Lighthouse',
         name: 'Lighthouse',
+        testId: 'lighthouse-link',
     },
 ];
 
