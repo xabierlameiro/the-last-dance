@@ -9,8 +9,7 @@ on:
             VERCEL_TOKEN:
                 required: true
 env:
-    VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
-    VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT: https://api.vercel.com/v6/deployments?teamId=$VERCEL_TEAM_ID
+    VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT: https://api.vercel.com/v6/deployments?teamId=${{ vars.VERCEL_TEAM_ID }}
 jobs:
     wait-for-vercel-deployment:
         name: Wait for current Vercel deployment to be ready
