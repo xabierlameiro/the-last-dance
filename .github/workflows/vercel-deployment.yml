@@ -37,10 +37,10 @@ jobs:
               env:
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
               with:
-                  deployment-url: pre.xabierlameiro.com # Must only contain the domain name (no http prefix, etc.)
+                  deployment-url: ${{ env.VERCEL_DEPLOYMENT_URL }} # Must only contain the domain name (no http prefix, etc.)
                   timeout: 240 # Wait for 4 mins before failing
             - name: Expose Vercel deployment info
               id: expose-vercel-deployment
-              run: echo "::set-output name=vercel-deployment-url::pre.xabierlameiro.com"
+              run: echo "::set-output name=vercel-deployment-url::${{ env.VERCEL_DEPLOYMENT_URL }}"
             - name: Display Vercel deployment status
               run: 'echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}'
