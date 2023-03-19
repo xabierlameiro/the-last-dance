@@ -38,7 +38,7 @@ export default withMDX({
     },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {
-        appDir: true,
+        appDir: false,
         largePageDataBytes: 800 * 1000,
     },
     images: {
