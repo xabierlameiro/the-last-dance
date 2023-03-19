@@ -1,14 +1,6 @@
 import { Page, test, expect } from '@playwright/test';
 import { socialLinks } from '@/constants/site';
 
-// You can override some options for a file or describe block.
-// test.use({
-//     headless: false,
-//     launchOptions: {
-//         slowMo: 200,
-//     },
-// });
-
 let page: Page;
 
 test.beforeAll(async ({ browser }) => {

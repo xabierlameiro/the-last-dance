@@ -8,7 +8,6 @@ import Header from './Header';
 type Props = {
     children: ReactElement;
     className?: string;
-    isBlog?: boolean;
 };
 
 /**
@@ -17,12 +16,11 @@ type Props = {
  *         <div>Content</div>
  *     </Layout>;
  *
- * @param {boolean} isBlog - Whether the page is a blog post the SEO changes
  * @param {string} className - The class name for the different pages
  * @param {JSX.Element} children - Content to be rendered
  * @returns {JSX.Element}
  */
-const Layout = ({ className, children, isBlog }: Props) => {
+const Layout = ({ className, children }: Props) => {
     return (
         <div className={styles.layout}>
             <Header />

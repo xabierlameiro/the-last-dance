@@ -1,0 +1,22 @@
+{
+    "extends": ["eslint:recommended", "next"],
+    "plugins": ["@typescript-eslint"],
+    "settings": {
+        "next": {
+            "rootDir": "./src"
+        }
+    },
+    "ignorePatterns": ["**/*.test.ts*", "**/*.stories.tsx"],
+    "rules": {
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "error"
+    },
+    "overrides": [
+        {
+            "files": ["*.ts"],
+            "rules": {
+                "no-undef": "off"
+            }
+        }
+    ]
+}

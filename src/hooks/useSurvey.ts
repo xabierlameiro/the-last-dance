@@ -9,30 +9,31 @@ const initialState = {
 };
 
 const reducer = (state: any, action: any) => {
+    const { questionNum } = action.payload;
+    const { answers, questionsDone, currentQuestion } = state;
+    const newAnswers = [...answers];
+
     switch (action.type) {
         case 'NEXT_QUESTION':
             return {
                 ...state,
-                currentQuestion: state.currentQuestion + 1,
+                currentQuestion: currentQuestion + 1,
             };
         case 'PREVIOUS_QUESTION':
             return {
                 ...state,
-                currentQuestion: state.currentQuestion - 1,
+                currentQuestion: currentQuestion - 1,
             };
         case 'ADD_ANSWER':
-            const { questionNum } = action.payload;
-            const { answers } = state;
-            const newAnswers = [...answers];
             newAnswers[questionNum] = {
                 ...action.payload,
             };
             return {
                 ...state,
                 answers: newAnswers,
-                currentQuestion: state.currentQuestion + 1,
-                questionsDone: questionNum > state.questionsDone ? questionNum : state.questionsDone,
-                success: newAnswers.every((answer) => answer.isCorrect) && state.currentQuestion === 10,
+                currentQuestion: currentQuestion + 1,
+                questionsDone: questionNum > questionsDone ? questionNum : questionsDone,
+                success: newAnswers.every((answer) => answer.isCorrect) && currentQuestion === 10,
             };
         default:
             return state;
