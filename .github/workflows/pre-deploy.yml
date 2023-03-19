@@ -13,6 +13,9 @@ jobs:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
         steps:
             - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
@@ -26,18 +29,10 @@ jobs:
               run: |
                   vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
                   echo URL=$(cat deploy-url.txt) >> $GITHUB_ENV
-    End-to-End Tests:
-        timeout-minutes: 60
-        needs: Unit-Tests and Deploy
-        runs-on: ubuntu-latest
-        env:
-            VERCEL_URL: ${{ env.URL }}
-            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
-        steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
-              with:
-                  node-version: 18
+            - name: Testing end to end
+              run: |
+                  echo "VERCEL_URL: ${{ env.URL }}"
+                  echo "NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}"
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps
             - name: Run Playwright tests
