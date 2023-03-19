@@ -10,8 +10,8 @@ jobs:
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/dev'
         environment:
-            name: Development
-            url: ${{ steps.vercel.outputs.url }}
+            name: dev
+            vercel-deployment-url: ${{ steps.vercel.outputs.url }}
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
         steps:
@@ -29,6 +29,6 @@ jobs:
               id: vercel
               run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> vercel-deployment-url.txt
             - name: Set url output
-              run: echo "::set-output name=url::$(cat vercel-deployment-url.txt)"
-            - name: Show Vercel Deployment URL
+              run: echo "url=$(cat vercel-deployment-url.txt)" >> $GITHUB_OUTPUT
+            - name: Show deployment URL
               run: echo ${{ steps.vercel.outputs.url }}
