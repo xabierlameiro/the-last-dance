@@ -1,9 +1,7 @@
 name: Dev workflow
-env:
-    VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
 on:
     push:
-        branches: [dev, master]
+        branches: [dev]
 jobs:
     unit-tests-and-deploy:
         runs-on: ubuntu-latest
@@ -11,6 +9,7 @@ jobs:
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
@@ -22,9 +21,9 @@ jobs:
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   yarn install
             - name: Linter
-              run: npm run lint
+              run: yarn run lint
             - name: Run unit tests
-              run: npm run test
+              run: yarn run test
             - name: Publish coverage report
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_COVERAGE_PROJECT_ID }}
@@ -34,7 +33,7 @@ jobs:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STORYBOOK_PROJECT_ID }}
               run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
             - name: Install Vercel CLI
-              run: npm install --global vercel@canary
+              run: yarn install --global vercel@canary
             - name: Trigger Vercel Deployment
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
