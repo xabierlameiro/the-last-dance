@@ -1,7 +1,6 @@
 name: Dev workflow
 env:
     VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-    VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
     push:
         branches: [dev, master]
@@ -27,14 +26,18 @@ jobs:
             - name: Run unit tests
               run: npm run test
             - name: Publish coverage report
-              run: |
-                  curl -X POST https://api.vercel.com/v1/integrations/deploy/${{ secrets.VERCEL_COVERAGE_PROJECT_ID }}
+              env:
+                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_COVERAGE_PROJECT_ID }}
+              run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
             - name: Publish storybook
-              run: |
-                  curl -X POST https://api.vercel.com/v1/integrations/deploy/${{ secrets.VERCEL_STORYBOOK_PROJECT_ID }}
+              env:
+                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STORYBOOK_PROJECT_ID }}
+              run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Trigger Vercel Deployment
+              env:
+                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               run: |
                   vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
                   echo "VERCEL_URL: ${{ env.URL }}"
