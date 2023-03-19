@@ -6,7 +6,7 @@ on:
     push:
         branches: [dev, master]
 jobs:
-    Unit-Tests and Deploy:
+    Unit tests and Deploy:
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/dev'
         env:
