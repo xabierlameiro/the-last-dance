@@ -11,8 +11,11 @@ on:
 env:
     VERCEL_FETCH_DEPLOYMENTS_API_ENDPOINT: https://api.vercel.com/v6/deployments?teamId=${{ vars.VERCEL_TEAM_ID }}
 jobs:
+    wait-for-push:
+        uses: ./.github/workflows/vercel.yml
     wait-for-vercel-deployment:
         name: Wait for current Vercel deployment to be ready
+        needs: wait-for-push
         runs-on: ubuntu-latest
         outputs:
             vercel-deployment-url: ${{ steps.expose-vercel-deployment.outputs.vercel-deployment-url }}
