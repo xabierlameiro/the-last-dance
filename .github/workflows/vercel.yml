@@ -11,6 +11,8 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
+            - name: Run unit tests
+              run: npm run coverage
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Pull Vercel Environment Information
