@@ -1,0 +1,26 @@
+name: Pre Deploy on Vercel - Unit Tests
+env:
+    VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+    VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+on:
+    push:
+        branches:
+            - dev
+jobs:
+    Deploy-Preview:
+        runs-on: ubuntu-latest
+        env:
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  yarn install
+            - name: Run unit tests
+              run: npm run test
+            - name: Install Vercel CLI
+              run: npm install --global vercel@canary
+            - name: Deploy Project Artifacts to Vercel
+              run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
