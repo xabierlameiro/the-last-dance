@@ -7,7 +7,7 @@ on:
         branches:
             - dev
 jobs:
-    Deploy-Preview:
+    Pre-Deploy:
         runs-on: ubuntu-latest
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}

@@ -1,0 +1,31 @@
+name: Post Deploy on Vercel - E2E Tests
+on:
+    push:
+    pull_request:
+jobs:
+    wait-for-deployment:
+        uses: ./.github/workflows/pre-deploy.yml
+        secrets:
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    playwright-e2e-test-stage:
+        timeout-minutes: 60
+        needs: wait-for-deployment
+        runs-on: ubuntu-latest
+        env:
+            VERCEL_URL: ${{ needs.wait-for-deployment.outputs.vercel-deployment-url }}
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps
+            - name: Run Playwright tests
+              run: npx playwright test
+            - uses: actions/upload-artifact@v3
+              if: always()
+              with:
+                  name: playwright-report
+                  path: playwright-report/
+                  retention-days: 30
