@@ -11,7 +11,7 @@ jobs:
         if: github.ref == 'refs/heads/dev'
         environment:
             name: dev
-            vercel-deployment-url: ${{ steps.vercel.outputs.url }}
+            url: ${{ steps.vercel.outputs.url }}
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
         steps:
