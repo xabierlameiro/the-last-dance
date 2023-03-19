@@ -22,6 +22,8 @@ jobs:
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   yarn install
+            - name: Linter
+              run: npm run lint
             - name: Run unit tests
               run: npm run test
             - name: Install Vercel CLI
