@@ -9,8 +9,9 @@ jobs:
     Pre-Deploy:
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/dev'
-        outputs:
-            vercel-deployment-url: ${{ steps.vercel.outputs.url }}
+        environment:
+            name: Development
+            url: ${{ steps.vercel.outputs.url }}
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
         steps:
