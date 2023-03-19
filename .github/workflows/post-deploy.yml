@@ -1,7 +1,7 @@
 name: Post Deploy on Vercel - E2E Tests
 on:
-    push:
-    pull_request:
+    workflow_call:
+
 jobs:
     wait-for-deployment:
         uses: ./.github/workflows/pre-deploy.yml
