@@ -1,4 +1,5 @@
-name: Pre Deploy on Vercel - Unit Tests in Development Environment
+name: Dev pipeline
+description: Run unit tests after deploy to dev on Vercel and run end-to-end tests
 env:
     VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
     VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -11,6 +12,7 @@ jobs:
         if: github.ref == 'refs/heads/dev'
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
@@ -25,17 +27,14 @@ jobs:
               run: npm run test
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
-            - name: Deploy Project Artifacts to Vercel
+            - name: Trigger Vercel Deployment
               run: |
                   vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
-                  echo URL=$(cat deploy-url.txt) >> $GITHUB_ENV
-            - name: Testing end to end
-              run: |
                   echo "VERCEL_URL: ${{ env.URL }}"
                   echo "NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}"
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps
-            - name: Run Playwright tests
+            - name: Run end-to-end tests
               run: npx playwright test
             - uses: actions/upload-artifact@v3
               if: always()
