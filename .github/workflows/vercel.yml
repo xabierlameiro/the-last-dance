@@ -15,6 +15,8 @@ jobs:
               run: npm install --global vercel@canary
             - name: Pull Vercel Environment Information
               run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+            - name: Install Dependencies
+              run: yarn i
             - name: Run unit tests
               run: npm run coverage
             - name: Build Project Artifacts
@@ -25,7 +27,7 @@ jobs:
               env:
                   NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
             - name: Deploy Project Artifacts to Vercel
-              run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+              run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
             - name: Epa
               run: |
                   echo "Vercel Deployment URL: ${{ steps.deploy.outputs.url }}"
