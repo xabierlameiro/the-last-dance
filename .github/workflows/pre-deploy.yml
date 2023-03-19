@@ -26,6 +26,9 @@ jobs:
               run: npm run lint
             - name: Run unit tests
               run: npm run test
+            - name: Deploy coverage
+              run: |
+                  curl -X POST https://api.vercel.com/v1/integrations/deploy/${{ secrets.VERCEL_COVERAGE_PROJECT_ID }}
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Trigger Vercel Deployment
