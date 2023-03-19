@@ -9,6 +9,8 @@ on:
 jobs:
     Pre-Deploy:
         runs-on: ubuntu-latest
+        outputs:
+            vercel-deployment-url: ${{ steps.vercel.outputs.url }}
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
         steps:
@@ -24,6 +26,8 @@ jobs:
               run: npm install --global vercel@canary
             - name: Deploy Project Artifacts to Vercel
               id: vercel
-              run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
-            - name: Print the output of previus step
-              run: echo ${{ steps.vercel.outputs }}
+              run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> vercel-deployment-url.txt
+            - name: Set url output
+              run: echo "url=$(cat vercel-deployment-url.txt)" >> $GITHUB_OUTPUT
+            - name: Print Vercel Deployment URL
+              run: echo ${{ steps.vercel.outputs.url }}
