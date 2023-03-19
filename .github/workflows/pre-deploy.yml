@@ -6,7 +6,7 @@ on:
     push:
         branches: [dev, master]
 jobs:
-    Pre-Deploy:
+    Unit-Tests and Deploy:
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/dev'
         env:
@@ -26,5 +26,25 @@ jobs:
               run: |
                   vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
                   echo URL=$(cat deploy-url.txt) >> $GITHUB_ENV
-            - name: Print URL of current deployment
-              run: echo ${{ env.URL }}
+    End-to-End Tests:
+        timeout-minutes: 60
+        needs: Unit-Tests and Deploy
+        runs-on: ubuntu-latest
+        env:
+            VERCEL_URL: ${{ env.URL }}
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps
+            - name: Run Playwright tests
+              run: npx playwright test
+            - uses: actions/upload-artifact@v3
+              if: always()
+              with:
+                  name: playwright-report
+                  path: playwright-report/
+                  retention-days: 30
