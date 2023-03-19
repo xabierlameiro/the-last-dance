@@ -10,6 +10,7 @@
 
 ## Overview
 
+-   `.github/workflows/*` - CI/CD workflows.
 -   `data/*` - The folder when contain all of my blog posts and other data in mdx format.
 -   `public/*` - The folder where all of my static assets live.
 -   `public/coverage/*` - The folder where all of my coverage reports live.

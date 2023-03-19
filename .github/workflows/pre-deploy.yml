@@ -4,11 +4,14 @@ env:
     VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
     push:
-        branches:
-            - dev
+        branches: [master]
 jobs:
     Pre-Deploy:
         runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/dev'
+        environment:
+            name: Development
+            url: ${{ steps.vercel.outputs.url }}
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
         steps:
@@ -23,4 +26,9 @@ jobs:
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Deploy Project Artifacts to Vercel
-              run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
+              id: vercel
+              run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> vercel-deployment-url.txt
+            - name: Set url output
+              run: echo "::set-output name=url::$(cat vercel-deployment-url.txt)"
+            - name: Show Vercel Deployment URL
+              run: echo ${{ steps.vercel.outputs.url }}
