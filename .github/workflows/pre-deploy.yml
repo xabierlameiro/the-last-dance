@@ -40,15 +40,8 @@ jobs:
               run: |
                   vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
                   echo URL=$(cat deploy-url.txt) >> $GITHUB_ENV
-                  echo "VERCEL_URL: ${{ env.URL }}"
-                  echo "NEXT_PUBLIC_DOMAIN: ${{ env.URL }}"
+                  echo NEXT_PUBLIC_DOMAIN=$(cat deploy-url.txt) >> $GITHUB_ENV
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps
             - name: Run end-to-end tests
               run: npx playwright test
-            - uses: actions/upload-artifact@v3
-              if: always()
-              with:
-                  name: playwright-report
-                  path: playwright-report/
-                  retention-days: 30
