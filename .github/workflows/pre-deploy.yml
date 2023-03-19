@@ -44,4 +44,6 @@ jobs:
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps
             - name: Run end-to-end tests
-              run: npx playwright test
+              run: yarn test:e2e:report
+            - name: Show for console content of playwright-report folder
+              run: ls -la playwright-report
