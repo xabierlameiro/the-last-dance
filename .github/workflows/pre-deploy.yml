@@ -23,4 +23,10 @@ jobs:
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Deploy Project Artifacts to Vercel
+              id: vercel
               run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
+            - name: Get Vercel Deployment URL
+              id: vercel-url
+              run: echo "::set-output name=vercel-deployment-url::$(vercel inspect ${{ steps.vercel.outputs.deployment-url }} --token=${{ secrets.VERCEL_TOKEN }} | grep -o 'https://.*')"
+            - name: Print of Vercel Deployment URL
+              run: echo ${{ steps.vercel-url.outputs.vercel-deployment-url }}
