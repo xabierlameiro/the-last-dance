@@ -20,7 +20,8 @@
         "prettier": "prettier --write .",
         "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json && node custom-docs.js",
         "lighthouse-report": "node lighthouse.cjs",
-        "test:e2e": "playwright test"
+        "test:e2e": "playwright test",
+        "test:e2e:report": "playwright test --reporter html"
     },
     "dependencies": {
         "@babel/preset-typescript": "^7.18.6",
