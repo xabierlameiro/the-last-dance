@@ -49,7 +49,8 @@ jobs:
               run: ls -la playwright-report
             - name: Publish e2e report
               run: |
-                  curl -X POST "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}" \
+                  curl -X POST \
                   -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  -d '{"name": "the-last-dance-e2e", "files": [{"file": "playwright-report/index.html" }], "projectSettings": {"framework": "null", "buildCommand": "echo 'no build step required'", "outputDirectory": "/"}}'
+                  -d '{"name": "the-last-dance-e2e", "files": [{"file": "playwright-report/index.html" }], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
+                  "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
