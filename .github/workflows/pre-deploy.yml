@@ -48,11 +48,11 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
-                  echo "::set-output name=value::$(cat playwright-report/index.html)"
+                  echo "PLAYWRIGHT_REPORT=$(cat playwright-report/index.html)" >> $GITHUB_OUTPUT
             - name: Publish e2e report
               run: |
                   curl -X POST \
                   -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  -d '{"name": "the-last-dance-e2e", "files": [{ "file":"index.html","data": "${{ steps.e2e.outputs.value }}" }], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
+                  -d '{"name": "the-last-dance-e2e", "files": [{ "file":"index.html","data": "${{ steps.e2e.outputs.PLAYWRIGHT_REPORT }}" }], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
                   "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
