@@ -15,11 +15,12 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: 18
+                  cache: yarn
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install
+                  yarn install --frozen-lockfile
             - name: Linter
               run: yarn run lint
             - name: Run unit tests
@@ -44,12 +45,14 @@ jobs:
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps chromium
             - name: Run end-to-end tests
-              run: yarn test:e2e:report
+              id: e2e
+              run: |
+                  yarn test:e2e:report
+                  echo "::set-output name=value::$(cat playwright-report/index.html)"
             - name: Publish e2e report
               run: |
-                  value=`cat playwright-report/index.html`
                   curl -X POST \
                   -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  -d '{"name": "the-last-dance-e2e", "files": [{ "file":"index.html","data": $value }], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
+                  -d '{"name": "the-last-dance-e2e", "files": [{ "file":"index.html","data": "${{ steps.e2e.outputs.value }}" }], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
                   "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
