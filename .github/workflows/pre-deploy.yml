@@ -86,24 +86,10 @@ jobs:
                   echo NEXT_PUBLIC_DOMAIN=$(cat deploy-url.txt) >> $GITHUB_ENV
 
             - name: Install Playwright Browsers
-              run: npx playwright install --with-deps chromium
-              # Cache the browsers to speed up future runs
-              # Note: this caching strategy may need to be adjusted based on the project
-              #       and the size of the browsers being cached
-              # See https://github.com/mxschmitt/action-cache-playwright for more information
-              uses: mxschmitt/action-cache-playwright@v1
-              with:
-                  cache-key: playwright-browsers
-                  paths: |
-                      /root/.cache/ms-playwright
-                      /root/.local/share/ms-playwright
-
+              run: |
+                  npx playwright install --with-deps chromium
             - name: Run end-to-end tests
               run: yarn test:e2e:report
-              # Cache the test results to speed up future runs
-              # Note: this caching strategy may need to be adjusted based on the project
-              #       and the size of the test results being cached
-              # See https://github.com/actions/cache/blob/main/examples.md#node---jest for more information
               uses: actions/cache@v2
               with:
                   path: playwright-report
