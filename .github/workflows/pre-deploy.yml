@@ -44,15 +44,15 @@ jobs:
                   echo NEXT_PUBLIC_DOMAIN=$(cat deploy-url.txt) >> $GITHUB_ENV
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps chromium
-            - name: Run end-to-end tests
-              id: e2e
+            - name: Read HTML report file
               run: |
-                  yarn test:e2e:report
-                  echo "PLAYWRIGHT_REPORT=$(cat playwright-report/index.html)" >> $GITHUB_OUTPUT
+                  HTML_REPORT=$(cat playwright-report/index.html)
+                  # print the value of the variable
+                  echo $HTML_REPORT
             - name: Publish e2e report
               run: |
                   curl -X POST \
                   -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  -d '{"name": "the-last-dance-e2e", "files": [{ "file":"index.html","data": "${{ steps.e2e.outputs.PLAYWRIGHT_REPORT }}" }], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
+                  -d '{"name": "the-last-dance-e2e", "files": [{ "file":"index.html","data": "'"$HTML_REPORT"'" }], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
                   "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
