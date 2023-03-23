@@ -15,11 +15,12 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: 18
+                  cache: yarn
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install
+                  yarn install --frozen-lockfile
             - name: Linter
               run: yarn run lint
             - name: Run unit tests
@@ -42,6 +43,15 @@ jobs:
                   echo URL=$(cat deploy-url.txt) >> $GITHUB_ENV
                   echo NEXT_PUBLIC_DOMAIN=$(cat deploy-url.txt) >> $GITHUB_ENV
             - name: Install Playwright Browsers
-              run: npx playwright install --with-deps
+              run: npx playwright install --with-deps chromium
             - name: Run end-to-end tests
-              run: npx playwright test
+              id: e2e
+              run: |
+                  yarn test:e2e:report
+            - name: Publish e2e report
+              run: |
+                  curl -X POST \
+                  -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                  -H "Content-Type: application/json" \
+                  --data '{"name": "the-last-dance-e2e", "files": [{"file":"index.html", "data":"<h1>hola</h1>"}], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
+                  "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
