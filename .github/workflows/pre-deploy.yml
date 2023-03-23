@@ -53,5 +53,5 @@ jobs:
                   curl -X POST \
                   -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  -d "{\"name\": \"the-last-dance-e2e\", \"files\": [{ \"file\":\"index.html\",\"data\": \"$(cat playwright-report/index.html)\" }], \"projectSettings\": {\"framework\": null, \"buildCommand\": \"echo 'no build step required'\", \"outputDirectory\": \"/\"}}" \
+                  --data '{"name": "the-last-dance-e2e", "files": [{"file":"index.html", "data":"<h1>hola</h1>"}], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
                   "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
