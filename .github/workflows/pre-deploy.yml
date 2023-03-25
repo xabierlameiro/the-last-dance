@@ -55,24 +55,33 @@ jobs:
                   yarn test:e2e:report
             - name: Upload e2e report
               run: |
-                  base64 -w 0 "playwright-report/index.html" > report.txt
-                  curl -X POST \
-                    -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                    -H "Content-Type: application/json" \
-                    --data-binary "@report.txt" \
-                    --data '{
-                      "name": "the-last-dance-e2e", 
-                      "files": [{
-                       "InlinedFile": {
-                        "data": "'$(base64 -w 0 "playwright-report/index.html")'",
-                        "encoding": "base64",
-                        "file" : "index.html"
-                       }
-                      }], 
-                      "target": "production",
-                      "projectSettings": {
-                        "framework": null, 
-                        "buildCommand": "echo '\''no build step required'\''", 
-                        "outputDirectory": "/"}
-                    }' \
-                    "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
+                  # Split the report into 1MB chunks
+                  split -b 1m report.txt report_chunk
+
+                  # Upload each chunk using a loop
+                  for file in report_chunk*
+                  do
+                    curl -X POST \
+                      -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                      -H "Content-Type: application/json" \
+                      --data-binary "@$file" \
+                      --data '{
+                        "name": "the-last-dance-e2e", 
+                        "files": [{
+                        "InlinedFile": {
+                          "data": "'$(base64 -w 0 "$file")'",
+                          "encoding": "base64",
+                          "file" : "index.html"
+                        }
+                        }], 
+                        "target": "production",
+                        "projectSettings": {
+                          "framework": null, 
+                          "buildCommand": "echo '\''no build step required'\''", 
+                          "outputDirectory": "/"}
+                      }' \
+                      "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
+
+                    # Remove the uploaded chunk
+                    rm $file
+                  done
