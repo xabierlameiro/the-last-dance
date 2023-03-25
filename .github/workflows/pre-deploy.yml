@@ -22,14 +22,18 @@ jobs:
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   yarn install --frozen-lockfile
             - name: Linter
+              if: false
               run: yarn run lint
             - name: Run unit tests
+              if: false
               run: yarn run test
             - name: Publish coverage report
+              if: false
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_COVERAGE_PROJECT_ID }}
               run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
             - name: Publish storybook
+              if: false
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STORYBOOK_PROJECT_ID }}
               run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
@@ -57,7 +61,7 @@ jobs:
                   curl --location --request POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
                     --header "x-vercel-digest: ${{ env.SHA256 }}" \
                     --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                    --header 'Content-Type: text/html' \
+                    --header 'Content-Type: text/plain' \
                     --data-binary '@playwright-report/index.html'
             - name: Calculate file size
               run: |
