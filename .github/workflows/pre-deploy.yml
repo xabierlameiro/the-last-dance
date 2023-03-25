@@ -48,10 +48,6 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
-            - name: Calculate SHA256 digest
-              run: |
-                  sha256=$(openssl dgst -sha256 -binary playwright-report/index.html | base64)
-                  echo "::set-output name=sha256::$sha256"
             - name: Upload file to Vercel
               run: |
                   curl --location --request POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
@@ -59,6 +55,10 @@ jobs:
                   --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   --header 'Content-Type: text/html' \
                   --data-binary '@playwright-report/index.html'
+            - name: Calculate file size
+              run: |
+                  file_size=$(stat -c%s playwright-report/index.html)
+                  echo "::set-output name=file_size::$file_size"
             - name: Create deployment on Vercel
               run: |
                   curl --location --request POST 'https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}' \
@@ -70,7 +70,7 @@ jobs:
                           {
                               "file": "playwright-report/index.html",
                               "sha": "'${{ steps.calculate_sha256.outputs.sha256 }}'",
-                              "size": '${{ steps.file_size.outputs.file_size }}'
+                              "size": '${{ steps.calculate_file_size.outputs.file_size }}'
                           }
                       ],
                       "projectSettings": {
