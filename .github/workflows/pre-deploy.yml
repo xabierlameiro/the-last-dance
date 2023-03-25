@@ -55,22 +55,21 @@ jobs:
                   yarn test:e2e:report
             - name: Upload e2e report
               run: |
-                  html=$(cat playwright-report/index.html)
-                    curl -X POST \
-                      -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                      -H "Content-Type: application/json" \
-                      --data '{
-                        "name": "the-last-dance-e2e", 
-                        "files": [{
-                         "InlinedFile": {
-                          "data": "'$(echo $html | base64)'",
-                          "encoding": "base64",
-                          "file" : "index.html"
-                         }
-                        }], 
-                        "projectSettings": {
-                          "framework": null, 
-                          "buildCommand": "echo '\''no build step required'\''", 
-                          "outputDirectory": "/"}
-                      }' \
-                      "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
+                  curl -X POST \
+                    -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                    -H "Content-Type: application/json" \
+                    --data '{
+                      "name": "the-last-dance-e2e", 
+                      "files": [{
+                       "InlinedFile": {
+                        "data": "playwright-report/index.html"
+                        "encoding": "base64",
+                        "file" : "index.html"
+                       }
+                      }], 
+                      "projectSettings": {
+                        "framework": null, 
+                        "buildCommand": "echo '\''no build step required'\''", 
+                        "outputDirectory": "/"}
+                    }' \
+                    "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
