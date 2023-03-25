@@ -64,7 +64,7 @@ jobs:
                       "name": "the-last-dance-e2e", 
                       "files": [{
                        "InlinedFile": {
-                        "data": null,
+                        "data": "'$(base64 -w 0 "playwright-report/index.html")'",
                         "encoding": "base64",
                         "file" : "index.html"
                        }
