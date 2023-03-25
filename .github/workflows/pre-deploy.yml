@@ -62,7 +62,7 @@ jobs:
                     --header "x-vercel-digest: ${{ env.SHA256 }}" \
                     --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                     --header 'Content-Type: text/html' \
-                    --data-binary '@playwright-report/index.html'
+                    --data-raw '@playwright-report/index.html'
             - name: Calculate file size
               run: |
                   file_size=$(stat -c%s playwright-report/index.html)
