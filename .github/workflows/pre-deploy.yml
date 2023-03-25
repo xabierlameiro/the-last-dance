@@ -55,12 +55,7 @@ jobs:
                   yarn test:e2e:report
             - name: Upload e2e report
               run: |
-                  # Split the report into 1MB chunks
-                  split -b 200k playwright-report/index.html report_chunk
-
-                  # Upload each chunk using a loop
-                  for file in report_chunk*
-                  do
+                  find playwright-report -name 'index.html' -type f | while read file; do
                     curl -X POST \
                       -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                       -H "Content-Type: application/json" \
@@ -81,7 +76,4 @@ jobs:
                           "outputDirectory": "/"}
                       }' \
                       "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
-
-                    # Remove the uploaded chunk
-                    rm $file
                   done
