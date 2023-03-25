@@ -55,23 +55,24 @@ jobs:
                   yarn test:e2e:report
             - name: Upload e2e report
               run: |
-                  # Escape the HTML content in the data field using jq
-                  escaped_html=$(jq --null-input --arg html "$(cat playwright-report/index.html)" '$html|@json')
+                  # Generate the JSON payload using jq, including the escaped HTML content
+                  json_payload=$(jq --null-input --arg html "$(cat playwright-report/index.html)" \
+                    '{ 
+                      "name": "the-last-dance-e2e", 
+                      "files": [{
+                        "file": "index.html",
+                        "data": $html | @html
+                      }],
+                      "projectSettings": {
+                        "framework": null, 
+                        "buildCommand": "echo '\''no build step required'\''", 
+                        "outputDirectory": "/"
+                      }
+                    }')
 
-                  # Send the JSON data to Vercel API using curl
+                  # Send the JSON payload to Vercel API using curl
                   curl -X POST \
                     -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                     -H "Content-Type: application/json" \
-                    --data '{
-                        "name": "the-last-dance-e2e", 
-                        "files": [{
-                          "file":"index.html", 
-                          "data": '"$escaped_html"'
-                        }],
-                        "projectSettings": {
-                          "framework": null, 
-                          "buildCommand": "echo '\''no build step required'\''", 
-                          "outputDirectory": "/"
-                        }
-                    }' \
+                    --data-binary "$json_payload" \
                     "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
