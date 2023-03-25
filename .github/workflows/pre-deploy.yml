@@ -40,6 +40,7 @@ jobs:
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Trigger Vercel Deployment
+              if: false
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               run: |
@@ -62,7 +63,9 @@ jobs:
                     --header "x-vercel-digest: ${{ env.SHA256 }}" \
                     --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                     --header 'Content-Type: text/html' \
-                    --data-raw '@playwright-report/index.html'
+                    --data-raw 'content' \
+                    --form 'file=@playwright-report/index.html'
+
             - name: Calculate file size
               run: |
                   file_size=$(stat -c%s playwright-report/index.html)
