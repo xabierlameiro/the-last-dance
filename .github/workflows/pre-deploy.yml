@@ -50,16 +50,25 @@ jobs:
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps chromium
             - name: Run end-to-end tests
-              id: e2e
               run: |
                   yarn test:e2e:report
-            - name: Save html content from playwright-report/index.html to env
+            - name: Save html content from playwright-report/index.html to $GITHUB_OUTPUT
+              id: e2e
               run: |
-                  echo "PLAYWRIGHT_HTML=$(cat playwright-report/index.html)" >> $GITHUB_ENV
-            - name: Publish e2e report
+                  html = $(cat playwright-report/index.html)
+                  echo html=$html >> $GITHUB_OUTPUT
+            - name: Upload e2e report
               run: |
                   curl -X POST \
                   -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  --data '{"name": "the-last-dance-e2e", "files": [{"file":"index.html", "data": "${{ env.PLAYWRIGHT_HTML }}"}], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \	
+                  --data '{
+                      "name": "the-last-dance-e2e", 
+                      "files": [{"file":"index.html", 
+                      "data": "${{ steps.e2e.outputs.html }}"}],
+                      "projectSettings": {
+                        "framework": null, 
+                        "buildCommand": "echo '\''no build step required'\''", 
+                        "outputDirectory": "/"}
+                  }' \
                   "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
