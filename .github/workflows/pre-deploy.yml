@@ -56,7 +56,7 @@ jobs:
             - name: Upload e2e report
               run: |
                   # Split the report into 1MB chunks
-                  split -b 1m report.txt report_chunk
+                  split -b 1m playwright-report/index.html report_chunk
 
                   # Upload each chunk using a loop
                   for file in report_chunk*
