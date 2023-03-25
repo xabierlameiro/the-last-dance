@@ -55,10 +55,7 @@ jobs:
                   yarn test:e2e:report
             - name: Upload e2e report
               run: |
-                  curl -X POST \
-                    -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                    -H "Content-Type: application/json" \
-                    --data-raw '{
+                  echo '{
                         "name": "the-last-dance-e2e", 
                         "files": [{
                           "file":"index.html", 
@@ -69,5 +66,10 @@ jobs:
                           "buildCommand": "echo '\''no build step required'\''", 
                           "outputDirectory": "/"
                         }
-                    }' \
+                    }' > data.json
+                    
+                  curl -X POST \
+                    -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                    -H "Content-Type: application/json" \
+                    --data-binary "@data.json" \
                     "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
