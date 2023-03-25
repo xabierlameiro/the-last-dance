@@ -55,14 +55,16 @@ jobs:
                   yarn test:e2e:report
             - name: Upload e2e report
               run: |
+                  base64 -w 0 "playwright-report/index.html" > report.txt
                   curl -X POST \
                     -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                     -H "Content-Type: application/json" \
+                    --data-binary "@report.txt" \
                     --data '{
                       "name": "the-last-dance-e2e", 
                       "files": [{
                        "InlinedFile": {
-                        "data": "'$(base64 -w 0 "playwright-report/index.html")'",
+                        "data": null,
                         "encoding": "base64",
                         "file" : "index.html"
                        }
