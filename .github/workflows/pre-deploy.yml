@@ -54,8 +54,8 @@ jobs:
                   echo "::set-output name=sha256::$sha256"
             - name: Upload file to Vercel
               run: |
-                  curl --location --request POST 'https://api.vercel.com/v2/now/files' \
-                  --header "x-vercel-digest: ${{ steps.calculate_sha256.outputs.sha256 }}" \
+                  curl --location --request POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
+                  --header "x-vercel-digest: $(openssl dgst -sha256 -binary playwright-report/index.html | base64)" \
                   --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   --header 'Content-Type: text/html' \
                   --data-binary '@playwright-report/index.html'
