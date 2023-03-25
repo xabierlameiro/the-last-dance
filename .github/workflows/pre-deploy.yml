@@ -48,17 +48,21 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
+            - name: Calculate SHA256
+              id: calculate_sha256
+              run: |
+                  echo SHA256=$(openssl dgst -sha256 -binary playwright-report/index.html | base64) >> $GITHUB_ENV
             - name: Upload file to Vercel
               run: |
                   curl --location --request POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
-                  --header "x-vercel-digest: $(openssl dgst -sha256 -binary playwright-report/index.html | base64)" \
+                  --header "x-vercel-digest: ${{ env.SHA256 }}" \
                   --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   --header 'Content-Type: text/html' \
                   --data-binary '@playwright-report/index.html'
             - name: Calculate file size
               run: |
                   file_size=$(stat -c%s playwright-report/index.html)
-                  echo "::set-output name=file_size::$file_size"
+                  echo SIZE=$file_size >> $GITHUB_ENV
             - name: Create deployment on Vercel
               run: |
                   curl --location --request POST 'https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}' \
@@ -69,8 +73,8 @@ jobs:
                       "files": [
                           {
                               "file": "playwright-report/index.html",
-                              "sha": "'${{ steps.calculate_sha256.outputs.sha256 }}'",
-                              "size": '${{ steps.calculate_file_size.outputs.file_size }}'
+                              "sha": '${{ env.SHA256 }}',
+                              "size": '${{ env.SIZE }}',
                           }
                       ],
                       "projectSettings": {
