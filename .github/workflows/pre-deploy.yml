@@ -61,7 +61,7 @@ jobs:
                   curl --location --request POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
                     --header "x-vercel-digest: ${{ env.SHA256 }}" \
                     --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                    --header 'Content-Type: text/plain' \
+                    --header 'Content-Type: text/html' \
                     --data-binary '@playwright-report/index.html'
             - name: Calculate file size
               run: |
@@ -77,8 +77,8 @@ jobs:
                       "files": [
                           {
                               "file": "playwright-report/index.html",
-                              "sha": '${{ env.SHA256 }}',
-                              "size": '${{ env.SIZE }}',
+                              "sha": "${{ env.SHA256 }}",
+                              "size": "${{ env.SIZE }}"
                           }
                       ],
                       "projectSettings": {
