@@ -62,7 +62,7 @@ jobs:
                       "name": "the-last-dance-e2e", 
                       "files": [{
                         "file":"index.html", 
-                        "data": "'$(cat playwright-report/index.html)'"
+                        "data": "'"$(cat playwright-report/index.html)"'",
                       }],
                       "projectSettings": {
                         "framework": null, 
