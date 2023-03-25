@@ -60,8 +60,10 @@ jobs:
                   -H "Content-Type: application/json" \
                   --data '{
                       "name": "the-last-dance-e2e", 
-                      "files": [{"file":"index.html", 
-                      "data": "'$(base64 -w 0 playwright-report/index.html)'"}],
+                      "files": [{
+                        "file":"index.html", 
+                        "data": "'$(cat playwright-report/index.html)'"
+                      }],
                       "projectSettings": {
                         "framework": null, 
                         "buildCommand": "echo '\''no build step required'\''", 
