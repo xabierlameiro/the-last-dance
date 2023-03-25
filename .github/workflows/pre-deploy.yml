@@ -58,7 +58,7 @@ jobs:
                   echo "SHA256=$SHA256" >> $GITHUB_ENV
             - name: Upload file to Vercel
               run: |
-                  curl --location --request POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
+                  curl --location --request POST 'https://api.vercel.com/v2/now/files' \
                     --header "x-vercel-digest: ${{ env.SHA256 }}" \
                     --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                     --header 'Content-Type: text/html' \
@@ -69,7 +69,7 @@ jobs:
                   echo SIZE=$file_size >> $GITHUB_ENV
             - name: Create deployment on Vercel
               run: |
-                  curl --location --request POST 'https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}' \
+                  curl --location --request POST 'https://api.vercel.com/v12/now/deployments' \
                   --header 'Content-Type: application/json' \
                   --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   --data-raw '{
