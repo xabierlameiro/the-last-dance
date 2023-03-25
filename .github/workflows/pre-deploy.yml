@@ -53,38 +53,13 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
-            - name: Calculate SHA256
+            - name: Save html content from playwright-report/index.html to env
               run: |
-                  SHA256=$(sha256sum playwright-report/index.html | cut -d ' ' -f 1)
-                  echo "SHA256=$SHA256" >> $GITHUB_ENV
-            - name: Upload file to Vercel
+                  echo "PLAYWRIGHT_HTML=$(cat playwright-report/index.html)" >> $GITHUB_ENV
+            - name: Publish e2e report
               run: |
-                  curl --location --request POST 'https://api.vercel.com/v2/now/files' \
-                    --header "x-vercel-digest: ${{ env.SHA256 }}" \
-                    --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                    --header 'Content-Type: text/html' \
-                    --data-raw 'content' \
-                    --form 'file=@playwright-report/index.html'
-
-            - name: Calculate file size
-              run: |
-                  file_size=$(stat -c%s playwright-report/index.html)
-                  echo SIZE=$file_size >> $GITHUB_ENV
-            - name: Create deployment on Vercel
-              run: |
-                  curl --location --request POST 'https://api.vercel.com/v12/now/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}' \
-                  --header 'Content-Type: application/json' \
-                  --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                  --data-raw '{
-                      "name": "the-last-dance-e2e",
-                      "files": [
-                          {
-                              "file": "playwright-report/index.html",
-                              "sha": "${{ env.SHA256 }}",
-                              "size": "${{ env.SIZE }}"
-                          }
-                      ],
-                      "projectSettings": {
-                          "framework": null
-                      }
-                  }'
+                  curl -X POST \
+                  -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                  -H "Content-Type: application/json" \
+                  --data '{"name": "the-last-dance-e2e", "files": [{"file":"index.html", "data": "${{ env.PLAYWRIGHT_HTML }}"}], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \	
+                  "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
