@@ -48,10 +48,26 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
-            - name: Publish e2e report
+            - name: Use the SHA to upload the file "playwright-report/index.html"
               run: |
-                  curl -X POST \
-                  -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                  -H "Content-Type: application/json" \
-                  --data '{"name": "the-last-dance-e2e", "files": [{"file":"index.html", "data":"<h1>hola</h1>"}], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
-                  "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
+                  curl --location --request POST 'https://api.vercel.com/v2/now/files' \
+                   --header 'x-vercel-digest: `SHA`' \
+                   --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                   --header 'Content-Type: text/html' \
+                   --data-raw 'playwright-report/index.html'
+            - name: Deploy to vercel
+              run: |
+                  curl --location --request POST 'https://api.vercel.com/v12/now/deployments' \
+                  --header 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' \
+                  --header 'Content-Type: application/json' \
+                  --data-raw '{
+                      "name": "the-last-dance-e2e",
+                      "files": [
+                          {
+                              "file": "playwright-report/index.html",
+                              "sha": "`SHA`"
+                              "size": 0,
+                          }
+                      ],
+                      "projectSettings": null,
+                  }'
