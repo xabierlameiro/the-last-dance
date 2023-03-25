@@ -51,7 +51,10 @@ jobs:
             - name: Calculate SHA256
               id: calculate_sha256
               run: |
-                  echo SHA256=$(openssl dgst -sha256 -binary playwright-report/index.html | base64) >> $GITHUB_ENV
+                  # string
+                  # The file SHA1 used to check the integrity
+                  # <= 40 characters
+                    echo SHA256=$(sha256sum playwright-report/index.html | cut -d ' ' -f 1) >> $GITHUB_ENV
             - name: Upload file to Vercel
               run: |
                   curl --location --request POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
