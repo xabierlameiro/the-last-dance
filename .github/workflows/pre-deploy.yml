@@ -55,7 +55,7 @@ jobs:
                   yarn test:e2e:report
             - name: Upload e2e report
               run: |
-                  html = $(cat e2e-report.html)
+                  html = $(cat playwright-report/index.html)
                   curl -X POST \
                   -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   -H "Content-Type: application/json" \
