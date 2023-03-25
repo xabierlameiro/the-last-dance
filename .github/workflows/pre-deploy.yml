@@ -55,21 +55,23 @@ jobs:
                   yarn test:e2e:report
             - name: Upload e2e report
               run: |
-                  echo '{
+                  # Escape the HTML content in the data field using jq
+                  escaped_html=$(jq --null-input --arg html "$(cat playwright-report/index.html)" '$html|@json')
+
+                  # Send the JSON data to Vercel API using curl
+                  curl -X POST \
+                    -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                    -H "Content-Type: application/json" \
+                    --data '{
                         "name": "the-last-dance-e2e", 
                         "files": [{
                           "file":"index.html", 
-                          "data": "'"$(cat playwright-report/index.html)"'"
+                          "data": '"$escaped_html"'
                         }],
                         "projectSettings": {
                           "framework": null, 
                           "buildCommand": "echo '\''no build step required'\''", 
                           "outputDirectory": "/"
                         }
-                    }' > data.json
-                    
-                  curl -X POST \
-                    -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                    -H "Content-Type: application/json" \
-                    --data-binary "@data.json" \
+                    }' \
                     "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
