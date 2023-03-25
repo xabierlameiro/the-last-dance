@@ -50,13 +50,9 @@ jobs:
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps chromium
             - name: Run end-to-end tests
-              run: |
-                  yarn test:e2e:report
-            - name: Save html content from playwright-report/index.html to $GITHUB_OUTPUT
               id: e2e
               run: |
-                  html = $(cat playwright-report/index.html)
-                  echo html=$html >> $GITHUB_OUTPUT
+                  yarn test:e2e:report
             - name: Upload e2e report
               run: |
                   curl -X POST \
@@ -65,7 +61,7 @@ jobs:
                   --data '{
                       "name": "the-last-dance-e2e", 
                       "files": [{"file":"index.html", 
-                      "data": "${{ steps.e2e.outputs.html }}"}],
+                      "data": "'$(base64 -w 0 playwright-report/index.html)'"}],
                       "projectSettings": {
                         "framework": null, 
                         "buildCommand": "echo '\''no build step required'\''", 
