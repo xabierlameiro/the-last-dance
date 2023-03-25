@@ -63,7 +63,7 @@ jobs:
                     "name": "the-last-dance-e2e", 
                     "files": [{
                       "file":"index.html", 
-                      "data": "'$(echo $html | base64 -w 0)'"
+                      "data": "<h1>mierda</h1>"
                     }], 
                     "projectSettings": {
                       "framework": null, 
