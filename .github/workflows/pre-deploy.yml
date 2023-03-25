@@ -53,27 +53,33 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
-            - name: Upload e2e report
+            - name: Get SHA and filesize playwright-report/index.html
+              id: get-sha
               run: |
-                  find playwright-report -name 'index.html' -type f | while read file; do
-                    curl -X POST \
-                      -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                      -H "Content-Type: application/json" \
-                      --data-binary "@$file" \
-                      --data '{
-                        "name": "the-last-dance-e2e", 
-                        "files": [{
-                        "InlinedFile": {
-                          "data": "'$(base64 -w 0 "$file")'",
-                          "encoding": "base64",
-                          "file" : "index.html"
-                        }
-                        }], 
-                        "target": "production",
-                        "projectSettings": {
-                          "framework": null, 
-                          "buildCommand": "echo '\''no build step required'\''", 
-                          "outputDirectory": "/"}
-                      }' \
-                      "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
-                  done
+                  echo SHA=$(sha1sum playwright-report/index.html | cut -d ' ' -f 1) >> $GITHUB_ENV
+                  echo filesizeinbytes=$(wc -c < playwright-report/index.html) >> $GITHUB_ENV
+            - name: Execute javascript
+              run: |
+                  curl --location --request POST 'https://api.vercel.com/v2/now/files' \
+                   --header 'x-vercel-digest: ${{ env.SHA }}' \
+                   --header 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' \
+                   --header 'Content-Type: text/plain' \
+                   --data-raw '@playwright-report/index.html'
+            - name: Deploy to Vercel
+              run: |
+                  curl --location --request POST 'https://api.vercel.com/v12/now/deployments' \
+                  --header 'Content-Type: application/json' \
+                  --header 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' \
+                  --data-raw '{
+                      "name": "the-last-dance-e2e", 
+                      "files": [
+                          {
+                              "file": "index.html",
+                              "sha":  "${{ env.SHA }}",
+                              "size": "${{ env.filesizeinbytes }}",
+                          }
+                      ],
+                      "projectSettings": {
+                          "framework": null
+                      }
+                  }'
