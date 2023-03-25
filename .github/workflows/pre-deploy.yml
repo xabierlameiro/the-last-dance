@@ -62,8 +62,11 @@ jobs:
                   --data '{
                     "name": "the-last-dance-e2e", 
                     "files": [{
-                      "file":"index.html", 
-                      "data": "<h1>mierda</h1>"
+                     "InlinedFile": {
+                      "data": "'$(echo $html | base64)'",
+                      "encoding": "base64",
+                      "file" : "index.html"
+                     }
                     }], 
                     "projectSettings": {
                       "framework": null, 
