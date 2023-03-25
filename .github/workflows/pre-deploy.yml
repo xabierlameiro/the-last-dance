@@ -49,19 +49,16 @@ jobs:
               run: |
                   yarn test:e2e:report
             - name: Calculate SHA256
-              id: calculate_sha256
               run: |
-                  # string
-                  # The file SHA1 used to check the integrity
-                  # <= 40 characters
-                    echo SHA256=$(sha256sum playwright-report/index.html | cut -d ' ' -f 1) >> $GITHUB_ENV
+                  SHA256=$(sha256sum playwright-report/index.html | cut -d ' ' -f 1)
+                  echo "SHA256=$SHA256" >> $GITHUB_ENV
             - name: Upload file to Vercel
               run: |
                   curl --location --request POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
-                  --header "x-vercel-digest: ${{ env.SHA256 }}" \
-                  --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                  --header 'Content-Type: text/html' \
-                  --data-binary '@playwright-report/index.html'
+                    --header "x-vercel-digest: ${{ env.SHA256 }}" \
+                    --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                    --header 'Content-Type: text/html' \
+                    --data-binary '@playwright-report/index.html'
             - name: Calculate file size
               run: |
                   file_size=$(stat -c%s playwright-report/index.html)
