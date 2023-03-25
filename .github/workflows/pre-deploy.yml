@@ -48,31 +48,32 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
-
-            - name: Get SHA
-              id: get-sha
+            - name: Calculate SHA256 digest
               run: |
-                  echo "::set-output name=sha::$(git rev-parse HEAD)"
-            - name: Use the SHA to upload the file "playwright-report/index.html"
+                  sha256=$(openssl dgst -sha256 -binary playwright-report/index.html | base64)
+                  echo "::set-output name=sha256::$sha256"
+            - name: Upload file to Vercel
               run: |
                   curl --location --request POST 'https://api.vercel.com/v2/now/files' \
-                   --header 'x-vercel-digest: ${{ steps.get-sha.outputs.sha }}' \
-                   --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                   --header 'Content-Type: text/html' \
-                   --data-raw 'playwright-report/index.html'
-            - name: Deploy to vercel
+                  --header "x-vercel-digest: ${{ steps.calculate_sha256.outputs.sha256 }}" \
+                  --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                  --header 'Content-Type: text/html' \
+                  --data-binary '@playwright-report/index.html'
+            - name: Create deployment on Vercel
               run: |
                   curl --location --request POST 'https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}' \
-                  --header 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' \
                   --header 'Content-Type: application/json' \
+                  --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                   --data-raw '{
                       "name": "the-last-dance-e2e",
                       "files": [
                           {
                               "file": "playwright-report/index.html",
-                              "sha": "`SHA`"
-                              "size": 0,
+                              "sha": "'${{ steps.calculate_sha256.outputs.sha256 }}'",
+                              "size": '${{ steps.file_size.outputs.file_size }}'
                           }
                       ],
-                      "projectSettings": null,
+                      "projectSettings": {
+                          "framework": null
+                      }
                   }'
