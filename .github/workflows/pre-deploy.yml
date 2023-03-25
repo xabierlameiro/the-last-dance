@@ -48,16 +48,21 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
+
+            - name: Get SHA
+              id: get-sha
+              run: |
+                  echo "::set-output name=sha::$(git rev-parse HEAD)"
             - name: Use the SHA to upload the file "playwright-report/index.html"
               run: |
                   curl --location --request POST 'https://api.vercel.com/v2/now/files' \
-                   --header 'x-vercel-digest: `SHA`' \
+                   --header 'x-vercel-digest: ${{ steps.get-sha.outputs.sha }}' \
                    --header "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                    --header 'Content-Type: text/html' \
                    --data-raw 'playwright-report/index.html'
             - name: Deploy to vercel
               run: |
-                  curl --location --request POST 'https://api.vercel.com/v12/now/deployments' \
+                  curl --location --request POST 'https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}' \
                   --header 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' \
                   --header 'Content-Type: application/json' \
                   --data-raw '{
