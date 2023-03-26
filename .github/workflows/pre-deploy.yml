@@ -63,4 +63,5 @@ jobs:
                   curl -X POST "https://api.vercel.com/v2/files?teamId=${{ secrets.VERCEL_ORG_ID }}" \
                    -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                    -H "Content-Length: ${{ env.filesizeinbytes }}" \
+                   -H "x-now-digest: ${{ env.SHA }}" \
                    -H "x-vercel-digest: ${{ env.SHA }}"
