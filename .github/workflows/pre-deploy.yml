@@ -59,10 +59,9 @@ jobs:
                   echo SHA=$(echo -n playwright-report/index.html | shasum | cut -d ' ' -f 1) >> $GITHUB_ENV
                   echo filesizeinbytes=$(wc -c < playwright-report/index.html) >> $GITHUB_ENV
                   echo playwright-report/index.html
-            - name: Execute javascript
+            - name: Upload playwright-report/index.html to Vercel and solve this issue curl (56) OpenSSL SSL_read error:0A000126:SSL routines::unexpected eof while reading, errno 0
               run: |
-                  curl -X POST "https://api.vercel.com/v2/files?teamId=${{ secrets.VERCEL_ORG_ID }}" \
-                   -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                   -H "Content-Length: ${{ env.filesizeinbytes }}" \
-                   -H "x-vercel-digest: ${{ env.SHA }}" \
-                   --ciphers AES256+EECDH:AES256+EDH
+                  curl --insecure -X POST "https://api.vercel.com/v2/files?teamId=${{ secrets.VERCEL_ORG_ID }}" \
+                  -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                  -H "Content-Length: ${{ env.filesizeinbytes }}" \
+                  -H "x-vercel-digest: ${{ env.SHA }}"
