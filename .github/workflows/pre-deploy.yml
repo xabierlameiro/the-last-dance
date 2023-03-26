@@ -65,5 +65,4 @@ jobs:
                    -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
                    -H "Content-Length: ${{ env.filesizeinbytes }}" \
                    -H "x-vercel-digest: ${{ env.SHA }}" \
-                   --ssl-version tls1.2 \
                    --ciphers AES256+EECDH:AES256+EDH
