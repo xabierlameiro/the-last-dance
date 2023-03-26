@@ -60,25 +60,7 @@ jobs:
                   echo filesizeinbytes=$(wc -c < playwright-report/index.html) >> $GITHUB_ENV
             - name: Execute javascript
               run: |
-                  curl --location --request POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
+                  curl -X POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
                    --header 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' \
                    --header 'Content-Length: ${{ env.filesizeinbytes }}'
                    --header 'x-vercel-digest: ${{ env.SHA }}' \
-            - name: Deploy to Vercel
-              run: |
-                  curl --location --request POST 'https://api.vercel.com/v12/now/deployments' \
-                  --header 'Content-Type: application/json' \
-                  --header 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' \
-                  --data-raw '{
-                      "name": "the-last-dance-e2e", 
-                      "files": [
-                          {
-                              "file": "index.html",
-                              "sha":  "${{ env.SHA }}",
-                              "size": "${{ env.filesizeinbytes }}",
-                          }
-                      ],
-                      "projectSettings": {
-                          "framework": null
-                      }
-                  }'
