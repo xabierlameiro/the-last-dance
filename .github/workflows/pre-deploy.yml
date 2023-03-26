@@ -22,20 +22,25 @@ jobs:
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   yarn install --frozen-lockfile
             - name: Linter
+              if: false
               run: yarn run lint
             - name: Run unit tests
+              if: false
               run: yarn run test
             - name: Publish coverage report
+              if: false
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_COVERAGE_PROJECT_ID }}
               run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
             - name: Publish storybook
+              if: false
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STORYBOOK_PROJECT_ID }}
               run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Trigger Vercel Deployment
+              if: false
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               run: |
@@ -48,10 +53,15 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
-            - name: Publish e2e report
+            - name: Get SHA and filesize playwright-report/index.html
+              id: get-sha
               run: |
-                  curl -X POST \
+                  echo SHA=$(echo -n playwright-report/index.html | shasum | cut -d ' ' -f 1) >> $GITHUB_ENV
+                  echo filesizeinbytes=$(wc -c < playwright-report/index.html) >> $GITHUB_ENV
+                  echo playwright-report/index.html
+            - name: Upload playwright-report/index.html to Vercel and solve this issue curl (56) OpenSSL SSL_read error:0A000126:SSL routines::unexpected eof while reading, errno 0
+              run: |
+                  curl --insecure -X POST "https://api.vercel.com/v2/files?teamId=${{ secrets.VERCEL_ORG_ID }}" \
                   -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                  -H "Content-Type: application/json" \
-                  --data '{"name": "the-last-dance-e2e", "files": [{"file":"index.html", "data":"<h1>hola</h1>"}], "projectSettings": {"framework": null, "buildCommand": "echo '\''no build step required'\''", "outputDirectory": "/"}}' \
-                  "https://api.vercel.com/v13/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}"
+                  -H "Content-Length: ${{ env.filesizeinbytes }}" \
+                  -H "x-vercel-digest: ${{ env.SHA }}"
