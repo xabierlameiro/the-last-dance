@@ -56,15 +56,14 @@ jobs:
             - name: Get SHA and filesize playwright-report/index.html
               id: get-sha
               run: |
-                  echo SHA=$(sha1sum playwright-report/index.html | cut -d ' ' -f 1) >> $GITHUB_ENV
+                  echo SHA=$(echo -n playwright-report/index.html | shasum | cut -d ' ' -f 1) >> $GITHUB_ENV
                   echo filesizeinbytes=$(wc -c < playwright-report/index.html) >> $GITHUB_ENV
             - name: Execute javascript
               run: |
-                  curl --location --request POST 'https://api.vercel.com/v2/now/files' \
-                   --header 'x-vercel-digest: ${{ env.SHA }}' \
+                  curl --location --request POST 'https://api.vercel.com/v2/now/files?teamId=${{ secrets.VERCEL_ORG_ID }}' \
                    --header 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' \
-                   --header 'Content-Type: text/plain' \
-                   --data-raw '@playwright-report/index.html'
+                   --header 'Content-Length: ${{ env.filesizeinbytes }}'
+                   --header 'x-vercel-digest: ${{ env.SHA }}' \
             - name: Deploy to Vercel
               run: |
                   curl --location --request POST 'https://api.vercel.com/v12/now/deployments' \
