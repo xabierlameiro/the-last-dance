@@ -53,15 +53,10 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
-            - name: Get SHA and filesize playwright-report/index.html
-              id: get-sha
-              run: |
-                  echo SHA=$(echo -n playwright-report/index.html | shasum | cut -d ' ' -f 1) >> $GITHUB_ENV
-                  echo filesizeinbytes=$(wc -c < playwright-report/index.html) >> $GITHUB_ENV
-                  echo playwright-report/index.html
-            - name: Upload playwright-report/index.html to Vercel and solve this issue curl (56) OpenSSL SSL_read error:0A000126:SSL routines::unexpected eof while reading, errno 0
-              run: |
-                  curl --insecure -X POST "https://api.vercel.com/v2/files?teamId=${{ secrets.VERCEL_ORG_ID }}" \
-                  -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                  -H "Content-Length: ${{ env.filesizeinbytes }}" \
-                  -H "x-vercel-digest: ${{ env.SHA }}"
+            - name: Upload report to vercel
+              uses: amondnet/vercel-action@v20
+              with:
+                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
+                  vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+                  vercel-project-id: ${{ secrets.VERCEL_COVERAGE_PROJECT_ID }}
+                  working-directory: playwrigth-report/index.html
