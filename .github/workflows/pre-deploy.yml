@@ -62,6 +62,7 @@ jobs:
             - name: Copy playwright-report/index.html to e2e-report/index.html
               run: |
                   ls -la
+                  cd e2e-report
                   cp -r ../playwright-report/index.html index.html
                   ls -la
                   git config --global user.email "xabier.lameiro@gmail.com"
