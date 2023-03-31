@@ -53,11 +53,19 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
-            - name: Upload report to Vercel
-              uses: amondnet/vercel-action@v20
+            - name: Checkout e2e-report repository
+              uses: actions/checkout@v2
               with:
-                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
-                  vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-                  vercel-args: '--prod' #Optional
-                  vercel-project-id: ${{ secrets.VERCEL_COVERAGE_PROJECT_ID }}
-                  working-directory: ./playwright-report
+                  repository: xabierlameiro/e2e-report
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  path: e2e-report
+            - name: Copy playwright-report/index.html to e2e-report/index.html
+              run: |
+                  ls -la
+                  cp -r ../playwright-report/index.html index.html
+                  ls -la
+                  git config --global user.email "xabier.lameiro@gmail.com"
+                  git config --global user.name "xabierlameiro.com"
+                  git add .
+                  git commit -m "Update e2e-report"
+                  git push
