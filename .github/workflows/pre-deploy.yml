@@ -61,10 +61,10 @@ jobs:
                   path: e2e-report
             - name: Copy playwright-report/index.html to e2e-report/index.html
               run: |
-                  ls -la
+                  ls -l
                   cd e2e-report
                   cp -r ../playwright-report/index.html index.html
-                  ls -la
+                  ls -l
                   git config --global user.email "xabier.lameiro@gmail.com"
                   git config --global user.user "Xabier Lameiro"
                   git config --global user.name "xabierlameiro.com"
