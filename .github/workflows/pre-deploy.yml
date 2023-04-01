@@ -64,6 +64,7 @@ jobs:
                   cd e2e-report
                   cp -r ../playwright-report/index.html index.html
                   ls -l
+                  git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/xabierlameiro/e2e-report
                   git add .
                   git commit -m "Update e2e-report"
                   git push origin main
