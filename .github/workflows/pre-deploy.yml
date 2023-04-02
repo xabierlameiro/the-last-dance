@@ -32,7 +32,7 @@ jobs:
                   repository: xabierlameiro/unit-report
                   token: ${{ secrets.TOKEN_GITHUB }}
                   path: unit-report
-            - name: Copy unit test coverage and publish
+            - name: Copy unit1 test coverage and publish
               run: |
                   cd unit-report
                   cp -r ../public/coverage/ coverage/
