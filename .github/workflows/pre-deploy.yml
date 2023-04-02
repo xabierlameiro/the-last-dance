@@ -37,11 +37,12 @@ jobs:
                   cd unit-report
                   ls -l
                   cp -r ../public/coverage .
-                  git config --global user.email "xabier.lameiro@gmail.com"
-                  git config --global user.name "xabierlameiro.com"
-                  git add .
-                  git commit -m "Update unit-report"
-                  git push origin main
+                  ls -l
+                  # git config --global user.email "xabier.lameiro@gmail.com"
+                  # git config --global user.name "xabierlameiro.com"
+                  # git add .
+                  # git commit -m "Update unit-report"
+                  # git push origin main
             - name: Publish coverage report
               if: false
               env:
