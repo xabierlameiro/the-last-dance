@@ -34,10 +34,7 @@ jobs:
                   path: unit-report
             - name: Copy unit test coverage and publish
               run: |
-                  ls -l
                   cd unit-report
-                  pwd
-                  ls -l
                   cp -r ../public/coverage/ coverage/
                   git config --global user.email "xabier.lameiro@gmail.com"
                   git config --global user.name "xabierlameiro.com"
