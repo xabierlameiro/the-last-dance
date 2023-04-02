@@ -41,16 +41,22 @@ jobs:
                   git add .
                   git commit -m "Update unit-report"
                   git push origin main
-            - name: Publish coverage report
-              if: false
-              env:
-                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_COVERAGE_PROJECT_ID }}
-              run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
-            - name: Publish storybook
-              if: false
-              env:
-                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STORYBOOK_PROJECT_ID }}
-              run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
+            - name: Checkout stb-report repository
+              uses: actions/checkout@v3
+              with:
+                  repository: xabierlameiro/stb-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: stb-report
+            - name: Copy storybook and publish
+              run: |
+                  yarn build-storybook
+                  cd stb-report
+                  cp -r ../storybook-static/ .
+                  git config --global user.email "xabier.lameiro@gmail.com"
+                  git config --global user.name "xabierlameiro.com"
+                  git add .
+                  git commit -m "Update stb-report"
+                  git push origin main
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Trigger Vercel Deployment
