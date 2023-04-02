@@ -38,7 +38,7 @@ jobs:
                   cd unit-report
                   pwd
                   ls -l
-                  cp -r ../public/coverage coverage
+                  cp -r ../public/coverage/ coverage/
                   git config --global user.email "xabier.lameiro@gmail.com"
                   git config --global user.name "xabierlameiro.com"
                   git add .
