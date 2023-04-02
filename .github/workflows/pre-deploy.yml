@@ -25,8 +25,22 @@ jobs:
               if: false
               run: yarn run lint
             - name: Run unit tests
-              if: false
-              run: yarn run test
+              run: yarn run coverage
+            - name: Checkout unit-report repository
+              uses: actions/checkout@v3
+              with:
+                  repository: xabierlameiro/unit-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: unit-report
+            - name: Copy unit test coverage and publish
+              run: |
+                  cd unit-report
+                  cp -r ../public/coverage/ coverage/
+                  git config --global user.email "xabier.lameiro@gmail.com"
+                  git config --global user.name "xabierlameiro.com"
+                  git add .
+                  git commit -m "Update unit-report"
+                  git push origin main
             - name: Publish coverage report
               if: false
               env:
@@ -53,15 +67,18 @@ jobs:
               id: e2e
               run: |
                   yarn test:e2e:report
-            - name: Get SHA and filesize playwright-report/index.html
-              id: get-sha
+            - name: Checkout e2e-report repository
+              uses: actions/checkout@v3
+              with:
+                  repository: xabierlameiro/e2e-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: e2e-report
+            - name: Copy playwright-report/index.html to e2e-report/index.html
               run: |
-                  echo SHA=$(echo -n playwright-report/index.html | shasum | cut -d ' ' -f 1) >> $GITHUB_ENV
-                  echo filesizeinbytes=$(wc -c < playwright-report/index.html) >> $GITHUB_ENV
-                  echo playwright-report/index.html
-            - name: Upload playwright-report/index.html to Vercel and solve this issue curl (56) OpenSSL SSL_read error:0A000126:SSL routines::unexpected eof while reading, errno 0
-              run: |
-                  curl --insecure -X POST "https://api.vercel.com/v2/files?teamId=${{ secrets.VERCEL_ORG_ID }}" \
-                  -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                  -H "Content-Length: ${{ env.filesizeinbytes }}" \
-                  -H "x-vercel-digest: ${{ env.SHA }}"
+                  cd e2e-report
+                  cp -r ../playwright-report/index.html index.html
+                  git config --global user.email "xabier.lameiro@gmail.com"
+                  git config --global user.name "xabierlameiro.com"
+                  git add .
+                  git commit -m "Update e2e-report"
+                  git push origin main
