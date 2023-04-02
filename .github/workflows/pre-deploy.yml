@@ -65,9 +65,7 @@ jobs:
                   cp -r ../playwright-report/index.html index.html
                   ls -l
                   git config --global user.email "xabier.lameiro@gmail.com"
-                  git config --global user.user "Xabier Lameiro"
                   git config --global user.name "xabierlameiro.com"
-                  git remote set-url origin https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/xabierlameiro/e2e-report
                   git add .
                   git commit -m "Update e2e-report"
                   git push origin main
