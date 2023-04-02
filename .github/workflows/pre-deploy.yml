@@ -35,7 +35,7 @@ jobs:
             - name: Copy unit1 test coverage and publish
               run: |
                   cd unit-report
-                  cp -r ../public/coverage/ coverage/
+                  cp -r ../public/coverage/ .
                   git config --global user.email "xabier.lameiro@gmail.com"
                   git config --global user.name "xabierlameiro.com"
                   git add .
