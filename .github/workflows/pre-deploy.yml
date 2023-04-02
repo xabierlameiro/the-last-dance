@@ -27,7 +27,7 @@ jobs:
             - name: Run unit tests
               run: yarn run coverage
             - name: Checkout unit-report repository
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
                   repository: xabierlameiro/unit-report
                   token: ${{ secrets.TOKEN_GITHUB }}
@@ -69,7 +69,7 @@ jobs:
               run: |
                   yarn test:e2e:report
             - name: Checkout e2e-report repository
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
                   repository: xabierlameiro/e2e-report
                   token: ${{ secrets.TOKEN_GITHUB }}
