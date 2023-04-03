@@ -22,7 +22,6 @@ jobs:
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   yarn install --frozen-lockfile
             - name: Linter
-              if: false
               run: yarn run lint
             - name: Run unit tests
               run: yarn run coverage
@@ -60,7 +59,6 @@ jobs:
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Trigger Vercel Deployment
-              if: false
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               run: |
