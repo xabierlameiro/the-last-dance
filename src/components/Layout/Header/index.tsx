@@ -118,7 +118,7 @@ const Header = ({ children }: { children?: ReactNode }) => {
             <SiBitcoincash />
             <Route />
             <NavLinks />
-            <CountDown date="2023-05-06T00:00:00+00:00" caption={f({ id: 'countdown.caption' })} />
+            <CountDown date="2023-05-26T00:00:00+00:00" caption={f({ id: 'countdown.caption' })} />
             <CryptoPrice />
             <IndexedCounter />
             <ViewCounter all />
