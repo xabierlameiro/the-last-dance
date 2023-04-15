@@ -40,6 +40,23 @@ jobs:
                   git add .
                   git commit -m "Update unit-report"
                   git push origin main
+            - name: Generate documentation
+            - run: yarn run jsdoc
+            - name: Checkout doc repository
+              uses: actions/checkout@v3
+              with:
+                  repository: xabierlameiro/doc-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: doc
+            - name: Copy documentation and publish
+              run: |
+                  cd doc
+                  cp -r ../public/docs/ .
+                  git config --global user.email "xabier.lameiro@gmail.com"
+                  git config --global user.name "xabierlameiro.com"
+                  git add .
+                  git commit -m "Update doc-report"
+                  git push origin main
             - name: Checkout stb-report repository
               uses: actions/checkout@v3
               with:
