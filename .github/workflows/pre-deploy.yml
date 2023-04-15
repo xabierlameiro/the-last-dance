@@ -41,7 +41,7 @@ jobs:
                   git commit -m "Update unit-report"
                   git push origin main
             - name: Generate documentation
-            - run: yarn run jsdoc
+              run: yarn run jsdoc
             - name: Checkout doc repository
               uses: actions/checkout@v3
               with:
