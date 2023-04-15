@@ -16,14 +16,7 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
 
             let replaced = data.replace(/<title>(.*)<\/title>/, '<title>Docs by Xabier Lameiro</title>');
 
-            if (path === 'public/docs/index.html') {
-                replaced = replaced.replace(/src="/g, 'src="docs/');
-                replaced = replaced.replace(/href="/g, 'href="docs/');
-                replaced = replaced.replace(/href="docs\/index.html"/g, 'href="/docs"');
-                replaced = replaced.replace(/url\('/g, "url('docs/");
-            }
-
-            replaced = replaced.replace(/href="index.html">Home/g, 'href="/docs">Home');
+            replaced = replaced.replace(/href="index.html">Home/g, 'href="/">Home');
 
             replaced = replaced.replace(
                 /<a href="docs\/https:\/\/github.com\/jsdoc\/jsdoc">JSDoc 3.6.11<\/a>/g,
