@@ -42,7 +42,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
+                  yarn install
             - name: Run linter
               run: yarn run lint
 
