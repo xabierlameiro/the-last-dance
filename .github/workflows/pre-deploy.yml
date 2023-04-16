@@ -11,6 +11,10 @@ jobs:
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
+            - name: Cancel previous redundant workflow runs
+              uses: styfle/cancel-workflow-action@0.11.0
+              with:
+                  access_token: ${{ secrets.TOKEN_GITHUB }}
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
