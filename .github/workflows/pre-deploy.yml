@@ -38,11 +38,6 @@ jobs:
         runs-on: ubuntu-latest
         needs: install_dependencies
         steps:
-            - name: Restore cache dependencies
-              uses: actions/cache@v2
-              with:
-                  path: ~/.cache/yarn
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
