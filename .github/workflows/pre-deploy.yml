@@ -44,7 +44,7 @@ jobs:
         needs: install_dependencies
         steps:
             - name: Linter
-              run: yarn && yarn run lint
+              run: yarn run lint
 
     unit-tests:
         runs-on: ubuntu-latest
