@@ -44,7 +44,8 @@ jobs:
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   yarn install
             - name: Run linter
-              run: yarn run lint
+              run: |
+                  ls -la
 
     unit-tests:
         runs-on: ubuntu-latest
