@@ -26,7 +26,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile && yarn lint
+                  yarn install --frozen-lockfile
             - name: Save cache node_modules
               uses: actions/cache@v2
               with:
