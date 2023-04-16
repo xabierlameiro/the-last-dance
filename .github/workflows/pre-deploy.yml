@@ -23,17 +23,29 @@ jobs:
                   node-version: 18
                   cache: yarn
             - name: Install dependencies
+              if: false
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   yarn install --frozen-lockfile && yarn run lint && yarn build
             - name: Save build
+              if: false
               uses: actions/upload-artifact@v2
               with:
                   name: build
                   path: dist
+    linter:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: yarn
+            - name: Linter
+              run: yarn run lint
 
-    unit-tests-and-deploy:
+    unit-tests:
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/dev'
         env:
