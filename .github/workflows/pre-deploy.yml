@@ -3,18 +3,16 @@ on:
     push:
         branches: [dev]
 jobs:
-    unit-tests-and-deploy:
+    avoid_reduncy:
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/dev'
-        env:
-            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
-            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
             - name: Cancel previous redundant workflow runs
               uses: styfle/cancel-workflow-action@0.11.0
               with:
-                  access_token: ${{ github.token }}
+                  access_token: ${{ secrets.TOKEN_GITHUB }}
+    lint:
+        runs-on: ubuntu-latest
+        steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
@@ -27,13 +25,21 @@ jobs:
                   yarn install --frozen-lockfile
             - name: Linter
               run: yarn run lint
+    unit-tests-and-deploy:
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/dev'
+        env:
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        steps:
             - name: Run unit tests
               run: yarn run coverage
             - name: Checkout unit-report repository
               uses: actions/checkout@v3
               with:
                   repository: xabierlameiro/unit-report
-                  token: ${{ github.token }}
+                  token: ${{ secrets.TOKEN_GITHUB }}
                   path: unit-report
             - name: Copy unit1 test coverage and publish
               run: |
@@ -50,7 +56,7 @@ jobs:
               uses: actions/checkout@v3
               with:
                   repository: xabierlameiro/doc-report
-                  token: ${{ github.token }}
+                  token: ${{ secrets.TOKEN_GITHUB }}
                   path: doc
             - name: Copy documentation and publish
               run: |
@@ -65,7 +71,7 @@ jobs:
               uses: actions/checkout@v3
               with:
                   repository: xabierlameiro/stb-report
-                  token: ${{ github.token }}
+                  token: ${{ secrets.TOKEN_GITHUB }}
                   path: stb-report
             - name: Copy storybook and publish
               run: |
@@ -96,7 +102,7 @@ jobs:
               uses: actions/checkout@v3
               with:
                   repository: xabierlameiro/e2e-report
-                  token: ${{ github.token }}
+                  token: ${{ secrets.TOKEN_GITHUB }}
                   path: e2e-report
             - name: Copy playwright-report/index.html to e2e-report/index.html
               run: |
