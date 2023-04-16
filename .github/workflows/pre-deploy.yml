@@ -23,7 +23,7 @@ jobs:
                   path: ~/.cache/yarn
                   key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
             - name: Install dependencies
-            - uses: actions/checkout@v3
+              uses: actions/checkout@v3
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
