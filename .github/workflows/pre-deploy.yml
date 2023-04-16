@@ -26,7 +26,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
+                  yarn install --frozen-lockfile && yarn lint
             - name: Save cache node_modules
               uses: actions/cache@v2
               with:
@@ -38,12 +38,16 @@ jobs:
         runs-on: ubuntu-latest
         needs: install_dependencies
         steps:
-            - uses: actions/checkout@v3
-            - name: Linter
+            - name: Restore cache dependencies
+              uses: actions/cache@v2
+              with:
+                  path: ~/.cache/yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+            - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install && yarn lint
+                  yarn install --frozen-lockfile && yarn lint
 
     unit-tests:
         runs-on: ubuntu-latest
