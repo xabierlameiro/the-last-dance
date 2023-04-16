@@ -17,19 +17,18 @@ jobs:
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
-            - name: Restore cache dependencies1
-              uses: actions/cache@v2
+            - uses: actions/checkout@v3
+            - uses: actions/cache@v2
+            - name: Restore cache dependencies
               with:
                   path: ~/.cache/yarn
                   key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
             - name: Install dependencies
-              uses: actions/checkout@v3
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   yarn install --frozen-lockfile
             - name: Save cache node_modules
-              uses: actions/cache@v2
               with:
                   path: ~/.cache/yarn
                   key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
