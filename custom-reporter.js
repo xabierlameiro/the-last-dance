@@ -27,7 +27,7 @@ glob('public/coverage/**/*.?(html|css)', function (err, files) {
 
             replaced = replaced.replace(
                 /(.*)<link rel="shortcut icon" (.*)\s* href="(.*)" \/>/,
-                '<link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">'
+                '<link rel="shortcut icon" type="image/x-icon" href="/favicon.png">'
             );
 
             replaced = replaced.replace(
@@ -44,12 +44,12 @@ glob('public/coverage/**/*.?(html|css)', function (err, files) {
         });
     });
 
-    readFile('public/favicon.svg', 'utf8', (err, data) => {
+    readFile('public/favicon.png', 'utf8', (err, data) => {
         if (err) {
             console.log('err', err);
             return;
         }
-        writeFile('public/coverage/favicon.svg', data, 'utf-8', function (err) {
+        writeFile('public/coverage/favicon.png', data, 'utf-8', function (err) {
             if (err) {
                 console.log('err', err);
                 return;

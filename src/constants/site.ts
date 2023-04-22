@@ -33,16 +33,22 @@ export const socialLinks = [
         testId: 'storybook-link',
     },
     {
-        href: 'https://xabierlameiro.com/docs',
+        href: 'https://docs.xabierlameiro.com',
         title: 'Docs',
         name: 'Docs',
         testId: 'docs-link',
     },
     {
-        href: 'https://xabierlameiro.com/coverage',
+        href: 'https://coverage.xabierlameiro.com',
         title: 'Coverage',
         name: 'Coverage',
         testId: 'coverage-link',
+    },
+    {
+        href: 'https://e2e.xabierlameiro.com',
+        title: 'e2e',
+        name: 'e2e',
+        testId: 'e2e-link',
     },
     {
         href: 'https://lighthouse.xabierlameiro.com',

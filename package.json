@@ -1,7 +1,7 @@
 {
     "name": "the-last-dance",
     "type": "module",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "The Last Dance",
     "license": "MIT",
     "private": true,
@@ -56,6 +56,7 @@
         "react-dom": "^18.2.0",
         "react-icons": "^4.7.1",
         "react-intl": "^6.2.5",
+        "sharp": "^0.32.0",
         "swr": "^2.0.2"
     },
     "devDependencies": {

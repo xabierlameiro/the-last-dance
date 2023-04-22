@@ -124,10 +124,9 @@ export const getStaticProps = async ({
 };
 
 export const getStaticPaths = () => {
-    let paths = glob
-        .sync(`${LEGAL_PATH}/**/*.mdx`)
-        .map((path) => path.replace(`${LEGAL_PATH}/`, '').replace(/\.mdx$/, ''));
-
+    let paths = glob.sync(`${LEGAL_PATH}/**/*.mdx`).map((path) => {
+        return path.replace(LEGAL_PATH, '').replace('.mdx', '').split('/').pop();
+    });
     return {
         paths: paths.map((path) => ({
             params: {

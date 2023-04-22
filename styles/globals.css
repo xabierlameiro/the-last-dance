@@ -56,6 +56,10 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+::-webkit-scrollbar {
+    display: none;
+}
+
 html,
 body {
     max-width: 100vw;
