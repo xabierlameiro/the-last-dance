@@ -19,7 +19,7 @@ const Document = (props: Props) => {
                 <meta name="twitter:site" content="@xlameirodev" />
                 <meta name="twitter:creator" content="@xlameirodev" />
                 <meta name="google" content="notranslate" />
-                <link rel="icon" href="/favicon.svg" title="The favicon" />
+                <link rel="icon" href="/favicon.png" title="The favicon" />
                 <script
                     type="application/ld+json"
                     key="website-jsonld"
