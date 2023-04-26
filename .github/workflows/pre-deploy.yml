@@ -11,6 +11,7 @@ jobs:
               with:
                   access_token: ${{ secrets.TOKEN_GITHUB }}
     unit-tests-and-deploy:
+        needs: avoid_reduncy
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/dev'
         env:
