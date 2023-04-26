@@ -3,6 +3,13 @@ on:
     push:
         branches: [dev]
 jobs:
+    avoid_reduncy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Cancel previous redundant workflow runs
+              uses: styfle/cancel-workflow-action@0.11.0
+              with:
+                  access_token: ${{ secrets.TOKEN_GITHUB }}
     unit-tests-and-deploy:
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/dev'
