@@ -11,14 +11,15 @@ jobs:
               with:
                   access_token: ${{ secrets.TOKEN_GITHUB }}
     code_checking:
-        needs: stop_previous_runs
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - name: Checkout repository
+              uses: actions/checkout@v3
+            - name: Restore cache
+              uses: actions/cache@v2
               with:
-                  node-version: 18
-                  cache: yarn
+                  path: ~/.cache/yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
@@ -26,8 +27,15 @@ jobs:
                   yarn install --frozen-lockfile
             - name: Linter
               run: yarn run lint
+            - name: Save cache
+              uses: actions/cache@v2
+              with:
+                  path: ~/.cache/yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
     unit_testing_and_report:
-        needs: stop_previous_runs
+        needs: code_checking
         runs-on: ubuntu-latest
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
@@ -35,10 +43,11 @@ jobs:
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - name: Restore cache
+              uses: actions/cache@v2
               with:
-                  node-version: 18
-                  cache: yarn
+                  path: ~/.cache/yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
@@ -62,7 +71,7 @@ jobs:
                   git commit -m "Update unit-report"
                   git push origin main
     docs_storybook_deploy_e2e:
-        needs: stop_previous_runs
+        needs: code_checking
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/dev'
         env:
@@ -71,10 +80,11 @@ jobs:
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - name: Restore cache
+              uses: actions/cache@v2
               with:
-                  node-version: 18
-                  cache: yarn
+                  path: ~/.cache/yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
