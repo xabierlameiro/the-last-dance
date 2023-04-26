@@ -10,7 +10,8 @@ jobs:
               uses: styfle/cancel-workflow-action@0.11.0
               with:
                   access_token: ${{ secrets.TOKEN_GITHUB }}
-    code-checking:
+    code_checking:
+        needs: stop_previous_runs
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
@@ -25,15 +26,9 @@ jobs:
                   yarn install --frozen-lockfile
             - name: Linter
               run: yarn run lint
-
-    unit-tests-and-deploy:
+    unit_testing_and_report:
         needs: stop_previous_runs
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/dev'
-        env:
-            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
-            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
@@ -62,6 +57,25 @@ jobs:
                   git add .
                   git commit -m "Update unit-report"
                   git push origin main
+    docs_storybook_deploy_e2e:
+        needs: stop_previous_runs
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/dev'
+        env:
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: yarn
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  yarn install --frozen-lockfile
             - name: Generate documentation
               run: yarn run jsdoc
             - name: Checkout doc repository
