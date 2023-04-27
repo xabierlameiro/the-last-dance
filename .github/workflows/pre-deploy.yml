@@ -137,8 +137,20 @@ jobs:
         needs: testing
         runs-on: ubuntu-latest
         env:
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: yarn
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  yarn install --frozen-lockfile
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Trigger Vercel Deployment
@@ -146,5 +158,3 @@ jobs:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               run: |
                   vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
-                  echo URL=$(cat deploy-url.txt) >> $GITHUB_ENV
-                  echo NEXT_PUBLIC_DOMAIN=$(cat deploy-url.txt) >> $GITHUB_ENV
