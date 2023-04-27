@@ -54,13 +54,15 @@ jobs:
               with:
                   node-version: 16
                   cache: 'yarn'
+            - name: Run unit tests
+              run: yarn run coverage
             - name: Checkout unit-report repository
               uses: actions/checkout@v3
               with:
                   repository: xabierlameiro/unit-report
                   token: ${{ secrets.TOKEN_GITHUB }}
                   path: unit-report
-            - name: Copy unit1 test coverage and publish
+            - name: Copy unit test coverage and publish
               run: |
                   cd unit-report
                   cp -r ../public/coverage/ .
