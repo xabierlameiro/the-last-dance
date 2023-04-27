@@ -136,68 +136,9 @@ jobs:
     deploy:
         needs: testing
         runs-on: ubuntu-latest
-        steps:
-            - name: Trigger Vercel Deployment
-              env:
-                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-              run: |
-                  vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
-                  echo URL=$(cat deploy-url.txt) >> $GITHUB_ENV
-                  echo NEXT_PUBLIC_DOMAIN=$(cat deploy-url.txt) >> $GITHUB_ENV
-
-    docs_storybook_deploy_e2e:
-        runs-on: ubuntu-latest
-        if: false
         env:
-            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
-            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
-              with:
-                  node-version: 18
-                  cache: yarn
-            - name: Install dependencies
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
-            - name: Generate documentation
-              run: yarn run jsdoc
-            - name: Checkout doc repository
-              uses: actions/checkout@v3
-              with:
-                  repository: xabierlameiro/doc-report
-                  token: ${{ secrets.TOKEN_GITHUB }}
-                  path: doc
-            - name: Copy documentation and publish
-              run: |
-                  cd doc
-                  cp -r ../public/docs/ .
-                  git config --global user.email "xabier.lameiro@gmail.com"
-                  git config --global user.name "xabierlameiro.com"
-                  git add .
-                  git commit -m "Update doc-report"
-                  git push origin main
-            - name: Checkout stb-report repository
-              uses: actions/checkout@v3
-              with:
-                  repository: xabierlameiro/stb-report
-                  token: ${{ secrets.TOKEN_GITHUB }}
-                  path: stb-report
-            - name: Copy storybook and publish
-              run: |
-                  yarn build-storybook
-                  cd stb-report
-                  cp -r ../storybook-static/ .
-                  git config --global user.email "xabier.lameiro@gmail.com"
-                  git config --global user.name "xabierlameiro.com"
-                  git add .
-                  git commit -m "Update stb-report"
-                  git push origin main
-            - name: Install Vercel CLI
-              run: npm install --global vercel@canary
             - name: Trigger Vercel Deployment
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -205,5 +146,3 @@ jobs:
                   vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
                   echo URL=$(cat deploy-url.txt) >> $GITHUB_ENV
                   echo NEXT_PUBLIC_DOMAIN=$(cat deploy-url.txt) >> $GITHUB_ENV
-            - name: Install Playwright Browsers
-              run: npx playwright install --with-deps chromium
