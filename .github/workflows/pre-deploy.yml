@@ -3,7 +3,7 @@ on:
     push:
         branches: [dev]
 jobs:
-    cancel-redundancy:
+    cancel_redundancy:
         runs-on: ubuntu-latest
         steps:
             - name: Cancel previous redundant workflow runs
@@ -142,7 +142,7 @@ jobs:
         steps:
             - uses: actions/checkout@v3
             - name: Install Vercel CLI
-              run: npm install --global vercel@canary
+              run: yarn global add vercel@canary
             - name: Trigger Vercel Deployment
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
