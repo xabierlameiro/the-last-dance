@@ -134,7 +134,7 @@ jobs:
                   git commit -m "Update stb-report"
                   git push origin main
     deploy:
-        needs: testing
+        needs: [code_checking, testing, documentation]
         runs-on: ubuntu-latest
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
@@ -146,15 +146,10 @@ jobs:
               with:
                   node-version: 18
                   cache: yarn
-            - name: Install dependencies
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Trigger Vercel Deployment
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               run: |
-                  vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
+                  vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
