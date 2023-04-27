@@ -4,6 +4,7 @@ on:
         branches: [dev]
 jobs:
     cancel_redundancy:
+        name: Cancel Redundant Workflow Runs
         runs-on: ubuntu-latest
         steps:
             - name: Cancel previous redundant workflow runs
@@ -11,6 +12,7 @@ jobs:
               with:
                   access_token: ${{ secrets.TOKEN_GITHUB }}
     code_checking:
+        name: Code Checking
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
@@ -26,6 +28,7 @@ jobs:
             - name: Linter
               run: yarn run lint
     testing:
+        name: Testing
         runs-on: ubuntu-latest
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
@@ -84,6 +87,7 @@ jobs:
                   git commit -m "Update e2e-report"
                   git push origin main
     documentation:
+        name: Documentation
         runs-on: ubuntu-latest
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
@@ -134,6 +138,7 @@ jobs:
                   git commit -m "Update stb-report"
                   git push origin main
     deploy:
+        name: Deploy
         runs-on: ubuntu-latest
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
