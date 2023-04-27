@@ -45,6 +45,7 @@ jobs:
             - name: Run unit tests
               run: yarn run coverage
             - name: Checkout unit-report repository
+              uses: actions/checkout@v3
               with:
                   repository: xabierlameiro/unit-report
                   token: ${{ secrets.TOKEN_GITHUB }}
