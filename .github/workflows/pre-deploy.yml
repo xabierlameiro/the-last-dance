@@ -133,6 +133,18 @@ jobs:
                   git add .
                   git commit -m "Update stb-report"
                   git push origin main
+    deploy:
+        needs: testing
+        runs-on: ubuntu-latest
+        steps:
+            - name: Trigger Vercel Deployment
+              env:
+                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+              run: |
+                  vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
+                  echo URL=$(cat deploy-url.txt) >> $GITHUB_ENV
+                  echo NEXT_PUBLIC_DOMAIN=$(cat deploy-url.txt) >> $GITHUB_ENV
+
     docs_storybook_deploy_e2e:
         runs-on: ubuntu-latest
         if: false
