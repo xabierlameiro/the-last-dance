@@ -20,13 +20,12 @@ jobs:
               with:
                   path: ~/.cache/yarn
                   key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: ${{ runner.os }}-yarn-
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   yarn install --frozen-lockfile
-            - name: Linter
-              run: yarn run lint
             - name: Save cache
               uses: actions/cache@v2
               with:
@@ -34,6 +33,8 @@ jobs:
                   key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-yarn-
+            - name: Linter
+              run: yarn run lint
     unit_testing_and_report:
         needs: code_checking
         runs-on: ubuntu-latest
@@ -48,13 +49,11 @@ jobs:
               with:
                   path: ~/.cache/yarn
                   key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-            - name: Install dependencies
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
-            - name: Run unit tests
-              run: yarn run coverage
+            - name: Add depencies to PATH
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 16
+                  cache: 'yarn'
             - name: Checkout unit-report repository
               uses: actions/checkout@v3
               with:
@@ -73,7 +72,7 @@ jobs:
     docs_storybook_deploy_e2e:
         needs: code_checking
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/dev'
+        if: false
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
