@@ -62,7 +62,7 @@ jobs:
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps chromium
             - name: Run dev server
-              run: yarn dev
+              run: yarn dev &
               background: true
             - name: Wait for dev server to be ready
               run: npx wait-on http://localhost:3000
