@@ -66,7 +66,6 @@ jobs:
             - name: Wait for dev server to be ready
               run: npx wait-on http://localhost:3000
             - name: Run end-to-end tests
-              id: e2e
               run: |
                   yarn test:e2e:report
             - name: Checkout e2e-report repository
@@ -84,7 +83,56 @@ jobs:
                   git add .
                   git commit -m "Update e2e-report"
                   git push origin main
-
+    documentation:
+        runs-on: ubuntu-latest
+        env:
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: yarn
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  yarn install --frozen-lockfile
+            - name: Generate documentation
+              run: yarn run jsdoc
+            - name: Checkout doc repository
+              uses: actions/checkout@v3
+              with:
+                  repository: xabierlameiro/doc-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: doc
+            - name: Copy documentation and publish
+              run: |
+                  cd doc
+                  cp -r ../public/docs/ .
+                  git config --global user.email "xabier.lameiro@gmail.com"
+                  git config --global user.name "xabierlameiro.com"
+                  git add .
+                  git commit -m "Update doc-report"
+                  git push origin main
+            - name: Checkout stb-report repository
+              uses: actions/checkout@v3
+              with:
+                  repository: xabierlameiro/stb-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: stb-report
+            - name: Copy storybook and publish
+              run: |
+                  yarn build-storybook
+                  cd stb-report
+                  cp -r ../storybook-static/ .
+                  git config --global user.email "xabier.lameiro@gmail.com"
+                  git config --global user.name "xabierlameiro.com"
+                  git add .
+                  git commit -m "Update stb-report"
+                  git push origin main
     docs_storybook_deploy_e2e:
         runs-on: ubuntu-latest
         if: false
@@ -147,22 +195,3 @@ jobs:
                   echo NEXT_PUBLIC_DOMAIN=$(cat deploy-url.txt) >> $GITHUB_ENV
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps chromium
-            - name: Run end-to-end tests
-              id: e2e
-              run: |
-                  yarn test:e2e:report
-            - name: Checkout e2e-report repository
-              uses: actions/checkout@v3
-              with:
-                  repository: xabierlameiro/e2e-report
-                  token: ${{ secrets.TOKEN_GITHUB }}
-                  path: e2e-report
-            - name: Copy playwright-report/index.html to e2e-report/index.html
-              run: |
-                  cd e2e-report
-                  cp -r ../playwright-report/index.html index.html
-                  git config --global user.email "xabier.lameiro@gmail.com"
-                  git config --global user.name "xabierlameiro.com"
-                  git add .
-                  git commit -m "Update e2e-report"
-                  git push origin main
