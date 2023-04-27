@@ -134,7 +134,6 @@ jobs:
                   git commit -m "Update stb-report"
                   git push origin main
     deploy:
-        needs: [code_checking, testing, documentation]
         runs-on: ubuntu-latest
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
