@@ -6,7 +6,7 @@ dotenv.config({
 });
 
 const baseUrl = 'http://localhost:3000';
-console.log(`ℹ️ Using base URL "${baseUrl}"`);
+console.log(`ℹ️ Using base URL "${baseUrl}" and env "${process.env.NODE_ENV}" and CI "${process.env.CI}"`);
 
 const opts = {
     headless: process.env.CI ? true : false,
@@ -25,4 +25,12 @@ export default defineConfig({
         ...opts,
     },
     testDir: './e2e',
+    reporter: [
+        [
+            'html',
+            {
+                done: () => console.log('✅ E2E tests done'),
+            },
+        ],
+    ],
 });
