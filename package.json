@@ -19,7 +19,7 @@
         "build-storybook": "storybook build",
         "prettier": "prettier --write .",
         "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json && node custom-docs.js",
-        "lighthouse-report": "node lighthouse.cjs",
+        "lighthouse-report": "node lighthouse/assets/lighthouse.js",
         "test:e2e": "playwright test",
         "test:e2e:report": "playwright test --reporter html"
     },
@@ -79,7 +79,7 @@
         "eslint-config-next": "^13.1.6",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-storybook": "^0.6.8",
-        "lighthouse": "^9.6.8",
+        "lighthouse": "^10.1.1",
         "storybook": "^7.0.0-beta.12",
         "storybook-react-intl": "^1.1.1",
         "typescript": "^4.9.4"
