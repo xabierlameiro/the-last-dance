@@ -281,8 +281,8 @@ for (const lang of Object.keys(translations)) {
                       <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
                       <meta name="viewport" content="width=device-width" />
                       <title>${translations[lang].title}</title>
-                      <link rel="icon" href="../../asserts/favicon.png" title="The favicon" />
-                      <link rel="stylesheet" href="../../asserts/connectors.css" />
+                      <link rel="icon" href="../../assets/favicon.png" title="The favicon" />
+                      <link rel="stylesheet" href="../../assets/connectors.css" />
                       <meta name="robots" content="noindex" />
                    </head>
                    <body class="container">
@@ -291,8 +291,8 @@ for (const lang of Object.keys(translations)) {
                       <p class="notice">${translations[lang].description}</p>
                       <ul class="links">${links.join('')}</ul>
                       <div class="chart" id="OrganiseChart-big-commpany"></div>
-                      <script src="../../asserts/raphael.js"></script>
-                      <script src="../../asserts/Treant.js"></script>
+                      <script src="../../assets/raphael.js"></script>
+                      <script src="../../assets/Treant.js"></script>
                       <script src="${lang === 'en' ? '../../' : `../../${lang}/`}connectors.js"></script>
                       <script>
                          new Treant(config);
