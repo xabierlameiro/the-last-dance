@@ -30,7 +30,7 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
 
             replaced = replaced.replace(
                 /<\/title>/,
-                '</title><link rel="icon" href="/favicon.png" title="The favicon"><meta name="robots" content="noindex">'
+                '</title><link rel="icon" href="https://pre.xabierlameiro.com/favicon.png" title="The favicon"><meta name="robots" content="noindex">'
             );
 
             replaced = replaced.replace(/Global/g, 'Components');

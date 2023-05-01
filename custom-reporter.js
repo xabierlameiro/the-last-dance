@@ -27,7 +27,7 @@ glob('public/coverage/**/*.?(html|css)', function (err, files) {
 
             replaced = replaced.replace(
                 /(.*)<link rel="shortcut icon" (.*)\s* href="(.*)" \/>/,
-                '<link rel="shortcut icon" type="image/x-icon" href="/favicon.png">'
+                '<link rel="shortcut icon" type="image/x-icon" href="https://pre.xabierlameiro.com/favicon.png">'
             );
 
             replaced = replaced.replace(
