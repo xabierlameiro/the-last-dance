@@ -144,8 +144,4 @@ jobs:
         steps:
             - name: Deploy to Vercel
               run: |
-                  curl -X POST \
-                    -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-                    -H "Content-Type: application/json" \
-                    -d '{"target": "production"}' \
-                    "https://api.vercel.com/v1/integrations/deploy/prj_pw4DYzndjCtYls8UHOdx1dfd8ZYZ/main"
+                  curl -X POST https://api.vercel.com/v1/integrations/deploy/${{ secrets.PRJ }}
