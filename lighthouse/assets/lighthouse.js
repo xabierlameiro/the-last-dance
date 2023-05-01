@@ -1,63 +1,7 @@
 import fs from 'fs';
 import lighthouse from 'lighthouse';
 import chromeLauncher from 'chrome-launcher';
-const chart = {
-    chart: {
-        container: '#OrganiseChart-big-commpany',
-        levelSeparation: 40,
-        siblingSeparation: 20,
-        subTeeSeparation: 30,
-        rootOrientation: 'NORTH',
-        nodeAlign: 'BOTTOM',
-
-        connectors: {
-            type: 'step',
-            style: {
-                'stroke-width': 2,
-            },
-        },
-        node: {
-            HTMLclass: 'big-commpany',
-        },
-    },
-};
-
-const nodeStructure = {
-    text: { name: 'pre.xabierlameiro.com' },
-    HTMLclass: 'domain',
-    drawLineThrough: true,
-    collapsable: true,
-    connectors: {
-        style: {
-            stroke: 'blue',
-            'arrow-end': 'oval-wide-long',
-        },
-    },
-};
-const options = {
-    logLevel: 'silent', //'info'
-    output: 'html',
-    onlyCategories: ['performance'],
-    formFactor: 'desktop',
-    throttling: {
-        rttMs: 40,
-        throughputKbps: 10 * 1024,
-        cpuSlowdownMultiplier: 1,
-        requestLatencyMs: 0, // 0 means unset
-        downloadThroughputKbps: 0,
-        uploadThroughputKbps: 0,
-    },
-    screenEmulation: {
-        mobile: false,
-        width: 1350,
-        height: 940,
-        deviceScaleFactor: 1,
-        disabled: false,
-    },
-    emulatedUserAgent:
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-};
-const DOMAIN = 'https://pre.xabierlameiro.com';
+import { chart, nodeStructure, options, DOMAIN, translations } from './constants.js';
 
 // Get the sitemap and filter the urls
 const sitemap = await fetch(`${DOMAIN}/sitemap.xml`).then((res) => {
@@ -81,39 +25,8 @@ let locales = sitemap.reduce((acc, url) => {
     return acc;
 }, {});
 
-// Translations
-const translations = {
-    es: {
-        title: 'Informes de Lighthouse',
-        subtitle: 'Más detalles en cada enlace',
-        description: 'Estos informes se generaron a través de un script',
-        lang: 'Español',
-    },
-    gl: {
-        title: 'Informes de Lighthouse',
-        subtitle: 'Máis detalles en cada enlace',
-        description: 'Estes informes foron xerados a través dun script',
-        lang: 'Galego',
-    },
-    en: {
-        title: 'Lighthouse reports',
-        subtitle: 'More details in each link',
-        description: 'These reports were generated via a script',
-        lang: 'English',
-    },
-};
-
 const index = locales.en.indexOf(DOMAIN);
 locales.en[index] = `${DOMAIN}/home`;
-
-// Add the legal pages
-locales.en.push(`${DOMAIN}/legal/cookies-policy`);
-locales.en.push(`${DOMAIN}/legal/legal-notice`);
-locales.en.push(`${DOMAIN}/legal/privacy-policy`);
-
-// `.report` is the HTML report as a string
-//const reportHtml = runnerResult.report;
-//fs.writeFileSync('lhreport.html', reportHtml);
 
 // `.lhr` is the Lighthouse Result as a JS object
 //console.log('Report is done for', runnerResult.lhr.finalDisplayedUrl);
