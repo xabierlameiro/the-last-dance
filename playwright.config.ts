@@ -5,7 +5,7 @@ dotenv.config({
     path: '.env.development',
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000';
+const baseUrl = 'http://localhost:3000';
 console.log(`ℹ️ Using base URL "${baseUrl}"`);
 
 const opts = {
@@ -25,4 +25,5 @@ export default defineConfig({
         ...opts,
     },
     testDir: './e2e',
+    reporter: [['html']],
 });

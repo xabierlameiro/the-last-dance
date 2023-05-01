@@ -51,7 +51,7 @@ export const socialLinks = [
         testId: 'e2e-link',
     },
     {
-        href: 'https://lighthouse.xabierlameiro.com',
+        href: 'https://performance.xabierlameiro.com',
         title: 'Lighthouse',
         name: 'Lighthouse',
         testId: 'lighthouse-link',

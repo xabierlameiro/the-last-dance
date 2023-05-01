@@ -1,0 +1,147 @@
+/* required LIB STYLES */
+/* .Treant se automatski dodaje na svaki chart conatiner */
+.Treant {
+   position: relative;
+   overflow: hidden;
+   padding: 0 !important;
+}
+.Treant > .node,
+.Treant > .pseudo {
+   position: absolute;
+   display: block;
+   visibility: hidden;
+}
+.Treant.Treant-loaded .node,
+.Treant.Treant-loaded .pseudo {
+   visibility: visible;
+}
+.Treant > .pseudo {
+   width: 0;
+   height: 0;
+   border: none;
+   padding: 0;
+}
+.Treant .collapse-switch {
+   width: 100%;
+   height: 100%;
+   display: block;
+   border: 1px solid transparent;
+   position: absolute;
+   top: 1px;
+   right: 1px;
+   cursor: pointer;
+}
+
+.Treant > .node img {
+   border: none;
+   float: left;
+}
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+fieldset,
+input,
+textarea,
+p,
+blockquote,
+th,
+td {
+   margin: 0;
+   padding: 0;
+}
+
+body {
+   background: #fff;
+   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+      'Segoe UI Emoji', 'Segoe UI Symbol';
+   color: #444444;
+}
+
+/* optional Container STYLES */
+.chart {
+   height: 100vh;
+   width: 100vw;
+}
+
+.node {
+   font-size: 16px;
+}
+
+.node.big-commpany {
+   cursor: pointer;
+   padding: 0 10px;
+   min-width: 60px;
+   text-align: center;
+   height: 30px;
+   border: 2px solid #e8e8e3;
+   border-radius: 2px;
+   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+   background: #fff;
+}
+.node.big-commpany:active {
+   box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.1);
+   margin: 1px 0 0 1px;
+   border: 2px solid #d3d3cb;
+}
+
+.node.big-commpany .node-name {
+   line-height: 30px;
+   color: #9b9b9b;
+   width: 100px;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+
+.node.big-commpany:hover .node-name {
+   color: #8b8b8b;
+   text-shadow: 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+.node.big-commpany.domain .node-name {
+   width: 150px;
+}
+
+.container {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+}
+
+.container h1 {
+   font-size: 2rem;
+   margin: 1rem;
+}
+
+.container h2 {
+   font-size: 18px;
+   margin-bottom: 1rem;
+   font-weight: normal;
+}
+
+.container a.node.big-commpany > p.node-name,
+.container a:link,
+.container a:visited {
+   color: dodgerblue;
+   text-decoration-style: dotted;
+   text-underline-offset: 4px;
+}
+
+.notice {
+   font-size: 14px;
+}

@@ -7,7 +7,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "prod": "yarn --prod --silent",
+        "prod": "yarn --prod --silent --ignore-scripts",
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
@@ -19,9 +19,9 @@
         "build-storybook": "storybook build",
         "prettier": "prettier --write .",
         "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json && node custom-docs.js",
-        "lighthouse-report": "node lighthouse.cjs",
+        "lighthouse-report": "node lighthouse/assets/lighthouse.js",
         "test:e2e": "playwright test",
-        "test:e2e:report": "playwright test --reporter html"
+        "test:e2e:report": "playwright test && node custom-report.js"
     },
     "dependencies": {
         "@babel/preset-typescript": "^7.18.6",
@@ -56,7 +56,6 @@
         "react-dom": "^18.2.0",
         "react-icons": "^4.7.1",
         "react-intl": "^6.2.5",
-        "sharp": "^0.32.0",
         "swr": "^2.0.2"
     },
     "devDependencies": {
@@ -75,13 +74,11 @@
         "@types/nodemailer": "^6.4.7",
         "@types/react": "^18.0.28",
         "@types/react-dom": "18.0.9",
-        "@types/react-icons": "^3.0.0",
-        "@types/react-intl": "^3.0.0",
         "eslint": "^8.30.0",
         "eslint-config-next": "^13.1.6",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-storybook": "^0.6.8",
-        "lighthouse": "^9.6.8",
+        "lighthouse": "^10.1.1",
         "storybook": "^7.0.0-beta.12",
         "storybook-react-intl": "^1.1.1",
         "typescript": "^4.9.4"

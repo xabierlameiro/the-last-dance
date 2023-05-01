@@ -3,9 +3,33 @@ on:
     push:
         branches: [dev]
 jobs:
-    unit-tests-and-deploy:
+    cancel_redundancy:
+        name: Cancel Redundant Workflow Runs
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/dev'
+        steps:
+            - name: Cancel previous redundant workflow runs
+              uses: styfle/cancel-workflow-action@0.11.0
+              with:
+                  access_token: ${{ secrets.TOKEN_GITHUB }}
+    code_checking:
+        name: Code Checking
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: yarn
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  yarn install --frozen-lockfile
+            - name: Linter
+              run: yarn run lint
+    testing:
+        name: Testing
+        runs-on: ubuntu-latest
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -21,8 +45,6 @@ jobs:
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   yarn install --frozen-lockfile
-            - name: Linter
-              run: yarn run lint
             - name: Run unit tests
               run: yarn run coverage
             - name: Checkout unit-report repository
@@ -31,7 +53,7 @@ jobs:
                   repository: xabierlameiro/unit-report
                   token: ${{ secrets.TOKEN_GITHUB }}
                   path: unit-report
-            - name: Copy unit1 test coverage and publish
+            - name: Copy report coverage folder and publish
               run: |
                   cd unit-report
                   cp -r ../public/coverage/ .
@@ -40,6 +62,48 @@ jobs:
                   git add .
                   git commit -m "Update unit-report"
                   git push origin main
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps chromium
+            - name: Run dev server
+              run: yarn dev &
+            - name: Wait for dev server to be ready
+              run: npx wait-on http://localhost:3000
+            - name: Run end-to-end tests
+              run: |
+                  yarn test:e2e:report
+            - name: Checkout e2e-report repository
+              uses: actions/checkout@v3
+              with:
+                  repository: xabierlameiro/e2e-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: e2e-report
+            - name: Copy playwright-report/index.html to e2e-report/index.html
+              run: |
+                  cd e2e-report
+                  cp -r ../playwright-report/index.html index.html
+                  git config --global user.email "xabier.lameiro@gmail.com"
+                  git config --global user.name "xabierlameiro.com"
+                  git add .
+                  git commit -m "Update e2e-report"
+                  git push origin main
+    documentation:
+        name: Documentation
+        runs-on: ubuntu-latest
+        env:
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: yarn
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  yarn install --frozen-lockfile
             - name: Generate documentation
               run: yarn run jsdoc
             - name: Checkout doc repository
@@ -73,33 +137,51 @@ jobs:
                   git add .
                   git commit -m "Update stb-report"
                   git push origin main
+    deploy:
+        name: Deploy
+        runs-on: ubuntu-latest
+        if: false
+        env:
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        steps:
+            - uses: actions/checkout@v3
             - name: Install Vercel CLI
-              run: npm install --global vercel@canary
+              run: yarn global add vercel@canary
             - name: Trigger Vercel Deployment
               env:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               run: |
-                  vercel deploy --token=${{ secrets.VERCEL_TOKEN }} >> deploy-url.txt
-                  echo URL=$(cat deploy-url.txt) >> $GITHUB_ENV
-                  echo NEXT_PUBLIC_DOMAIN=$(cat deploy-url.txt) >> $GITHUB_ENV
-            - name: Install Playwright Browsers
-              run: npx playwright install --with-deps chromium
-            - name: Run end-to-end tests
-              id: e2e
+                  vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
+    lighthouse:
+        name: Lighthouse
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: yarn
+            - name: Install dependencies
               run: |
-                  yarn test:e2e:report
-            - name: Checkout e2e-report repository
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  yarn install --frozen-lockfile
+            - name: Execute Lighthouse
+              run: yarn lighthouse-report
+            - name: Checkout performance-report repository
               uses: actions/checkout@v3
               with:
-                  repository: xabierlameiro/e2e-report
+                  repository: xabierlameiro/performance-report
                   token: ${{ secrets.TOKEN_GITHUB }}
-                  path: e2e-report
-            - name: Copy playwright-report/index.html to e2e-report/index.html
+                  path: performance-report
+            - name: Copy output folder and publish
               run: |
-                  cd e2e-report
-                  cp -r ../playwright-report/index.html index.html
+                  cd performance-report
+                  cp -r ../lighthouse .
                   git config --global user.email "xabier.lameiro@gmail.com"
                   git config --global user.name "xabierlameiro.com"
                   git add .
-                  git commit -m "Update e2e-report"
+                  git commit -m "Update performance-report"
                   git push origin main
