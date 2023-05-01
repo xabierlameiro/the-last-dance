@@ -141,10 +141,6 @@ jobs:
         name: Deploy
         runs-on: ubuntu-latest
         needs: [code_checking, testing, documentation]
-        env:
-            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
-            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
             - name: Deploy to Vercel
               run: |
@@ -153,35 +149,3 @@ jobs:
                     -H "Content-Type: application/json" \
                     -d '{"target": "production"}' \
                     "https://api.vercel.com/v1/integrations/deploy/prj_pw4DYzndjCtYls8UHOdx1dfd8ZYZ/main"
-    lighthouse:
-        name: Lighthouse
-        runs-on: ubuntu-latest
-        if: false
-        steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
-              with:
-                  node-version: 18
-                  cache: yarn
-            - name: Install dependencies
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
-            - name: Execute Lighthouse
-              run: yarn lighthouse-report
-            - name: Checkout performance-report repository
-              uses: actions/checkout@v3
-              with:
-                  repository: xabierlameiro/performance-report
-                  token: ${{ secrets.TOKEN_GITHUB }}
-                  path: performance-report
-            - name: Copy output folder and publish
-              run: |
-                  cd performance-report
-                  cp -r ../lighthouse .
-                  git config --global user.email "xabier.lameiro@gmail.com"
-                  git config --global user.name "xabierlameiro.com"
-                  git add .
-                  git commit -m "Update performance-report"
-                  git push origin main

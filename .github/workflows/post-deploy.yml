@@ -1,31 +1,42 @@
-name: Post Deploy on Vercel - E2E Tests
-on:
-    workflow_call:
+# Workflow to use after pull request is merged on master branch and waitin for deploy on production
 
+name: Deploy
+on:
+    push:
+        branches:
+            - master
 jobs:
-    wait-for-deployment:
-        uses: ./.github/workflows/pre-deploy.yml
-        secrets:
-            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-    playwright-e2e-test-stage:
-        timeout-minutes: 60
-        needs: wait-for-deployment
+    lighthouse:
+        name: Lighthouse
         runs-on: ubuntu-latest
-        env:
-            VERCEL_URL: ${{ needs.wait-for-deployment.outputs.vercel-deployment-url }}
-            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+        if: false
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - name: Install Playwright Browsers
-              run: npx playwright install --with-deps
-            - name: Run Playwright tests
-              run: npx playwright test
-            - uses: actions/upload-artifact@v3
-              if: always()
+                  cache: yarn
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  yarn install --frozen-lockfile
+            - name: Execute Lighthouse
+              run: |
+                  sleep 10m
+                  yarn lighthouse-report
+            - name: Checkout performance-report repository
+              uses: actions/checkout@v3
               with:
-                  name: playwright-report
-                  path: playwright-report/
-                  retention-days: 30
+                  repository: xabierlameiro/performance-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: performance-report
+            - name: Copy output folder and publish
+              run: |
+                  cd performance-report
+                  cp -r ../lighthouse .
+                  git config --global user.email "xabier.lameiro@gmail.com"
+                  git config --global user.name "xabierlameiro.com"
+                  git add .
+                  git commit -m "Update performance-report"
+                  git push origin main
