@@ -9,7 +9,6 @@ jobs:
     lighthouse:
         name: Lighthouse
         runs-on: ubuntu-latest
-        if: false
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
