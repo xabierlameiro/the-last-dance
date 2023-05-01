@@ -140,23 +140,23 @@ jobs:
     deploy:
         name: Deploy
         runs-on: ubuntu-latest
-        if: false
+        needs: [code_checking, testing, documentation]
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
-            - uses: actions/checkout@v3
-            - name: Install Vercel CLI
-              run: yarn global add vercel@canary
-            - name: Trigger Vercel Deployment
-              env:
-                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+            - name: Deploy to Vercel
               run: |
-                  vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
+                  curl -X POST \
+                    -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                    -H "Content-Type: application/json" \
+                    -d '{"target": "production"}' \
+                    "https://api.vercel.com/v1/integrations/deploy/prj_pw4DYzndjCtYls8UHOdx1dfd8ZYZ/main"
     lighthouse:
         name: Lighthouse
         runs-on: ubuntu-latest
+        if: false
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
