@@ -170,3 +170,18 @@ jobs:
                   yarn install --frozen-lockfile
             - name: Execute Lighthouse
               run: yarn lighthouse-report
+            - name: Checkout performance-report repository
+              uses: actions/checkout@v3
+              with:
+                  repository: xabierlameiro/performance-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: performance-report
+            - name: Copy output folder and publish
+              run: |
+                  cd performance-report
+                  cp -r ../lighthouse .
+                  git config --global user.email "xabier.lameiro@gmail.com"
+                  git config --global user.name "xabierlameiro.com"
+                  git add .
+                  git commit -m "Update performance-report"
+                  git push origin main
