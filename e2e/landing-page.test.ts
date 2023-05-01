@@ -7,6 +7,10 @@ test.beforeAll(async ({ browser }) => {
     page = await browser.newPage({});
 });
 
+test.afterAll(async () => {
+    await page.close();
+});
+
 test.describe('Landing page', () => {
     test('should navigate to landing page', async () => {
         await page.goto('/');

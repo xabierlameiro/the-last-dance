@@ -21,7 +21,7 @@
         "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json && node custom-docs.js",
         "lighthouse-report": "node lighthouse/assets/lighthouse.js",
         "test:e2e": "playwright test",
-        "test:e2e:report": "playwright test"
+        "test:e2e:report": "playwright test && node custom-report.js"
     },
     "dependencies": {
         "@babel/preset-typescript": "^7.18.6",
