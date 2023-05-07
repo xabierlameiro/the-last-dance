@@ -142,8 +142,9 @@ jobs:
         runs-on: ubuntu-latest
         needs: [code_checking, testing, documentation]
         steps:
-            - name: Bump version
+            - name: Checkout version repository
               uses: actions/checkout@v3
+            - name: Bump version
               uses: paulhatch/semantic-version@v5.0.2
               with:
                   change_path: ./
