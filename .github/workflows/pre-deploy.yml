@@ -57,8 +57,8 @@ jobs:
               run: |
                   cd unit-report
                   cp -r ../public/coverage/ .
-                  git config --global user.email "xabier.lameiro@gmail.com"
-                  git config --global user.name "xabierlameiro.com"
+                  git config --global user.email "action@github.com"
+                  git config --global user.name "GitHub Action"
                   git add .
                   git commit -m "Update unit-report"
                   git push origin main
@@ -81,13 +81,13 @@ jobs:
               run: |
                   cd e2e-report
                   cp -r ../playwright-report/index.html index.html
-                  git config --global user.email "xabier.lameiro@gmail.com"
-                  git config --global user.name "xabierlameiro.com"
+                  git config --global user.email "action@github.com"
+                  git config --global user.name "GitHub Action"
                   git add .
                   git commit -m "Update e2e-report"
                   git push origin main
     documentation:
-        name: Documentation
+        name: Documenting
         runs-on: ubuntu-latest
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
@@ -116,8 +116,8 @@ jobs:
               run: |
                   cd doc
                   cp -r ../public/docs/ .
-                  git config --global user.email "xabier.lameiro@gmail.com"
-                  git config --global user.name "xabierlameiro.com"
+                  git config --global user.email "action@github.com"
+                  git config --global user.name "GitHub Action"
                   git add .
                   git commit -m "Update doc-report"
                   git push origin main
@@ -132,8 +132,8 @@ jobs:
                   yarn build-storybook
                   cd stb-report
                   cp -r ../storybook-static/ .
-                  git config --global user.email "xabier.lameiro@gmail.com"
-                  git config --global user.name "xabierlameiro.com"
+                  git config --global user.email "action@github.com"
+                  git config --global user.name "GitHub Action"
                   git add .
                   git commit -m "Update stb-report"
                   git push origin main
@@ -150,7 +150,6 @@ jobs:
               id: version
               uses: paulhatch/semantic-version@v5.0.2
               with:
-                  bump_each_commit: true
                   version_format: '${major}.${minor}.${patch}'
                   major_pattern: 'MAJOR -'
                   minor_pattern: 'MINOR -'
