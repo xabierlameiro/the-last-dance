@@ -1,6 +1,4 @@
-# Workflow to use after pull request is merged on master branch and waitin for deploy on production
-
-name: Deploy
+name: Workflow Post-Deploy
 on:
     push:
         branches:

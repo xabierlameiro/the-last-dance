@@ -1,4 +1,4 @@
-name: Dev workflow
+name: Workflow Pre-Deploy
 on:
     push:
         branches: [dev]
@@ -137,10 +137,22 @@ jobs:
                   git add .
                   git commit -m "Update stb-report"
                   git push origin main
+    version:
+        name: Version
+        runs-on: ubuntu-latest
+        needs: [code_checking, testing, documentation]
+        steps:
+            - name: Checkout version repository
+              uses: actions/checkout@v3
+            - name: Bump version
+              uses: paulhatch/semantic-version@v5.0.2
+              with:
+                  change_path: ./
+                  bump_each_commit: true
     deploy:
         name: Deploy
         runs-on: ubuntu-latest
-        needs: [code_checking, testing, documentation]
+        needs: [version]
         steps:
             - name: Deploy to Vercel
               run: |
