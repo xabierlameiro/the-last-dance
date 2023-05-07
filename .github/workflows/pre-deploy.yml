@@ -143,6 +143,7 @@ jobs:
         needs: [code_checking, testing, documentation]
         steps:
             - name: Bump version
+              uses: actions/checkout@v3
               uses: paulhatch/semantic-version@v5.0.2
               with:
                   change_path: ./
