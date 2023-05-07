@@ -144,11 +144,23 @@ jobs:
         steps:
             - name: Checkout version repository
               uses: actions/checkout@v3
-            - name: Bump version
+              with:
+                  fetch-depth: 0
+            - name: Version
+              id: version
               uses: paulhatch/semantic-version@v5.0.2
               with:
-                  change_path: ./
                   bump_each_commit: true
+                  version_format: '${major}.${minor}.${patch}'
+                  major_pattern: 'MAJOR -'
+                  minor_pattern: 'MINOR -'
+            - name: Update version in package.json and add tag
+              run: |
+                  git config --global user.email "action@github.com"
+                  git config --global user.name "GitHub Action"
+                  npm version ${{ steps.version.outputs.version }}
+                  git push --follow-tags
+
     deploy:
         name: Deploy
         runs-on: ubuntu-latest
