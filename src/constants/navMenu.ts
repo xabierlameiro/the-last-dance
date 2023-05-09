@@ -16,9 +16,9 @@ export const menu: Array<Item> = [
         img: '/menu/notes.png',
         alt: 'Go to blog',
         link: {
-            en: '/blog/react/filter-for-positions',
-            es: '/blog/react/filtro-para-posiciones',
-            gl: '/blog/react/filtro-para-posicions',
+            en: '/blog/nextjs/continuous-integration-with-github-actions-workflow',
+            es: '/blog/nextjs/integracion-continua-con-github-actions-workflow',
+            gl: '/blog/nextjs/integracion-continua-con-github-actions-workflow',
         },
         testId: 'blog',
     },
