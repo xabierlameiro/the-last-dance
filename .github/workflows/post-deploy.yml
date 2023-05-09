@@ -1,8 +1,7 @@
 name: Workflow Post-Deploy
 on:
     push:
-        branches:
-            - master
+        branches: [master]
 jobs:
     lighthouse:
         name: Lighthouse
