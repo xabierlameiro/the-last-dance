@@ -16,7 +16,7 @@ const GoogleAdsense = () => {
                 style={{
                     display: 'grid',
                     margin: '0 auto',
-                    minHeight: '321px',
+                    minHeight: 'auto',
                     overflow: 'hidden',
                 }}
             >
