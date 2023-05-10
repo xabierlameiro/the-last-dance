@@ -20,7 +20,7 @@ export const chart = {
 };
 
 export const nodeStructure = {
-    text: { name: 'pre.xabierlameiro.com' },
+    text: { name: 'xabierlameiro.com' },
     HTMLclass: 'domain',
     drawLineThrough: true,
     collapsable: true,
@@ -56,7 +56,7 @@ export const options = {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
 };
 
-export const DOMAIN = 'https://pre.xabierlameiro.com';
+export const DOMAIN = 'https://xabierlameiro.com';
 
 export const translations = {
     es: {
