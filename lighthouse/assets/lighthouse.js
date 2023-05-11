@@ -51,7 +51,7 @@ for (const lang of Object.keys(translations)) {
             ...options,
         });
         await chromeLauncher.killAll();
-        let fileName = url.replace(/https:\/\/pre.xabierlameiro.com\//, '').replace(/\//g, '-');
+        let fileName = url.replace(/https:\/\/xabierlameiro.com\//, '').replace(/\//g, '-');
 
         if (fileName === 'es' || fileName === 'gl') {
             fileName = 'home';
@@ -62,7 +62,7 @@ for (const lang of Object.keys(translations)) {
             result.report
         );
 
-        const cleanUrl = url.replace(/https:\/\/pre.xabierlameiro.com\//, '');
+        const cleanUrl = url.replace(/https:\/\/xabierlameiro.com\//, '');
         const urlWithoutLocale = cleanUrl.replace(/(gl|es)\//, '');
 
         const urlSplitted = urlWithoutLocale.split('/');
