@@ -36,17 +36,17 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
                 return await data.json().then((res) => {
                     const terms = res['data']['items'];
                     const outsideTemp = terms.find((item: any) => item.id === 'OutsideTemp').value;
-                    const ZoneMeasuredTemp = terms.find((item: any) => item.id === 'ZoneMeasuredTemp').value;
+                    const zoneMeasuredTemp = terms.find((item: any) => item.id === 'ZoneMeasuredTemp').value;
 
                     return {
                         outsideTemp,
-                        ZoneMeasuredTemp,
+                        zoneMeasuredTemp,
                     };
                 });
             })
             .catch((error) => error);
 
-        res.status(200).json({ value });
+        res.status(200).json(value);
     } catch (err: Error | unknown) {
         if (err instanceof Error) {
             res.status(500).json({ error: err.message });
