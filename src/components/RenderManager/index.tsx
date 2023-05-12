@@ -2,6 +2,7 @@ import React from 'react';
 import Loading from './Loading';
 import Error from './Error';
 import Tooltip from '@/components/Tooltip';
+import { useIntl } from 'react-intl';
 
 type Props = {
     error: boolean;
@@ -22,13 +23,15 @@ type Props = {
  * @returns {React.ReactNode} - Returns children or error/loading icon
  */
 const RenderManager = ({ error, loading, errorTitle, loadingTitle, children }: Props) => {
+    const { formatMessage: f } = useIntl();
+
     if (error) {
         return (
             <Tooltip>
                 <Tooltip.Trigger>
                     <Error />
                 </Tooltip.Trigger>
-                <Tooltip.Content>{errorTitle}</Tooltip.Content>
+                <Tooltip.Content>{errorTitle ?? f({ id: 'rendermanager.error' })}</Tooltip.Content>
             </Tooltip>
         );
     }
@@ -38,7 +41,7 @@ const RenderManager = ({ error, loading, errorTitle, loadingTitle, children }: P
                 <Tooltip.Trigger>
                     <Loading />
                 </Tooltip.Trigger>
-                <Tooltip.Content>{loadingTitle}</Tooltip.Content>
+                <Tooltip.Content>{loadingTitle ?? f({ id: 'rendermanager.loading' })}</Tooltip.Content>
             </Tooltip>
         );
     }

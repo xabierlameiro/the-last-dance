@@ -10,6 +10,7 @@ import IndexedCounter from '@/components/IndexedCounter';
 import CountDown from '@/components/CountDown';
 import Heating from '@/components/Heating';
 import Tooltip from '@/components/Tooltip';
+import DeploymentStatus from '@/components/DeploymentStatus';
 import dynamic from 'next/dynamic';
 
 const Weather = dynamic(() => import('@/components/Weather'), {
@@ -119,6 +120,7 @@ const Header = ({ children }: { children?: ReactNode }) => {
             <Route />
             <NavLinks />
             <CountDown date="2023-05-26T00:00:00+00:00" caption={f({ id: 'countdown.caption' })} />
+            <DeploymentStatus />
             <CryptoPrice />
             <IndexedCounter />
             <ViewCounter all />

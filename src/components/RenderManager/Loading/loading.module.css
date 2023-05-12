@@ -4,6 +4,7 @@
     height: 16px;
     align-self: center;
     justify-self: center;
+    display: flex;
 }
 
 @keyframes spin {

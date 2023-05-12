@@ -1,4 +1,5 @@
 svg.error {
+    display: flex;
     width: 16px;
     height: 16px;
     color: rgba(var(--red-color));

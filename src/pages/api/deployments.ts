@@ -1,13 +1,27 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+export type DeploymentStatus = 'BUILDING' | 'ERROR' | 'INITIALIZING' | 'QUEUED' | 'READY' | 'CANCELED';
+export type DeploymentEnviroment = 'production' | 'preview';
+
+export type DeploymentResponse = {
+    status: DeploymentStatus;
+    enviroment: DeploymentEnviroment;
+    createdAt: string;
+    buildingAt: string;
+    ready: string;
+    username: string;
+};
+
+export type DeploymentResponseType = DeploymentResponse | { error: string };
+
 /**
  * @description Get the last deployment status
  * @param _request NextApiRequest
  * @param res NextApiResponse
- * @returns {Promise<{ status: string; enviroment: string; } | { error: string; }>}
+ * @returns {Promise<DeploymentResponse>}
  * @example localhost:3000/api/deployments
  */
-export default async function handler(_request: NextApiRequest, res: NextApiResponse<{}>) {
+export default async function handler(_request: NextApiRequest, res: NextApiResponse<DeploymentResponseType>) {
     try {
         const result = await fetch(
             `https://api.vercel.com/v6/deployments?projectId=${process.env.NEXT_PROJECT_ID}&teamId=${process.env.NEXT_TEAM_ID}&target=${process.env.NEXT_ENV}&limit=1`,
@@ -23,7 +37,11 @@ export default async function handler(_request: NextApiRequest, res: NextApiResp
 
         res.status(200).json({
             status: data.deployments[0]['state'],
-            enviroment: process.env.NEXT_ENV,
+            enviroment: process.env.NEXT_ENV as 'production' | 'preview',
+            createdAt: data.deployments[0]['createdAt'],
+            buildingAt: data.deployments[0]['buildingAt'],
+            ready: data.deployments[0]['ready'],
+            username: data.deployments[0]['creator']['username'],
         });
     } catch (err: Error | unknown) {
         if (err instanceof Error) {

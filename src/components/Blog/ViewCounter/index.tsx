@@ -41,7 +41,12 @@ const ViewCounter = ({ all }: { all?: boolean }) => {
                 <Tooltip>
                     <Tooltip.Trigger>
                         <span className={styles.users} data-testid="new-users">
-                            <FiUsers />
+                            <FiUsers
+                                style={{
+                                    fill: 'transparent',
+                                    width: '14px',
+                                }}
+                            />
                             <RenderManager
                                 loading={!data}
                                 error={error}
