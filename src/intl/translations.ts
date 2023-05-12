@@ -70,6 +70,10 @@ export const messages = {
         'countdown.seconds': 'secs',
         'settings.dark': 'Theme (Dark)',
         'settings.light': 'Theme (Light)',
+        'deploymentstatus.tooltip':
+            'Status : {status} The user {username} has deployed to {enviroment} enviroment at {createdAt}',
+        'rendermanager.error': 'An error has occurred, we are working on it',
+        'rendermanager.loading': 'Getting the data...',
     },
     es: {
         'blog.title': 'Esta es la página de blog',
@@ -143,6 +147,10 @@ export const messages = {
         'countdown.seconds': 'segus',
         'settings.dark': 'Tema (Oscuro)',
         'settings.light': 'Tema (Claro)',
+        'deploymentstatus.tooltip':
+            'Estado : {status} El usuario {username} ha desplegado en el entorno de {enviroment} a fecha {createdAt}',
+        'rendermanager.error': 'Ha ocurrido un error, estamos trabajando en ello',
+        'rendermanager.loading': 'Obteniendo los datos...',
     },
     gl: {
         'blog.title': 'Esta é a páxina de blog',
@@ -214,5 +222,9 @@ export const messages = {
         'countdown.seconds': 'segus',
         'settings.dark': 'Tema (Escuro)',
         'settings.light': 'Tema (Claro)',
+        'deploymentstatus.tooltip':
+            'Estado : {status} O usuario {username} ha desplegado no entorno de {enviroment} a data {createdAt}',
+        'rendermanager.error': 'Ocurriu un erro, estamos traballando niso',
+        'rendermanager.loading': 'Obtendo os datos...',
     },
 };

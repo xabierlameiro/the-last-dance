@@ -12,12 +12,6 @@
     width: 19px;
 }
 
-.views svg.error {
-    width: 16px;
-    height: 16px;
-    color: rgba(var(--red-color));
-}
-
 .spinner {
     animation: spin 1s linear infinite;
     width: 16px;
@@ -34,11 +28,6 @@
     font-size: 14px;
     user-select: none;
     gap: 8px;
-}
-
-.views .users svg {
-    width: 14px;
-    fill: transparent;
 }
 
 @keyframes spin {
