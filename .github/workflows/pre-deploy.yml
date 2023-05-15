@@ -34,6 +34,7 @@ jobs:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+            NEXT_ENV: 'preview'
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3

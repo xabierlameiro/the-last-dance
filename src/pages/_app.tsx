@@ -31,7 +31,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
     return (
         <>
-            {process.env.NODE_ENV === 'production' && (
+            {process.env.NEXT_ENV === 'production' && (
                 <>
                     <Script
                         defer
