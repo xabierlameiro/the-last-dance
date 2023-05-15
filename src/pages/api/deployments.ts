@@ -24,7 +24,7 @@ export type DeploymentResponseType = DeploymentResponse | { error: string };
 export default async function handler(_request: NextApiRequest, res: NextApiResponse<DeploymentResponseType>) {
     try {
         const result = await fetch(
-            `https://api.vercel.com/v6/deployments?projectId=${process.env.NEXT_PROJECT_ID}&teamId=${process.env.NEXT_TEAM_ID}&target=${process.env.NEXT_ENV}&limit=1`,
+            `https://api.vercel.com/v6/deployments?projectId=${process.env.NEXT_PROJECT_ID}&teamId=${process.env.NEXT_TEAM_ID}&target=${process.env.NEXT_PUBLIC_ENV}&limit=1`,
             {
                 headers: {
                     Authorization: `Bearer ${process.env.NEXT_TOKEN}`,
@@ -37,7 +37,7 @@ export default async function handler(_request: NextApiRequest, res: NextApiResp
 
         res.status(200).json({
             status: data.deployments[0]['state'],
-            enviroment: process.env.NEXT_ENV as 'production' | 'preview',
+            enviroment: process.env.NEXT_PUBLIC_ENV as 'production' | 'preview',
             createdAt: data.deployments[0]['createdAt'],
             buildingAt: data.deployments[0]['buildingAt'],
             ready: data.deployments[0]['ready'],
