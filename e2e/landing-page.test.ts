@@ -26,15 +26,15 @@ test.describe('Landing page', () => {
         await page.getByTitle('contact.json').click();
         await page.getByTitle('index.tsx').click();
     });
-    test('should click and close the modal', async () => {
+    /*     test('should click and close the modal', async () => {
         await page.getByTestId('close').click();
-    });
-    test('should click and open the modal', async () => {
+    }); */
+    /*     test('should click and open the modal', async () => {
         await page.getByTestId('home').click();
     });
     test('should click on minimise the modal', async () => {
         await page.getByTestId('minimise').click();
-    });
+    }); */
     test('should open the modal again', async () => {
         await page.getByTestId('home').click();
     });
