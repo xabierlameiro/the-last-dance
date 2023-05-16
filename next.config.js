@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-import { remarkCodeHike } from '@xabierlameiro/code-hike';
+import { remarkCodeHike } from '@code-hike/mdx';
 import theme from 'shiki/themes/one-dark-pro.json' assert { type: 'json' };
 import nextMDX from '@next/mdx';
 

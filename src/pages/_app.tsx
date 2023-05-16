@@ -1,6 +1,6 @@
 import React from 'react';
 import '../../styles/globals.css';
-import '@xabierlameiro/code-hike/dist/index.css';
+import '@code-hike/mdx/dist/index.css';
 import Script from 'next/script';
 import { IntlProvider } from 'react-intl';
 import { useRouter } from 'next/router';
