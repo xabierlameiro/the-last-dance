@@ -10,6 +10,7 @@
         "debugg": "cross-env NODE_OPTIONS='--inspect' next dev",
         "prod": "yarn --prod --silent --ignore-scripts",
         "build": "next build",
+        "start:debugg": "cross-env NODE_OPTIONS='--inspect' next start",
         "start": "next start",
         "lint": "next lint",
         "test": "SET NODE_ENV=development && jest --silent",

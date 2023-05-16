@@ -35,7 +35,7 @@ To always have a current snapshot of the sitemap of my site I use playwright to 
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```js main.js
+```javascript main.js
 const browser = await chromium.launch();
 const page = await browser.newPage();
 await page.goto('https://xabierlameiro.com/sitemap.xml');
@@ -68,7 +68,7 @@ await browser.close();
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```js main.js
+```javascript main.js
 for (const url of locales[lang]) {
     // Report
     const result = await launchChromeAndRunLighthouse(
@@ -93,7 +93,7 @@ for (const url of locales[lang]) {
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```js main.js
+```javascript main.js
 const chart = {
     chart: {
         container: '#OrganiseChart-big-commpany',
