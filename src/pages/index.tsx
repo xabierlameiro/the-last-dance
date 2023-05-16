@@ -59,7 +59,7 @@ const Home = ({ content }: Props) => {
 export const getStaticProps = async (params: { locale: string }) => {
     const { locale } = params;
     const path = 'data/home';
-    const desktop = await serializePath(path, `${locale}.mdx`);
+    const desktop = await serializePath(path, `desktop.${locale}.mdx`);
     const mobile = await serializePath(path, `mobile.${locale}.mdx`);
 
     return {
