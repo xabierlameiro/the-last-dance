@@ -28,10 +28,13 @@ export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric)
 
 const App = ({ Component, pageProps }: AppProps) => {
     const { locale = 'en' } = useRouter();
+    const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
+    const hasNavigator = typeof navigator !== 'undefined';
+    const isNotLighthouse = hasNavigator && navigator?.userAgent.includes('Chrome-Lighthouse');
 
     return (
         <>
-            {process.env.NEXT_PUBLIC_ENV === 'production' && !navigator.userAgent.includes('Chrome-Lighthouse') && (
+            {isProduction && isNotLighthouse && (
                 <>
                     <Script
                         defer
