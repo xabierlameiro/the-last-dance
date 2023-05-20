@@ -57,7 +57,8 @@ const Home = ({ content }: Props) => {
     );
 };
 
-export async function getServerSideProps({ locale }: { locale: string }) {
+export const getStaticProps = async (params: { locale: string }) => {
+    const { locale } = params;
     const HOME_PATH = path.join(process.cwd(), 'data/home');
     const desktop = await serializePath(HOME_PATH, `desktop.${locale}.mdx`);
     const mobile = await serializePath(HOME_PATH, `mobile.${locale}.mdx`);
@@ -70,6 +71,6 @@ export async function getServerSideProps({ locale }: { locale: string }) {
             },
         },
     };
-}
+};
 
 export default Home;
