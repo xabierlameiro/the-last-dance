@@ -7,6 +7,7 @@ import { MDXRemote } from 'next-mdx-remote';
 import { components } from '@/helpers/mdxjs';
 import { serializePath } from '@/helpers/mdx';
 import SEO from '@/components/SEO';
+import path from 'path';
 
 type Props = {
     content: {
@@ -57,9 +58,9 @@ const Home = ({ content }: Props) => {
 };
 
 export async function getServerSideProps({ locale }: { locale: string }) {
-    const path = 'data/home';
-    const desktop = await serializePath(path, `desktop.${locale}.mdx`);
-    const mobile = await serializePath(path, `mobile.${locale}.mdx`);
+    const HOME_PATH = path.join(process.cwd(), 'data/home');
+    const desktop = await serializePath(HOME_PATH, `desktop.${locale}.mdx`);
+    const mobile = await serializePath(HOME_PATH, `mobile.${locale}.mdx`);
 
     return {
         props: {

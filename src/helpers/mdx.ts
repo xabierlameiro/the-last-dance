@@ -16,8 +16,7 @@ import fs from 'fs';
  * @returns {Object} - Object with MDX content and meta data.
  */
 export const serializePath = (route: string, fileName: string) => {
-    const folderPath = path.join(process.cwd(), route);
-    const filePath = path.join(folderPath, fileName);
+    const filePath = path.join(route, fileName);
     const mdx = fs.readFileSync(filePath, 'utf8');
 
     return sz(mdx, {
