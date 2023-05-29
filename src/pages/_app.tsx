@@ -30,7 +30,7 @@ const App = ({ Component, pageProps }: AppProps) => {
     const { locale = 'en' } = useRouter();
     const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
     const hasNavigator = typeof navigator !== 'undefined';
-    const isNotLighthouse = hasNavigator && navigator?.userAgent.includes('Chrome-Lighthouse');
+    const isNotLighthouse = hasNavigator && !navigator?.userAgent.includes('Chrome-Lighthouse');
 
     return (
         <>
