@@ -19,14 +19,7 @@ jobs:
                   yarn install --frozen-lockfile
             - name: Execute Lighthouse
               run: |
-                    # Deploy to Vercel here (replace with the appropriate command)
-                    # Wait for the deployment to finish
-                    DEPLOYMENT_ID=$(vercel deploy --prod | grep 'https://your-vercel-app.vercel.app' | cut -d ' ' -f 2)
-                    STATUS=""
-                    while [[ "$STATUS" != "READY" ]]; do
-                      sleep 30s
-                      STATUS=$(vercel deployments ls $DEPLOYMENT_ID --json | jq -r '.[0].state')
-                    done
+                  sleep 10m
                   yarn lighthouse-report
             - name: Checkout performance-report repository
               uses: actions/checkout@v3

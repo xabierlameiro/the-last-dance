@@ -91,9 +91,9 @@ const useSurvey = () => {
             questionText: 'Rango salarial:',
             questionHtml: '<h1>El rango salarial es :</h1>',
             answerOptions: [
-                { answerText: 'Menor o igual a 49.000€', isCorrect: false },
-                { answerText: 'Entre 50.000€ y 59.000€', isCorrect: true },
-                { answerText: 'Mayor o igual a 60.000€', isCorrect: true },
+                { answerText: 'Menor o igual a 59.000€', isCorrect: false },
+                { answerText: 'Entre 60.000€ y 69.000€', isCorrect: true },
+                { answerText: 'Mayor o igual a 70.000€', isCorrect: true },
             ],
         },
         {
