@@ -9,7 +9,7 @@ const initialState = {
 };
 
 const reducer = (state: any, action: any) => {
-    const { questionNum } = action.payload;
+    const { questionNum } = action.payload || {};
     const { answers, questionsDone, currentQuestion } = state;
     const newAnswers = [...answers];
 
