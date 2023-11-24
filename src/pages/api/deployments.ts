@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 export type DeploymentStatus = 'BUILDING' | 'ERROR' | 'INITIALIZING' | 'QUEUED' | 'READY' | 'CANCELED';
-export type DeploymentEnviroment = 'production' | 'preview';
+export type Deploymentenvironment = 'production' | 'preview';
 
 export type DeploymentResponse = {
     status: DeploymentStatus;
-    enviroment: DeploymentEnviroment;
+    environment: Deploymentenvironment;
     createdAt: string;
     buildingAt: string;
     ready: string;
@@ -37,7 +37,7 @@ export default async function handler(_request: NextApiRequest, res: NextApiResp
 
         res.status(200).json({
             status: data.deployments[0]['state'],
-            enviroment: process.env.NEXT_PUBLIC_ENV as 'production' | 'preview',
+            environment: process.env.NEXT_PUBLIC_ENV as 'production' | 'preview',
             createdAt: data.deployments[0]['createdAt'],
             buildingAt: data.deployments[0]['buildingAt'],
             ready: data.deployments[0]['ready'],

@@ -18,6 +18,7 @@ type Props = {
  */
 const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {}) => {
     const difference = +new Date(date) - +new Date();
+    const years = Math.floor(difference / (1000 * 60 * 60 * 24 * 30 * 12));
     const months = Math.floor((difference / (1000 * 60 * 60 * 24 * 30)) % 12);
     const days = Math.floor((difference / (1000 * 60 * 60 * 24)) % 30);
     const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
@@ -26,6 +27,7 @@ const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {
 
     if (difference > 0) {
         setTime({
+            years: years < 10 ? `0${years}` : years,
             months: months < 10 ? `0${months}` : months,
             days: days < 10 ? `0${days}` : days,
             hours: hours < 10 ? `0${hours}` : hours,
@@ -46,6 +48,7 @@ const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {
 const CountDown = ({ date: dateProvided, caption }: Props) => {
     const { formatMessage: f } = useIntl();
     const [time, setTime] = React.useState({
+        years: 0,
         months: 0,
         days: 0,
         hours: 0,
@@ -65,6 +68,10 @@ const CountDown = ({ date: dateProvided, caption }: Props) => {
         <Tooltip>
             <Tooltip.Trigger>
                 <div className={styles.countdown} data-testid="countdown">
+                    <div className={styles.countdown__item}>
+                        <div suppressHydrationWarning>{time.years}</div>
+                        <div className={styles.countdown__item__text}>{f({ id: 'countdown.years' })}</div>
+                    </div>
                     <div className={styles.countdown__item}>
                         <div suppressHydrationWarning>{time.months}</div>
                         <div className={styles.countdown__item__text}>{f({ id: 'countdown.months' })}</div>

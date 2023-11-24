@@ -33,7 +33,7 @@ const DeploymentStatus = () => {
     const { data, isLoading, isError } = useDeploymentStatus();
     const { formatMessage: f } = useIntl();
 
-    const { status, username, enviroment, createdAt } = data ?? {};
+    const { status, username, environment, createdAt } = data ?? {};
 
     return (
         <RenderManager error={isError} loading={isLoading}>
@@ -49,7 +49,7 @@ const DeploymentStatus = () => {
                         {
                             status: status,
                             username: username,
-                            enviroment: enviroment,
+                            environment: environment,
                             createdAt: new Date(createdAt).toLocaleString(),
                         }
                     )}
