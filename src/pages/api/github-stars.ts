@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Octokit } from 'octokit';
+import allowCors from '../../helpers/cors';
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
@@ -19,7 +20,7 @@ const REPOSITORY = {
  *     total?: number;
  * }>}
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
         const {
             data: { stargazers_count },
@@ -28,4 +29,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (err: any) {
         res.status(500).json({ statusCode: err.status, message: err.message });
     }
-}
+});

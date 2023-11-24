@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { NextApiRequest, NextApiResponse } from 'next';
+import allowCors from '../../helpers/cors';
 
 /**
  * @description This is a test to get the data from the Google Search Console API
@@ -8,7 +9,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
  * @returns Promise<void>
  * @see https://developers.google.com/webmaster-tools/v1/searchanalytics/query
  */
-export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
+export default allowCors(async function handler(_req: NextApiRequest, res: NextApiResponse) {
     const auth = new google.auth.GoogleAuth({
         credentials: {
             client_email: process.env.ANALYTICS_CLIENT_EMAIL,
@@ -35,4 +36,4 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
         .then((response) => response.data);
 
     res.status(200).json(response);
-}
+})

@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import allowCors from '../../helpers/cors';
 
 export type DeploymentStatus = 'BUILDING' | 'ERROR' | 'INITIALIZING' | 'QUEUED' | 'READY' | 'CANCELED';
 export type Deploymentenvironment = 'production' | 'preview';
@@ -21,7 +22,7 @@ export type DeploymentResponseType = DeploymentResponse | { error: string };
  * @returns {Promise<DeploymentResponse>}
  * @example localhost:3000/api/deployments
  */
-export default async function handler(_request: NextApiRequest, res: NextApiResponse<DeploymentResponseType>) {
+export default allowCors(async function handler(_request: NextApiRequest, res: NextApiResponse<DeploymentResponseType>) {
     try {
         const result = await fetch(
             `https://api.vercel.com/v6/deployments?projectId=${process.env.NEXT_PROJECT_ID}&teamId=${process.env.NEXT_TEAM_ID}&target=${process.env.NEXT_PUBLIC_ENV}&limit=1`,
@@ -48,4 +49,4 @@ export default async function handler(_request: NextApiRequest, res: NextApiResp
             res.status(500).json({ error: err.message });
         }
     }
-}
+});

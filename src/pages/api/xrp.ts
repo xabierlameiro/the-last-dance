@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import jsdom from 'jsdom';
+import allowCors from '../../helpers/cors';
 
 /**
  * @description Get the price of XRP in EUR
@@ -7,7 +8,7 @@ import jsdom from 'jsdom';
  * @returns {Promise<{ price: string; todaySummary: string; todayPorcentage: string } | { error: string }>}
  * @example https://xabierlameiro.com/api/xrp
  */
-export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
+export default allowCors(async function handler(_req: NextApiRequest, res: NextApiResponse) {
     const { JSDOM } = jsdom;
     const response = await fetch('https://www.google.com/search?q=xrp+eur+price', {
         method: 'GET',
@@ -45,4 +46,4 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
             res.status(500).json({ error: err.message });
         }
     }
-}
+});

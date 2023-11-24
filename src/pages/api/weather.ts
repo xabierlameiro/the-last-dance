@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import jsdom from 'jsdom';
+import allowCors from '../../helpers/cors';
 
 const getWeatherData = async (city: string) => {
     const { JSDOM } = jsdom;
@@ -50,7 +51,7 @@ const getWeatherData = async (city: string) => {
  * @returns Promise<void>
  * @example http://localhost:3000/api/weather?cities=Madrid,Barcelona
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { query } = req;
     const { cities = '' } = query;
 
@@ -71,4 +72,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             res.status(500).json({ error: err.message });
         }
     }
-}
+});

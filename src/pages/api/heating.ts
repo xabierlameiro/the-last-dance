@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import allowCors from '../../helpers/cors';
 
 /**
  * @description Get the heating grades inside the house and the outside temperature
@@ -7,7 +8,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
  * @returns {Promise<{ outsideTemp: number; ZoneMeasuredTemp: number; } | { statusCode: number; message: string; }>}
  * @example localhost:3000/api/heating
  */
-export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
+export default allowCors(async function handler(_req: NextApiRequest, res: NextApiResponse) {
     try {
         const value = await fetch('https://www.ariston-net.remotethermo.com/R2/Account/Login?returnUrl=%2FR2%2FHome', {
             method: 'POST',
@@ -52,4 +53,4 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
             res.status(500).json({ error: err.message });
         }
     }
-}
+});

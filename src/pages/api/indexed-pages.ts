@@ -1,12 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import jsdom from 'jsdom';
+import allowCors from '../../helpers/cors';
 
 /**
  * @description Get the number of indexed pages in Google
  *
  * @returns {Promise<{ num: string } | { error: string } | void>}
  */
-export default async function handler(
+export default allowCors(async function handler(
     _req: NextApiRequest,
     res: NextApiResponse
 ): Promise<{ num: string } | { error: string } | void> {
@@ -34,4 +35,4 @@ export default async function handler(
     } catch (err) {
         res.status(500).json({ error: err });
     }
-}
+});

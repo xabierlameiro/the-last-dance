@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
+import allowCors from '../../helpers/cors';
 
 /**
  * @description This function is used to get the total number of page views for a given page. It uses the Google
@@ -15,7 +16,7 @@ import { BetaAnalyticsDataClient } from '@google-analytics/data';
  * @throws {Error: Error while parsing analytics data}
  * @see https://developers.google.com/analytics/devguides/reporting/data/v1/api-schema
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { query } = req;
     const { slug } = query;
     let data = null;
@@ -110,4 +111,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             res.status(500).json({ error: err.message });
         }
     }
-}
+});
