@@ -25,7 +25,7 @@ export type DeploymentResponseType = DeploymentResponse | { error: string };
 export default allowCors(async function handler(_request: NextApiRequest, res: NextApiResponse<DeploymentResponseType>) {
     try {
         const result = await fetch(
-            `https://api.vercel.com/v6/deployments?projectId=${process.env.NEXT_PROJECT_ID}&teamId=${process.env.NEXT_TEAM_ID}&target=${process.env.NEXT_PUBLIC_ENV}&limit=1`,
+            `https://api.vercel.com/v6/deployments?projectId=${process.env.NEXT_PROJECT_ID}&target=${process.env.NEXT_PUBLIC_ENV}&limit=1`,
             {
                 headers: {
                     Authorization: `Bearer ${process.env.NEXT_TOKEN}`,
