@@ -20,7 +20,6 @@
     overflow: auto;
     font-size: 13px;
     outline: none;
-    height: 360px;
     background-color: rgba(var(--blog-background));
     color: rgba(var(--blog-font));
 }
