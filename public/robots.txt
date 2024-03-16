@@ -1,6 +1,12 @@
 # *
 User-agent: *
 Allow: /
+Disallow: /lighthouse.xabierlameiro.com/
+Disallow: /coverage.xabierlameiro.com/
+Disallow: /performance.xabierlameiro.com/
+Disallow: /docs.xabierlameiro.com/
+Disallow: /storybook.xabierlameiro.com/
+Disallow: /pre.xabierlameiro.com/
 
 # Host
 Host: https://xabierlameiro.com/
