@@ -8,8 +8,6 @@ Disallow: /docs.xabierlameiro.com/
 Disallow: /storybook.xabierlameiro.com/
 Disallow: /pre.xabierlameiro.com/
 
-# Host
-Host: https://xabierlameiro.com/
 
 # Sitemaps
 Sitemap: https://xabierlameiro.com/sitemap.xml
