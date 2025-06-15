@@ -1,17 +1,18 @@
+// Usage: `node custom-docs.js`
 import { readFile, writeFile } from 'fs';
 import glob from 'glob';
 
 glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
     if (err) {
-        console.log('err', err);
-        return;
+        console.error('err', err);
+        process.exit(1);
     }
 
     files.forEach((path) => {
         readFile(path, 'utf8', (err, data) => {
             if (err) {
-                console.log('err', err);
-                return;
+                console.error('err', err);
+                process.exit(1);
             }
 
             let replaced = data.replace(/<title>(.*)<\/title>/, '<title>Docs by Xabier Lameiro</title>');
@@ -39,8 +40,8 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
 
             writeFile(path, replaced, 'utf-8', function (err, a) {
                 if (err) {
-                    console.log('err', err);
-                    return;
+                    console.error('err', err);
+                    process.exit(1);
                 }
             });
         });
@@ -49,16 +50,16 @@ glob('public/docs/*.?(html|css|ts.html)', function (err, files) {
 
 readFile('public/docs/styles/jsdoc-default.css', 'utf8', (err, data) => {
     if (err) {
-        console.log('err', err);
-        return;
+        console.error('err', err);
+        process.exit(1);
     }
 
     let replaced = data.replace(/nav(?:\r\n|\r|\n){/g, 'nav { position:sticky; top:20px;');
 
     writeFile('public/docs/styles/jsdoc-default.css', replaced, 'utf-8', function (err, a) {
         if (err) {
-            console.log('err', err);
-            return;
+            console.error('err', err);
+            process.exit(1);
         }
     });
 });
