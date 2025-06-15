@@ -6,6 +6,7 @@ import SEO from '@/components/SEO';
 import useWindowResize from '@/hooks/useWidowResize';
 import useSurvey from '@/hooks/useSurvey';
 import NavigationArrows from '@/components/NavigationArrows';
+import QuestionBlock from '@/components/QuestionBlock';
 
 const Survey = () => {
     const { width, height } = useWindowResize();
@@ -49,39 +50,17 @@ const Survey = () => {
                     </div>
                 }
                 body={
-                    // TODO: Move to a component
                     <div className={styles.container}>
-                        {questions.map(
-                            (question: any, index: number) =>
-                                currentQuestionNum === index && (
-                                    <div key={index} className={styles.question}>
-                                        <div
-                                            dangerouslySetInnerHTML={{ __html: question.questionHtml }}
-                                            className={styles.questionHtml}
-                                        />
-                                        {question.answerOptions?.map((answerOption: any) => (
-                                            <label htmlFor={answerOption.answerText} key={answerOption.answerText}>
-                                                <input
-                                                    onChange={(e) =>
-                                                        handleAnswerOptionClick({
-                                                            question: question.questionText,
-                                                            answer: e.target.value,
-                                                            isCorrect: answerOption.isCorrect,
-                                                            questionNum: index,
-                                                        })
-                                                    }
-                                                    type="radio"
-                                                    id={answerOption.answerText}
-                                                    name={String(index)}
-                                                    value={answerOption.answerText}
-                                                    checked={answers[index]?.answer === answerOption.answerText}
-                                                />
-                                                {answerOption.answerText}
-                                            </label>
-                                        ))}
-                                    </div>
-                                )
-                        )}
+                        {questions.map((question: any, index: number) => (
+                            <QuestionBlock
+                                key={index}
+                                question={question}
+                                index={index}
+                                currentQuestionNum={currentQuestionNum}
+                                answers={answers}
+                                handleAnswerOptionClick={handleAnswerOptionClick}
+                            />
+                        ))}
                     </div>
                 }
                 footer={
