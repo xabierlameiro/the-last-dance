@@ -13,7 +13,7 @@
         "start:debugg": "cross-env NODE_OPTIONS='--inspect' next start",
         "start": "next start",
         "lint": "next lint",
-        "test": "SET NODE_ENV=development && jest --silent",
+        "test": "cross-env NODE_ENV=development jest --silent",
         "coverage": "rm -rf public/coverage && jest --coverage --silent && node custom-reporter.js",
         "watch": "jest --watchAll",
         "test:clear": "jest --clearCache",
