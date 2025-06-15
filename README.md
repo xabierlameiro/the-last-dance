@@ -7,6 +7,7 @@
 -   **Storybook**: [Storybook](https://storybook.js.org/)
 -   **Testing**: [Jest](https://jestjs.io/)
 -   **Deployment**: [Vercel](https://vercel.com)
+-   **Package Manager**: Yarn (Berry)
 
 ## Overview
 
@@ -30,7 +31,8 @@
 
 ## Running Locally
 
-This application requires Node.js v18 or higher.
+This application requires Node.js v18.20.0 or higher.
+Yarn (Berry) is the official package manager for this project.
 
 ```bash
 git clone https://github.com/xabierlameiro/the-last-dance.git
