@@ -30,13 +30,30 @@
 
 ## Running Locally
 
-This application requires Node.js v16 ++.
+This application requires Node.js v18.20.0 or higher.
 
 ```bash
 git clone https://github.com/xabierlameiro/the-last-dance.git
-npm i
-npm run dev
+
+# Use the correct Node.js version (if you have nvm installed)
+nvm use
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
 ```
+
+### Node.js Version
+
+This project uses Node.js v18.20.0. If you have `nvm` installed, you can use:
+
+```bash
+nvm use
+```
+
+This will automatically use the Node.js version specified in `.nvmrc`.
 
 ## Pending tasks
 
