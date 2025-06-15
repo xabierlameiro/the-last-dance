@@ -29,6 +29,11 @@
 -   `src/intl/*` - The folder where all of my translations live.
 -   `styles/*` - The folder where all of my global styles live.
 
+## GitHub Workflows
+
+-   **pre-deploy.yml** – Runs linting and tests after installing dependencies on pushes to `dev` and publishes coverage, documentation and Storybook.
+-   **post-deploy.yml** – Executes Lighthouse audits on pushes to `master`.
+
 ## Running Locally
 
 This application requires Node.js v18.20.0 or higher.
