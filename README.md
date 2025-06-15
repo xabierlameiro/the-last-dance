@@ -37,6 +37,9 @@ Yarn (Berry) is the official package manager for this project.
 ```bash
 git clone https://github.com/xabierlameiro/the-last-dance.git
 
+# Create your environment file
+cp .env.example .env.development # or .env.local
+
 # Use the correct Node.js version (if you have nvm installed)
 nvm use
 
