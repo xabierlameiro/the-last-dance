@@ -27,15 +27,18 @@ jobs:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
-                  node-version: 18.x
+                  node-version: 18
                   cache: yarn
             - name: Install dependencies
               run: |
+                  corepack enable
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
-            - name: Linter
-              run: yarn run lint
+                  yarn install --immutable
+            - name: Lint
+              run: yarn lint
+            - name: Test
+              run: yarn test
     testing:
         name: Testing
         runs-on: ubuntu-latest
@@ -50,13 +53,18 @@ jobs:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
-                  node-version: 18.x
+                  node-version: 18
                   cache: yarn
             - name: Install dependencies
               run: |
+                  corepack enable
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
+                  yarn install --immutable
+            - name: Lint
+              run: yarn lint
+            - name: Test
+              run: yarn test
             - name: Run unit tests
               run: yarn run coverage
             - name: Checkout unit-report repository
@@ -111,13 +119,18 @@ jobs:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
-                  node-version: 18.x
+                  node-version: 18
                   cache: yarn
             - name: Install dependencies
               run: |
+                  corepack enable
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
+                  yarn install --immutable
+            - name: Lint
+              run: yarn lint
+            - name: Test
+              run: yarn test
             - name: Generate documentation
               run: yarn run jsdoc
             - name: Checkout doc repository
