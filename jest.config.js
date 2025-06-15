@@ -22,8 +22,7 @@ const customJestConfig = {
     coverageReporters: ['html'],
     collectCoverageFrom: ['src/components/**/*.tsx'],
     moduleNameMapper: {
-        '^@/helpers(.*)$': '<rootDir>src/helpers/index.ts$1',
-        '^@/helpers(.*)$': '<rootDir>src/helpers/$1',
+        '^@/helpers(.*)$': '<rootDir>/src/helpers/$1',
         '^@/layout(.*)$': '<rootDir>src/components/Layout/index.tsx$1',
         '^@/test$': '<rootDir>/jest.setup.js',
         '^@/components(.*)$': '<rootDir>src/components/$1',
