@@ -1,6 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import allowCors from '../../helpers/cors';
 
+interface HeatingData {
+    outsideTemp: number;
+    zoneMeasuredTemp: number;
+}
+
+type HeatingResponse = HeatingData | { error: string };
+
 /**
  * @description Get the heating grades inside the house and the outside temperature
  * @param _req NextApiRequest
@@ -8,7 +15,10 @@ import allowCors from '../../helpers/cors';
  * @returns {Promise<{ outsideTemp: number; ZoneMeasuredTemp: number; } | { statusCode: number; message: string; }>}
  * @example localhost:3000/api/heating
  */
-export default allowCors(async function handler(_req: NextApiRequest, res: NextApiResponse) {
+export default allowCors(async function handler(
+    _req: NextApiRequest,
+    res: NextApiResponse<HeatingResponse>
+) {
     try {
         const value = await fetch('https://www.ariston-net.remotethermo.com/R2/Account/Login?returnUrl=%2FR2%2FHome', {
             method: 'POST',
@@ -35,13 +45,13 @@ export default allowCors(async function handler(_req: NextApiRequest, res: NextA
                 );
 
                 return await data.json().then((res) => {
-                    const terms = res['data']['items'];
-                    const outsideTemp = terms.find((item: any) => item.id === 'OutsideTemp').value;
-                    const zoneMeasuredTemp = terms.find((item: any) => item.id === 'ZoneMeasuredTemp').value;
+                    const terms: Array<{ id: string; value: number }> = res['data']['items'];
+                    const outsideTemp = terms.find((item) => item.id === 'OutsideTemp')?.value;
+                    const zoneMeasuredTemp = terms.find((item) => item.id === 'ZoneMeasuredTemp')?.value;
 
                     return {
-                        outsideTemp,
-                        zoneMeasuredTemp,
+                        outsideTemp: outsideTemp ?? 0,
+                        zoneMeasuredTemp: zoneMeasuredTemp ?? 0,
                     };
                 });
             })

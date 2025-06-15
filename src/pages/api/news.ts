@@ -10,7 +10,21 @@ import allowCors from '../../helpers/cors';
  * @example getWeatherData('London')
  * @example getWeatherData('Madrid')
  */
-const getWeatherData = async (city: string) => {
+interface NewsItem {
+    title: string | null;
+    description: string | null;
+    link: string | undefined;
+    published: string | null;
+}
+
+interface NewsData {
+    city: string;
+    news: NewsItem[];
+}
+
+type NewsResponse = NewsData | { error: string };
+
+const getWeatherData = async (city: string): Promise<NewsData | null> => {
     const { JSDOM } = jsdom;
 
     const response = await fetch(`https://www.google.com/search?q=${city}&tbm=nws&tbs=sbd:1`, {
@@ -54,7 +68,10 @@ const getWeatherData = async (city: string) => {
  * @returns Promise<void>
  * @example http://localhost:3000/api/news?city=London
  */
-export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+export default allowCors(async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse<NewsResponse>
+) {
     const { query } = req;
     const { city } = query;
 

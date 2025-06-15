@@ -3,7 +3,19 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import jsdom from 'jsdom';
 import allowCors from '../../helpers/cors';
 
-const getWeatherData = async (city: string) => {
+interface WeatherData {
+    city: string;
+    name?: string | null;
+    precipitation?: string | null;
+    humidity?: string | null;
+    windSpeed?: string | null;
+    grades?: string | null;
+    imageUrl?: string | undefined;
+}
+
+type WeatherResponse = WeatherData[] | { error: string };
+
+const getWeatherData = async (city: string): Promise<WeatherData> => {
     const { JSDOM } = jsdom;
     const response = await fetch(`https://www.google.com/search?q=tiempo+${city}`, {
         method: 'GET',
@@ -51,7 +63,10 @@ const getWeatherData = async (city: string) => {
  * @returns Promise<void>
  * @example http://localhost:3000/api/weather?cities=Madrid,Barcelona
  */
-export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+export default allowCors(async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse<WeatherResponse>
+) {
     const { query } = req;
     const { cities = '' } = query;
 
@@ -63,7 +78,9 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
 
         await Promise.allSettled(citiesArray.map((city) => getWeatherData(city)))
             .then((raw) => {
-                const results = raw.map((result: any) => result.value);
+                const results = raw
+                    .filter((r): r is PromiseFulfilledResult<WeatherData> => r.status === 'fulfilled')
+                    .map((result) => result.value);
                 res.status(200).json(results);
             })
             .catch((err) => res.status(500).json({ error: err.message }));

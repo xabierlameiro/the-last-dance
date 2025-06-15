@@ -1,17 +1,37 @@
 import { useRouter } from 'next/router';
 import { useReducer, useEffect, useRef } from 'react';
 
-const initialState = {
+interface Answer {
+    question: string;
+    answer: string;
+    isCorrect: boolean;
+    questionNum: number;
+}
+
+interface SurveyState {
+    currentQuestion: number;
+    questionsDone: number;
+    success: boolean;
+    answers: Answer[];
+}
+
+type SurveyAction =
+    | { type: 'NEXT_QUESTION' }
+    | { type: 'PREVIOUS_QUESTION' }
+    | { type: 'ADD_ANSWER'; payload: Answer };
+
+const initialState: SurveyState = {
     currentQuestion: 0,
     questionsDone: 0,
     success: false,
     answers: [],
 };
 
-const reducer = (state: any, action: any) => {
-    const { questionNum } = action.payload || {};
+const reducer = (state: SurveyState, action: SurveyAction): SurveyState => {
+    const { questionNum } =
+        'payload' in action ? action.payload : ({} as Partial<Answer>);
     const { answers, questionsDone, currentQuestion } = state;
-    const newAnswers = [...answers];
+    const newAnswers: Answer[] = [...answers];
 
     switch (action.type) {
         case 'NEXT_QUESTION':
@@ -43,6 +63,7 @@ const reducer = (state: any, action: any) => {
 const useSurvey = () => {
     const { query } = useRouter();
     const { name = '&#128075;' } = query;
+    const parsedName = Array.isArray(name) ? name[0] : name;
     const emailRef = useRef<boolean>(false);
 
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -52,7 +73,7 @@ const useSurvey = () => {
             questionText: '¿ Continuamos ?',
             questionHtml: `
                     <h1>Hola ${
-                        (name as any).charAt(0).toUpperCase() + name.slice(1)
+                        parsedName.charAt(0).toUpperCase() + parsedName.slice(1)
                     }, gracias por ponerte en contanto!</h1>
                     <p>
                         Si has llegado hasta aquí, seguro que es por que tienes una posición increíble y me lo
@@ -229,7 +250,7 @@ const useSurvey = () => {
                                     <code> ${navigator.userAgent} </code>
                                     <ol> 
                                         ${state.answers.map(
-                                            (answer: any) =>
+                                            (answer) =>
                                                 `<li> ${answer.question} : ${answer.answer} - ${
                                                     answer.isCorrect ? '✅' : '🚫'
                                                 } </li>`
@@ -240,7 +261,7 @@ const useSurvey = () => {
                     });
                     emailRef.current = true;
                 } catch (e) {
-                    console.log(e);
+                    // Error ignored
                 }
             })();
         }
