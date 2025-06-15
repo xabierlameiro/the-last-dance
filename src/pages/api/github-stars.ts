@@ -20,13 +20,23 @@ const REPOSITORY = {
  *     total?: number;
  * }>}
  */
-export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse) {
+type GitHubStarsResponse = number | { statusCode: number; message: string };
+
+export default allowCors(async function handler(
+    _req: NextApiRequest,
+    res: NextApiResponse<GitHubStarsResponse>
+) {
     try {
         const {
             data: { stargazers_count },
         } = await octokit.rest.repos.get(REPOSITORY);
         res.status(200).json(stargazers_count);
-    } catch (err: any) {
-        res.status(500).json({ statusCode: err.status, message: err.message });
+    } catch (err: unknown) {
+        if (err && typeof err === 'object' && 'status' in err && 'message' in err) {
+            const { status, message } = err as { status: number; message: string };
+            res.status(500).json({ statusCode: status, message });
+        } else {
+            res.status(500).json({ statusCode: 500, message: 'Unknown error' });
+        }
     }
 });

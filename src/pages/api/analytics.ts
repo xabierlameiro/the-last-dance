@@ -16,10 +16,20 @@ import allowCors from '../../helpers/cors';
  * @throws {Error: Error while parsing analytics data}
  * @see https://developers.google.com/analytics/devguides/reporting/data/v1/api-schema
  */
-export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+interface AnalyticsData {
+    pageViews: string | number;
+    newUsers: string | number;
+}
+
+type AnalyticsResponse = AnalyticsData | { error: string };
+
+export default allowCors(async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse<AnalyticsResponse>
+) {
     const { query } = req;
     const { slug } = query;
-    let data = null;
+    let data: AnalyticsData | null = null;
     const analyticsDataClient = new BetaAnalyticsDataClient({
         credentials: {
             client_email: process.env.ANALYTICS_CLIENT_EMAIL,
