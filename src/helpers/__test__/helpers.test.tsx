@@ -29,3 +29,43 @@ describe('clx', () => {
         expect(clx('a', true ? 'b' : '', false ? 'c' : '', undefined)).toBe('a b');
     });
 });
+
+describe('other helper utilities', () => {
+    const { isNotEng, cleanTrailingSlash, removeTrailingSlash, getLang } = require('..');
+
+    it('isNotEng should check default locale', () => {
+        expect(isNotEng('es')).toBe(true);
+        expect(isNotEng('en')).toBe(false);
+        expect(isNotEng(undefined)).toBe(true);
+    });
+
+    it('cleanTrailingSlash should remove only root slash', () => {
+        expect(cleanTrailingSlash('/')).toBe('');
+        expect(cleanTrailingSlash('/es')).toBe('/es');
+    });
+
+    it('removeTrailingSlash should trim slash at end', () => {
+        expect(removeTrailingSlash('path/')).toBe('path');
+        expect(removeTrailingSlash('path')).toBe('path');
+    });
+
+    it('getLang should prefix lang when not english', () => {
+        expect(getLang('es')).toBe('/es');
+        expect(getLang('en')).toBe('');
+    });
+
+    it('fetcher should resolve json or throw', async () => {
+        const { fetcher } = require('..');
+        (global.fetch as jest.Mock).mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({ a: 1 }),
+        });
+        await expect(fetcher('url')).resolves.toEqual({ a: 1 });
+
+        (global.fetch as jest.Mock).mockResolvedValueOnce({
+            ok: false,
+            statusText: 'Bad',
+        });
+        await expect(fetcher('url')).rejects.toThrow('Bad');
+    });
+});
