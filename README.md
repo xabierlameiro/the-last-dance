@@ -30,7 +30,7 @@
 
 ## Running Locally
 
-This application requires Node.js v18.20.0 or higher.
+This application requires Node.js v18 or higher.
 
 ```bash
 git clone https://github.com/xabierlameiro/the-last-dance.git
