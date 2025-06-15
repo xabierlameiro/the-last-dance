@@ -2,10 +2,16 @@ name: Workflow Post-Deploy
 on:
     push:
         branches: [master]
+
+permissions:
+  contents: read
+
 jobs:
     lighthouse:
         name: Lighthouse
         runs-on: ubuntu-latest
+        permissions:
+          contents: read
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3

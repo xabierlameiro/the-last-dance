@@ -2,10 +2,17 @@ name: Workflow Pre-Deploy
 on:
     push:
         branches: [dev]
+
+permissions:
+  contents: read
+
 jobs:
     cancel_redundancy:
         name: Cancel Redundant Workflow Runs
         runs-on: ubuntu-latest
+        permissions:
+          actions: write
+          contents: read
         steps:
             - name: Cancel previous redundant workflow runs
               uses: styfle/cancel-workflow-action@0.11.0
@@ -14,6 +21,8 @@ jobs:
     code_checking:
         name: Linting
         runs-on: ubuntu-latest
+        permissions:
+          contents: read
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
@@ -30,6 +39,8 @@ jobs:
     testing:
         name: Testing
         runs-on: ubuntu-latest
+        permissions:
+          contents: read
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -90,6 +101,8 @@ jobs:
     documentation:
         name: Documenting
         runs-on: ubuntu-latest
+        permissions:
+          contents: read
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -141,6 +154,8 @@ jobs:
     version:
         name: Versioning
         runs-on: ubuntu-latest
+        permissions:
+          contents: write
         needs: [code_checking, testing, documentation]
         steps:
             - name: Checkout version repository
@@ -164,6 +179,8 @@ jobs:
     deploy:
         name: Trigger deploy on preview environment
         runs-on: ubuntu-latest
+        permissions:
+          contents: read
         needs: [version]
         steps:
             - name: Deploy to Vercel
