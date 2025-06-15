@@ -3,7 +3,7 @@ import styles from '@/styles/survey.module.css';
 import ControlButtons from '@/components/ControlButtons';
 import Confetti from 'react-confetti';
 import SEO from '@/components/SEO';
-import useWindowResize from '@/hooks/useWidowResize';
+import useWindowResize from '@/hooks/useWindowResize';
 import useSurvey from '@/hooks/useSurvey';
 import NavigationArrows from '@/components/NavigationArrows';
 import QuestionBlock from '@/components/QuestionBlock';

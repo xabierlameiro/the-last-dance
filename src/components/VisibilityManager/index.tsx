@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import useWindowResize from '@/hooks/useWidowResize';
+import useWindowResize from '@/hooks/useWindowResize';
 
 type Props = {
     children: ReactElement | ReactElement[];
