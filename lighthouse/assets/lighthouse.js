@@ -1,7 +1,10 @@
+// Usage: `node lighthouse/assets/lighthouse.js`
 import fs from 'fs';
 import lighthouse from 'lighthouse';
 import chromeLauncher from 'chrome-launcher';
 import { chart, nodeStructure, options, DOMAIN, translations } from './constants.js';
+
+try {
 
 // Get the sitemap and filter the urls
 const sitemap = await fetch(`${DOMAIN}/sitemap.xml`).then((res) => {
@@ -216,4 +219,8 @@ for (const lang of Object.keys(translations)) {
                    </body>
                 </html>`
     );
+}
+} catch (err) {
+    console.error('Lighthouse generation failed', err);
+    process.exit(1);
 }
