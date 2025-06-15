@@ -31,7 +31,8 @@
 
 ## Running Locally
 
-This application requires Node.js v18.20.0 or higher.
+This application requires **Node.js v18.20.0** (see `.nvmrc`).
+Until the Next.js 15 migration is complete, other versions are not supported.
 Yarn (Berry) is the official package manager for this project.
 
 ```bash
@@ -52,7 +53,8 @@ yarn dev
 
 ### Node.js Version
 
-This project uses Node.js v18.20.0. If you have `nvm` installed, you can use:
+This project is pinned to Node.js v18.20.0 until the Next.js 15 migration is complete.
+If you have `nvm` installed, you can use:
 
 ```bash
 nvm use
