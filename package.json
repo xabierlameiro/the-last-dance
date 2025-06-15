@@ -90,6 +90,9 @@
         "node": ">=18",
         "yarn": ">=1.22.0"
     },
+    "resolutions": {
+        "protobufjs": "^7.2.5"
+    },
     "browser": {
         "fs": false,
         "path": false,
