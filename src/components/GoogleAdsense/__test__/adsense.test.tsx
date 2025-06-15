@@ -1,3 +1,4 @@
+// @ts-nocheck
 import GoogleAdsense from '..';
 import { render } from '@/test';
 
