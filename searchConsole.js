@@ -1,5 +1,4 @@
 // Usage: `node searchConsole.js`
-import fetch from 'node-fetch';
 
 export const sendSitemapToSearchConsole = async () => {
     try {
