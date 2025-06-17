@@ -1,0 +1,130 @@
+:root {
+    /* common */
+    --white-color: 255, 255, 255;
+    --color-available-arrow: 95, 91 98;
+    --grey-color: 236, 232, 238;
+    --dark-grey-color: 166, 166, 166;
+    --red-color: 237, 106, 94;
+    --yellow-color: 245, 190, 79;
+    --green-color: 98, 199, 86;
+    --disable-color: 217, 212, 222;
+    --blue-color: 29, 88, 154;
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    --status-building: #ffd700;
+    --status-error: #ff0000;
+    --status-initializing: #ffa500;
+    --status-queue: #0000ff;
+    --status-ready: #00ff00;
+    --status-canceled: #808080;
+}
+
+[data-theme='dark'] {
+    --blog-nav: 48, 41, 51;
+    --blog-header: 53, 45, 55;
+    --blog-background: 30, 30, 30;
+    --blog-font: 223, 222, 223;
+    --blog-font-selected: 255, 255, 255;
+    --blog-font-description: 160, 156, 161;
+    --blog-icons: 160, 157, 162;
+    --blog-border: 30, 30, 30;
+    --input-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="490" height="490"><path fill="none" stroke="rgba(160, 157, 162)" stroke-width="36" stroke-linecap="round" d="m280,278a153,153 0 1,0-2,2l170,170m-91-117 110,110-26,26-110-110" /></svg>');
+    --header-background: linear-gradient(to right, rgba(47, 41, 51, 1), rgba(30, 30, 30, 1));
+    --terminal-header: 62, 54, 63;
+    --termianl-header-font: 185, 177, 187;
+}
+
+[data-theme='light'] {
+    --blog-nav: 204, 202, 219;
+    --blog-header: 255, 255, 255;
+    --blog-background: 255, 255, 255;
+    --blog-font: 39, 39, 39;
+    --blog-font-selected: 255, 255, 255;
+    --blog-font-description: 141, 141, 141;
+    --blog-icons: 0, 0, 0;
+    --blog-border: 141, 141, 141, 0.2;
+    --input-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="490" height="490"><path fill="none" stroke="rgba( 101, 99, 102)" stroke-width="36" stroke-linecap="round" d="m280,278a153,153 0 1,0-2,2l170,170m-91-117 110,110-26,26-110-110" /></svg>');
+    --header-background: linear-gradient(
+        to right,
+        rgba(227, 168, 208, 1),
+        rgba(228, 217, 234, 1),
+        rgba(230, 194, 220, 1)
+    );
+    --terminal-header: 245, 238, 247;
+    --termianl-header-font: 73, 71, 74;
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+html,
+body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    font-family: var(--font-family);
+    color: rgba(var(--blog-font));
+}
+
+@media (prefers-color-scheme: dark) {
+    html {
+        color-scheme: dark;
+    }
+}
+
+a {
+    color: rgba(var(--blue-color));
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+/* storybook */
+.sb-main-centered.sb-show-main {
+    background-image: url('/background-image.jpeg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* code hike resets */
+.comments code > .ch-code-scroll-content > div,
+.home code > .ch-code-scroll-content > div {
+    transform: initial !important;
+}
+
+.ch-code-scroll-parent {
+    padding-right: 20px !important;
+}
+
+#__next .ch-codeblock,
+#__next .ch-codegroup {
+    margin: 0;
+}
+
+#__next .ch-code-scroll-parent {
+    font-size: 12px;
+}
+
+.emoji {
+    font-size: 2em;
+}
+
+div.ch-frame-title-bar > div > div {
+    color: rgb(172, 175, 180);
+}
+
+div.ch-frame-title-bar .ch-editor-tab-active > div {
+    color: rgb(220, 220, 220);
+}
+
+div.dialog_dialog__mcyQq.dialog_open___BRYL div.ch-code-multiline-mark {
+    background-color: rgba(255, 255, 255, 0.01) !important;
+}

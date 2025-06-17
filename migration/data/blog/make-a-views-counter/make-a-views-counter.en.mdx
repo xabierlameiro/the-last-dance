@@ -1,0 +1,162 @@
+---
+title: 'Make a views counter with google analytics'
+slug: 'make-a-views-counter-with-google-analytics'
+author: 'Xabier Lameiro'
+category: 'Nextjs'
+tags: ['node']
+locale: 'en'
+excerpt: 'Make a views counter for your blog with google analytics and nextjs api routes. Using BetaAnalyticsDataClient from google analytics data api'
+description: 'Make a views counter for your blog with google analytics and nextjs api routes. Using BetaAnalyticsDataClient from google analytics data api'
+image: '/posts/make-a-views-counter.png'
+alternate:
+    [
+        { lang: 'es', url: 'hacer-un-contador-de-vistas-con-google-analytics' },
+        { lang: 'gl', url: 'facer-un-contador-de-vistas-con-google-analytics' },
+    ]
+---
+
+# Make a views counter with google analytics
+
+<Date date="01-10-2023" />
+
+<GoogleAdsense />
+
+Is not necessary make a complex system to count the views of your blog. You can use google analytics to do it, you dont need persiste the data in a database.
+
+Here we dont explain how to create a Google analytics account, you can follow this [tutorial](https://support.google.com/analytics/answer/1008015?hl=en 'Google analytics link') to do it.
+
+## 1. Create a endpoint to get the data using the class BetaAnalyticsDataClient
+
+```ts .analytics.ts v1
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+    const { query } = req;
+    const { slug = '/' } = query;
+
+    const analyticsDataClient = new BetaAnalyticsDataClient({
+        credentials: {
+            client_email: process.env.ANALYTICS_CLIENT_EMAIL,
+            private_key: process.env.ANALYTICS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        },
+        projectId: process.env.ANALYTICS_PROJECT_ID,
+    });
+
+    const [response] = await analyticsDataClient.runReport({
+        property: `properties/348472560`,
+        dateRanges: [
+            {
+                startDate: '2023-01-01',
+                endDate: 'today',
+            },
+        ],
+        dimensions: [
+            {
+                name: 'date',
+            },
+            {
+                name: 'pagePath',
+            },
+        ],
+        metrics: [
+            {
+                name: 'screenPageViews',
+            },
+        ],
+        dimensionFilter: {
+            filter: {
+                fieldName: 'pagePath',
+                stringFilter: {
+                    matchType: 'EXACT',
+                    value: slug.toString(),
+                },
+            },
+        },
+        orderBys: [
+            {
+                dimension: {
+                    dimensionName: 'date',
+                },
+            },
+        ],
+    });
+
+    if (!response || !response.rows) {
+        res.status(500).json({ error: 'Error while parsing analytics data' });
+        return;
+    }
+
+    let total = response.rows.reduce((prev: Object, curr: Object) => {
+        return prev + parseInt(curr.metricValues[0].value, 0);
+    }, 0);
+
+    try {
+        res.status(200).json({ total });
+    } catch (err: Error) {
+        res.status(500).json({ error: err });
+    }
+}
+```
+
+## 2. Create a component to show the data
+
+> You can create a component to consume the api from the client using useEffect or from a page retrieving the data from the server. It is your choice
+
+In my case I am going to make 3 different renderings, one for when it is loading, one for the error and the last one for the information.
+
+```tsx ViewCounter.tsx mark=29,36,43 v1
+type Props = {
+    children?: React.ReactNode;
+};
+
+const Container = ({ children }: Props) => {
+    return (
+        <div className={styles.views} title="Number of views in this post from Google analytics">
+            <BsBook />
+            {children}
+        </div>
+    );
+};
+
+const StarCounter = () => {
+    const [views, setViews] = React.useState(-1);
+    const { asPath } = useRouter();
+
+    React.useEffect(() => {
+        (async () => {
+            try {
+                const { total } = await fetch(`/api/analytics?slug=${asPath}`).then((res) => res.json());
+                setViews(total);
+            } catch (e) {
+                setViews(-2);
+            }
+        })();
+    }, [asPath]);
+
+    if (views === -2)
+        return (
+            <Container>
+                <RxCross2 className={styles.error} title="Error on endpoint" />
+            </Container>
+        );
+
+    if (views === -1)
+        return (
+            <Container>
+                <FaSpinner className={styles.spinner} title="Loading views" />
+            </Container>
+        );
+
+    return (
+        <Container>
+            <span>{views}</span>
+        </Container>
+    );
+};
+
+export default StarCounter;
+```
+
+## 3. Include your component wherever you want to display it
+
+To see the result of the above code just look at the top of the page and you will see a book icon with a counter on the right hand side.
+
+You can see the complete code in my repository if you need it, and if you find it useful or like it you can give me a star

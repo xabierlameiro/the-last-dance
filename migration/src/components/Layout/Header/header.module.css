@@ -1,0 +1,59 @@
+.header {
+    height: 24px;
+    background: var(--header-background);
+    color: rgba(var(--blog-icons));
+    display: grid;
+    grid-template-columns: auto max-content auto 1fr repeat(6, auto);
+    gap: 20px;
+    align-items: center;
+    padding: 0 18px;
+    overflow: scroll;
+    white-space: nowrap;
+}
+
+.header::-webkit-scrollbar {
+    display: none;
+}
+
+.header svg {
+    height: 18px;
+    width: 18px;
+    fill: rgba(var(--blog-icons));
+    stroke: rgba(var(--blog-icons));
+}
+
+.route {
+    font-size: 14px;
+    font-weight: 700;
+    user-select: none;
+    color: rgba(var(--blog-icons));
+}
+
+.dateAndHour {
+    user-select: none;
+    cursor: pointer;
+    display: grid;
+    grid-auto-flow: column;
+    gap: 5px;
+    font-size: 14px;
+    color: rgba(var(--blog-icons));
+    text-transform: capitalize;
+}
+
+.navLinks {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 20px;
+    width: max-content;
+}
+
+.navLinks a {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(var(--blog-icons));
+    text-decoration: none;
+}
+
+.button {
+    cursor: pointer;
+}

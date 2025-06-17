@@ -1,0 +1,19 @@
+.stars {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    font-size: 15px;
+    gap: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    color: rgb(91, 87, 87);
+    font-weight: 400;
+}
+
+.stars svg {
+    fill: rgba(var(--yellow-color));
+}
+
+.stars span {
+    color: rgba(var(--blog-icons));
+}

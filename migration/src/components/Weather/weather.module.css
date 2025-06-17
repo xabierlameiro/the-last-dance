@@ -1,0 +1,84 @@
+.container {
+    padding: 10px 0;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(9.4px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: absolute;
+    width: 400px;
+    min-height: auto;
+    right: 10px;
+    top: 50px;
+    z-index: 1;
+    transition: all 0.2s ease-in;
+    white-space: pre-wrap;
+}
+/* pending add styles for mobile */
+@media screen and (max-width: 900px) {
+    .container {
+        display: none;
+    }
+}
+
+.cities {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    height: auto;
+}
+
+.city {
+    box-sizing: border-box;
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
+    width: auto;
+    height: auto;
+    max-height: 200px;
+    padding: 20px;
+    margin: 0 10px;
+    border-radius: 16px;
+    display: grid;
+    grid-template-columns: 0.7fr 1fr;
+    box-shadow: 0 8px 32px 0 rgb(31 38 135 / 37%);
+}
+
+.cityName {
+    text-transform: capitalize;
+}
+
+.info {
+    font-size: 12px;
+}
+
+.weather {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    height: inherit;
+}
+
+.open {
+    transform: translateX(0px);
+}
+
+.close {
+    transform: translateX(450px);
+}
+
+.iconClose {
+    display: none;
+    position: absolute;
+    cursor: pointer;
+    height: 20px;
+    width: 20px;
+    left: -7px;
+    top: -7px;
+    background-color: lightgrey;
+    clip-path: circle(50%);
+    transition: all 0.2s ease-in;
+}
+
+.open:hover .cities .iconClose {
+    display: block;
+}

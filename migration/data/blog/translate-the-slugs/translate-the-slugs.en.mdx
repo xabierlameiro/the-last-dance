@@ -1,0 +1,182 @@
+---
+title: 'How translate the slugs in my web pages?'
+slug: 'translate-slugs-web-pages'
+author: 'Xabier Lameiro'
+category: 'Nextjs'
+tags: ['intl']
+locale: 'en'
+excerpt: 'Translate the urls of my website, to have a 100% internationalised site using nextjs and static pages with mdxjs files.'
+description: 'Translate the urls of my website, to have a 100% internationalised site using nextjs and static pages with mdxjs files.'
+image: '/posts/translate-slugs-web-pages.png'
+alternate: [{ lang: 'es', url: 'como-traducir-las-urls' }, { lang: 'gl', url: 'como-traducir-as-urls' }]
+---
+
+# How translate the slugs in my web pages?
+
+<Date date="01-12-2023" />
+
+<GoogleAdsense />
+
+I wanted to make a blog and I was wondering how to internationalise my site including its urls.
+The challenge is to make the pages are created at build time are assigned to each of its translated slugs.
+
+This is my solution:
+
+## 1. Create a mdx file for each language, for example:
+
+-   `data/blog/translate-the-slugs/translate-the-slugs.en.mdx`
+-   `data/blog/translate-the-slugs/translate-the-slugs.es.mdx`
+-   `data/blog/translate-the-slugs/translate-the-slugs.gl.mdx`
+
+## 2. Inside each mdx file, the important thigs are:
+
+```mdx translate-the-slugs.en.mdx mark=3,7,11 v1
+---
+title: 'How translate the slugs in my web pages?'
+slug: 'translate-slugs-web-pages'
+author: 'Xabier Lameiro'
+category: 'Nextjs'
+tags: ['intl']
+locale: 'en'
+excerpt: 'Translate the urls of my website, to have a 100% internationalised site using nextjs and static pages with mdxjs files.'
+description: 'Translate the urls of my website, to have a 100% internationalised site using nextjs and static pages with mdxjs files.'
+image: '/posts/translate-slugs-web-pages.png'
+alternate: [{ lang: 'es', url: 'como-traducir-las-urls' }, { lang: 'gl', url: 'como-traducir-as-urls' }]
+---
+
+# How translate the slugs in my web pages?
+
+<Date date="01-12-2023" />
+```
+
+## 3. With getStaticPaths we created the pages for each language:
+
+In my case I create different pages for each tag and category, but you can create the pages you want.
+
+```mdx translate-the-slugs.en.mdx mark=4,17 v1
+export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
+    const posts = await getAllPosts();
+
+    const tags = posts.reduce((...code) => {
+            const paths = post.meta.tags.map((tag: string) => ({
+                params: {
+                    category: tag.toLowerCase(),
+                    slug: post.meta.slug,
+                },
+                locale: post.meta.locale,
+            }));
+            return [...acc, ...paths];
+        },
+        []
+    );
+
+    const categories = posts.map((...code) => ({
+            params: {
+                category: post.meta.category.toLowerCase(),
+                slug: post.meta.slug,
+            },
+            locale: post.meta.locale,
+        })
+    );
+
+    return {
+        paths: [...tags, ...categories],
+        fallback: 'blocking',
+    };
+
+};
+```
+
+## 4. With getStaticProps we get the data of the mdx file:
+
+When getStaticPaths is executed, it passes the locale to getStaticProps, in this moment we have the category, slug and locale, so we can get the data of the mdx file.
+
+```mdx translate-the-slugs.en.mdx mark=12,13,14,15 v1
+export const getStaticProps = async (data: {
+    params: {
+        category: string;
+        slug: string;
+    };
+    locale: string;
+}) => {
+    const {
+        params: { category },
+        locale,
+    } = data;
+    const post = await getPostBySlug(data);
+    const mdxSource = await serialize(post.content);
+    const { categories, tags } = await getAllCategories(locale);
+    const posts = await getPostsByLocaleAndCategory(locale, category);
+
+    return {
+        props: {
+            tags,
+            categories,
+            posts,
+            post: {
+                ...post,
+                content: mdxSource,
+            },
+        },
+    };
+
+};
+```
+
+### 4.1. Get the data of the mdx file with help from gray-matter and fs:
+
+We need create functions to help us to get the data of the mdx file.
+
+```ts findPostBySlug v1
+const findPostBySlug = (slug: string | { params: { slug: string } }) => {
+    let paths = glob.sync(`${POST_PATH}/**/*.mdx`);
+
+    if (typeof slug === 'object') {
+        slug = slug.params.slug;
+    } else {
+        slug = slug.split('/')[slug.split('/').length - 1];
+    }
+    const [route] = paths.filter((path) => {
+        const document = fs.readFileSync(path, 'utf8');
+        const { data } = matter(document);
+        const fileName = path.split('/').pop();
+        if (data.slug === slug || fileName == `${slug}.mdx`) {
+            return true;
+        }
+    });
+    return matter(fs.readFileSync(route, 'utf8'));
+};
+```
+
+### 4.2. Serialize the mdx file with help from @next-mdx-remote/serialize:
+
+```ts import { serialize as sz } from 'next-mdx-remote/serialize'; v1
+
+/**
+ * @description Serialize MDX file with Code Hike.
+ *
+ * @example
+ *     serialize('# Hello World');
+ *     returns { content: '...', meta: {...} }
+ *
+ * @param {string} mdx - MDX file.
+ * @returns {Object} - Object with MDX content and meta data.
+ */
+export const serialize = (mdx: string) =>
+    sz(mdx, {
+        mdxOptions: {
+            remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
+            useDynamicImport: true,
+        },
+    });
+```
+
+### 4.3. Get the data finally into your component for the presentation layer.
+
+```tsx [slug].tsx v1
+    const PostPage = ({ post, tags, categories, posts }: Props) => {
+        ...print your magic here...
+    };
+```
+
+You can see the result by looking at the url of this post and changing the language in settings and looking at the same post again.

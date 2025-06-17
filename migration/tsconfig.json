@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "**/*.stories.tsx",
+    "**/*.test.tsx",
+    "**/__test__/**/*",
+    "**/__tests__/**/*",
+    "src/components/News/**",
+    "src/components/Heating/**",
+    "src/components/Weather/**",
+    "src/components/Blog/ArticlePanel/**",
+    "src/components/Blog/ViewCounter/**", 
+    "src/components/Blog/StarCounter/**",
+    "src/components/IndexedCounter/**",
+    "src/components/CryptoPrice/**",
+    "src/components/Layout/Header/**",
+    "src/components/DeploymentStatus/**",
+    "src/components/RenderManager/**"
+  ]
+}

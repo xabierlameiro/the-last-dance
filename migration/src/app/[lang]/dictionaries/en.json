@@ -1,0 +1,109 @@
+{
+  "seo": {
+    "title": "Front end developer, microcomputing and networks Technician",
+    "description": "I'm a developer with more than 5 years of experience working in the online banking sector, currently specialized in Nextjs and React. Passionate about technology and programming, I like to learn new things and share knowledge with the community."
+  },
+  "blog": {
+    "title": "This is the blog page",
+    "categories": "Topics",
+    "readtime": "{readTime} minutes of reading time",
+    "breadcrumb": "Notes",
+    "readHits": "{hits} hits",
+    "tags": "Tags"
+  },
+  "language": "English",
+  "home": {
+    "breadcrumb": "Code"
+  },
+  "settings": {
+    "title": "System Preferences",
+    "desc": "Web application developer, microcomputing and networks",
+    "lang": "Language & Region",
+    "langAlt": "Language & Region Icon",
+    "lang.preferred": "Preferred languages:",
+    "lang.description": "Language & Region preferences control the language you see in menus and dialogues, and the formats of date, times and currencies",
+    "search": "Search",
+    "avatar": "Avatar image",
+    "breadcrumb": "System Preferences",
+    "dark": "Theme (Dark)",
+    "light": "Theme (Light)"
+  },
+  "background.image.alt": "This is the background image",
+  "comments": {
+    "breadcrumb": "Terminal"
+  },
+  "legal": {
+    "title": "Legal documents",
+    "breadcrumb": "Legals",
+    "cookies-policy": "Cookies Policy",
+    "legal-notice": "Legal Notice",
+    "privacy-policy": "Privacy Policy",
+    "search-placeholder": "Search in legals"
+  },
+  "weather": {
+    "tooltip": "Click above for weather and news updates",
+    "precipitation": "Precipitation {precipitation}",
+    "humidity": "Humidity {humidity}",
+    "windSpeed": "Wind {windSpeed}"
+  },
+  "countdown": {
+    "caption": "Important date",
+    "years": "years",
+    "months": "months",
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds"
+  },
+  "starCounter": {
+    "tooltip": "Come on, give me a star!",
+    "error": "Error getting the number of stars",
+    "loading": "Loading... stars"
+  },
+  "viewCounter": {
+    "error": "Error getting the number of views",
+    "loading": "Loading... views",
+    "tooltipAll": "Number of total website visits from Google analytics",
+    "tooltipPage": "Number of page visits from Google analytics",
+    "users.error": "Error getting the number of users",
+    "users.loading": "Loading... users",
+    "users.tooltip": "Number of users from Google analytics"
+  },
+  "cryptoPrice": {
+    "error": "Error getting the price of the Ripple coin",
+    "loading": "Loading... price",
+    "tooltip": "Ripple coin price today, porcentage {todayPorcentage}"
+  },
+  "heating": {
+    "error": "Error getting the temperature",
+    "loading": "Loading... temperature",
+    "tooltip": "Temperature outside {outsideTemp}º and inside {zoneMeasuredTemp}º of my house"
+  },
+  "indexedCounter": {
+    "error": "Error getting the number of indexed pages",
+    "loading": "Loading... indexed pages",
+    "tooltip": "{num} pages indexed in Google"
+  },
+  "news": {
+    "error": "Error getting the news",
+    "loading": "Loading... news"
+  },
+  "deploymentstatus": {
+    "tooltip": "Status : {status} The user {username} has deployed to {environment} environment at {createdAt}"
+  },
+  "rendermanager": {
+    "error": "An error has occurred, we are working on it",
+    "loading": "Getting the data..."
+  },
+  "navigation": {
+    "home": "Home",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry"
+  }
+}

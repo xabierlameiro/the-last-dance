@@ -1,0 +1,21 @@
+.input {
+    user-select: none;
+    width: 162px;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid lightgrey;
+    font-size: 13px;
+    text-indent: 24px;
+    background-size: 15px;
+    background-position: 8px;
+    background-repeat: no-repeat;
+    background-image: var(--input-icon);
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
+}
+
+.input::placeholder {
+    text-indent: 24px;
+    font-size: 12px;
+    color: rgba(var(--blog-icons));
+}

@@ -1,0 +1,26 @@
+.header {
+    display: grid;
+    background-color: rgba(var(--terminal-header));
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    padding: 5px 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    gap: 10px;
+}
+
+.header div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(var(--termianl-header-font));
+    font-weight: 600;
+    font-size: 12px;
+    gap: 5px;
+}
+
+.header div svg {
+    color: rgba(var(--blue-color));
+    font-size: 20px;
+}
