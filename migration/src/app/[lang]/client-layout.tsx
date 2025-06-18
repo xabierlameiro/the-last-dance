@@ -1,6 +1,5 @@
 'use client'
 
-import { TranslationProvider } from '@/hooks/useTranslationSimple'
 import LayoutWrapper from '@/components/LayoutWrapper'
 import { ReactNode } from 'react'
 
@@ -13,11 +12,9 @@ type Props = {
 export default function ClientLayout({ children, dict, lang }: Props) {
   return (
     <div lang={lang}>
-      <TranslationProvider dict={dict} lang={lang}>
-        <LayoutWrapper>
-          {children}
-        </LayoutWrapper>
-      </TranslationProvider>
+      <LayoutWrapper dict={dict} lang={lang}>
+        {children}
+      </LayoutWrapper>
     </div>
   )
 }

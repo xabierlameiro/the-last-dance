@@ -26,7 +26,11 @@
     "avatar": "Imagen de avatar",
     "breadcrumb": "Preferencias del sistema",
     "dark": "Tema (Oscuro)",
-    "light": "Tema (Claro)"
+    "light": "Tema (Claro)",
+    "seo": {
+      "title": "Configuración - Preferencias del sistema",
+      "description": "Configuración del sistema, cambio de idioma y tema, preferencias de usuario"
+    }
   },
   "background.image.alt": "Esta es la imagen de fondo",
   "comments": {
@@ -46,6 +50,8 @@
   },
   "weather": {
     "tooltip": "Haz clic encima para obtener actualizaciones del tiempo y las noticias",
+    "error": "Error al obtener el tiempo",
+    "loading": "Cargando... tiempo",
     "precipitation": "Precipitación {precipitation}",
     "humidity": "Humedad {humidity}",
     "windSpeed": "Viento {windSpeed}"
@@ -120,5 +126,14 @@
       "title": "¡Gracias!",
       "message": "Tu feedback es valioso para nosotros y nos ayuda a mejorar nuestros servicios."
     }
-  }
+  },
+  "viewCounter.error": "Error al obtener el número de visitas",
+  "viewCounter.loading": "Cargando... visitas",
+  "viewCounter.tooltipAll": "Número total de visitas a la web desde Google analytics",
+  "viewCounter.tooltipPage": "Número de visitas a la página desde Google analytics",
+  "viewCounter.users.error": "Error al obtener el número de usuarios",
+  "viewCounter.users.loading": "Cargando... usuarios",
+  "viewCounter.users.tooltip": "Número de usuarios desde Google analytics",
+  "deploymentstatus.tooltip": "Estado : {status} El usuario {username} ha desplegado en el entorno de {environment} a fecha {createdAt}",
+  "rendermanager.loading": "Obteniendo los datos..."
 }

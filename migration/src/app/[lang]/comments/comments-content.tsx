@@ -6,15 +6,18 @@ import ControlButtons from '@/components/ControlButtons';
 import { AiFillFolder } from 'react-icons/ai';
 import styles from '@/styles/comments.module.css';
 import Data from '../../../../data/comments/index.mdx';
+import { useDialog } from '@/context/dialog';
 
 type Props = {
   lang: string
 }
 
 export default function CommentsContent({ lang }: Props) {
+  const { dispatch, open } = useDialog();
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const [height, setHeight] = React.useState(0);
   const [width, setWidth] = React.useState(0);
+  const close = () => dispatch({ type: 'close' });
 
   React.useEffect(() => {
     if (dialogRef.current) {
@@ -25,13 +28,13 @@ export default function CommentsContent({ lang }: Props) {
 
   return (
     <Dialog
-      open
+      open={open}
       modalMode
       className="comments"
       dialogRef={dialogRef as React.RefObject<HTMLDivElement>}
       header={
         <div className={styles.header}>
-          <ControlButtons />
+          <ControlButtons disabled onClickClose={close} onClickMinimise={close} />
           <div>
             <AiFillFolder />
             xabier.lameirocardama - bash - {width}x{height}

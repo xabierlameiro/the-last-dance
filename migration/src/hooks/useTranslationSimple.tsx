@@ -36,6 +36,20 @@ export function useTranslation() {
   const { dict, lang } = context
 
   const t = (key: string, values?: Record<string, string | number>): string => {
+    // First try direct access (for flattened keys like 'viewCounter.users.error')
+    if (dict.hasOwnProperty(key)) {
+      const value = dict[key]
+      if (typeof value === 'string') {
+        if (values) {
+          return value.replace(/\{(\w+)\}/g, (match: string, varName: string) => {
+            return values[varName]?.toString() || match
+          })
+        }
+        return value
+      }
+    }
+    
+    // Fallback to nested access (for nested object keys)
     const keys = key.split('.')
     let value: any = dict
     
@@ -44,7 +58,7 @@ export function useTranslation() {
     }
     
     if (typeof value !== 'string') {
-      console.warn(`Translation key "${key}" not found`)
+      console.warn(`Translation key "${key}" not found`, { dict, keys, value })
       return key
     }
 

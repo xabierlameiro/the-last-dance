@@ -14,8 +14,8 @@ export async function generateMetadata(
   const dict = await getDictionary(lang)
   
   return {
-    title: `${dict.settings.title} - ${dict.seo.title}`,
-    description: `${dict.settings.title}. ${dict.settings.desc}`,
+    title: dict.settings.seo?.title || `${dict.settings.title} - ${dict.seo.title}`,
+    description: dict.settings.seo?.description || `${dict.settings.title}. ${dict.settings.desc}`,
   }
 }
 

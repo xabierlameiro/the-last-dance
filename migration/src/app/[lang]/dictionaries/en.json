@@ -46,6 +46,8 @@
   },
   "weather": {
     "tooltip": "Click above for weather and news updates",
+    "error": "Error getting the weather",
+    "loading": "Loading... weather",
     "precipitation": "Precipitation {precipitation}",
     "humidity": "Humidity {humidity}",
     "windSpeed": "Wind {windSpeed}"
@@ -120,5 +122,14 @@
       "title": "Thank you!",
       "message": "Your feedback is valuable to us and helps us improve our services."
     }
-  }
+  },
+  "viewCounter.error": "Error getting the number of views",
+  "viewCounter.loading": "Loading... views",
+  "viewCounter.tooltipAll": "Number of total website visits from Google analytics",
+  "viewCounter.tooltipPage": "Number of page visits from Google analytics",
+  "viewCounter.users.error": "Error getting the number of users",
+  "viewCounter.users.loading": "Loading... users",
+  "viewCounter.users.tooltip": "Number of users from Google analytics",
+  "deploymentstatus.tooltip": "Status : {status} The user {username} has deployed to {environment} environment at {createdAt}",
+  "rendermanager.loading": "Getting the data..."
 }

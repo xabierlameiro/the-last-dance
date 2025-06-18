@@ -46,6 +46,8 @@
   },
   "weather": {
     "tooltip": "Fai clic enriba para obter actualizacións do tempo e as novas",
+    "error": "Erro ao obter o tempo",
+    "loading": "Cargando... tempo",
     "precipitation": "Precipitación {precipitation}",
     "humidity": "Humedade {humidity}",
     "windSpeed": "Vento {windSpeed}"
@@ -109,5 +111,14 @@
       "title": "Grazas!",
       "message": "O teu feedback é valioso para nós e axúdanos a mellorar os nosos servizos."
     }
-  }
+  },
+  "viewCounter.error": "Erro ao obter o número de visitas",
+  "viewCounter.loading": "Cargando... visitas",
+  "viewCounter.tooltipAll": "Número total de visitas á web desde Google analytics",
+  "viewCounter.tooltipPage": "Número de visitas á páxina desde Google analytics",
+  "viewCounter.users.error": "Erro ao obter o número de usuarios",
+  "viewCounter.users.loading": "Cargando... usuarios",
+  "viewCounter.users.tooltip": "Número de usuarios desde Google analytics",
+  "deploymentstatus.tooltip": "Estado : {status} O usuario {username} ha desplegado no entorno de {environment} a data {createdAt}",
+  "rendermanager.loading": "Obtendo os datos..."
 }

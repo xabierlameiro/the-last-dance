@@ -1,5 +1,7 @@
 'use client'
 
+import Dialog from '@/components/Dialog'
+
 export default function GlobalError({
   error,
   reset,
@@ -10,20 +12,32 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body>
-        <div className="min-h-screen flex items-center justify-center p-8">
-          <div className="max-w-md mx-auto text-center">
-            <h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
-            <p className="text-gray-600 mb-4">
-              A global error occurred. Please try again.
-            </p>
-            <button
-              onClick={reset}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Try again
-            </button>
-          </div>
-        </div>
+        <Dialog
+          modalMode
+          withPadding
+          open={true}
+          body={
+            <div style={{ display: 'grid', placeContent: 'center', height: 'inherit' }}>
+              <div style={{ textAlign: 'center' }}>
+                <div>Oh! sorry, a server error has occurred!</div>
+                <button 
+                  onClick={reset}
+                  style={{ 
+                    marginTop: '1rem', 
+                    padding: '0.5rem 1rem', 
+                    background: '#007acc', 
+                    color: 'white', 
+                    border: 'none', 
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          }
+        />
       </body>
     </html>
   )

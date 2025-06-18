@@ -13,8 +13,8 @@ export async function generateMetadata(
   const dict = await getDictionary(lang)
   
   return {
-    title: `${dict.comments.breadcrumb} - ${dict.seo.title}`,
-    description: 'Web application comments, allows users to leave comments on the content of the page',
+    title: dict.comments.seo?.title || `${dict.comments.breadcrumb} - ${dict.seo.title}`,
+    description: dict.comments.seo?.description || 'Web application comments, allows users to leave comments on the content of the page',
   }
 }
 

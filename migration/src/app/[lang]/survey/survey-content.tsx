@@ -37,7 +37,7 @@ export default function SurveyContent({ dictionary }: SurveyContentProps) {
         open
         header={
           <div className={styles.header}>
-            <ControlButtons />
+            <ControlButtons disabled />
             <div>Survey {questionsDoneNum}/{totalQuestions}</div>
           </div>
         }

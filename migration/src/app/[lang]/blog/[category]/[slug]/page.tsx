@@ -1,6 +1,31 @@
 import React from 'react';
 import { getPostBySlug, getAllPosts } from '@/helpers/fileReader';
 import type { Metadata } from 'next';
+import { MDXRemote } from 'next-mdx-remote/rsc';
+import { serialize } from '@/helpers/mdx';
+import Dialog from '@/components/Dialog';
+import ControlButtons from '@/components/ControlButtons';
+import { Code } from '@/components/Code';
+import { CodeWithTabs } from '@/components/CodeWithTabs';
+import styles from '@/styles/blog.module.css';
+
+// MDX Components with CodeHike v1
+const mdxComponents = {
+    h1: ({ children }: any) => (
+        <h1 className="text-4xl font-bold mb-4">{children}</h1>
+    ),
+    h2: ({ children }: any) => (
+        <h2 className="text-3xl font-semibold mb-3">{children}</h2>
+    ),
+    h3: ({ children }: any) => (
+        <h3 className="text-2xl font-medium mb-2">{children}</h3>
+    ),
+    p: ({ children }: any) => (
+        <p className="mb-4 leading-7">{children}</p>
+    ),
+    Code, // CodeHike v1 component
+    CodeWithTabs, // CodeHike v1 component for tabs
+};
 
 type Props = {
     params: Promise<{
