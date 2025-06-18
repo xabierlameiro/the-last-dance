@@ -1,44 +1,58 @@
-import { NextRequest, NextResponse } from 'next/server';
-import jsdom from 'jsdom';
+import { NextResponse } from 'next/server'
+import { handleCors } from '../../../helpers/cors'
+
+interface CoinGeckoResponse {
+    ripple: {
+        eur: number;
+        eur_24h_change: number;
+    };
+}
 
 /**
- * @description Get the price of XRP in EUR
- *
- * @returns {Promise<{ price: string; todaySummary: string; todayPorcentage: string } | { error: string }>}
- * @example https://xabierlameiro.com/api/xrp
+ * @description Get the price of XRP in EUR using CoinGecko API
+ * @example GET /api/xrp
  */
-export async function GET(_req: NextRequest) {
-    const { JSDOM } = jsdom;
-
+export async function GET() {
     try {
-        const response = await fetch('https://www.google.com/search?q=xrp+eur+price', {
-            method: 'GET',
-            headers: new Headers({
-                'user-agent':
-                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
-                'cache-control': 'max-age=0',
-            }),
-        });
+        // Using CoinGecko free API - more reliable than scraping
+        const response = await fetch(
+            'https://api.coingecko.com/api/v3/simple/price?ids=ripple&vs_currencies=eur&include_24hr_change=true',
+            {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (compatible; XabierLameiro/1.0)',
+                },
+                // Next.js 15: Use no-store for fresh data on every request
+                cache: 'no-store'
+            }
+        );
 
         if (!response.ok) {
-            throw new Error('Failed to fetch XRP price');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const raw = await response.text();
-        const dom = new JSDOM(raw);
-        const price = dom.window.document.querySelector('.pclqee')?.textContent;
-        const todaySummary = dom.window.document.querySelector('[jsname="SwWl3d"]')?.textContent;
-        const todayPorcentage = dom.window.document.querySelector('[jsname="rfaVEf"]')?.textContent;
+        const data: CoinGeckoResponse = await response.json();
+        
+        if (!data.ripple) {
+            throw new Error('XRP price data not found');
+        }
 
-        return NextResponse.json({
+        const price = `${data.ripple.eur.toFixed(4)} €`;
+        const change = data.ripple.eur_24h_change;
+        const todayPorcentage = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+        const todaySummary = change >= 0 ? 'Up' : 'Down';
+
+        const successResponse = NextResponse.json({
             price,
             todaySummary,
             todayPorcentage,
         });
+        return handleCors(successResponse);
     } catch (err: unknown) {
-        if (err instanceof Error) {
-            return NextResponse.json({ error: err.message }, { status: 500 });
-        }
-        return NextResponse.json({ error: 'Unknown error' }, { status: 500 });
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+        const errorResponse = NextResponse.json({ error: errorMessage }, { status: 500 });
+        return handleCors(errorResponse);
     }
 }
+        
