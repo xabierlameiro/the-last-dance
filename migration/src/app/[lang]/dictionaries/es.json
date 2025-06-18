@@ -30,7 +30,11 @@
   },
   "background.image.alt": "Esta es la imagen de fondo",
   "comments": {
-    "breadcrumb": "Terminal"
+    "breadcrumb": "Terminal",
+    "seo": {
+      "title": "Comentarios",
+      "description": "Sección de comentarios y feedback de usuarios"
+    }
   },
   "legal": {
     "title": "Documentos legales",
@@ -105,5 +109,16 @@
     "loading": "Cargando...",
     "error": "Error",
     "retry": "Reintentar"
+  },
+  "survey": {
+    "breadcrumb": "Encuesta",
+    "seo": {
+      "title": "Encuesta",
+      "description": "Encuesta de feedback para mejorar nuestros servicios"
+    },
+    "success": {
+      "title": "¡Gracias!",
+      "message": "Tu feedback es valioso para nosotros y nos ayuda a mejorar nuestros servicios."
+    }
   }
 }

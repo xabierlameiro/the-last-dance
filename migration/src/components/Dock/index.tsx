@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import { menu } from '@/constants/navMenu';
 import Icon from '@/components/Dock/Icon';

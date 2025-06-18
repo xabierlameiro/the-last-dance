@@ -30,7 +30,11 @@
   },
   "background.image.alt": "This is the background image",
   "comments": {
-    "breadcrumb": "Terminal"
+    "breadcrumb": "Terminal",
+    "seo": {
+      "title": "Comments",
+      "description": "User comments and feedback section"
+    }
   },
   "legal": {
     "title": "Legal documents",
@@ -105,5 +109,16 @@
     "loading": "Loading...",
     "error": "Error",
     "retry": "Retry"
+  },
+  "survey": {
+    "breadcrumb": "Survey",
+    "seo": {
+      "title": "Survey",
+      "description": "User feedback survey to improve our services"
+    },
+    "success": {
+      "title": "Thank you!",
+      "message": "Your feedback is valuable to us and helps us improve our services."
+    }
   }
 }

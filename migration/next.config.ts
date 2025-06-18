@@ -14,6 +14,35 @@ const nextConfig: NextConfig = {
     experimental: {
         largePageDataBytes: 800 * 1000,
     },
+    // Headers configuration for security
+    async headers() {
+        return [
+            {
+                source: '/api/:path*',
+                headers: [
+                    { key: 'Access-Control-Allow-Credentials', value: 'false' },
+                    { key: 'Access-Control-Allow-Origin', value: process.env.NEXT_PUBLIC_DOMAIN ?? 'https://xabierlameiro.com' },
+                    { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS,POST' },
+                    { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+                    { key: 'X-Content-Type-Options', value: 'nosniff' },
+                    { key: 'X-Frame-Options', value: 'DENY' },
+                    { key: 'X-XSS-Protection', value: '1; mode=block' },
+                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+                    { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+                ],
+            },
+            {
+                source: '/:path*',
+                headers: [
+                    { key: 'X-Content-Type-Options', value: 'nosniff' },
+                    { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+                    { key: 'X-XSS-Protection', value: '1; mode=block' },
+                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+                    { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+                ],
+            },
+        ];
+    },
 };
 
 /** @type {import('codehike/mdx').CodeHikeConfig} */
