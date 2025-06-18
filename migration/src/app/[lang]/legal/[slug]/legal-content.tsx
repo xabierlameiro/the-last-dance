@@ -3,7 +3,6 @@
 import React from 'react';
 import Dialog from '@/components/Dialog';
 import ControlButtons from '@/components/ControlButtons';
-import { MDXRemote } from 'next-mdx-remote/rsc';
 import styles from '@/styles/legal.module.css';
 import SearchInput from '@/components/SearchInput';
 import Link from 'next/link';
@@ -14,10 +13,9 @@ import { useDialog } from '@/context/dialog';
 import SidesShift from '@/components/SidesShift';
 import useSideShift from '@/hooks/useSideShift';
 import { clx } from '@/helpers';
-import { MDXRemoteSerializeResult } from 'next-mdx-remote';
 
 type Props = {
-    source: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, string>>;
+    compiledContent: React.ReactElement;
     meta?: {
         noindex?: boolean;
         title: string;
@@ -31,34 +29,35 @@ type Props = {
     };
     dict: any;
     slug: string;
+    lang: string;
 };
 
-export default function LegalContent({ source, meta, dict, slug }: Props) {
+export default function LegalContent({ compiledContent, meta, dict, slug, lang }: Props) {
     const { open, dispatch } = useDialog();
     const { left, onSideShiftLeft } = useSideShift();
     const [selected, setSelected] = React.useState(0);
     const close = () => dispatch({ type: 'close' });
 
-    const links = [
+    const links = React.useMemo(() => [
         {
             title: dict.legal['cookies-policy'],
-            href: '/legal/cookies-policy',
+            href: `/${lang}/legal/cookies-policy`,
             icon: <BiCookie />,
             slug: 'cookies-policy',
         },
         {
             title: dict.legal['legal-notice'],
-            href: '/legal/legal-notice',
+            href: `/${lang}/legal/legal-notice`,
             icon: <VscLaw />,
             slug: 'legal-notice',
         },
         {
             title: dict.legal['privacy-policy'],
-            href: '/legal/privacy-policy',
+            href: `/${lang}/legal/privacy-policy`,
             icon: <MdOutlinePrivacyTip />,
             slug: 'privacy-policy',
         },
-    ];
+    ], [dict.legal, lang]);
 
     // Find the selected index based on current slug
     React.useEffect(() => {
@@ -66,7 +65,7 @@ export default function LegalContent({ source, meta, dict, slug }: Props) {
         if (index !== -1) {
             setSelected(index);
         }
-    }, [slug]); // links is stable, no need to include in deps
+    }, [slug, links]);
 
     return (
         <Dialog
@@ -98,7 +97,7 @@ export default function LegalContent({ source, meta, dict, slug }: Props) {
                         </ul>
                     </nav>
                     <article className={styles.content}>
-                        {source && <MDXRemote {...source} />}
+                        {compiledContent}
                     </article>
                 </div>
             }

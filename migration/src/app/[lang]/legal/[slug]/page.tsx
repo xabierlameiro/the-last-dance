@@ -5,7 +5,7 @@ import LegalContent from './legal-content';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { serialize } from '@/helpers/mdx';
+import { compileMDX } from 'next-mdx-remote/rsc';
 
 const LEGAL_PATH = path.join(process.cwd(), 'data/legal');
 
@@ -71,9 +71,23 @@ export default async function LegalPage({ params }: Props) {
     try {
         const { lang, slug } = await params;
         const dict = await getDictionary(lang);
-        const fullPath = path.join(LEGAL_PATH, `${slug}.mdx`);
         
-        if (!fs.existsSync(fullPath)) {
+        // Buscar el archivo con el idioma específico primero, si no existe usar inglés como fallback
+        const filePaths = [
+            path.join(LEGAL_PATH, `${slug}.${lang}.mdx`),
+            path.join(LEGAL_PATH, `${slug}.en.mdx`),
+            path.join(LEGAL_PATH, `${slug}.mdx`) // fallback para archivos sin idioma
+        ];
+        
+        let fullPath = '';
+        for (const filePath of filePaths) {
+            if (fs.existsSync(filePath)) {
+                fullPath = filePath;
+                break;
+            }
+        }
+        
+        if (!fullPath) {
             return (
                 <div>
                     <h1>Legal document not found</h1>
@@ -84,9 +98,22 @@ export default async function LegalPage({ params }: Props) {
         
         const mdx = fs.readFileSync(fullPath, 'utf8');
         const { content, data } = matter(mdx);
-        const mdxSource = await serialize(content);
         
-        return <LegalContent source={mdxSource} meta={data} dict={dict} slug={slug} />;
+        // Reemplazar enlaces estáticos con enlaces dinámicos basados en el idioma
+        const processedContent = content.replace(
+            /\[([^\]]+)\]\(\/[a-z]{2}(\/legal\/[^)]+)\)/g,
+            `[$1](/${lang}$2)`
+        );
+        
+        // Compilar el contenido MDX usando compileMDX
+        const { content: compiledContent } = await compileMDX({
+            source: processedContent,
+            options: {
+                parseFrontmatter: true,
+            },
+        });
+
+        return <LegalContent compiledContent={compiledContent} meta={data} dict={dict} slug={slug} lang={lang} />;
     } catch (error) {
         console.error('Error rendering legal page:', error);
         return (

@@ -43,6 +43,36 @@ const nextConfig: NextConfig = {
             },
         ];
     },
+    // Redirects for legacy URLs
+    async redirects() {
+        return [
+            {
+                source: '/legal/:slug*',
+                destination: '/es/legal/:slug*',
+                permanent: true,
+            },
+            {
+                source: '/blog/:path*',
+                destination: '/es/blog/:path*',
+                permanent: true,
+            },
+            {
+                source: '/settings',
+                destination: '/es/settings',
+                permanent: true,
+            },
+            {
+                source: '/survey',
+                destination: '/es/survey',
+                permanent: true,
+            },
+            {
+                source: '/comments',
+                destination: '/es/comments',
+                permanent: true,
+            },
+        ];
+    },
 };
 
 /** @type {import('codehike/mdx').CodeHikeConfig} */
