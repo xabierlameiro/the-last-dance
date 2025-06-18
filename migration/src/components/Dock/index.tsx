@@ -24,21 +24,21 @@ const Dock = () => {
         <nav className={styles.dock} data-testid="dock">
             <ul>
                 {menu.map(({ link, img, alt, testId }, index) => {
-                    const path = pathname.split('/')[1];
-                    const term =
-                        typeof link === 'object'
-                            ? link[lang as keyof typeof link]?.split('/')[1]
-                            : link.split('/')[1];
-                    const check = term ? path.includes(term) : false;
+                    // Obtener la ruta correcta según el idioma
+                    const href = typeof link === 'object' ? link[lang as keyof typeof link] : link;
+                    
+                    // Comparar rutas para determinar si está seleccionado
+                    const isSelected = pathname === href || 
+                        (href && pathname.startsWith(href.replace(/\/[^/]+$/, '')) && href !== `/${lang}`);
                         
                     return (
                         <li
                             key={`${testId}-${index}`}
-                            className={clx(pathname === link || check ? styles.selected : '')}
+                            className={clx(isSelected ? styles.selected : '')}
                             data-testid={testId}
                         >
                             <Link 
-                                href={link?.[lang as keyof typeof link] ?? link} 
+                                href={href} 
                                 title={alt}
                                 onClick={clickHandler}
                             >

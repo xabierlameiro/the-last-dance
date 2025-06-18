@@ -16,7 +16,7 @@ type Props = {
  * @param {boolean} leftPosition - If true, the button will be positioned on the left
  * @returns {JSX.Element}
  */
-const ShidesShift = ({ handleClick, leftPosition, className }: Props) => {
+const SidesShift = ({ handleClick, leftPosition, className }: Props) => {
     return (
         <TfiMinus
             data-testid="sides-shift"
@@ -26,4 +26,4 @@ const ShidesShift = ({ handleClick, leftPosition, className }: Props) => {
     );
 };
 
-export default ShidesShift;
+export default SidesShift;

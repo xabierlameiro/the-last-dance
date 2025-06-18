@@ -1,10 +1,6 @@
-import dynamic from 'next/dynamic';
 import VisibilityManager from '@/components/VisibilityManager';
-import Loading from '@/components/RenderManager/Loading';
 import Image from 'next/image';
 import { MDXComponents } from 'mdx/types';
-
-const Adsense = dynamic(() => import('@/components/GoogleAdsense'), { ssr: false, loading: () => <Loading /> });
 
 const GoogleAdsense = () => {
     return (
@@ -17,13 +13,25 @@ const GoogleAdsense = () => {
                     overflow: 'hidden',
                 }}
             >
-                <Adsense slot="6172794554" />
+                {/* Adsense component placeholder */}
+                <div>Advertisement placeholder</div>
             </div>
         </VisibilityManager>
     );
 };
 
-const DateComponent = dynamic(() => import('@/components/Date'));
+// Simple Date component for MDX
+const DateComponent = ({ date }: { date: string }) => {
+    return (
+        <time dateTime={date} style={{ 
+            fontSize: '0.875rem', 
+            color: '#666', 
+            fontStyle: 'italic' 
+        }}>
+            {new Date(date).toLocaleDateString()}
+        </time>
+    );
+};
 
 // Create a simple version without hooks for MDX
 const ControlButtons = () => {

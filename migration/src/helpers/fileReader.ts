@@ -23,14 +23,18 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
     } else {
         slug = slug.split('/')[slug.split('/').length - 1];
     }
-    const [route] = paths.filter((path) => {
+    
+    const route = paths.find((path) => {
         const document = fs.readFileSync(path, 'utf8');
         const { data } = matter(document);
         const fileName = path.split('/').pop();
-        if (data.slug === slug || fileName == `${slug}.mdx`) {
-            return true;
-        }
+        return data.slug === slug || fileName === `${slug}.mdx`;
     });
+    
+    if (!route) {
+        throw new Error(`Post with slug "${slug}" not found`);
+    }
+    
     return matter(fs.readFileSync(route, 'utf8'));
 };
 
@@ -78,6 +82,8 @@ export const getPostBySlug = (slug: string | { params: { slug: string } }) => {
  */
 const getPostSlugs = () => {
     let paths = globSync(`${POST_PATH}/**/*.mdx`);
+    // Ordenar alfabéticamente para mantener consistencia con legacy
+    paths = paths.sort();
     paths = paths.map((path) => path.replace(`${POST_PATH}/`, '').replace(/\.mdx$/, ''));
     return paths;
 };
@@ -209,10 +215,23 @@ export const getAllTags = (locale: string) => {
     const tags = posts.map((post) => post.meta.tags);
     return [...new Set(tags.flat())].map((tag) => {
         const postsBytag = getPostsByTag(tag, locale);
+        
+        // Validar que existe el primer post y tiene los campos necesarios
+        if (!postsBytag[0]?.meta?.category || !postsBytag[0]?.meta?.slug) {
+            console.warn('getAllTags: Invalid post for tag', tag, postsBytag[0]);
+            return {
+                tag,
+                total: tags.flat().filter((t) => t === tag).length,
+                href: `/${locale}/blog`, // Fallback a la página principal del blog
+            };
+        }
+        
+        const href = `/${locale}/blog/${tag.toLowerCase()}/${postsBytag[0].meta.slug}`;
+        
         return {
             tag,
             total: tags.flat().filter((t) => t === tag).length,
-            href: `/blog/${tag.toLowerCase()}/${postsBytag[0].meta.slug}`,
+            href,
         };
     });
 };
@@ -235,10 +254,22 @@ export const getAllCategories = (locale: string) => {
     return {
         categories: [...new Set(categories)].map((category) => {
             const postsByCategory = getPostsByCategory(category, locale);
+            const firstPost = postsByCategory[0];
+            
+            // Validar que existe el primer post y tiene los campos necesarios
+            if (!firstPost?.meta?.slug) {
+                console.warn('getAllCategories: Invalid post for category', category, firstPost);
+                return {
+                    category,
+                    total: categories.filter((c) => c === category).length,
+                    href: `/${locale}/blog`, // Fallback a la página principal del blog
+                };
+            }
+            
             return {
                 category,
                 total: categories.filter((c) => c === category).length,
-                href: `/blog/${category.toLowerCase()}/${postsByCategory[0].meta.slug}`,
+                href: `/${locale}/blog/${category.toLowerCase()}/${firstPost.meta.slug}`,
             };
         }),
         tags,

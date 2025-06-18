@@ -44,20 +44,23 @@ const NavList = ({ title, list, category, isCategory }: Props) => {
                         },
                         index: number
                     ) => {
+                        // Validar que href existe antes de renderizar el Link
+                        if (!item.href) {
+                            console.warn('NavList: item without href', item);
+                            return null;
+                        }
+                        
+                        // Calcular className para evitar ternarios anidados
+                        const isSelected = (isCategory && category == item.category.toLowerCase()) || 
+                                         (!isCategory && category == item.tag.toLowerCase());
+                        const itemClassName = isSelected ? styles.selected : '';
+                        
                         return (
-                            <li key={index}>
+                            <li key={item.href || `${isCategory ? item.category : item.tag}-${index}`}>
                                 <Link
                                     href={item.href}
                                     title={isCategory ? item.category : item.tag}
-                                    className={
-                                        isCategory
-                                            ? category == item.category.toLowerCase()
-                                                ? styles.selected
-                                                : ''
-                                            : category == item.tag.toLowerCase()
-                                            ? styles.selected
-                                            : ''
-                                    }
+                                    className={itemClassName}
                                 >
                                     {isCategory ? <BsFolder2 /> : <BsTag />}
                                     <div className={styles.tag}>{isCategory ? item.category : item.tag}</div>

@@ -1,6 +1,6 @@
 'use client'
 
-import LayoutWrapper from '@/components/LayoutWrapper'
+import LayoutWrapper from '@/components/LayoutWrapper.tsx'
 import { ReactNode } from 'react'
 
 type Props = {

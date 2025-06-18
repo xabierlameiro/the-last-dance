@@ -78,11 +78,25 @@ export function useTranslation() {
 
   const formatDate = (date: Date | string | number, options?: Intl.DateTimeFormatOptions) => {
     const dateObj = new Date(date)
-    return dateObj.toLocaleDateString(lang, options)
+    // Map custom locales to standard ones
+    const localeMap: Record<string, string> = {
+      'gl': 'es-ES', // Gallego maps to Spanish
+      'es': 'es-ES',
+      'en': 'en-US'
+    }
+    const locale = localeMap[lang] || 'en-US'
+    return dateObj.toLocaleDateString(locale, options)
   }
 
   const formatNumber = (value: number, options?: Intl.NumberFormatOptions) => {
-    return value.toLocaleString(lang, options)
+    // Map custom locales to standard ones
+    const localeMap: Record<string, string> = {
+      'gl': 'es-ES', // Gallego maps to Spanish
+      'es': 'es-ES',
+      'en': 'en-US'
+    }
+    const locale = localeMap[lang] || 'en-US'
+    return value.toLocaleString(locale, options)
   }
 
   return {

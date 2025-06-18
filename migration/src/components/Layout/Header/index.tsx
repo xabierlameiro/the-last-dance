@@ -28,10 +28,19 @@ const DateAndHour = ({ children, minutes = 1 }: { children?: ReactNode; minutes?
     const { lang, t } = useTranslation();
     const [date, setDate] = React.useState(new Date());
     const [openWeatherWidget, setOpenWeatherWidget] = React.useState<boolean>(false);
-    const day = date.toLocaleDateString(lang, { weekday: 'short' });
-    const dayNumber = date.toLocaleDateString(lang, { day: 'numeric' });
-    const month = date.toLocaleDateString(lang, { month: 'short' });
-    const hour = date.toLocaleTimeString(lang, { hour: 'numeric', minute: 'numeric' });
+    
+    // Map custom locales to standard ones
+    const localeMap: Record<string, string> = {
+        'gl': 'es-ES', // Gallego maps to Spanish
+        'es': 'es-ES',
+        'en': 'en-US'
+    };
+    const locale = localeMap[lang] || 'en-US';
+    
+    const day = date.toLocaleDateString(locale, { weekday: 'short' });
+    const dayNumber = date.toLocaleDateString(locale, { day: 'numeric' });
+    const month = date.toLocaleDateString(locale, { month: 'short' });
+    const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
 
     React.useEffect(() => {
         const interval = setInterval(() => {
