@@ -5,7 +5,8 @@ import LegalContent from './legal-content';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { compileMDX } from 'next-mdx-remote/rsc';
+import { remark } from 'remark';
+import html from 'remark-html';
 
 const LEGAL_PATH = path.join(process.cwd(), 'data/legal');
 
@@ -40,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     try {
         const { slug, lang } = await params;
         const dict = await getDictionary(lang);
-        const fullPath = path.join(LEGAL_PATH, `${slug}.mdx`);
+        const fullPath = path.join(LEGAL_PATH, `${slug}.${lang}.mdx`);
         
         if (fs.existsSync(fullPath)) {
             const mdx = fs.readFileSync(fullPath, 'utf8');
@@ -71,27 +72,14 @@ export default async function LegalPage({ params }: Props) {
     try {
         const { lang, slug } = await params;
         const dict = await getDictionary(lang);
+        const fullPath = path.join(LEGAL_PATH, `${slug}.${lang}.mdx`);
         
-        // Buscar el archivo con el idioma específico primero, si no existe usar inglés como fallback
-        const filePaths = [
-            path.join(LEGAL_PATH, `${slug}.${lang}.mdx`),
-            path.join(LEGAL_PATH, `${slug}.en.mdx`),
-            path.join(LEGAL_PATH, `${slug}.mdx`) // fallback para archivos sin idioma
-        ];
-        
-        let fullPath = '';
-        for (const filePath of filePaths) {
-            if (fs.existsSync(filePath)) {
-                fullPath = filePath;
-                break;
-            }
-        }
-        
-        if (!fullPath) {
+        if (!fs.existsSync(fullPath)) {
             return (
                 <div>
                     <h1>Legal document not found</h1>
                     <p>The requested legal document could not be found.</p>
+                    <p>Searched for: {fullPath}</p>
                 </div>
             );
         }
@@ -99,21 +87,19 @@ export default async function LegalPage({ params }: Props) {
         const mdx = fs.readFileSync(fullPath, 'utf8');
         const { content, data } = matter(mdx);
         
-        // Reemplazar enlaces estáticos con enlaces dinámicos basados en el idioma
-        const processedContent = content.replace(
-            /\[([^\]]+)\]\(\/[a-z]{2}(\/legal\/[^)]+)\)/g,
-            `[$1](/${lang}$2)`
-        );
+        // Process markdown to HTML using remark
+        const processedContent = await remark()
+            .use(html)
+            .process(content);
+        const htmlContent = processedContent.toString();
         
-        // Compilar el contenido MDX usando compileMDX
-        const { content: compiledContent } = await compileMDX({
-            source: processedContent,
-            options: {
-                parseFrontmatter: true,
-            },
-        });
-
-        return <LegalContent compiledContent={compiledContent} meta={data} dict={dict} slug={slug} lang={lang} />;
+        // Ensure meta has required title field
+        const meta = {
+            title: data.title || dict.legal.title,
+            ...data
+        };
+        
+        return <LegalContent content={htmlContent} meta={meta} dict={dict} slug={slug} lang={lang} />;
     } catch (error) {
         console.error('Error rendering legal page:', error);
         return (

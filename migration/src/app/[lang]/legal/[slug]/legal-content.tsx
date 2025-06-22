@@ -6,19 +6,21 @@ import ControlButtons from '@/components/ControlButtons';
 import styles from '@/styles/legal.module.css';
 import SearchInput from '@/components/SearchInput';
 import Link from 'next/link';
-import { BiCookie } from 'react-icons/bi';
-import { VscLaw } from 'react-icons/vsc';
-import { MdOutlinePrivacyTip } from 'react-icons/md';
 import { useDialog } from '@/context/dialog';
 import SidesShift from '@/components/SidesShift';
 import useSideShift from '@/hooks/useSideShift';
 import { clx } from '@/helpers';
 
+// Dynamic imports for icons to avoid SSR issues
+const IconCookie = () => <span>🍪</span>;
+const IconLaw = () => <span>⚖️</span>;
+const IconPrivacy = () => <span>🔒</span>;
+
 type Props = {
-    compiledContent: React.ReactElement;
+    content: string;
     meta?: {
         noindex?: boolean;
-        title: string;
+        title?: string;
         author?: string;
         description?: string;
         image?: string;
@@ -32,7 +34,7 @@ type Props = {
     lang: string;
 };
 
-export default function LegalContent({ compiledContent, meta, dict, slug, lang }: Props) {
+export default function LegalContent({ content, meta, dict, slug, lang }: Props) {
     const { open, dispatch } = useDialog();
     const { left, onSideShiftLeft } = useSideShift();
     const [selected, setSelected] = React.useState(0);
@@ -42,19 +44,16 @@ export default function LegalContent({ compiledContent, meta, dict, slug, lang }
         {
             title: dict.legal['cookies-policy'],
             href: `/${lang}/legal/cookies-policy`,
-            icon: <BiCookie />,
             slug: 'cookies-policy',
         },
         {
             title: dict.legal['legal-notice'],
             href: `/${lang}/legal/legal-notice`,
-            icon: <VscLaw />,
             slug: 'legal-notice',
         },
         {
             title: dict.legal['privacy-policy'],
             href: `/${lang}/legal/privacy-policy`,
-            icon: <MdOutlinePrivacyTip />,
             slug: 'privacy-policy',
         },
     ], [dict.legal, lang]);
@@ -66,6 +65,19 @@ export default function LegalContent({ compiledContent, meta, dict, slug, lang }
             setSelected(index);
         }
     }, [slug, links]);
+
+    const getIcon = (slug: string) => {
+        switch (slug) {
+            case 'cookies-policy':
+                return <IconCookie key={slug} />;
+            case 'legal-notice':
+                return <IconLaw key={slug} />;
+            case 'privacy-policy':
+                return <IconPrivacy key={slug} />;
+            default:
+                return null;
+        }
+    };
 
     return (
         <Dialog
@@ -80,16 +92,16 @@ export default function LegalContent({ compiledContent, meta, dict, slug, lang }
                         <SearchInput placeHolderText={dict.legal['search-placeholder']} />
                         <span className={styles.title}>{dict.legal.title}</span>
                         <ul>
-                            {links.map((link) => (
+                            {links.map((link, index) => (
                                 <li
                                     key={link.slug}
-                                    className={selected === links.findIndex(l => l.slug === link.slug) ? styles.selected : ''}
+                                    className={selected === index ? styles.selected : ''}
                                 >
                                     <Link 
                                         href={link.href}
-                                        onClick={() => setSelected(links.findIndex(l => l.slug === link.slug))}
+                                        onClick={() => setSelected(index)}
                                     >
-                                        {link.icon}
+                                        {getIcon(link.slug)}
                                         <span>{link.title}</span>
                                     </Link>
                                 </li>
@@ -97,7 +109,7 @@ export default function LegalContent({ compiledContent, meta, dict, slug, lang }
                         </ul>
                     </nav>
                     <article className={styles.content}>
-                        {compiledContent}
+                        <div dangerouslySetInnerHTML={{ __html: content }} />
                     </article>
                 </div>
             }
