@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { handleCors } from '../../../helpers/cors'
 
 /**
  * @description Get the number of indexed pages by reading sitemap.xml
@@ -33,13 +32,16 @@ export async function GET() {
         const num = urlMatches?.length ?? locMatches?.length ?? 0;
 
         const successResponse = NextResponse.json({ num });
-        return handleCors(successResponse);
+        return successResponse;
     } catch (err: unknown) {
         console.error('Error fetching indexed pages:', err);
         
         // If sitemap fails, return an error without fallback
         const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-        const errorResponse = NextResponse.json({ error: errorMessage }, { status: 500 });
-        return handleCors(errorResponse);
+        const errorResponse = NextResponse.json({ 
+            error: errorMessage,
+            num: 0 
+        }, { status: 500 });
+        return errorResponse;
     }
 }

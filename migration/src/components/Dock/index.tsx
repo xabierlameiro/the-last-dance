@@ -27,6 +27,12 @@ const Dock = () => {
                     // Obtener la ruta correcta según el idioma
                     const href = typeof link === 'object' ? link[lang as keyof typeof link] : link;
                     
+                    // Validar que href existe antes de renderizar
+                    if (!href) {
+                        console.warn('Dock: Missing href for menu item', { link, lang, testId });
+                        return null;
+                    }
+                    
                     // Comparar rutas para determinar si está seleccionado
                     const isSelected = pathname === href || 
                         (href && pathname.startsWith(href.replace(/\/[^/]+$/, '')) && href !== `/${lang}`);

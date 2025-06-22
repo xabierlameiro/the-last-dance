@@ -20,14 +20,15 @@ type Props = {
  */
 const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {}) => {
     const difference = +new Date(date) - +new Date();
-    const years = Math.floor(difference / (1000 * 60 * 60 * 24 * 30 * 12));
-    const months = Math.floor((difference / (1000 * 60 * 60 * 24 * 30)) % 12);
-    const days = Math.floor((difference / (1000 * 60 * 60 * 24)) % 30);
-    const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((difference / (1000 * 60)) % 60);
-    const seconds = Math.floor((difference / 1000) % 60);
-
+    
     if (difference > 0) {
+        const years = Math.floor(difference / (1000 * 60 * 60 * 24 * 365));
+        const months = Math.floor((difference % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
+        const days = Math.floor((difference % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
         setTime({
             years: years < 10 ? `0${years}` : years,
             months: months < 10 ? `0${months}` : months,
@@ -35,6 +36,16 @@ const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {
             hours: hours < 10 ? `0${hours}` : hours,
             minutes: minutes < 10 ? `0${minutes}` : minutes,
             seconds: seconds < 10 ? `0${seconds}` : seconds,
+        });
+    } else {
+        // If the date has passed, set all to 00
+        setTime({
+            years: '00',
+            months: '00',
+            days: '00',
+            hours: '00',
+            minutes: '00',
+            seconds: '00',
         });
     }
 

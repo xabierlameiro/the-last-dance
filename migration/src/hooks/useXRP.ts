@@ -1,10 +1,8 @@
 import useSWR from 'swr';
 import { fetcher } from '@/helpers';
 
-const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/xrp`);
-
 const useXRP = () => {
-    const { data, error, isLoading } = useSWR(url, fetcher, {
+    const { data, error, isLoading } = useSWR('/api/xrp', fetcher, {
         dedupingInterval: 5000,
         keepPreviousData: true,
         fallbackData: {

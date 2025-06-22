@@ -129,10 +129,10 @@ const Header = ({ children }: { children?: ReactNode }) => {
 
     return (
         <header data-testid="header" className={styles.header}>
-            <SiBitcoincash />
+            <SiBitcoincash {...({} as any)} />
             <Route />
             <NavLinks />
-            <CountDown date="2025-04-28T00:00:00+00:00" caption={t('countdown.caption')} />
+            <CountDown date="2025-11-14T00:00:00+00:00" caption={t('countdown.caption')} />
             <DeploymentStatus />
             <CryptoPrice />
             <IndexedCounter />

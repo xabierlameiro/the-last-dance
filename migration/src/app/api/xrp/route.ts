@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { handleCors } from '../../../helpers/cors'
 
 interface CoinGeckoResponse {
     ripple: {
@@ -38,7 +37,7 @@ export async function GET() {
             throw new Error('XRP price data not found');
         }
 
-        const price = `${data.ripple.eur.toFixed(4)} €`;
+        const price = data.ripple.eur;
         const change = data.ripple.eur_24h_change;
         const todayPorcentage = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
         const todaySummary = change >= 0 ? 'Up' : 'Down';
@@ -48,11 +47,17 @@ export async function GET() {
             todaySummary,
             todayPorcentage,
         });
-        return handleCors(successResponse);
+        return successResponse;
     } catch (err: unknown) {
+        console.error('Error fetching XRP data:', err);
         const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-        const errorResponse = NextResponse.json({ error: errorMessage }, { status: 500 });
-        return handleCors(errorResponse);
+        const errorResponse = NextResponse.json({ 
+            error: errorMessage,
+            price: 0,
+            todaySummary: '',
+            todayPorcentage: '',
+        }, { status: 500 });
+        return errorResponse;
     }
 }
         

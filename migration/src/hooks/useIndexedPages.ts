@@ -1,10 +1,8 @@
 import useSWR from 'swr';
 import { fetcher } from '@/helpers';
 
-const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/indexed-pages`);
-
 const useIndexedPages = () => {
-    const { data, error, isLoading } = useSWR(url, fetcher, {
+    const { data, error, isLoading } = useSWR('/api/indexed-pages', fetcher, {
         dedupingInterval: 5000,
         fallbackData: {
             num: 0,
