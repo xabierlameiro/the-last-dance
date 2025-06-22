@@ -5,14 +5,14 @@ import Dialog from '@/components/Dialog';
 import ControlButtons from '@/components/ControlButtons';
 import { AiFillFolder } from 'react-icons/ai';
 import styles from '@/styles/comments.module.css';
-import Data from '../../../../data/comments/index.mdx';
 import { useDialog } from '@/context/dialog';
 
 type Props = {
-  lang: string
+  lang: string;
+  content: string;
 }
 
-export default function CommentsContent({ lang }: Props) {
+export default function CommentsContent({ lang, content }: Props) {
   const { dispatch, open } = useDialog();
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const [height, setHeight] = React.useState(0);
@@ -36,12 +36,17 @@ export default function CommentsContent({ lang }: Props) {
         <div className={styles.header}>
           <ControlButtons disabled onClickClose={close} onClickMinimise={close} />
           <div>
-            <AiFillFolder />
+            <AiFillFolder style={{ display: 'inline-block' }} />
             xabier.lameirocardama - bash - {width}x{height}
           </div>
         </div>
       }
-      body={<Data />}
+      body={
+        <div 
+          dangerouslySetInnerHTML={{ __html: content }}
+          style={{ height: 'inherit', borderRadius: 0 }}
+        />
+      }
     />
   );
 }
