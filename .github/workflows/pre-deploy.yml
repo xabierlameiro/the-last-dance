@@ -28,7 +28,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --ci
+                  npm install --ci --legacy-peer-deps
             - name: Linter
               run: npm run lint
     testing:
@@ -49,7 +49,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --ci
+                  npm install --ci --legacy-peer_deps
             - name: Run unit tests
               run: npm run coverage
             - name: Checkout unit-report repository
@@ -110,7 +110,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --ci
+                  npm install --ci --legacy-peer-deps
             - name: Generate documentation
               run: npm run jsdoc
             - name: Checkout doc repository
