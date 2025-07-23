@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'fs/promises';
-import { glob } from 'glob';
+import pkg from 'glob';
+const { glob } = pkg;
 
 async function processFiles() {
     try {
