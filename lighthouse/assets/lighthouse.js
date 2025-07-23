@@ -162,11 +162,11 @@ for (const lang of Object.keys(translations)) {
     };
     // clean empty childrens
     config.nodeStructure.children.forEach((item) => {
-        if (item.children && item.children.every((item) => item === undefined)) {
+        if (item.children?.every((item) => item === undefined)) {
             delete item.children;
         } else if (item.children) {
             item.children.forEach((item) => {
-                if (item.children && item.children.every((item) => item === undefined)) {
+                if (item.children?.every((item) => item === undefined)) {
                     delete item.children;
                 }
             });

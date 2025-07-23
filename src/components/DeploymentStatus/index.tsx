@@ -17,7 +17,7 @@ const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/deployments`);
 export const useDeploymentStatus = () => {
     const { data, error } = useSWR(url.toString(), fetcher);
     return {
-        data: data,
+        data,
         isLoading: !error && !data,
         isError: error,
     };
@@ -47,9 +47,9 @@ const DeploymentStatus = () => {
                             id: 'deploymentstatus.tooltip',
                         },
                         {
-                            status: status,
-                            username: username,
-                            environment: environment,
+                            status,
+                            username,
+                            environment,
                             createdAt: new Date(createdAt).toLocaleString(),
                         }
                     )}

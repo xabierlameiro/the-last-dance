@@ -58,7 +58,7 @@ export default allowCors(async function handler(
             .catch((error) => error);
 
         res.status(200).json(value);
-    } catch (err: Error | unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             res.status(500).json({ error: err.message });
         }

@@ -55,7 +55,7 @@ const getWeatherData = async (city: string): Promise<NewsData | null> => {
     });
 
     return {
-        city: city,
+        city,
         news,
     };
 };

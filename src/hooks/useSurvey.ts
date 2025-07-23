@@ -8,6 +8,17 @@ interface Answer {
     questionNum: number;
 }
 
+interface AnswerOption {
+    answerText: string;
+    isCorrect: boolean;
+}
+
+interface Question {
+    questionText?: string;
+    questionHtml?: string;
+    answerOptions?: AnswerOption[];
+}
+
 interface SurveyState {
     currentQuestion: number;
     questionsDone: number;
@@ -71,7 +82,7 @@ const useSurvey = () => {
 
     const [state, dispatch] = useReducer(reducer, initialState);
 
-    const questions = [
+    const questions: Question[] = [
         {
             questionText: '¿ Continuamos ?',
             questionHtml: `
@@ -275,7 +286,7 @@ const useSurvey = () => {
     };
 
     const handleNextQuestion = () => {
-        if (state.currentQuestion != 0 && state.questionsDone >= state.currentQuestion)
+        if (state.currentQuestion !== 0 && state.questionsDone >= state.currentQuestion)
             dispatch({ type: 'NEXT_QUESTION' });
     };
 
@@ -300,3 +311,4 @@ const useSurvey = () => {
 };
 
 export default useSurvey;
+export type { Question };

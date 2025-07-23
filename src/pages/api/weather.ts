@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import jsdom from 'jsdom';
+import { JSDOM } from 'jsdom';
+import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
 
 interface WeatherData {
@@ -10,13 +11,13 @@ interface WeatherData {
     humidity?: string | null;
     windSpeed?: string | null;
     grades?: string | null;
-    imageUrl?: string | undefined;
+    imageUrl?: string;
 }
 
 type WeatherResponse = WeatherData[] | { error: string };
 
 const getWeatherData = async (city: string): Promise<WeatherData> => {
-    const { JSDOM } = jsdom;
+    // const { JSDOM } = jsdom; // Already imported above
     const response = await fetch(`https://www.google.com/search?q=tiempo+${city}`, {
         method: 'GET',
         headers: {
@@ -28,9 +29,28 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
         },
         redirect: 'follow',
     });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const raw = await response.text();
     const dom = new JSDOM(raw);
     const weatherBox = dom.window.document.querySelector('#wob_wc') as HTMLImageElement;
+
+    if (!weatherBox) {
+        console.warn(`Weather widget not found for city: ${city}`);
+        // Return basic structure with city name only if weather widget is not found
+        return {
+            city,
+            name: null,
+            precipitation: null,
+            humidity: null,
+            windSpeed: null,
+            grades: null,
+            imageUrl: undefined,
+        };
+    }
 
     try {
         const grades = weatherBox.querySelector('#wob_tm')?.textContent;
@@ -49,7 +69,7 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
             grades,
             imageUrl,
         };
-    } catch (err: Error | unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             throw new Error(err.message);
         }
@@ -85,7 +105,7 @@ export default allowCors(async function handler(
                 res.status(200).json(results);
             })
             .catch((err) => res.status(500).json({ error: err.message }));
-    } catch (err: Error | unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             res.status(500).json({ error: err.message });
         }

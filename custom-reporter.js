@@ -2,7 +2,7 @@
 import { readFile, writeFile } from 'fs';
 import glob from 'glob';
 
-glob('public/coverage/**/*.?(html|css)', function (err, files) {
+glob('public/coverage/**/*.?(html|css)', (err, files) => {
     if (err) {
         console.error('err', err);
         process.exit(1);
@@ -36,7 +36,7 @@ glob('public/coverage/**/*.?(html|css)', function (err, files) {
                 '.pad1 { padding: 10px; width: 100%; overflow: scroll; }'
             );
 
-            writeFile(path, replaced, 'utf-8', function (err) {
+            writeFile(path, replaced, 'utf-8', (err) => {
                 if (err) {
                     console.error('err', err);
                     process.exit(1);
@@ -50,7 +50,7 @@ glob('public/coverage/**/*.?(html|css)', function (err, files) {
             console.error('err', err);
             process.exit(1);
         }
-        writeFile('public/coverage/favicon.png', data, 'utf-8', function (err) {
+        writeFile('public/coverage/favicon.png', data, 'utf-8', (err) => {
             if (err) {
                 console.error('err', err);
                 process.exit(1);

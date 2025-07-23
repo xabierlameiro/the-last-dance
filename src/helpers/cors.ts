@@ -1,7 +1,7 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse, NextApiHandler } from 'next';
 
 const allowCors =
-  (fn: any) => async (req: NextApiRequest, res: NextApiResponse) => {
+  <T extends NextApiHandler>(fn: T) => async (req: NextApiRequest, res: NextApiResponse) => {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader(

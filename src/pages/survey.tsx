@@ -4,7 +4,7 @@ import ControlButtons from '@/components/ControlButtons';
 import Confetti from 'react-confetti';
 import SEO from '@/components/SEO';
 import useWindowResize from '@/hooks/useWindowResize';
-import useSurvey from '@/hooks/useSurvey';
+import useSurvey, { type Question } from '@/hooks/useSurvey';
 import NavigationArrows from '@/components/NavigationArrows';
 import QuestionBlock from '@/components/QuestionBlock';
 
@@ -51,7 +51,7 @@ const Survey = () => {
                 }
                 body={
                     <div className={styles.container}>
-                        {questions.map((question: any, index: number) => (
+                        {questions.map((question: Question, index: number) => (
                             <QuestionBlock
                                 key={index}
                                 question={question}

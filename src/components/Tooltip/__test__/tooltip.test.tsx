@@ -18,7 +18,7 @@ describe('Tooltip', () => {
 
     it('should render tooltip', () => {
         render(
-            <Tooltip initialOpen={true}>
+            <Tooltip initialOpen>
                 <Tooltip.Trigger>
                     <div data-testid="trigger" />
                 </Tooltip.Trigger>

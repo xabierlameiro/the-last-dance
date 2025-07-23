@@ -36,7 +36,7 @@
        */
       inheritAttrs: function (applyTo, applyFrom) {
          for (var attr in applyFrom) {
-            if (applyFrom.hasOwnProperty(attr)) {
+            if (Object.prototype.hasOwnProperty.call(applyFrom, attr)) {
                if (
                   applyTo[attr] instanceof Object &&
                   applyFrom[attr] instanceof Object &&
@@ -91,7 +91,7 @@
          }
          var res = new obj.constructor();
          for (var key in obj) {
-            if (obj.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
                res[key] = this.cloneObj(obj[key]);
             }
          }
@@ -105,16 +105,16 @@
        */
       addEvent: function (el, eventType, handler) {
          if ($) {
-            $(el).on(eventType + '.treant', handler);
+            $(el).on(`${eventType}.treant`, handler);
          } else if (el.addEventListener) {
             // DOM Level 2 browsers
             el.addEventListener(eventType, handler, false);
          } else if (el.attachEvent) {
             // IE <= 8
-            el.attachEvent('on' + eventType, handler);
+            el.attachEvent(`on${eventType}`, handler);
          } else {
             // ancient browsers
-            el['on' + eventType] = handler;
+            el[`on${eventType}`] = handler;
          }
       },
 
@@ -183,7 +183,7 @@
 
       getStyle: function (element, strCssRule, asInt) {
          var strValue = '';
-         if (document.defaultView && document.defaultView.getComputedStyle) {
+         if (document.defaultView?.getComputedStyle) {
             strValue = document.defaultView.getComputedStyle(element, '').getPropertyValue(strCssRule);
          } else if (element.currentStyle) {
             strCssRule = strCssRule.replace(/\-(\w)/g, function (strMatch, p1) {
@@ -230,8 +230,8 @@
          if ($) {
             $(element).width(width).height(height);
          } else {
-            element.style.width = width + 'px';
-            element.style.height = height + 'px';
+            element.style.width = `${width}px`;
+            element.style.height = `${height}px`;
          }
       },
       isjQueryAvailable: function () {
@@ -530,7 +530,7 @@
 
          var leftSibling = node.leftSibling();
 
-         if (node.childrenCount() === 0 || level == this.CONFIG.maxDepth) {
+         if (node.childrenCount() === 0 || level === this.CONFIG.maxDepth) {
             // set preliminary x-coordinate
             if (leftSibling) {
                node.prelim = leftSibling.prelim + leftSibling.size() + this.CONFIG.siblingSeparation;
@@ -2046,12 +2046,12 @@
          //fist loop: find config, find root;
          while (i--) {
             node = configArray[i];
-            if (node.hasOwnProperty('container')) {
+            if (Object.prototype.hasOwnProperty.call(node, 'container')) {
                this.jsonStructure.chart = node;
                continue;
             }
 
-            if (!node.hasOwnProperty('parent') && !node.hasOwnProperty('container')) {
+            if (!Object.prototype.hasOwnProperty.call(node, 'parent') && !Object.prototype.hasOwnProperty.call(node, 'container')) {
                this.jsonStructure.nodeStructure = node;
                node._json_id = 0;
             }

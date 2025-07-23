@@ -46,6 +46,10 @@ const Legal = ({ source, meta }: Props) => {
     const [selected, setSelected] = React.useState(0);
     const close = () => dispatch({ type: 'close' });
 
+    const handleLinkClick = React.useCallback((index: number) => {
+        setSelected(index);
+    }, []);
+
     const links = [
         {
             title: f({ id: 'legal.cookies-policy' }),
@@ -82,7 +86,7 @@ const Legal = ({ source, meta }: Props) => {
                                 {links.map((link, index) => (
                                     <li
                                         key={index}
-                                        onClick={() => setSelected(index)}
+                                        onClick={() => handleLinkClick(index)}
                                         className={selected === index ? styles.selected : ''}
                                     >
                                         <Link href={link.href}>

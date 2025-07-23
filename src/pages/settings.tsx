@@ -105,7 +105,7 @@ const Settings = () => {
             />
             <Dialog 
                 modalMode 
-                open={true} 
+                open 
                 body={<Content lang={lang} toggleLang={toggleLang} />} 
                 header={<Header lang={lang} toggleLang={toggleLang} />} 
             />

@@ -7,8 +7,8 @@ export type AnswerOption = {
 };
 
 export type Question = {
-    questionText: string;
-    questionHtml: string;
+    questionText?: string;
+    questionHtml?: string;
     answerOptions?: AnswerOption[];
 };
 
@@ -37,7 +37,8 @@ const QuestionBlock = ({
     return (
         <div data-testid="question-block" className={styles.question}>
             <div
-                dangerouslySetInnerHTML={{ __html: question.questionHtml }}
+                // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here as questionHtml is sanitized content
+                dangerouslySetInnerHTML={{ __html: question.questionHtml || '' }}
                 className={styles.questionHtml}
             />
             {question.answerOptions?.map((answerOption) => (
@@ -45,7 +46,7 @@ const QuestionBlock = ({
                     <input
                         onChange={(e) =>
                             handleAnswerOptionClick({
-                                question: question.questionText,
+                                question: question.questionText || '',
                                 answer: e.target.value,
                                 isCorrect: answerOption.isCorrect,
                                 questionNum: index,

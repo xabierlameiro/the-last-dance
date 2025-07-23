@@ -2,14 +2,24 @@ import useSWR from 'swr';
 import React from 'react';
 import { fetcher } from '@/helpers';
 
-const initialValues = [
+interface WeatherData {
+    city: string;
+    name: string;
+    precipitation: string;
+    humidity: string;
+    windSpeed: string;
+    grades: string;
+    imageUrl?: string;
+}
+
+const initialValues: WeatherData[] = [
     {
         city: 'moraña',
-        name: '',
-        precipitation: 0,
-        humidity: 0,
-        windSpeed: 0,
-        grades: 0,
+        name: 'Partly cloudy',
+        precipitation: '0%',
+        humidity: '50%',
+        windSpeed: '10 km/h',
+        grades: '15',
         imageUrl: '',
     },
 ];
@@ -20,7 +30,7 @@ const useWeather = (cities: string[]) => {
         return url;
     }, [cities]);
 
-    const { data, error, isLoading } = useSWR(url, fetcher, {
+    const { data, error, isLoading } = useSWR(url.toString(), fetcher, {
         dedupingInterval: 5000,
         keepPreviousData: true,
         fallback: initialValues,
@@ -28,10 +38,11 @@ const useWeather = (cities: string[]) => {
     });
 
     return {
-        data,
+        data: data as WeatherData[] | undefined,
         error,
         loading: isLoading,
     };
 };
 
 export default useWeather;
+export type { WeatherData };
