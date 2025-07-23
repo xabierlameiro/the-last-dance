@@ -1,0 +1,58 @@
+# Vercel ignore file
+# Documentation
+*.md
+jsdoc.json
+public/docs/
+
+# Testing and Development
+__test__/
+__tests__/
+**/*.test.*
+**/*.spec.*
+e2e/
+playwright-report/
+test-results/
+coverage/
+lighthouse/
+.storybook/
+storybook-static/
+**/*.stories.*
+
+# Configuration files
+jest.*
+playwright.config.*
+.eslintrc.*
+.prettierrc.*
+
+# Environment files
+.env.example
+
+# Build artifacts
+.next/
+dist/
+build/
+
+# Lock files (keep package-lock.json, remove yarn.lock if exists)
+yarn.lock
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.swc/

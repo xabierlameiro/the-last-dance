@@ -5,6 +5,6 @@
             "dev": false
         }
     },
-    "buildCommand": "yarn install --silent && yarn build",
-    "installCommand": "yarn install --silent"
+    "buildCommand": "npm install --legacy-peer-deps && npm run build",
+    "installCommand": "npm install --legacy-peer-deps"
 }
