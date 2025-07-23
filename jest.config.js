@@ -10,7 +10,7 @@ const createJestConfig = nextJest({
 /** @type {import('jest').Config} */
 const customJestConfig = {
     setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-    setupFiles: ['<rootDir>/jest.mock.js'],
+    setupFiles: ['<rootDir>/jest.mock.js', '<rootDir>/jest.env.setup.js'],
     coveragePathIgnorePatterns: [
         '^.*\\.stories\\.[jt]sx?$',
         'src/components/index.tsx',
@@ -22,7 +22,6 @@ const customJestConfig = {
     coverageReporters: ['html'],
     collectCoverageFrom: ['src/components/**/*.tsx'],
     moduleNameMapper: {
-        '^@/helpers(.*)$': '<rootDir>src/helpers/index.ts$1',
         '^@/helpers(.*)$': '<rootDir>src/helpers/$1',
         '^@/layout(.*)$': '<rootDir>src/components/Layout/index.tsx$1',
         '^@/test$': '<rootDir>/jest.setup.js',

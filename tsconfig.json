@@ -36,14 +36,22 @@
         ]
     },
     "include": [
-        "./jest.setup.js",
         "next-env.d.ts",
         "**/*.ts",
         "**/*.tsx",
         "**/*.mdx",
         ".next/types/**/*.ts",
-        "custom-reporter.js",
         "./next.config.ts"
     ],
-    "exclude": ["node_modules", "storybook-static", "**/*.stories.tsx"]
+    "exclude": [
+        "node_modules", 
+        "storybook-static", 
+        "**/*.stories.tsx",
+        "**/*.test.tsx",
+        "**/*.test.ts",
+        "**/__test__/**/*",
+        "**/__tests__/**/*",
+        "./jest.setup.js",
+        "custom-reporter.js"
+    ]
 }

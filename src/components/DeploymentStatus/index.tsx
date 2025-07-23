@@ -15,7 +15,7 @@ const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/deployments`);
  * @example - const { data, isLoading, isError } = useDeploymentStatus();
  */
 export const useDeploymentStatus = () => {
-    const { data, error } = useSWR(url, fetcher);
+    const { data, error } = useSWR(url.toString(), fetcher);
     return {
         data: data,
         isLoading: !error && !data,

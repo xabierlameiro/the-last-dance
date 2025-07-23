@@ -16,8 +16,8 @@ type WeatherProps = {
  */
 const News = ({ city }: WeatherProps) => {
     const ref = React.useRef<HTMLDivElement>(null);
-    const handleMouseEnter = React.useRef<() => void>();
-    const handleMouseLeave = React.useRef<() => void>();
+    const handleMouseEnter = React.useRef<(() => void) | null>(null);
+    const handleMouseLeave = React.useRef<(() => void) | null>(null);
     const { data, error } = useNews(city);
     const { formatMessage: f } = useIntl();
 
@@ -46,8 +46,8 @@ const News = ({ city }: WeatherProps) => {
                 ref={ref}
                 data-testid="news"
                 className={styles.container}
-                onMouseEnter={handleMouseEnter.current}
-                onMouseLeave={handleMouseLeave.current}
+                onMouseEnter={handleMouseEnter.current || undefined}
+                onMouseLeave={handleMouseLeave.current || undefined}
             >
                 {data.news.map((news: { link: string; title: string; published: string; description: string }) => (
                     <a

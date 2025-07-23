@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 import { remarkCodeHike } from '@code-hike/mdx';
-import theme from 'shiki/themes/one-dark-pro.json' assert { type: 'json' };
+import theme from 'shiki/themes/one-dark-pro.json' with { type: 'json' };
 import nextMDX from '@next/mdx';
 
 const withMDX = nextMDX({
@@ -38,16 +38,35 @@ export default withMDX({
     },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {
-        appDir: false,
         largePageDataBytes: 800 * 1000,
     },
     images: {
-        domains: [
-            'ssl.gstatic.com',
-            'gstatic.com',
-            'uploads-ssl.webflow.com',
-            'code.visualstudio.com',
-            'googlecm.hit.gemius.pl',
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'ssl.gstatic.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'gstatic.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'uploads-ssl.webflow.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'code.visualstudio.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'googlecm.hit.gemius.pl',
+                pathname: '/**',
+            },
         ],
     },
     i18n: {
@@ -55,13 +74,17 @@ export default withMDX({
         defaultLocale: 'en',
         localeDetection: false,
     },
-    headers: {
-        source: '/:path*',
-        headers: [
-            { key: "Access-Control-Allow-Credentials", value: "true" },
-            { key: "Access-Control-Allow-Origin", value: "*" },
-            { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
-            { key: "Access-Control-Allow-Headers", value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" },
-        ],
+    headers: async () => {
+        return [
+            {
+                source: '/:path*',
+                headers: [
+                    { key: "Access-Control-Allow-Credentials", value: "true" },
+                    { key: "Access-Control-Allow-Origin", value: "*" },
+                    { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+                    { key: "Access-Control-Allow-Headers", value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" },
+                ],
+            }
+        ];
     },
 });

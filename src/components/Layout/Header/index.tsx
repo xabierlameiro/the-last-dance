@@ -54,7 +54,7 @@ const DateAndHour = ({ children, minutes = 1 }: { children?: ReactNode; minutes?
                 <Tooltip.Content>{f({ id: 'weather.tooltip' })}</Tooltip.Content>
             </Tooltip>
             {children &&
-                React.cloneElement(children as React.ReactElement, {
+                React.cloneElement(children as React.ReactElement<{ open?: boolean; handleClose?: () => void }>, {
                     open: openWeatherWidget,
                     handleClose: () => setOpenWeatherWidget(false),
                 })}
