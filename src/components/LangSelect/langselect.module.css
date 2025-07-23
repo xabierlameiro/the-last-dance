@@ -16,8 +16,8 @@
 
 .lang_select {
     width: 200px;
-    height: 100%;
-    overflow: auto;
+    height: auto; /* Cambiar de 100% a auto para evitar problemas de altura */
+    overflow: visible; /* Cambiar de auto a visible para asegurar que el contenido se muestre correctamente */
     font-size: 13px;
     outline: none;
     background-color: rgba(var(--blog-background));

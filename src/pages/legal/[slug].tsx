@@ -6,7 +6,6 @@ import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from '@/helpers/mdx';
 import styles from '@/styles/legal.module.css';
 import path from 'path';
-import glob from 'glob';
 import fs from 'fs';
 import SearchInput from '@/components/SearchInput';
 import Link from 'next/link';
@@ -124,13 +123,15 @@ export const getStaticProps = async ({
 };
 
 export const getStaticPaths = () => {
-    let paths = glob.sync(`${LEGAL_PATH}/**/*.mdx`).map((path) => {
-        return path.replace(LEGAL_PATH, '').replace('.mdx', '').split('/').pop();
-    });
+    const files = fs.readdirSync(LEGAL_PATH);
+    const paths = files
+        .filter((file) => file.endsWith('.mdx'))
+        .map((file) => file.replace('.mdx', ''));
+    
     return {
-        paths: paths.map((path) => ({
+        paths: paths.map((slug) => ({
             params: {
-                slug: path,
+                slug,
             },
         })),
         fallback: 'blocking',

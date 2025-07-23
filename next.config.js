@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 import { remarkCodeHike } from '@code-hike/mdx';
-import theme from 'shiki/themes/one-dark-pro.json' assert { type: 'json' };
+import theme from 'shiki/themes/one-dark-pro.json' with { type: 'json' };
 import nextMDX from '@next/mdx';
 
 const withMDX = nextMDX({
@@ -41,12 +41,32 @@ export default withMDX({
         largePageDataBytes: 800 * 1000,
     },
     images: {
-        domains: [
-            'ssl.gstatic.com',
-            'gstatic.com',
-            'uploads-ssl.webflow.com',
-            'code.visualstudio.com',
-            'googlecm.hit.gemius.pl',
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'ssl.gstatic.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'gstatic.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'uploads-ssl.webflow.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'code.visualstudio.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'googlecm.hit.gemius.pl',
+                pathname: '/**',
+            },
         ],
     },
     i18n: {
@@ -54,32 +74,17 @@ export default withMDX({
         defaultLocale: 'en',
         localeDetection: false,
     },
-    async headers() {
+    headers: async () => {
         return [
-            {
-                source: '/api/:path*',
-                headers: [
-                    { key: 'Access-Control-Allow-Credentials', value: 'false' },
-                    { key: 'Access-Control-Allow-Origin', value: process.env.NEXT_PUBLIC_DOMAIN || 'https://xabierlameiro.com' },
-                    { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS,POST' },
-                    { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
-                    { key: 'X-Content-Type-Options', value: 'nosniff' },
-                    { key: 'X-Frame-Options', value: 'DENY' },
-                    { key: 'X-XSS-Protection', value: '1; mode=block' },
-                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-                    { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-                ],
-            },
             {
                 source: '/:path*',
                 headers: [
-                    { key: 'X-Content-Type-Options', value: 'nosniff' },
-                    { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-                    { key: 'X-XSS-Protection', value: '1; mode=block' },
-                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-                    { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+                    { key: "Access-Control-Allow-Credentials", value: "true" },
+                    { key: "Access-Control-Allow-Origin", value: "*" },
+                    { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+                    { key: "Access-Control-Allow-Headers", value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" },
                 ],
-            },
+            }
         ];
     },
 });
