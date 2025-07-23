@@ -1,11 +1,10 @@
 import React from 'react';
 import styles from '@/styles/settings.module.css';
 import { useIntl } from 'react-intl';
-import { useDialog } from '@/context/dialog';
 import SEO from '@/components/SEO';
 import Avatar from '@/components/Avatar';
 import Dialog from '@/components/Dialog';
-import LangeSelect from '@/components/LangSelect';
+import LangSelect from '@/components/LangSelect';
 import SearchInput from '@/components/SearchInput';
 import IconWithName from '@/components/IconWithName';
 import ControlButtons from '@/components/ControlButtons';
@@ -13,20 +12,22 @@ import NavigationArrows from '@/components/NavigationArrows';
 import GridLayoutControl from '@/components/GridLayoutControl';
 import useDarkMode from '@/hooks/useDarkMode';
 
-const toggleHandler = (dispatch: Function) => () => dispatch({ type: 'toggleLang' });
+const toggleHandler = (toggleLang: () => void) => () => toggleLang();
 
-const Header = () => {
-    const { lang, dispatch } = useDialog();
+const Header = ({ lang, toggleLang }: { lang: boolean; toggleLang: () => void }) => {
     const { formatMessage: f } = useIntl();
-    const close = () => dispatch({ type: 'close' });
+    const close = () => {
+        // For a standalone page, we can't really "close", so we'll go back to home
+        window.location.href = '/';
+    };
     return (
         <header className={styles.header}>
             <ControlButtons disabled onClickClose={close} onClickMinimise={close} />
             <NavigationArrows
                 disabledRight={lang}
                 disabledLeft={!lang}
-                onClickLeft={toggleHandler(dispatch)}
-                onClickRight={toggleHandler(dispatch)}
+                onClickLeft={toggleHandler(toggleLang)}
+                onClickRight={toggleHandler(toggleLang)}
             />
             <GridLayoutControl routeName={f({ id: 'settings.title' })} />
             <SearchInput placeHolderText={f({ id: 'settings.search' })} />
@@ -34,9 +35,8 @@ const Header = () => {
     );
 };
 
-const Content = () => {
+const Content = ({ lang, toggleLang }: { lang: boolean; toggleLang: () => void }) => {
     const { formatMessage: f } = useIntl();
-    const { lang, dispatch } = useDialog();
     const {
         theme,
         scheme: { dark },
@@ -53,7 +53,7 @@ const Content = () => {
                         alt={f({ id: 'settings.langAlt' })}
                         name={f({ id: 'settings.lang.description' })}
                     />
-                    <LangeSelect />
+                    <LangSelect />
                 </div>
             </>
         );
@@ -73,7 +73,7 @@ const Content = () => {
                     icon="/settings/lang.png"
                     alt={f({ id: 'settings.langAlt' })}
                     name={f({ id: 'settings.lang' })}
-                    onClick={toggleHandler(dispatch)}
+                    onClick={toggleHandler(toggleLang)}
                 />
                 <IconWithName
                     icon="/settings/theme.png"
@@ -89,7 +89,11 @@ const Content = () => {
 
 const Settings = () => {
     const { formatMessage: f } = useIntl();
-    const { open } = useDialog();
+    // For the settings page, we always want the dialog to be open
+    // We don't use the context here since this is a dedicated page
+    const [lang, setLang] = React.useState(false);
+
+    const toggleLang = () => setLang(!lang);
 
     return (
         <>
@@ -99,7 +103,12 @@ const Settings = () => {
                     description: f({ id: 'settings.seo.description' }),
                 }}
             />
-            <Dialog modalMode open={open} body={<Content />} header={<Header />} />
+            <Dialog 
+                modalMode 
+                open={true} 
+                body={<Content lang={lang} toggleLang={toggleLang} />} 
+                header={<Header lang={lang} toggleLang={toggleLang} />} 
+            />
         </>
     );
 };

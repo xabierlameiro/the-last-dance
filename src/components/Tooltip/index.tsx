@@ -107,9 +107,9 @@ const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement
                 context.getReferenceProps({
                     ref,
                     ...props,
-                    ...children.props,
+                    ...(children.props || {}),
                     'data-state': context.open ? 'open' : 'closed',
-                })
+                } as React.HTMLProps<Element>)
             );
         }
 

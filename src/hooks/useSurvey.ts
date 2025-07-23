@@ -260,7 +260,7 @@ const useSurvey = () => {
                         }),
                     });
                     emailRef.current = true;
-                } catch (e) {
+                } catch {
                     // Error ignored
                 }
             })();

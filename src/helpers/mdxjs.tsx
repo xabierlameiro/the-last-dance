@@ -26,7 +26,10 @@ const GoogleAdsense = () => {
     );
 };
 
-const Date = dynamic(() => import('@/components/Date'));
+const DateComponent = dynamic(() => import('@/components/Date'), {
+    ssr: false,
+    loading: () => <Loading />,
+});
 
 export const ControlButtons = () => {
     const { dispatch } = useDialog();
@@ -34,4 +37,11 @@ export const ControlButtons = () => {
     return <CButtons disabled withPadding onClickClose={closeHandler} onClickMinimise={closeHandler} />;
 };
 
-export const components = { CH, ControlButtons, Date, GoogleAdsense, Image };
+// @ts-ignore: MDX component compatibility
+export const components = { 
+    CH, 
+    ControlButtons, 
+    Date: DateComponent, 
+    GoogleAdsense, 
+    Image 
+};

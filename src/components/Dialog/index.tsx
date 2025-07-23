@@ -3,7 +3,7 @@ import styles from './dialog.module.css';
 import { clx } from '@/helpers';
 
 type Props = {
-    dialogRef?: React.RefObject<HTMLDivElement>;
+    dialogRef?: React.RefObject<HTMLDivElement | null>;
     className?: string;
     open?: boolean;
     withPadding?: boolean;

@@ -40,5 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Storybook
+storybook-static/
+
 migration/node_modules
 migration/.next

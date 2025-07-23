@@ -4,6 +4,7 @@ import { FC, useId } from 'react';
 type AdComponent = FC<{
     slot: string;
     client?: string;
+    horizontal?: boolean;
 }>;
 
 /**
