@@ -52,6 +52,7 @@
         "**/__test__/**/*",
         "**/__tests__/**/*",
         "./jest.setup.js",
-        "custom-reporter.js"
+        "custom-reporter.js",
+        "migration/**/*"
     ]
 }

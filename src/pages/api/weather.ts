@@ -53,6 +53,7 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
         if (err instanceof Error) {
             throw new Error(err.message);
         }
+        throw new Error('Unknown error occurred');
     }
 };
 

@@ -45,16 +45,19 @@ const reducer = (state: SurveyState, action: SurveyAction): SurveyState => {
                 currentQuestion: currentQuestion - 1,
             };
         case 'ADD_ANSWER':
-            newAnswers[questionNum] = {
-                ...action.payload,
-            };
-            return {
-                ...state,
-                answers: newAnswers,
-                currentQuestion: currentQuestion + 1,
-                questionsDone: questionNum > questionsDone ? questionNum : questionsDone,
-                success: newAnswers.every((answer) => answer.isCorrect) && currentQuestion === 10,
-            };
+            if (questionNum !== undefined) {
+                newAnswers[questionNum] = {
+                    ...action.payload,
+                };
+                return {
+                    ...state,
+                    answers: newAnswers,
+                    currentQuestion: currentQuestion + 1,
+                    questionsDone: questionNum > questionsDone ? questionNum : questionsDone,
+                    success: newAnswers.every((answer) => answer.isCorrect) && currentQuestion === 10,
+                };
+            }
+            return state;
         default:
             return state;
     }

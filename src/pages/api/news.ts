@@ -47,10 +47,10 @@ const getWeatherData = async (city: string): Promise<NewsData | null> => {
 
     const news = Array.from(elements).map((element) => {
         return {
-            title: element.querySelector('[role="heading"]')?.textContent,
-            description: element.querySelector('.GI74Re.nDgy9d')?.textContent,
-            link: element.querySelector('a')?.href,
-            published: element.querySelector('.OSrXXb.ZE0LJd.YsWzw')?.textContent,
+            title: element.querySelector('[role="heading"]')?.textContent || null,
+            description: element.querySelector('.GI74Re.nDgy9d')?.textContent || null,
+            link: element.querySelector('a')?.href || '',
+            published: element.querySelector('.OSrXXb.ZE0LJd.YsWzw')?.textContent || null,
         };
     });
 

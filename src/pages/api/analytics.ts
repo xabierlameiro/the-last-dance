@@ -62,8 +62,8 @@ export default allowCors(async function handler(
                 return;
             }
             data = {
-                pageViews: response?.rows?.[0].metricValues?.[0].value,
-                newUsers: response?.rows?.[0].metricValues?.[1].value,
+                pageViews: response?.rows?.[0].metricValues?.[0].value || '0',
+                newUsers: response?.rows?.[0].metricValues?.[1].value || '0',
             };
         } else {
             const [response] = await analyticsDataClient.runReport({
@@ -101,8 +101,8 @@ export default allowCors(async function handler(
 
             if (response.rowCount > 0) {
                 data = {
-                    pageViews: response?.rows?.[0].metricValues?.[0].value,
-                    newUsers: response?.rows?.[0].metricValues?.[1].value,
+                    pageViews: response?.rows?.[0].metricValues?.[0].value || '0',
+                    newUsers: response?.rows?.[0].metricValues?.[1].value || '0',
                 };
             } else {
                 data = {
@@ -113,8 +113,8 @@ export default allowCors(async function handler(
         }
 
         res.status(200).json({
-            pageViews: data.pageViews,
-            newUsers: data.newUsers,
+            pageViews: data?.pageViews || '0',
+            newUsers: data?.newUsers || '0',
         });
     } catch (err: Error | unknown) {
         if (err instanceof Error) {

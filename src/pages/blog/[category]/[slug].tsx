@@ -119,7 +119,6 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                     <MDXRemote
                                         frontmatter={undefined}
                                         {...post.content}
-                                        // @ts-expect-error: MDX component compatibility
                                         components={components}
                                         scope={{}}
                                     />

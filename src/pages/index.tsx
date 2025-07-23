@@ -40,13 +40,11 @@ const Home = ({ content }: Props) => {
                 body={
                     <>
                         <VisibilityManager hideOnDesktop hideOnTablet>
-                            {/* @ts-expect-error: MDX component compatibility */}
                             <MDXRemote {...content.mobile} components={components} frontmatter={undefined} scope={{}} />
                         </VisibilityManager>
                         <VisibilityManager hideOnMobile>
                             <MDXRemote
                                 {...content.desktop}
-                                // @ts-expect-error: MDX component compatibility
                                 components={components}
                                 frontmatter={undefined}
                                 scope={{}}
