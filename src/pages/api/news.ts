@@ -72,25 +72,34 @@ export default allowCors(async function handler(
     req: NextApiRequest,
     res: NextApiResponse<NewsResponse>
 ) {
+    // Only allow GET requests
+    if (req.method !== 'GET') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     const { query } = req;
     const { city } = query;
 
+    // Validate city parameter
     if (!city || typeof city !== 'string') {
-        res.status(500).json({ error: 'City must be a string' });
-        return;
+        return res.status(400).json({ error: 'City parameter is required and must be a string' });
     }
 
-    const data = await getWeatherData(city);
-
-    if (!data || !data.city || !data.news) {
-        res.status(500).json({ error: 'Error getting weather data' });
-        return;
+    // Validate city format
+    if (city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s-]+$/.test(city)) {
+        return res.status(400).json({ error: 'Invalid city name format' });
     }
 
-    const response = {
-        city: data.city,
-        news: data.news,
-    };
+    try {
+        const data = await getWeatherData(city);
 
-    res.status(200).json(response);
+        if (!data || !data.city || !data.news) {
+            return res.status(500).json({ error: 'Error getting weather data' });
+        }
+
+        res.status(200).json(data);
+    } catch (error) {
+        console.error('News API Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });

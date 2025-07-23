@@ -231,9 +231,9 @@ const useSurvey = () => {
                             </tr>
                         </table>
                         <ul>
-                            <li> Escríbeme a <a href="mailto:xabier.lameiro@gmail.cm" target="_blank">xabier.lameiro@gmail.com</a></li>
-                            <li> Enlace a mi <a href="https://github.com/xabierlameiro" target="_blank"> github </a></li>
-                            <li> Enlace a mi <a href="https://www.linkedin.com/in/xlameiro/" target="_blank"> linkedin </a></li>
+                            <li> Escríbeme a <a href="mailto:xabier.lameiro@gmail.cm" target="_blank" rel="noopener noreferrer">xabier.lameiro@gmail.com</a></li>
+                            <li> Enlace a mi <a href="https://github.com/xabierlameiro" target="_blank" rel="noopener noreferrer"> github </a></li>
+                            <li> Enlace a mi <a href="https://www.linkedin.com/in/xlameiro/" target="_blank" rel="noopener noreferrer"> linkedin </a></li>
                             <li> Descárgate mi  <a href="/xabierlameiro.com.pdf" download> currículum </a></li>
                         </ul>`
                             : `

@@ -110,7 +110,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --ci --legacy-peer-deps
+                  npm install --legacy-peer-deps
             - name: Generate documentation
               run: npm run jsdoc
             - name: Checkout doc repository

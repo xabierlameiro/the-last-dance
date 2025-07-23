@@ -27,9 +27,19 @@ export default allowCors(async function handler(
     req: NextApiRequest,
     res: NextApiResponse<AnalyticsResponse>
 ) {
+    // Only allow GET requests
+    if (req.method !== 'GET') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     const { query } = req;
     const { slug } = query;
     let data: AnalyticsData | null = null;
+
+    // Validate slug parameter if provided
+    if (slug && (typeof slug !== 'string' || slug.includes('..') || slug.includes('\\'))) {
+        return res.status(400).json({ error: 'Invalid slug parameter' });
+    }
 
     // Validate required environment variables
     if (!process.env.ANALYTICS_CLIENT_EMAIL || !process.env.ANALYTICS_PRIVATE_KEY || !process.env.ANALYTICS_PROJECT_ID) {

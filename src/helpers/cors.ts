@@ -3,7 +3,19 @@ import type { NextApiRequest, NextApiResponse, NextApiHandler } from 'next';
 const allowCors =
   <T extends NextApiHandler>(fn: T) => async (req: NextApiRequest, res: NextApiResponse) => {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    
+    // More restrictive CORS - only allow specific origins in production
+    const allowedOrigins = process.env.NODE_ENV === 'production' 
+      ? [process.env.NEXT_PUBLIC_DOMAIN || 'https://xabierlameiro.com']
+      : ['http://localhost:3000', 'https://localhost:3000'];
+    
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    } else if (process.env.NODE_ENV !== 'production') {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+    
     res.setHeader(
       'Access-Control-Allow-Methods',
       'GET,OPTIONS,PATCH,DELETE,POST,PUT'

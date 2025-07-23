@@ -88,14 +88,40 @@ export default allowCors(async function handler(
     req: NextApiRequest,
     res: NextApiResponse<WeatherResponse>
 ) {
+    // Only allow GET requests
+    if (req.method !== 'GET') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     const { query } = req;
     const { cities = '' } = query;
 
-    if (!cities) {
-        res.status(500).json({ error: 'query param citites must be a strings with comma' });
+    // Validate cities parameter
+    if (!cities || typeof cities !== 'string') {
+        return res.status(400).json({ error: 'Cities parameter must be a non-empty string' });
     }
+
+    // Validate cities format and length
+    const citiesArray = String(cities).split(',').map(city => city.trim()).filter(Boolean);
+    
+    if (citiesArray.length === 0) {
+        return res.status(400).json({ error: 'At least one city must be provided' });
+    }
+    
+    if (citiesArray.length > 5) {
+        return res.status(400).json({ error: 'Maximum 5 cities allowed' });
+    }
+
+    // Validate each city name (basic validation)
+    const invalidCities = citiesArray.filter(city => 
+        !city || city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s-]+$/.test(city)
+    );
+    
+    if (invalidCities.length > 0) {
+        return res.status(400).json({ error: `Invalid city names: ${invalidCities.join(', ')}` });
+    }
+
     try {
-        const citiesArray = String(cities).split(',');
 
         await Promise.allSettled(citiesArray.map((city) => getWeatherData(city)))
             .then((raw) => {

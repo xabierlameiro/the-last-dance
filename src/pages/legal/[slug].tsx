@@ -113,7 +113,30 @@ export const getStaticProps = async ({
     };
 }) => {
     const { slug } = params;
+    
+    // Validate slug to prevent directory traversal
+    if (!slug || typeof slug !== 'string' || slug.includes('..') || slug.includes('/') || slug.includes('\\')) {
+        return {
+            notFound: true,
+        };
+    }
+    
     const fullPath = path.join(LEGAL_PATH, `${slug}.mdx`);
+    
+    // Ensure the resolved path is within the legal directory
+    if (!fullPath.startsWith(LEGAL_PATH)) {
+        return {
+            notFound: true,
+        };
+    }
+    
+    // Check if file exists
+    if (!fs.existsSync(fullPath)) {
+        return {
+            notFound: true,
+        };
+    }
+    
     const mdx = fs.readFileSync(fullPath, 'utf8');
     const { content, data } = matter(mdx);
     const mdxSource = await serialize(content);
