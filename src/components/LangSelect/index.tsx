@@ -9,7 +9,7 @@ import { messages } from '../../../src/intl/translations';
  *
  * @returns {JSX.Element}
  */
-const LangeSelect = () => {
+const LangSelect = () => {
     const { formatMessage: f } = useIntl();
     const router = useRouter();
 
@@ -45,4 +45,4 @@ const LangeSelect = () => {
     );
 };
 
-export default LangeSelect;
+export default LangSelect;
