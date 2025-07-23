@@ -15,16 +15,16 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: 18.20.0
-                  cache: yarn
+                  cache: npm
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
+                  npm install --legacy-peer-deps
             - name: Execute Lighthouse
               run: |
                   sleep 10m
-                  yarn lighthouse-report
+                  npm run lighthouse-report
             - name: Checkout performance-report repository
               uses: actions/checkout@v3
               with:
