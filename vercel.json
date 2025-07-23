@@ -5,6 +5,11 @@
             "dev": false
         }
     },
-    "buildCommand": "npm install --legacy-peer-deps && npm run build",
-    "installCommand": "npm install --legacy-peer-deps"
+    "buildCommand": "npm run build",
+    "installCommand": "npm install --legacy-peer-deps",
+    "functions": {
+        "src/pages/api/**/*.ts": {
+            "runtime": "nodejs18.x"
+        }
+    }
 }
