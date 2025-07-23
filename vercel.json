@@ -4,5 +4,7 @@
             "master": true,
             "dev": false
         }
-    }
+    },
+    "buildCommand": "yarn install --silent && yarn build",
+    "installCommand": "yarn install --silent"
 }

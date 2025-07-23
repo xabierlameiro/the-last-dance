@@ -8,7 +8,7 @@
     "scripts": {
         "dev": "next dev",
         "debugg": "cross-env NODE_OPTIONS='--inspect' next dev",
-        "prod": "yarn --prod --silent --ignore-scripts",
+        "prod": "yarn install --production=false --silent --ignore-scripts",
         "build": "next build",
         "start:debugg": "cross-env NODE_OPTIONS='--inspect' next start",
         "start": "next start",
@@ -27,6 +27,7 @@
         "next-info": "npx --no-install next info"
     },
     "dependencies": {
+        "@babel/core": "^7.27.1",
         "@babel/preset-typescript": "^7.18.6",
         "@code-hike/mdx": "^0.8.3",
         "@floating-ui/dom": "^1.1.1",
