@@ -79,7 +79,7 @@ export const getLang = (lang: string | undefined) => (isNotEng(lang) ? `/${lang}
  * @param ref  React.RefObject<HTMLDivElement>
  * @returns  interval
  */
-export const setInverval = (ref: React.RefObject<HTMLDivElement>) => {
+export const setInverval = (ref: React.RefObject<HTMLDivElement | null>) => {
     let step = 0;
     const interval = setInterval(() => {
         if (ref.current) {
