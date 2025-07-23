@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
 
 /**

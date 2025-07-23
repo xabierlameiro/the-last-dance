@@ -10,7 +10,7 @@ describe('GoogleAdsense', () => {
     });
 
     it('Should renders GoogleAdsense component with horizontal prop', () => {
-        const { container } = render(<GoogleAdsense slot="1234567890" horizontal={true} />);
+        const { container } = render(<GoogleAdsense slot="1234567890" horizontal />);
         expect(container.querySelector('ins')).toBeInTheDocument();
     });
 

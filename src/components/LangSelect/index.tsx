@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
+import React from 'react';
 import styles from './langselect.module.css';
 import { messages } from '../../../src/intl/translations';
 
@@ -13,12 +14,19 @@ const LangSelect = () => {
     const { formatMessage: f } = useIntl();
     const router = useRouter();
 
-    const handleLanguageChange = (newLocale: string) => {
+    const handleLanguageChange = React.useCallback((newLocale: string) => {
         // Use router.push with locale parameter
         router.push(router.asPath, router.asPath, {
             locale: newLocale,
         });
-    };
+    }, [router]);
+
+    const handleSelectChange = React.useCallback(
+        (e: React.ChangeEvent<HTMLSelectElement>) => {
+            handleLanguageChange(e.target.value);
+        },
+        [handleLanguageChange]
+    );
 
     return (
         <div className={styles.lang_container} data-testid="lang-select">
@@ -31,7 +39,7 @@ const LangSelect = () => {
                 className={styles.lang_select}
                 size={Object.keys(messages).length}
                 value={router.locale}
-                onChange={(e) => handleLanguageChange(e.target.value)}
+                onChange={handleSelectChange}
             >
                 {Object.entries(messages).map(([key, value]) => {
                     return (

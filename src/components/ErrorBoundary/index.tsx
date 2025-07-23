@@ -4,15 +4,15 @@ import SEO from '@/components/SEO';
 import Dialog from '@/components/Dialog';
 import Layout from '@/components/Layout';
 
-class ErrorBoundary extends React.Component<React.PropsWithChildren<unknown>, { hasError: boolean; error?: any }> {
-    constructor(props: any) {
+class ErrorBoundary extends React.Component<React.PropsWithChildren<unknown>, { hasError: boolean; error?: Error }> {
+    constructor(props: React.PropsWithChildren<unknown>) {
         super(props);
         this.state = {
             hasError: false,
         };
     }
 
-    static getDerivedStateFromError(error: any) {
+    static getDerivedStateFromError(error: Error) {
         return { hasError: true, error };
     }
 
@@ -35,7 +35,7 @@ class ErrorBoundary extends React.Component<React.PropsWithChildren<unknown>, { 
                             header={<ControlButtons disabled />}
                             body={
                                 <div style={{ display: 'grid', placeContent: 'center', height: 'inherit' }}>
-                                    {JSON.stringify(this.state.error.message)}
+                                    {this.state.error?.message || 'An unknown error occurred'}
                                 </div>
                             }
                         />

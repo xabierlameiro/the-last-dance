@@ -9,7 +9,7 @@ describe('SEO', () => {
                     title: 'test title',
                     noindex: true,
                 }}
-                isBlog={true}
+                isBlog
             />
         );
         

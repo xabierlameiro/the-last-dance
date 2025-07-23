@@ -13,7 +13,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 type locales = 'en' | 'es' | 'gl';
 declare global {
     interface Window {
-        gtag: (event: string, name: any, obj: object) => void;
+        gtag: (event: string, name: string, obj: object) => void;
     }
 }
 

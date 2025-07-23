@@ -52,10 +52,10 @@ export function useTooltip({
 
     const hover = useHover(context, {
         move: false,
-        enabled: controlledOpen == null,
+        enabled: controlledOpen === null,
     });
     const focus = useFocus(context, {
-        enabled: controlledOpen == null,
+        enabled: controlledOpen === null,
     });
     const dismiss = useDismiss(context);
     const role = useRole(context, { role: 'tooltip' });
@@ -80,7 +80,7 @@ const TooltipContext = React.createContext<ContextType>(null);
 export const useTooltipContext = () => {
     const context = React.useContext(TooltipContext);
 
-    if (context == null) {
+    if (context === null) {
         throw new Error('Tooltip components must be wrapped in <Tooltip />');
     }
 
@@ -97,7 +97,8 @@ function Tooltip({ children, ...options }: { children: React.ReactNode } & Toolt
 const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement> & { asChild?: boolean }>(
     function TooltipTrigger({ children, asChild = false, ...props }, propRef) {
         const context = useTooltipContext();
-        const childrenRef = (children as any).ref;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const childrenRef = (children as any)?.ref;
         const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);
 
         // `asChild` allows the user to pass any element as the anchor
@@ -143,7 +144,7 @@ const TooltipContent = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivE
                         position: context.strategy,
                         top: context.y ?? 0,
                         left: context.x ?? 0,
-                        visibility: context.x == null ? 'hidden' : 'visible',
+                        visibility: context.x === null ? 'hidden' : 'visible',
                         ...props.style,
                     }}
                     {...context.getFloatingProps(props)}

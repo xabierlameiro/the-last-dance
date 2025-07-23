@@ -12,7 +12,7 @@ import { defaultLocale, MAX_STEPS } from '@/constants/site';
 export const clx = (...classes: Array<string | null | undefined>) => {
     classes = classes
         .filter((element) => {
-            return element !== '' && element !== null && element !== undefined;
+            return element !== '' && element !== null;
         })
         .map((item) => item?.trim());
 
@@ -106,10 +106,10 @@ export const setInverval = (ref: React.RefObject<HTMLDivElement | null>) => {
  * @description Utility function to use SWR with fetcher.
  * @example const { data, error } = useSWR('/api/weather', fetcher);
  * @param {string} url
- * @returns {Promise<any>}
+ * @returns {Promise<unknown>}
  * @see https://swr.vercel.app/docs/data-fetching
  */
-export const fetcher = (url: string): Promise<any> =>
+export const fetcher = (url: string): Promise<unknown> =>
     fetch(url).then((res) => {
         if (res.ok) {
             return res.json();

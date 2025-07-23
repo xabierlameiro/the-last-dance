@@ -36,7 +36,7 @@ export const GoogleAdsense: AdComponent = ({ client = 'ca-pub-3537017956623483',
             />
             <Script
                 async
-                id={id + '#' + slot}
+                id={`${id}#${slot}`}
                 dangerouslySetInnerHTML={{
                     __html: `(adsbygoogle = window.adsbygoogle || []).push({});`,
                 }}

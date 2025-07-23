@@ -10,7 +10,7 @@ const useXRP = () => {
         fallbackData: {
             price: 0,
             todaySummary: '',
-            todayPorcentage: '',
+            todayPorcentage: '0%',
         },
     });
 

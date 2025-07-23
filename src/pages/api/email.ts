@@ -23,7 +23,7 @@ export default async function handler(
     const mailOptions = {
         from: process.env.EMAIL,
         to: process.env.EMAIL,
-        subject: subject,
+        subject,
         html: message,
     };
 
