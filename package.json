@@ -56,6 +56,10 @@
         "react-icons": "^4.7.1",
         "react-intl": "^6.8.9",
         "swr": "^2.0.2",
+        "typescript": "^5.8.3",
+        "@types/node": "^22.0.0",
+        "@types/react": "^19.1.8",
+        "@types/react-dom": "^19.1.6",
         "webpack": "^5.88.0"
     },
     "devDependencies": {
@@ -70,10 +74,7 @@
         "@storybook/testing-library": "^0.0.13",
         "@storybook/theming": "^6.5.14",
         "@types/glob": "^8.0.0",
-        "@types/node": "^22.0.0",
         "@types/nodemailer": "^6.4.7",
-        "@types/react": "^19.1.8",
-        "@types/react-dom": "^19.1.6",
         "cross-env": "6",
         "eslint": "^9.31.0",
         "eslint-config-next": "^15.4.3",
@@ -88,12 +89,11 @@
         "lighthouse": "^12.2.1",
         "prettier": "^2.8.3",
         "storybook": "^8.4.7",
-        "storybook-react-intl": "^1.1.1",
-        "typescript": "^5.8.3"
+        "storybook-react-intl": "^1.1.1"
     },
     "engines": {
         "node": ">=18.0.0",
-        "yarn": ">=1.22.0"
+        "npm": ">=8.0.0"
     },
     "resolutions": {
         "protobufjs": "^7.2.5",
