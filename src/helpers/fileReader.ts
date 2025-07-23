@@ -1,9 +1,30 @@
 import path from 'path';
 import fs from 'fs';
-import glob from 'glob';
 import matter from 'gray-matter';
+
 // Path to posts directory
 const POST_PATH = path.join(process.cwd(), 'data/blog');
+
+/**
+ * @description Recursively find all .mdx files in a directory
+ */
+const findMdxFiles = (dir: string): string[] => {
+    const files: string[] = [];
+    const items = fs.readdirSync(dir);
+
+    for (const item of items) {
+        const fullPath = path.join(dir, item);
+        const stat = fs.statSync(fullPath);
+
+        if (stat.isDirectory()) {
+            files.push(...findMdxFiles(fullPath));
+        } else if (item.endsWith('.mdx')) {
+            files.push(fullPath);
+        }
+    }
+
+    return files;
+};
 
 /**
  * @description Find post by slug.
@@ -16,18 +37,18 @@ const POST_PATH = path.join(process.cwd(), 'data/blog');
  * @returns {Object} - Object with post content and meta data.
  */
 const findPostBySlug = (slug: string | { params: { slug: string } }) => {
-    let paths = glob.sync(`${POST_PATH}/**/*.mdx`);
+    const paths = findMdxFiles(POST_PATH);
 
     if (typeof slug === 'object') {
         slug = slug.params.slug;
     } else {
         slug = slug.split('/')[slug.split('/').length - 1];
     }
-    const [route] = paths.filter((path) => {
-        const document = fs.readFileSync(path, 'utf8');
+    const [route] = paths.filter((filePath) => {
+        const document = fs.readFileSync(filePath, 'utf8');
         const { data } = matter(document);
-        const fileName = path.split('/').pop();
-        if (data.slug === slug || fileName == `${slug}.mdx`) {
+        const fileName = filePath.split('/').pop();
+        if (data.slug === slug || fileName === `${slug}.mdx`) {
             return true;
         }
     });
@@ -77,9 +98,8 @@ export const getPostBySlug = (slug: string | { params: { slug: string } }) => {
  * @returns {Array} - Array with slugs.
  */
 const getPostSlugs = () => {
-    let paths = glob.sync(`${POST_PATH}/**/*.mdx`);
-    paths = paths.map((path) => path.replace(`${POST_PATH}/`, '').replace(/\.mdx$/, ''));
-    return paths;
+    const paths = findMdxFiles(POST_PATH);
+    return paths.map((filePath) => filePath.replace(`${POST_PATH}/`, '').replace(/\.mdx$/, ''));
 };
 
 /**
