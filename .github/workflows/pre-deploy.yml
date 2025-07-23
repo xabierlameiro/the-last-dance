@@ -5,7 +5,7 @@ on:
 jobs:
     cancel_redundancy:
         name: Cancel Redundant Workflow Runs
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Cancel previous redundant workflow runs
               uses: styfle/cancel-workflow-action@0.11.0
@@ -13,7 +13,7 @@ jobs:
                   access_token: ${{ secrets.TOKEN_GITHUB }}
     code_checking:
         name: Linting
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
@@ -29,7 +29,7 @@ jobs:
               run: yarn run lint
     testing:
         name: Testing
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -65,6 +65,8 @@ jobs:
                   git push origin main
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps chromium
+              env:
+                  DEBIAN_FRONTEND: noninteractive
             - name: Run dev server
               run: yarn dev &
             - name: Wait for dev server to be ready
@@ -89,7 +91,7 @@ jobs:
                   git push origin main
     documentation:
         name: Documenting
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -140,7 +142,7 @@ jobs:
                   git push origin main
     version:
         name: Versioning
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         needs: [code_checking, testing, documentation]
         steps:
             - name: Checkout version repository
@@ -163,7 +165,7 @@ jobs:
 
     deploy:
         name: Trigger deploy on preview environment
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         needs: [version]
         steps:
             - name: Deploy to Vercel
