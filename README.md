@@ -7,6 +7,7 @@
 -   **Storybook**: [Storybook](https://storybook.js.org/)
 -   **Testing**: [Jest](https://jestjs.io/)
 -   **Deployment**: [Vercel](https://vercel.com)
+-   **Package Manager**: Yarn (Berry)
 
 ## Overview
 
@@ -30,13 +31,36 @@
 
 ## Running Locally
 
-This application requires Node.js v16 ++.
+This application requires **Node.js v18.20.0** (see `.nvmrc`).
+Until the Next.js 15 migration is complete, other versions are not supported.
+Yarn (Berry) is the official package manager for this project.
 
 ```bash
 git clone https://github.com/xabierlameiro/the-last-dance.git
-npm i
-npm run dev
+
+# Create your environment file
+cp .env.example .env.development # or .env.local
+
+# Use the correct Node.js version (if you have nvm installed)
+nvm use
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
 ```
+
+### Node.js Version
+
+This project is pinned to Node.js v18.20.0 until the Next.js 15 migration is complete.
+If you have `nvm` installed, you can use:
+
+```bash
+nvm use
+```
+
+This will automatically use the Node.js version specified in `.nvmrc`.
 
 ## Pending tasks
 

@@ -1,0 +1,86 @@
+---
+title: 'Implementar o meu libro de contos de compoñentes é moi sinxelo'
+slug: 'despregar-storybook-facilmente'
+author: 'Xabier Lameiro'
+category: 'React'
+tags: ['storybook']
+locale: 'gl'
+excerpt: 'Implementación de compoñentes de React con Storybook: un xeito sinxelo de mostrar o teu traballo. Buscas un xeito sinxelo de mostrar os teus compoñentes de React e compartilos?'
+description: 'Implementación de compoñentes de React con Storybook: un xeito sinxelo de mostrar o teu traballo. Buscas un xeito sinxelo de mostrar os teus compoñentes de React e compartilos?'
+image: '/posts/deploying-storybook.png'
+alternate:
+    [
+        { lang: 'en', url: 'deploying-my-storybook-is-very-simple' },
+        { lang: 'es', url: 'desplegar-storybook-facilmente' },
+    ]
+---
+
+# Mostrar o meu storybook é moi sinxelo
+
+<Date date="01-04-2023" />
+
+<GoogleAdsense />
+
+Unha vez que creas os teus compoñentes do Storybook, podes compartilos de varias maneiras. Podes implementar Storybook en Vercel, GitHub ou Netlify ou Heroku e compartir o URL co teu equipo e clientes potenciais.
+Tamén podes crear unha versión estática do Storybook e implementala nun servidor web. Isto permíteche ter unha versión do Storybook que está sempre en liña e actualizada.
+
+Storybook é fácil de configurar e xestionar. Necesitarás Node.js e algunhas dependencias de desenvolvemento instaladas para configurar o teu propio ambiente. Tamén podes usar generator-storybook para comezar a crear rapidamente un ficheiro de configuración de Storybook.
+
+Unha vez que configures o teu Storybook, podes comezar a escribir historias para os teus compoñentes. Unha historia é esencialmente unha breve explicación de como se usará o teu compoñente na aplicación. Podes escribir historias para os compoñentes que xa tes
+creado e tamén calquera compoñente no que esteas a traballar. Storybook tamén che permite crear variacións do teu compoñente, isto é útil para as probas A/B.
+
+Implementar compoñentes de React con Storybook é unha boa forma de mostrar o teu traballo e garantir que os teus compoñentes estean libres de erros. Permítelle crear guías de estilo en directo para os seus compoñentes e ofrece unha caixa de probas para probalos.
+Configurar Storybook pode parecer desalentador, pero é doado se segues a documentación. Unha vez que o teñas configurado, podes comezar a crear historias e variacións dos teus compoñentes e compartilas co teu equipo e clientes potenciais.
+
+## 1. Comandos do storybook
+
+```javascript package.json v1
+"scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+}
+```
+
+## 2. Fai un historial dos teus compoñentes
+
+```tsx Avatar.stories.tsx v1
+import React from 'react';
+import { ComponentStory, ComponentMeta } from '@storybook/react';
+import Avatar from '.';
+
+export default {
+    /* 👇 The title prop is optional.
+     * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
+     * to learn how to generate automatic titles
+     */
+    title: 'Settings / Avatar',
+    component: Avatar,
+} as ComponentMeta<typeof Avatar>;
+
+//👇 We create a “template” of how args map to rendering
+const Template: ComponentStory<typeof Avatar> = (args) => <Avatar {...args} />;
+
+// 👇 Each story then reuses that template
+export const Primary = Template.bind({});
+
+Primary.args = {
+    name: 'Juan Carlos de Borbón',
+    description: 'Rey emérito de España',
+    img: '/avatar.png',
+    alt: 'Quien bien se vive!',
+};
+```
+
+## 3. Implementación do libro de contos
+
+As cousas máis importantes son o comando de compilación, o directorio de saída e o comando de instalación. (fío, npm ou o que sexa) para as dependencias.
+
+```bash yard build-storybook v1
+
+./storybook-static
+
+yarn i || npm i || npx i
+
+```
+
+> Aquí podes ver o exemplo do meu libro de contos despregado nun subdominio: [https://storybook.xabierlameiro.com](https://storybook.xabierlameiro.com 'Enlace a storybook.xabierlameiro.com')

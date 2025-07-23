@@ -1,0 +1,117 @@
+---
+title: 'Automatización dos informes de Lighthouse'
+slug: 'automatizacion-dos-informes-de-lighthouse'
+author: 'Xabier Lameiro'
+category: 'Javascript'
+tags: ['node']
+locale: 'gl'
+excerpt: 'Automatización de informes de Lighthouse usando playwright e a api de lightouse nunha web despregada nun exemplo real'
+description: 'Automatización de informes de Lighthouse usando playwright e a api de lightouse nunha web despregada nun exemplo real'
+image: '/posts/automatic-lighthouse-report.png'
+alternate:
+    [
+        { lang: 'en', url: 'lighthouse-reporting-automation' },
+        { lang: 'es', url: 'automatizacion-de-informes-de-lighthouse' },
+    ]
+---
+
+# Automatización dos informes de Lighthouse
+
+<Date date="01-24-2023" />
+
+<GoogleAdsense />
+
+Unha maneira fácil de ter automatizados os informes de Lighthouse é usando a ferramenta de Google chamada [Lighthouse CI](https://github.com/GoogleChrome/lighthouse) que nos permite pasar o test de ligthouse a unha web e gardar os resultados nun servidor para poder comparalos cos resultados doutras execucións.
+
+Podes ir vendo as melloras en performance, accesibilidade, SEO, etc. da túa web. Inclusive podes engadir regras novas con plugins personalizados, por exemplo, para comprobar que non se engadiu html que non cumpra coas regras de accesibilidade.
+
+Nun próximo post a idea é crear un plugin para lighthouse desde cero pra comprobar algunhas "normas" non escritas de SEO en cada un dos meus post.
+
+Para ter sempre unha foto actual do sitemap da miña web utilizo playwright para revisar o sitemap, ter o arbol de ligazóns e crear un organigrama usando Treant.js como podes ver aquí [reporte de lighthouse](https://lighthouse.xabierlameiro.com 'Reporte de lighthouse')
+
+## Como o fixen?
+
+## 1. Consegue todas as urls da túa sitemap
+
+```javascript main.js v1
+const browser = await chromium.launch();
+const page = await browser.newPage();
+await page.goto('https://xabierlameiro.com/sitemap.xml');
+// get site map inside a body
+const sitemap = await page.$eval('body', (el) => el.innerHTML);
+// get all urls inside sitemap
+const urls = sitemap.match(/<loc>(.*?)<\/loc>/g).map((url) => url.replace(/<\/?loc>/g, ''));
+// split urls in locales bearing in mind that 'en' is the default locale and it's not included in the url
+let locales = urls.reduce((acc, url) => {
+    let locale = url.split('/')[3];
+    if (locale !== 'gl' && locale !== 'es') {
+        locale = 'en';
+    }
+    if (!acc[locale]) {
+        acc[locale] = [];
+    }
+    acc[locale].push(url);
+    return acc;
+}, {});
+
+const index = locales.en.indexOf('https://xabierlameiro.com');
+locales.en[index] = 'https://xabierlameiro.com/home';
+
+await browser.close();
+```
+
+## 2. Executa lighthouse en cada unha das urls e garda o reporte
+
+```javascript main.js v1
+for (const url of locales[lang]) {
+    // Report
+    const result = await launchChromeAndRunLighthouse(
+        url === 'https://xabierlameiro.com/home' ? 'https://xabierlameiro.com' : url,
+        options
+    );
+    let fileName = url.split('/').pop();
+
+    if (fileName === 'es' || fileName === 'gl') {
+        fileName = 'home';
+    }
+    // write report in output folder
+    fs.writeFileSync(lang === 'en' ? `output/${fileName}.html` : `output/${lang}/${fileName}.html`, result.report);
+}
+```
+
+## 3. Crea un organigrama usando Treant.js
+
+> Exemplo só do primeiro nivel do arbol
+
+```javascript main.js v1
+const chart = {
+    chart: {
+        container: '#OrganiseChart-big-commpany',
+        levelSeparation: 40,
+        siblingSeparation: 20,
+        subTeeSeparation: 30,
+        rootOrientation: 'NORTH',
+        nodeAlign: 'BOTTOM',
+
+        connectors: {
+            type: 'step',
+            style: {
+                'stroke-width': 2,
+            },
+        },
+        node: {
+            HTMLclass: 'big-commpany',
+        },
+    },
+};
+```
+
+> Todo o código esta dispoñible na miña respositoro de [github](https://github.com/xabierlameiro/lighthouse-report/blob/master/main.js 'Ligazón a repostorio de github')
+
+## 4. Executa o teu script e desprega os arquivos nun servidor estático como Vercel
+
+```bash node main.js v1
+
+```
+
+Se queres ver os resultados só feixe click en "Lightouse" na barra de navegación superior.

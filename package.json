@@ -62,13 +62,13 @@
     },
     "devDependencies": {
         "@playwright/test": "^1.31.2",
-        "@storybook/addon-essentials": "^7.0.0-beta.12",
-        "@storybook/addon-interactions": "^7.0.0-beta.12",
-        "@storybook/addon-links": "^7.0.0-beta.12",
+        "@storybook/addon-essentials": "^8.4.7",
+        "@storybook/addon-interactions": "^8.4.7",
+        "@storybook/addon-links": "^8.4.7",
         "@storybook/addons": "^6.5.14",
-        "@storybook/blocks": "^7.0.0-beta.12",
-        "@storybook/nextjs": "^7.0.0-beta.12",
-        "@storybook/react": "^7.0.0-beta.12",
+        "@storybook/blocks": "^8.4.7",
+        "@storybook/nextjs": "^8.4.7",
+        "@storybook/react": "^8.4.7",
         "@storybook/testing-library": "^0.0.13",
         "@storybook/theming": "^6.5.14",
         "@types/glob": "^8.0.0",
@@ -86,6 +86,13 @@
         "storybook": "^7.0.0-beta.12",
         "storybook-react-intl": "^1.1.1",
         "typescript": "^5.8.3"
+    },
+    "engines": {
+        "node": ">=18",
+        "yarn": ">=1.22.0"
+    },
+    "resolutions": {
+        "protobufjs": "^7.2.5"
     },
     "browser": {
         "fs": false,

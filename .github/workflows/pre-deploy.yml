@@ -2,6 +2,10 @@ name: Workflow Pre-Deploy
 on:
     push:
         branches: [dev]
+
+permissions:
+  contents: read
+
 jobs:
     cancel_redundancy:
         name: Cancel Redundant Workflow Runs
@@ -18,7 +22,7 @@ jobs:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
-                  node-version: 18
+                  node-version: 18.20.0
                   cache: yarn
             - name: Install dependencies
               run: |
@@ -39,7 +43,7 @@ jobs:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
-                  node-version: 18
+                  node-version: 18.20.0
                   cache: yarn
             - name: Install dependencies
               run: |
@@ -100,7 +104,7 @@ jobs:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v3
               with:
-                  node-version: 18
+                  node-version: 18.20.0
                   cache: yarn
             - name: Install dependencies
               run: |

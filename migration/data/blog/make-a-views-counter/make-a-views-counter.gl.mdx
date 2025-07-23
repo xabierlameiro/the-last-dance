@@ -1,0 +1,162 @@
+---
+title: 'Fai un contador de visitas con google analytics'
+slug: 'facer-un-contador-de-vistas-con-google-analytics'
+author: 'Xabier Lameiro'
+category: 'Nextjs'
+tags: ['node']
+locale: 'gl'
+excerpt: 'Crea un contador de vistas para o seu blogue con google analytics e nextjs api route. Uso de BetaAnalyticsDataClient desde a API de datos de Google Analytics'
+description: 'Crea un contador de vistas para o seu blogue con google analytics e nextjs api route. Uso de BetaAnalyticsDataClient desde a API de datos de Google Analytics'
+image: '/posts/make-a-views-counter.png'
+alternate:
+    [
+        { lang: 'en', url: 'make-a-views-counter-with-google-analytics' },
+        { lang: 'es', url: 'hacer-un-contador-de-vistas-con-google-analytics' },
+    ]
+---
+
+# Fai un contador de visitas con google analytics
+
+<Date date="01-10-2023" />
+
+<GoogleAdsense />
+
+Non é necesario facer un sistema complexo para contar as vistas do teu blogue. Pode usar Google Analytics para facelo, non necesita conservar os datos nunha base de datos.
+
+Aquí non explicamos como crear unha conta de Google analytics, podes seguir este [titorial](https://support.google.com/analytics/answer/1008015?hl=en 'Google analytics Link') para facelo.
+
+## 1. Crea un endpoint para obter os datos usando a clase BetaAnalyticsDataClient
+
+```ts .analytics.ts v1
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+    const { query } = req;
+    const { slug = '/' } = query;
+
+    const analyticsDataClient = new BetaAnalyticsDataClient({
+        credentials: {
+            client_email: process.env.ANALYTICS_CLIENT_EMAIL,
+            private_key: process.env.ANALYTICS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        },
+        projectId: process.env.ANALYTICS_PROJECT_ID,
+    });
+
+    const [response] = await analyticsDataClient.runReport({
+        property: `properties/348472560`,
+        dateRanges: [
+            {
+                startDate: '2023-01-01',
+                endDate: 'today',
+            },
+        ],
+        dimensions: [
+            {
+                name: 'date',
+            },
+            {
+                name: 'pagePath',
+            },
+        ],
+        metrics: [
+            {
+                name: 'screenPageViews',
+            },
+        ],
+        dimensionFilter: {
+            filter: {
+                fieldName: 'pagePath',
+                stringFilter: {
+                    matchType: 'EXACT',
+                    value: slug.toString(),
+                },
+            },
+        },
+        orderBys: [
+            {
+                dimension: {
+                    dimensionName: 'date',
+                },
+            },
+        ],
+    });
+
+    if (!response || !response.rows) {
+        res.status(500).json({ error: 'Error while parsing analytics data' });
+        return;
+    }
+
+    let total = response.rows.reduce((prev: Object, curr: Object) => {
+        return prev + parseInt(curr.metricValues[0].value, 0);
+    }, 0);
+
+    try {
+        res.status(200).json({ total });
+    } catch (err: Object) {
+        res.status(500).json({ error: err });
+    }
+}
+```
+
+Non é necesario facer un sistema complexo para contar as vistas do teu blogue. Pode usar Google Analytics para facelo, non necesita conservar os datos nunha base de datos, pode usar a API de Google Analytics para obter os datos.
+
+Aquí non explicamos como crear unha conta de Google Analytics, podes seguir este [titorial](https://support.google.com/analytics/answer/1008015?hl=en) para facelo.
+
+## 1. Cre un punto final para obter os datos usando a clase BetaAnalyticsDataClient
+
+```tsx ViewCounter.tsx mark=29,36,43 v1
+type Props = {
+    children?: React.ReactNode;
+};
+
+const Container = ({ children }: Props) => {
+    return (
+        <div className={styles.views} title="Number of views in this post from Google analytics">
+            <BsBook />
+            {children}
+        </div>
+    );
+};
+
+const StarCounter = () => {
+    const [views, setViews] = React.useState(-1);
+    const { asPath } = useRouter();
+
+    React.useEffect(() => {
+        (async () => {
+            try {
+                const { total } = await fetch(`/api/analytics?slug=${asPath}`).then((res) => res.json());
+                setViews(total);
+            } catch (e) {
+                setViews(-2);
+            }
+        })();
+    }, [asPath]);
+
+    if (views === -2)
+        return (
+            <Container>
+                <RxCross2 className={styles.error} title="Error on endpoint" />
+            </Container>
+        );
+
+    if (views === -1)
+        return (
+            <Container>
+                <FaSpinner className={styles.spinner} title="Loading views" />
+            </Container>
+        );
+
+    return (
+        <Container>
+            <span>{views}</span>
+        </Container>
+    );
+};
+
+export default StarCounter;
+```
+
+## 3. Inclúe o teu compoñente onde queiras mostralo
+
+Para ver o resultado do código anterior, só mire a parte superior da páxina e verá un ícono de libro cun contador no lado dereito.
+
+Podes ver o código completo no meu repositorio se o necesitas, e se che parece útil ou che gusta podes darme unha estrela

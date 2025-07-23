@@ -1,0 +1,63 @@
+.articleControls {
+    background-color: rgba(var(--blog-header));
+    border-bottom: 1px solid rgba(var(--blog-border));
+    display: grid;
+    padding: 0 20px;
+    grid-template-columns: 1fr repeat(2, max-content) 1fr repeat(5, max-content) 220px;
+    align-items: center;
+    gap: 20px;
+}
+
+.articleControls + div {
+    background-color: rgba(var(--blog-background));
+    color: rgba(var(--blog-font));
+}
+
+.articleControls svg {
+    color: rgba(var(--blog-icons));
+}
+
+@media screen and (max-width: 768px) {
+    .articleControls {
+        width: calc(100vw - 40px);
+        grid-template-columns: 200px repeat(2, max-content) 1fr repeat(5, max-content) 220px;
+        overflow: scroll;
+        padding: 0 10px;
+    }
+    .articleControls::-webkit-scrollbar {
+        display: none;
+    }
+}
+.articleControls svg {
+    font-size: 21.5px;
+    stroke-width: 0%;
+}
+.articleControls input {
+    width: 100%;
+}
+.rotate {
+    transform: rotate(-50deg);
+}
+
+.readTime {
+    font-size: 13px;
+    color: rgb(91, 87, 87);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+
+.readContainer {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    font-size: 15px;
+    gap: 5px;
+}
+.readContainer span {
+    color: rgba(var(--blog-icons));
+}

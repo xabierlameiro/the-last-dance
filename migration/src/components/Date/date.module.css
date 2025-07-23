@@ -1,0 +1,9 @@
+.date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-transform: capitalize;
+    font-weight: 200;
+    padding: 0 0 20px;
+}

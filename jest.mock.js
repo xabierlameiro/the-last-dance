@@ -1,5 +1,8 @@
 /* global jest */
 
+// Mock environment variables
+process.env.NEXT_PUBLIC_DOMAIN = 'https://xabierlameiro.com';
+
 jest.mock('react-intl', () => ({
     useIntl: () => ({
         formatMessage: (object) => object.id,

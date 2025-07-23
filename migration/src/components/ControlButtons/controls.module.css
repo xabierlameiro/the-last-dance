@@ -1,0 +1,67 @@
+.ch_frame_buttons {
+    display: flex;
+    cursor: pointer;
+    gap: 6px;
+    outline: none;
+    user-select: none;
+}
+
+.ch_frame_button {
+    width: 12.8px;
+    height: 12.8px;
+    border: 0.08em solid;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    display: grid;
+    place-content: center;
+    outline: none;
+    user-select: none;
+}
+
+.ch_frame_button svg {
+    color: rgba(var(--blog-font));
+    transform: scale(0.7);
+    opacity: 0;
+}
+
+.ch_frame_buttons:hover .ch_frame_button svg {
+    opacity: 1;
+}
+
+.ch_frame_button_left {
+    border-color: rgba(var(--red-color));
+    background-color: rgba(var(--red-color));
+}
+
+.ch_frame_button_middle {
+    border-color: rgba(var(--yellow-color));
+    background-color: rgba(var(--yellow-color));
+}
+
+.ch_frame_button_right {
+    border-color: rgba(var(--green-color));
+    background-color: rgba(var(--green-color));
+}
+
+.ch_frame_button_right svg {
+    transform: scale(0.45) rotate(93deg);
+    stroke-width: 2px;
+}
+
+.ch_frame_button_disabled {
+    background-color: rgba(var(--disable-color));
+    border-color: rgba(var(--disable-color));
+    pointer-events: none;
+    user-select: none;
+    cursor: default;
+    opacity: 0.4;
+}
+
+.ch_frame_buttons:hover .ch_frame_button_disabled svg {
+    opacity: 0;
+}
+
+.withPadding {
+    padding: 0 10px;
+}

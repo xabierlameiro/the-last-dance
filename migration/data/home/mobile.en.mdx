@@ -1,0 +1,29 @@
+```tsx index.tsx v1
+import React from 'react';
+import styles from './knowledge.module.css';
+
+type Props = {
+    name?: string;
+};
+const name = 'Xabier Lameiro';
+
+const App = ({ name = name }: Props) => {
+ return (
+  <main className={`${styles.experience}`}>
+
+   <h1>👋, my name is {name}!</h1>
+
+   <p className={`${styles.education}`}>
+     I&apos;m Frontend developer. 
+     I have worked in the banking and 
+     retail sector for companies like CaixaBank, 
+     Openbak and Inditex. I like
+     web development, applications,
+     automations and the IOT.
+   </p>
+  </main>
+ );
+};
+
+export { App, App as default };
+```

@@ -1,0 +1,45 @@
+---
+title: 'Posible solución para NPM - Failed to replace env in config: $\{NPM_TOKEN}'
+slug: 'npm-token-solucion-erro'
+author: 'Xabier Lameiro'
+category: 'Error'
+tags: ['npm']
+locale: 'gl'
+excerpt: 'Como evitar perder duas horas da túa vida por un erro de NPM, que non deixa executar comandos de yarn ou npm. Este erro producíase cando se intentaba executar un comando de yarn ou npm e aparecía o seguinte erro: Failed to replace env in config: ${NPM_TOKEN}'
+description: 'Como evitar perder duas horas da túa vida por un erro de NPM, que non deixa executar comandos de yarn ou npm. Este erro producíase cando se intentaba executar un comando de yarn ou npm e aparecía o seguinte erro: Failed to replace env in config: ${NPM_TOKEN}'
+image: '/posts/npm-token.png'
+alternate: [{ lang: 'en', url: 'npm-token-solution-error' }, { lang: 'es', url: 'npm-token-solucion-error' }]
+---
+
+# Posible solución para NPM - Failed to replace env in config: $\{NPM_TOKEN}
+
+<Date date="01-03-2023" />
+
+<GoogleAdsense />
+
+Neste breve post vou ensinar unha solución para o erro `Failed to replace env in config: ${NPM_TOKEN}` que se produce cando se tenta executar un comando de yarn ou npm.
+
+Pode ser que nalgún momento atopáchesche con este erro ao tentar executar un comando de yarn ou npm. No meu caso foi
+por que publique unha das miñas librerias en github e para poder instalala desde github, necesitaba un token.
+Este token xérase en github e se garda nas variables de contorna do sistema.
+
+Pero é necesario crear un arquivo .npmrc na raiz do proxecto e engadir o seguinte contido:
+
+```bash .npmrc v1
+@xabierlameiro:registry=https://npm.pkg.github.com/
+//npm.pkg.github.com/:_authToken=${NPM_TOKEN}
+```
+
+O que pode ocorrer é que deixes est arquivo fóra do cartafol do proyeccto e gárdelo no cartafol de usuario,
+por exemplo no meu caso gardeino no cartafol `C:\Users\xabierlameiro\.npmrc` e por iso dábame o erro.
+
+Para solucionalo, o que fixen foi:
+
+```bash yarn install --verbose v1
+```
+
+Ensinoume os roteiros onde estaba a buscar o arquivo .npmrc e deime conta que o estaba usando desde no cartafol de usuario.
+
+**_Elimineino_** do cartafol de usuario e volvino a crear na raiz do proxecto e xa non me daba o erro.
+
+> Espero que se vos pasa o mesmo, sírvavos de axuda.

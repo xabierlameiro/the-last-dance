@@ -1,0 +1,31 @@
+.status {
+    background-color: transparent;
+    width: 15px;
+    height: 15px;
+    border-radius: 100%;
+    border: 0.1px solid rgba(var(--grey-color));
+}
+
+.building {
+    background-color: var(--status-building);
+}
+
+.error {
+    background-color: var(--status-error);
+}
+
+.initializing {
+    background-color: var(--status-initializing);
+}
+
+.queue {
+    background-color: var(--status-queue);
+}
+
+.ready {
+    background-color: var(--status-ready);
+}
+
+.canceled {
+    background-color: var(--status-canceled);
+}

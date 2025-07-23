@@ -1,0 +1,23 @@
+```tsx index.tsx box=9[23:38] v1
+import React from 'react';
+import styles from './knowledge.module.css';
+
+type Props = {
+    name?: string;
+};
+
+const App = ({ name = 'Xabier Lameiro' }: Props) => {
+    return (
+        <main className={`${styles.experience} ${styles.education}`}>
+            <h1>👋, chámome {name}!</h1>
+            <p>
+                Son desarrollador Frontend. Traballei e traballo no sector bancario
+                e retail para empresas como CaixaBank, Openbak e Inditex. Gústame 
+                o desenvolvemento de aplicacións, as automatizacións e o IoT.
+            </p>
+        </main>
+    );
+};
+
+export { App, App as default };
+```

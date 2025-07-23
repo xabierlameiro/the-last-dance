@@ -1,0 +1,83 @@
+---
+title: 'Deploying my storybook is very simple'
+slug: 'deploying-my-storybook-is-very-simple'
+author: 'Xabier Lameiro'
+category: 'React'
+tags: ['storybook']
+locale: 'en'
+excerpt: 'Deploying React Components with Storybook: An Easy Way to Showcase Your Work. Are you looking for an easy way to showcase your React components and share them with?'
+description: 'Deploying React Components with Storybook: An Easy Way to Showcase Your Work. Are you looking for an easy way to showcase your React components and share them with?'
+image: '/posts/deploying-storybook.png'
+alternate:
+    [{ lang: 'es', url: 'desplegar-storybook-facilmente' }, { lang: 'gl', url: 'despregar-storybook-facilmente' }]
+---
+
+# Deploying my storybook is very simple
+
+<Date date="01-04-2023" />
+
+<GoogleAdsense />
+
+Once you\'ve created your components in Storybook, you are able to share them in a few different ways. You can deploy Storybook to Vercel, GitHub or Netlify or Heroku and share the URL with your team and potential clients.
+Alternatively, you can also create a static version of Storybook and deploy it to a web server. This allows you to have a version of Storybook that is always online and up to date.
+
+Storybook is easy to set up and manage. You will need Node.js and a few development dependencies installed in order to set up your own environment. You can also use generator-storybook to quickly get started with creating a Storybook configuration file.
+
+Once you\'ve configured your Storybook, you can start writing stories for your components. A story is essentially a brief explanation of how your component will be used in the application. You can write stories for components that you have already
+created and also any components that you are working on. Storybook also allows you to create variations of your component, this is helpful for A/B testing.
+
+Deploying React components with Storybook is a great way to showcase your work and ensure your components are bug-free. It allows you to create living style guides for your components and provides a sandbox for testing them.
+Setting up Storybook can seem daunting, but it is easy if you follow the documentation. Once you have it set up, you can start creating stories and variations of your components and sharing them with your team and potential clients.
+
+## 1. Storybook commands
+
+```javascript package.json v1
+"scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+}
+```
+
+## 2. Make a stories from your components
+
+```tsx Avatar.stories.tsx v1
+import React from 'react';
+import { ComponentStory, ComponentMeta } from '@storybook/react';
+import Avatar from '.';
+
+export default {
+    /* 👇 The title prop is optional.
+     * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
+     * to learn how to generate automatic titles
+     */
+    title: 'Settings / Avatar',
+    component: Avatar,
+} as ComponentMeta<typeof Avatar>;
+
+//👇 We create a “template” of how args map to rendering
+const Template: ComponentStory<typeof Avatar> = (args) => <Avatar {...args} />;
+
+// 👇 Each story then reuses that template
+export const Primary = Template.bind({});
+
+Primary.args = {
+    name: 'Juan Carlos de Borbón',
+    description: 'Rey emérito de España',
+    img: '/avatar.png',
+    alt: 'Quien bien se vive!',
+};
+```
+
+## 3. Deploy Storybook
+
+The most important things are build command, output directory and install command. (yarn, npm or whatever) for dependencies.
+
+```bash yard build-storybook v1
+
+./storybook-static
+
+yarn i || npm i || npx i
+
+```
+
+> Here you can show the example of my storybook deployed in a subdomain: [https://storybook.xabierlameiro.com](https://storybook.xabierlameiro.com 'Link to my storybook')

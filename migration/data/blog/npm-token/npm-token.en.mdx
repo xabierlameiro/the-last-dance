@@ -1,0 +1,45 @@
+---
+title: 'Possible solution for NPM - Failed to replace env in config: $\{NPM_TOKEN}'
+slug: 'npm-token-solution-error'
+author: 'Xabier Lameiro'
+category: 'Error'
+tags: ['npm']
+locale: 'en'
+excerpt: "How to avoid losing 2 hours of your life because of an NPM bug, that doesn't let you run yarn or npm commands"
+description: 'How to avoid losing 2 hours of your life due to an NPM error, which does not let you run yarn or npm commands. This error occurs when you try to run a yarn or npm command and you get the following error: Failed to replace env in config: ${{NPM_TOKEN}'
+image: '/posts/npm-token.png'
+alternate: [{ lang: 'es', url: 'npm-token-solucion-error' }, { lang: 'gl', url: 'npm-token-solucion-erro' }]
+---
+
+# Possible solution for NPM - Failed to replace env in config: $\{NPM_TOKEN}
+
+<Date date="01-03-2023" />
+
+<GoogleAdsense />
+
+In this short post I am going to show a solution for the `Failed to replace env in config: ${{NPM_TOKEN}` error that occurs when trying to run a yarn or npm command.
+
+You may have encountered this error at some point when trying to run a yarn or npm command. In my case it was
+because I published one of my libraries on github and in order to install it from github, I needed a token.
+This token is generated in github and stored in the system environment variables.
+
+But it is necessary to create an .npmrc file in the root of the project and add the following content:
+
+```bash .npmrc v1
+@xabierlameiro:registry=https://npm.pkg.github.com/
+//npm.pkg.github.com/:_authToken=${NPM_TOKEN}
+```
+
+What can happen is that you leave this file outside the project folder and save it in the user folder,
+for example in my case I saved it in the folder `C:\Users\xabierlameiro\.npmrc` and that's why I got the error.
+
+To solve it, what I did was:
+
+```bash yarn install --verbose v1
+```
+
+It showed me the paths where I was looking for the .npmrc file and I realised that I was using it from the user folder.
+
+I **_deleted_** it from the user folder and recreated it in the root of the project and it no longer gave me the error.
+
+> I hope that if the same thing happens to you, it will help.

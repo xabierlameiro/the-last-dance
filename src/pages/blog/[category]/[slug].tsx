@@ -16,7 +16,7 @@ import Loading from '@/components/RenderManager/Loading';
 import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
 import dynamic from 'next/dynamic';
-import useWindowResize from '@/hooks/useWidowResize';
+import useWindowResize from '@/hooks/useWindowResize';
 import SEO from '@/components/SEO';
 import Script from 'next/script';
 

@@ -1,0 +1,18 @@
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav svg {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease-in;
+}
+
+.disabled {
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.2;
+}

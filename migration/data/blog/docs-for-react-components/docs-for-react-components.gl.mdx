@@ -1,0 +1,105 @@
+---
+title: 'Como documentar os meus compoñentes react con JSDoc'
+slug: 'documentar-os-meus-compoñentes-de-react'
+author: 'Xabier Lameiro'
+category: 'React'
+tags: ['node']
+locale: 'gl'
+excerpt: 'Crea automaticamente documentación dos teus compoñentes react con jsdoc e publícaa no teu sitio estático'
+description: 'Crea automaticamente documentación dos teus compoñentes react con jsdoc e publícaa no teu sitio estático'
+image: '/posts/how-document-my-react-components-with-jsdoc.png'
+alternate:
+    [
+        { lang: 'en', url: 'how-document-my-react-components-with-jsdoc' },
+        { lang: 'es', url: 'documentar-mis-componentes-de-react' },
+    ]
+---
+
+# Como documentar os meus compoñentes react con JSDoc
+
+<Date date="01-16-2023" />
+
+<GoogleAdsense />
+
+## Introdución
+
+É necesario ter unha boa documentación sobre os nosos compoñentes, para que outros desarrolladores poidan entender como funciona e como usalo. En leste articulo imos ver como podemos documentar os nosos compoñentes de react con JSDoc e como publicar a documentación no noso sitio estático.
+
+Cuns sinxelos pasos, a librería jsdoc e o uso das boas prácticas de programación cando traballemos con react, poderemos ter unha documentación dos nosos compoñentes de forma automática. Existen diferentes plugins para upgradear o noso jsdoc e dar soporte a react, pero como React non deixa de ser javascript e as compoñentes funcións a lib por defecto é máis que suficiente.
+
+O reporte que imos xerar non deixa de ser un arquivo html, polo que poderás despregalo en calquera sitio estático.
+
+> Se utilizas typescript necesitarás instalar jsdoc-babel
+
+## 1. Instalación
+
+```bash yarn add jsdoc-babel -D v1
+
+```
+
+## 2. Configuración
+
+```json jsdoc.json v1
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc", "closure"]
+    },
+    "source": {
+        "include": ["src/components/"],
+        "includePattern": ".+\\.tsx$",
+        "excludePattern": "(node_modules/|docs)"
+    },
+    "plugins": ["plugins/markdown", "node_modules/jsdoc-babel"],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false
+    },
+    "babel": {
+        "extensions": ["tsx"],
+        "ignore": ["**/*.(test|spec).ts"],
+        "babelrc": false,
+        "presets": [["@babel/preset-env", { "targets": { "node": true } }], "@babel/preset-typescript"],
+        "plugins": ["@babel/proposal-class-properties", "@babel/proposal-object-rest-spread"]
+    },
+    "opts": {
+        "encoding": "utf8",
+        "destination": "./public/docs/",
+        "recurse": true,
+        "verbose": true
+    }
+}
+```
+
+## 3. Customiza o teu reporte
+
+```javascript custom-docs.js mark=13 v1
+
+import { readFile, writeFile } from 'fs';
+import glob from 'glob';
+
+glob('public/docs/**/*.?(html|css)', function (err, files) {
+    if (err) {
+        console.log('err', err);
+        return;
+    }
+
+    files.forEach((path) => {
+        readFile(path, 'utf8', (err, data) => {
+            ...code
+        });
+    });
+});
+
+
+```
+
+> Aí deberías buscar o código que necesitas para modificar o teu reporte e sobreescribirlo.
+
+## 4. Xera o teu reporte
+
+```bash yarn jsdoc -c jsdoc.json v1
+
+```
+
+Para ver un exemplo de saída podes click arriba onde di Docs ou a través deste [ligazón](https://docs.xabierlameiro.com 'Link to my docs')
