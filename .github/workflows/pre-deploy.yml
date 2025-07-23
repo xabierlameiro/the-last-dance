@@ -23,14 +23,14 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: 18.20.0
-                  cache: yarn
+                  cache: npm
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
+                  npm install --legacy-peer-deps
             - name: Linter
-              run: yarn run lint
+              run: npm run lint
     testing:
         name: Testing
         runs-on: ubuntu-22.04
@@ -44,14 +44,14 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: 18.20.0
-                  cache: yarn
+                  cache: npm
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
+                  npm install --legacy-peer-deps
             - name: Run unit tests
-              run: yarn run coverage
+              run: npm run coverage
             - name: Checkout unit-report repository
               uses: actions/checkout@v3
               with:
@@ -72,12 +72,12 @@ jobs:
               env:
                   DEBIAN_FRONTEND: noninteractive
             - name: Run dev server
-              run: yarn dev &
+              run: npm run dev &
             - name: Wait for dev server to be ready
               run: npx wait-on http://localhost:3000
             - name: Run end-to-end tests
               run: |
-                  yarn test:e2e:report
+                  npm run test:e2e:report
             - name: Checkout e2e-report repository
               uses: actions/checkout@v3
               with:
@@ -105,14 +105,14 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: 18.20.0
-                  cache: yarn
+                  cache: npm
             - name: Install dependencies
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
+                  npm install --legacy-peer-deps
             - name: Generate documentation
-              run: yarn run jsdoc
+              run: npm run jsdoc
             - name: Checkout doc repository
               uses: actions/checkout@v3
               with:
@@ -136,7 +136,7 @@ jobs:
                   path: stb-report
             - name: Copy storybook and publish
               run: |
-                  yarn build-storybook
+                  npm run build-storybook
                   cd stb-report
                   cp -r ../storybook-static/ .
                   git config --global user.email "action@github.com"

@@ -23,6 +23,7 @@ const Document = (props: Props) => {
                 <script
                     type="application/ld+json"
                     key="website-jsonld"
+                    // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify({
                             '@context': 'https://schema.org',
@@ -35,6 +36,7 @@ const Document = (props: Props) => {
                 />
                 <script
                     type="application/ld+json"
+                    // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify({
                             '@context': 'http://schema.org',

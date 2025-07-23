@@ -49,7 +49,7 @@ const News = ({ city }: WeatherProps) => {
                 onMouseEnter={handleMouseEnter.current || undefined}
                 onMouseLeave={handleMouseLeave.current || undefined}
             >
-                {data.news.map((news: { link: string; title: string; published: string; description: string }) => (
+                {data?.news?.map((news) => (
                     <a
                         href={news.link}
                         target="_blank"

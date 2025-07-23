@@ -23,6 +23,10 @@ type Props = {
 const Notification = ({ title, message, type = 'success' }: Props) => {
     const [show, setShow] = React.useState(true);
 
+    const handleClose = React.useCallback(() => {
+        setShow(false);
+    }, []);
+
     React.useEffect(() => {
         if (show) {
             const timeout = setTimeout(() => {
@@ -31,6 +35,7 @@ const Notification = ({ title, message, type = 'success' }: Props) => {
 
             return () => clearTimeout(timeout);
         }
+        return undefined;
     }, [show]);
 
     return (
@@ -42,7 +47,7 @@ const Notification = ({ title, message, type = 'success' }: Props) => {
                 show ? styles.show : styles.hide
             )}
         >
-            <GrFormClose className={styles.close} onClick={() => setShow(false)} />
+            <GrFormClose className={styles.close} onClick={handleClose} />
             <div className={styles.title}>{title}</div>
             <div className={styles.message}>{message}</div>
         </div>

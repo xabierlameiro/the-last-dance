@@ -1,16 +1,25 @@
 import useSWR from 'swr';
-import { fetcher } from '@/helpers';
+import type { XRPData } from '../types/api';
 
-const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/xrp`);
+const url = `${process.env.NEXT_PUBLIC_DOMAIN}/api/xrp`;
+
+const fetchXRP = async (url: string): Promise<XRPData> => {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch XRP data: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data as XRPData;
+};
 
 const useXRP = () => {
-    const { data, error, isLoading } = useSWR(url, fetcher, {
+    const { data, error, isLoading } = useSWR<XRPData>(url, fetchXRP, {
         dedupingInterval: 5000,
         keepPreviousData: true,
         fallbackData: {
             price: 0,
             todaySummary: '',
-            todayPorcentage: '',
+            todayPorcentage: '0%',
         },
     });
 

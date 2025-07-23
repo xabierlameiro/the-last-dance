@@ -1,4 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
 
 /**
@@ -31,22 +32,20 @@ export default allowCors(async function handler(_req: NextApiRequest, res: NextA
             throw new Error('XRP data not found');
         }
 
-        const price = data.ripple.eur.toFixed(4);
+        const price = parseFloat(data.ripple.eur.toFixed(4));
         const change24h = data.ripple.eur_24h_change;
         const todayPorcentage = `${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}%`;
         const todaySummary = change24h > 0 ? 'Up' : 'Down';
 
         res.status(200).json({
-            price: `€${price}`,
+            price,
             todaySummary,
             todayPorcentage,
         });
-    } catch (err: Error | unknown) {
-        console.error('XRP API Error:', err);
-        if (err instanceof Error) {
-            res.status(500).json({ error: err.message });
-        } else {
-            res.status(500).json({ error: 'Unknown error occurred' });
+    } catch (err) {
+        if (process.env.NODE_ENV === 'development') {
+            console.error('XRP API Error:', err);
         }
+        res.status(500).json({ error: 'Internal server error' });
     }
 });

@@ -48,13 +48,14 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                         data-testid="json-ld"
                         type="application/ld+json"
                         key="item-jsonld"
+                        // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
                         dangerouslySetInnerHTML={{
                             __html: JSON.stringify({
                                 '@context': 'https://schema.org',
                                 '@type': 'Article',
                                 headline: title,
-                                description: description,
-                                url: url,
+                                description,
+                                url,
                                 ...(image && { image: [`${process.env.NEXT_PUBLIC_DOMAIN}/${image}`] }),
                                 datePublished: new Date().toISOString(),
                                 dateModified: new Date().toISOString(),

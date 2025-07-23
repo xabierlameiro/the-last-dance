@@ -41,8 +41,8 @@ const page = await browser.newPage();
 await page.goto('https://xabierlameiro.com/sitemap.xml');
 // get site map inside a body
 const sitemap = await page.$eval('body', (el) => el.innerHTML);
-// get all urls inside sitemap
-const urls = sitemap.match(/<loc>(.*?)<\/loc>/g).map((url) => url.replace(/<\/?loc>/g, ''));
+// get all urls inside sitemap - Fixed: Use safer regex pattern
+const urls = sitemap.match(/<loc>([^<]+)<\/loc>/g)?.map((url) => url.replace(/<\/?loc>/g, '')) || [];
 // split urls in locales bearing in mind that 'en' is the default locale and it's not included in the url
 let locales = urls.reduce((acc, url) => {
     let locale = url.split('/')[3];

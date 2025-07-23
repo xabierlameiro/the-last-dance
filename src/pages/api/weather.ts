@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import jsdom from 'jsdom';
+import { JSDOM } from 'jsdom';
+import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
 
 interface WeatherData {
@@ -10,13 +11,13 @@ interface WeatherData {
     humidity?: string | null;
     windSpeed?: string | null;
     grades?: string | null;
-    imageUrl?: string | undefined;
+    imageUrl?: string;
 }
 
 type WeatherResponse = WeatherData[] | { error: string };
 
 const getWeatherData = async (city: string): Promise<WeatherData> => {
-    const { JSDOM } = jsdom;
+    // const { JSDOM } = jsdom; // Already imported above
     const response = await fetch(`https://www.google.com/search?q=tiempo+${city}`, {
         method: 'GET',
         headers: {
@@ -28,9 +29,28 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
         },
         redirect: 'follow',
     });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const raw = await response.text();
     const dom = new JSDOM(raw);
     const weatherBox = dom.window.document.querySelector('#wob_wc') as HTMLImageElement;
+
+    if (!weatherBox) {
+        console.warn(`Weather widget not found for city: ${city}`);
+        // Return basic structure with city name only if weather widget is not found
+        return {
+            city,
+            name: null,
+            precipitation: null,
+            humidity: null,
+            windSpeed: null,
+            grades: null,
+            imageUrl: undefined,
+        };
+    }
 
     try {
         const grades = weatherBox.querySelector('#wob_tm')?.textContent;
@@ -49,7 +69,7 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
             grades,
             imageUrl,
         };
-    } catch (err: Error | unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             throw new Error(err.message);
         }
@@ -68,14 +88,40 @@ export default allowCors(async function handler(
     req: NextApiRequest,
     res: NextApiResponse<WeatherResponse>
 ) {
+    // Only allow GET requests
+    if (req.method !== 'GET') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     const { query } = req;
     const { cities = '' } = query;
 
-    if (!cities) {
-        res.status(500).json({ error: 'query param citites must be a strings with comma' });
+    // Validate cities parameter
+    if (!cities || typeof cities !== 'string') {
+        return res.status(400).json({ error: 'Cities parameter must be a non-empty string' });
     }
+
+    // Validate cities format and length
+    const citiesArray = String(cities).split(',').map(city => city.trim()).filter(Boolean);
+    
+    if (citiesArray.length === 0) {
+        return res.status(400).json({ error: 'At least one city must be provided' });
+    }
+    
+    if (citiesArray.length > 5) {
+        return res.status(400).json({ error: 'Maximum 5 cities allowed' });
+    }
+
+    // Validate each city name (basic validation)
+    const invalidCities = citiesArray.filter(city => 
+        !city || city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s-]+$/.test(city)
+    );
+    
+    if (invalidCities.length > 0) {
+        return res.status(400).json({ error: `Invalid city names: ${invalidCities.join(', ')}` });
+    }
+
     try {
-        const citiesArray = String(cities).split(',');
 
         await Promise.allSettled(citiesArray.map((city) => getWeatherData(city)))
             .then((raw) => {
@@ -85,7 +131,7 @@ export default allowCors(async function handler(
                 res.status(200).json(results);
             })
             .catch((err) => res.status(500).json({ error: err.message }));
-    } catch (err: Error | unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             res.status(500).json({ error: err.message });
         }

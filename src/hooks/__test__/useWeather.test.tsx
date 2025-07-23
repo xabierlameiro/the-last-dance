@@ -13,10 +13,10 @@ describe('useWeather hook', () => {
     it('returns weather data for cities', () => {
         const mockData = [{ city: 'london' }];
         (useSWR as jest.Mock).mockReturnValue({ data: mockData, error: false, isLoading: false });
-        const expectedUrl = new URL('https://xabierlameiro.com/api/weather');
+        const expectedUrl = new URL(`${process.env.NEXT_PUBLIC_DOMAIN || 'https://pre.xabierlameiro.com'}/api/weather`);
         expectedUrl.searchParams.append('cities', 'london,paris');
         render(<TestComponent />);
-        expect(useSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function), expect.any(Object));
+        expect(useSWR).toHaveBeenCalledWith(expectedUrl.toString(), expect.any(Function), expect.any(Object));
         expect(screen.getByTestId('city').textContent).toBe('london');
     });
 });

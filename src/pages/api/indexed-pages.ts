@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
 
 /**
@@ -86,7 +87,9 @@ export default allowCors(async function handler(
 
         res.status(200).json({ num });
     } catch (err) {
-        console.error('Indexed pages API Error:', err);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Indexed pages API Error:', err);
+        }
         
         // Provide a fallback number instead of erroring completely
         const fallbackNum = 127; // Based on visible project structure

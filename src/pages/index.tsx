@@ -1,9 +1,8 @@
-import * as React from 'react';
 import Dialog from '@/components/Dialog';
 import VisibilityManager from '@/components/VisibilityManager';
 import { useDialog } from '@/context/dialog';
 import { useIntl } from 'react-intl';
-import { MDXRemote } from 'next-mdx-remote';
+import { MDXRemote, type MDXRemoteProps } from 'next-mdx-remote';
 import { components } from '@/helpers/mdxjs';
 import { serializePath } from '@/helpers/mdx';
 import SEO from '@/components/SEO';
@@ -19,6 +18,9 @@ type Props = {
         };
     };
 };
+
+// Tipo correcto para MDX components
+type MDXComponents = NonNullable<MDXRemoteProps['components']>;
 
 const Home = ({ content }: Props) => {
     const { open } = useDialog();
@@ -40,12 +42,12 @@ const Home = ({ content }: Props) => {
                 body={
                     <>
                         <VisibilityManager hideOnDesktop hideOnTablet>
-                            <MDXRemote {...content.mobile} components={components} frontmatter={undefined} scope={{}} />
+                            <MDXRemote {...content.mobile} components={components as MDXComponents} frontmatter={undefined} scope={{}} />
                         </VisibilityManager>
                         <VisibilityManager hideOnMobile>
                             <MDXRemote
                                 {...content.desktop}
-                                components={components}
+                                components={components as MDXComponents}
                                 frontmatter={undefined}
                                 scope={{}}
                             />

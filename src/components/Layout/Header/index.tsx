@@ -33,6 +33,10 @@ const DateAndHour = ({ children, minutes = 1 }: { children?: ReactNode; minutes?
     const month = date.toLocaleDateString(locale, { month: 'short' });
     const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
 
+    const handleWeatherClick = React.useCallback(() => {
+        setOpenWeatherWidget(true);
+    }, []);
+
     React.useEffect(() => {
         const interval = setInterval(() => {
             setDate(new Date());
@@ -44,12 +48,12 @@ const DateAndHour = ({ children, minutes = 1 }: { children?: ReactNode; minutes?
         <div>
             <Tooltip>
                 <Tooltip.Trigger>
-                    <div className={styles.dateAndHour} onClick={() => setOpenWeatherWidget(true)}>
+                    <button type="button" className={styles.dateAndHour} onClick={handleWeatherClick}>
                         <span suppressHydrationWarning>{day}</span>
                         <span suppressHydrationWarning>{dayNumber}</span>
                         <span suppressHydrationWarning>{month}</span>
                         <span suppressHydrationWarning>{hour}</span>
-                    </div>
+                    </button>
                 </Tooltip.Trigger>
                 <Tooltip.Content>{f({ id: 'weather.tooltip' })}</Tooltip.Content>
             </Tooltip>

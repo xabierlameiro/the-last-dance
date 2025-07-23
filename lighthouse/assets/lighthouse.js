@@ -9,7 +9,7 @@ try {
 // Get the sitemap and filter the urls
 const sitemap = await fetch(`${DOMAIN}/sitemap.xml`).then((res) => {
     return res.text().then((str) => {
-        const urls = str.match(/<loc>(.*?)<\/loc>/g).map((loc) => {
+        const urls = str.match(/<loc>([^<]+)<\/loc>/g).map((loc) => {
             return loc.replace(/<\/?loc>/g, '');
         });
         return urls;
@@ -162,11 +162,11 @@ for (const lang of Object.keys(translations)) {
     };
     // clean empty childrens
     config.nodeStructure.children.forEach((item) => {
-        if (item.children && item.children.every((item) => item === undefined)) {
+        if (item.children?.every((item) => item === undefined)) {
             delete item.children;
         } else if (item.children) {
             item.children.forEach((item) => {
-                if (item.children && item.children.every((item) => item === undefined)) {
+                if (item.children?.every((item) => item === undefined)) {
                     delete item.children;
                 }
             });

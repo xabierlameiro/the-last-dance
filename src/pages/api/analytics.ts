@@ -27,20 +27,37 @@ export default allowCors(async function handler(
     req: NextApiRequest,
     res: NextApiResponse<AnalyticsResponse>
 ) {
+    // Only allow GET requests
+    if (req.method !== 'GET') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     const { query } = req;
     const { slug } = query;
     let data: AnalyticsData | null = null;
-    const analyticsDataClient = new BetaAnalyticsDataClient({
-        credentials: {
-            client_email: process.env.ANALYTICS_CLIENT_EMAIL,
-            private_key: process.env.ANALYTICS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        },
-        projectId: process.env.ANALYTICS_PROJECT_ID,
-    });
+
+    // Validate slug parameter if provided
+    if (slug && (typeof slug !== 'string' || slug.includes('..') || slug.includes('\\'))) {
+        return res.status(400).json({ error: 'Invalid slug parameter' });
+    }
+
+    // Validate required environment variables
+    if (!process.env.ANALYTICS_CLIENT_EMAIL || !process.env.ANALYTICS_PRIVATE_KEY || !process.env.ANALYTICS_PROJECT_ID) {
+        console.error('Missing required environment variables for Google Analytics API');
+        return res.status(500).json({ error: 'Configuration error' });
+    }
+
     try {
+        const analyticsDataClient = new BetaAnalyticsDataClient({
+            credentials: {
+                client_email: process.env.ANALYTICS_CLIENT_EMAIL,
+                private_key: process.env.ANALYTICS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            },
+            projectId: process.env.ANALYTICS_PROJECT_ID,
+        });
         if (!slug) {
             const [response] = await analyticsDataClient.runReport({
-                property: `properties/348472560`,
+                property: 'properties/348472560',
                 dateRanges: [
                     {
                         startDate: '2023-01-01',
@@ -67,7 +84,7 @@ export default allowCors(async function handler(
             };
         } else {
             const [response] = await analyticsDataClient.runReport({
-                property: `properties/348472560`,
+                property: 'properties/348472560',
                 dateRanges: [
                     {
                         startDate: '2023-01-01',
@@ -116,7 +133,7 @@ export default allowCors(async function handler(
             pageViews: data?.pageViews || '0',
             newUsers: data?.newUsers || '0',
         });
-    } catch (err: Error | unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             res.status(500).json({ error: err.message });
         }

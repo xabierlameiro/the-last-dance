@@ -44,7 +44,18 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
     } else {
         slug = slug.split('/')[slug.split('/').length - 1];
     }
+    
+    // Validate slug to prevent directory traversal
+    if (!slug || typeof slug !== 'string' || slug.includes('..') || slug.includes('/') || slug.includes('\\')) {
+        throw new Error('Invalid slug parameter');
+    }
+    
     const [route] = paths.filter((filePath) => {
+        // Ensure the file path is within the POST_PATH directory
+        if (!filePath.startsWith(POST_PATH)) {
+            return false;
+        }
+        
         const document = fs.readFileSync(filePath, 'utf8');
         const { data } = matter(document);
         const fileName = filePath.split('/').pop();
@@ -52,6 +63,11 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
             return true;
         }
     });
+    
+    if (!route) {
+        throw new Error('Post not found');
+    }
+    
     return matter(fs.readFileSync(route, 'utf8'));
 };
 
@@ -276,11 +292,18 @@ export const getAllCategories = (locale: string) => {
  * @returns {number} - Number of words.
  */
 export const countWords = (content: string) => {
-    const words = content.split(/\s/g);
-    const codeBlocks = content.match(/```(.|\n)*?```/g) || [];
-    const codeBlocksWords = codeBlocks.map((block) => block.split(/\s/g));
-    const wordsInCodeBlocks = codeBlocksWords.flat().length;
-    return words.length - wordsInCodeBlocks;
+    // Fixed: Use a more secure approach to avoid regex DoS
+    // Split by triple backticks and count words only in non-code sections
+    const parts = content.split('```');
+    let nonCodeContent = '';
+    
+    // Take every other part (non-code sections)
+    for (let i = 0; i < parts.length; i += 2) {
+        nonCodeContent += parts[i] || '';
+    }
+    
+    const nonCodeWords = nonCodeContent.split(/\s/g).filter(word => word.length > 0);
+    return nonCodeWords.length;
 };
 
 /**

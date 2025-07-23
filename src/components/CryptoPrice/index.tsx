@@ -26,7 +26,7 @@ const CryptoPrice = () => {
                         errorTitle={f({ id: 'cryptoPrice.error' })}
                         loadingTitle={f({ id: 'cryptoPrice.loading' })}
                     >
-                        {formatNumber(!isNaN(data.price) ? data.price : 0, {
+                        {formatNumber(!isNaN(data?.price ?? 0) ? (data?.price ?? 0) : 0, {
                             style: 'currency',
                             currency: 'EUR',
                             minimumFractionDigits: 2,
@@ -39,7 +39,7 @@ const CryptoPrice = () => {
                 {f(
                     { id: 'cryptoPrice.tooltip' },
                     {
-                        todayPorcentage: data.todayPorcentage,
+                        todayPorcentage: data?.todayPorcentage ?? '0%',
                     }
                 )}
             </Tooltip.Content>

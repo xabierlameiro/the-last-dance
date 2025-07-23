@@ -10,17 +10,18 @@ import { defaultLocale, MAX_STEPS } from '@/constants/site';
  * @returns {string}
  */
 export const clx = (...classes: Array<string | null | undefined>) => {
-    classes = classes
+    const filteredClasses = classes
         .filter((element) => {
             return element !== '' && element !== null && element !== undefined;
         })
-        .map((item) => item?.trim());
+        .map((item) => item?.trim())
+        .filter((item) => item !== '');
 
-    if (!classes) {
+    if (!filteredClasses.length) {
         return '';
     }
 
-    return classes.join(' ');
+    return filteredClasses.join(' ');
 };
 
 /**
@@ -106,10 +107,10 @@ export const setInverval = (ref: React.RefObject<HTMLDivElement | null>) => {
  * @description Utility function to use SWR with fetcher.
  * @example const { data, error } = useSWR('/api/weather', fetcher);
  * @param {string} url
- * @returns {Promise<any>}
+ * @returns {Promise<unknown>}
  * @see https://swr.vercel.app/docs/data-fetching
  */
-export const fetcher = (url: string): Promise<any> =>
+export const fetcher = (url: string): Promise<unknown> =>
     fetch(url).then((res) => {
         if (res.ok) {
             return res.json();

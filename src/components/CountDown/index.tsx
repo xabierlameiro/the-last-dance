@@ -8,16 +8,29 @@ type Props = {
     caption?: string;
 };
 
+type TimeLeft = {
+    years: string | number;
+    months: string | number;
+    days: string | number;
+    hours: string | number;
+    minutes: string | number;
+    seconds: string | number;
+};
+
 /**
  * @description This function is used to calculate the time left until the date
  * @param {string} date - The date to calculate the time left
  * @param {Function} setTime - The function to set the time left
- * @param {Object} timeLeft - The time left object
- * @returns {Object} - The time left object
+ * @param {TimeLeft} timeLeft - The time left object
+ * @returns {TimeLeft} - The time left object
  * @example calculateTimeLeft('2021-12-31', setTime)
  */
-const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {}) => {
-    const difference = +new Date(date) - +new Date();
+const calculateTimeLeft = (
+    date: string, 
+    setTime: (time: TimeLeft) => void, 
+    timeLeft: TimeLeft = {} as TimeLeft
+) => {
+    const difference = new Date(date).getTime() - Date.now();
     const years = Math.floor(difference / (1000 * 60 * 60 * 24 * 30 * 12));
     const months = Math.floor((difference / (1000 * 60 * 60 * 24 * 30)) % 12);
     const days = Math.floor((difference / (1000 * 60 * 60 * 24)) % 30);
@@ -47,7 +60,7 @@ const calculateTimeLeft = (date: string, setTime: Function, timeLeft: Object = {
  */
 const CountDown = ({ date: dateProvided, caption }: Props) => {
     const { formatMessage: f } = useIntl();
-    const [time, setTime] = React.useState({
+    const [time, setTime] = React.useState<TimeLeft>({
         years: 0,
         months: 0,
         days: 0,
