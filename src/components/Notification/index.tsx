@@ -35,6 +35,7 @@ const Notification = ({ title, message, type = 'success' }: Props) => {
 
             return () => clearTimeout(timeout);
         }
+        return undefined;
     }, [show]);
 
     return (

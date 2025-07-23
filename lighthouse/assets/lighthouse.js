@@ -9,7 +9,7 @@ try {
 // Get the sitemap and filter the urls
 const sitemap = await fetch(`${DOMAIN}/sitemap.xml`).then((res) => {
     return res.text().then((str) => {
-        const urls = str.match(/<loc>(.*?)<\/loc>/g).map((loc) => {
+        const urls = str.match(/<loc>([^<]+)<\/loc>/g).map((loc) => {
             return loc.replace(/<\/?loc>/g, '');
         });
         return urls;

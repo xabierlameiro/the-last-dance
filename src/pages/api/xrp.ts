@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
 
@@ -42,12 +42,10 @@ export default allowCors(async function handler(_req: NextApiRequest, res: NextA
             todaySummary,
             todayPorcentage,
         });
-    } catch (err: unknown) {
-        console.error('XRP API Error:', err);
-        if (err instanceof Error) {
-            res.status(500).json({ error: err.message });
-        } else {
-            res.status(500).json({ error: 'Unknown error occurred' });
+    } catch (err) {
+        if (process.env.NODE_ENV === 'development') {
+            console.error('XRP API Error:', err);
         }
+        res.status(500).json({ error: 'Internal server error' });
     }
 });

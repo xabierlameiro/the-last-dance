@@ -276,11 +276,18 @@ export const getAllCategories = (locale: string) => {
  * @returns {number} - Number of words.
  */
 export const countWords = (content: string) => {
-    const words = content.split(/\s/g);
-    const codeBlocks = content.match(/```(.|\n)*?```/g) || [];
-    const codeBlocksWords = codeBlocks.map((block) => block.split(/\s/g));
-    const wordsInCodeBlocks = codeBlocksWords.flat().length;
-    return words.length - wordsInCodeBlocks;
+    // Fixed: Use a more secure approach to avoid regex DoS
+    // Split by triple backticks and count words only in non-code sections
+    const parts = content.split('```');
+    let nonCodeContent = '';
+    
+    // Take every other part (non-code sections)
+    for (let i = 0; i < parts.length; i += 2) {
+        nonCodeContent += parts[i] || '';
+    }
+    
+    const nonCodeWords = nonCodeContent.split(/\s/g).filter(word => word.length > 0);
+    return nonCodeWords.length;
 };
 
 /**

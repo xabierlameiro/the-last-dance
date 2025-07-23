@@ -1,4 +1,3 @@
-import React from 'react';
 import '../../styles/globals.css';
 import '@code-hike/mdx/dist/index.css';
 import Script from 'next/script';
@@ -32,6 +31,13 @@ const App = ({ Component, pageProps }: AppProps) => {
     const hasNavigator = typeof navigator !== 'undefined';
     const isNotLighthouse = hasNavigator && !navigator?.userAgent.includes('Chrome-Lighthouse');
 
+    const handleIntlError = (err: Error) => {
+        // if Missing locale data for locale: "gl" in Intl.NumberFormat ignore it
+        if (err.message.includes('Missing locale data for locale: "gl"')) {
+            // Silently ignore this specific error
+        }
+    };
+
     return (
         <>
             {isProduction && isNotLighthouse && (
@@ -58,12 +64,7 @@ const App = ({ Component, pageProps }: AppProps) => {
             <IntlProvider
                 locale={locale}
                 messages={messages[locale as locales]}
-                onError={(err) => {
-                    // if  Missing locale data for locale: "gl" in Intl.NumberFormat ignore it
-                    if (err.message.includes('Missing locale data for locale: "gl"')) {
-                        return;
-                    }
-                }}
+                onError={handleIntlError}
             >
                 <ErrorBoundary>
                     <Notification

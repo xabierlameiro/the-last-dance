@@ -1,5 +1,5 @@
 import { remarkCodeHike } from '@code-hike/mdx';
-import theme from 'shiki/themes/one-dark-pro.json' assert { type: 'json' };
+import theme from 'shiki/themes/one-dark-pro.json' with { type: 'json' };
 import { serialize as sz } from 'next-mdx-remote/serialize';
 import path from 'path';
 import fs from 'fs';

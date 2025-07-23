@@ -10,17 +10,18 @@ import { defaultLocale, MAX_STEPS } from '@/constants/site';
  * @returns {string}
  */
 export const clx = (...classes: Array<string | null | undefined>) => {
-    classes = classes
+    const filteredClasses = classes
         .filter((element) => {
-            return element !== '' && element !== null;
+            return element !== '' && element !== null && element !== undefined;
         })
-        .map((item) => item?.trim());
+        .map((item) => item?.trim())
+        .filter((item) => item !== '');
 
-    if (!classes) {
+    if (!filteredClasses.length) {
         return '';
     }
 
-    return classes.join(' ');
+    return filteredClasses.join(' ');
 };
 
 /**

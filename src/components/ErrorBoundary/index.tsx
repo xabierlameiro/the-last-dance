@@ -44,7 +44,7 @@ class ErrorBoundary extends React.Component<React.PropsWithChildren<unknown>, { 
             );
         }
 
-        return <>{this.props.children}</>;
+        return this.props.children;
     }
 }
 

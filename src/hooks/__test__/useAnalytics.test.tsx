@@ -13,8 +13,7 @@ describe('useAnalytics hook', () => {
     it('returns analytics data', () => {
         const mockData = { pageViews: 5, newUsers: 2 };
         (useSWR as jest.Mock).mockReturnValue({ data: mockData, error: false, isLoading: false });
-        const expectedUrl = new URL('https://xabierlameiro.com/api/analytics');
-        expectedUrl.searchParams.set('slug', '/undefined');
+        const expectedUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/api/analytics?slug=%2Fundefined`;
         render(<TestComponent />);
         expect(useSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function), expect.any(Object));
         expect(screen.getByTestId('page-views').textContent).toBe('5');

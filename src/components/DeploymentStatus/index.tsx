@@ -1,21 +1,30 @@
 import React from 'react';
 import useSWR from 'swr';
-import { fetcher } from '@/helpers';
 import styles from './deploymentstatus.module.css';
 import Tooltip from '@/components/Tooltip';
 import { useIntl } from 'react-intl';
 import RenderManager from '@/components/RenderManager';
+import type { DeploymentData } from '../../types/api';
 
-const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/deployments`);
+const url = `${process.env.NEXT_PUBLIC_DOMAIN}/api/deployments`;
+
+const fetchDeployment = async (url: string): Promise<DeploymentData> => {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch deployment data: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data as DeploymentData;
+};
 
 /**
  *
- * @returns { {data: object, isLoading: boolean, isError: boolean} } - The deployment status
+ * @returns { {data: DeploymentData | undefined, isLoading: boolean, isError: boolean} } - The deployment status
  * @description - Fetches the deployment status
  * @example - const { data, isLoading, isError } = useDeploymentStatus();
  */
 export const useDeploymentStatus = () => {
-    const { data, error } = useSWR(url.toString(), fetcher);
+    const { data, error } = useSWR<DeploymentData>(url, fetchDeployment);
     return {
         data,
         isLoading: !error && !data,
@@ -33,13 +42,16 @@ const DeploymentStatus = () => {
     const { data, isLoading, isError } = useDeploymentStatus();
     const { formatMessage: f } = useIntl();
 
-    const { status, username, environment, createdAt } = data ?? {};
+    const status = data?.status;
+    const username = data?.username;
+    const environment = data?.environment;
+    const createdAt = data?.createdAt;
 
     return (
         <RenderManager error={isError} loading={isLoading}>
             <Tooltip>
                 <Tooltip.Trigger>
-                    <div className={`${styles.status} ${styles[status?.toLowerCase()]}`} />
+                    <div className={`${styles.status} ${status ? styles[status.toLowerCase()] : ''}`} />
                 </Tooltip.Trigger>
                 <Tooltip.Content>
                     {f(
@@ -50,7 +62,7 @@ const DeploymentStatus = () => {
                             status,
                             username,
                             environment,
-                            createdAt: new Date(createdAt).toLocaleString(),
+                            createdAt: createdAt ? new Date(createdAt).toLocaleString() : '',
                         }
                     )}
                 </Tooltip.Content>

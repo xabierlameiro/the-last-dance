@@ -37,8 +37,8 @@ export const ControlButtons = () => {
     return <CButtons disabled withPadding onClickClose={closeHandler} onClickMinimise={closeHandler} />;
 };
 
-// @ts-ignore: MDX component compatibility
-export const components = { 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const components: Record<string, any> = { 
     CH, 
     ControlButtons, 
     Date: DateComponent, 

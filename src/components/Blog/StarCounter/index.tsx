@@ -31,7 +31,7 @@ const StarCounter = () => {
                         errorTitle={f({ id: 'starCounter.error' })}
                         loadingTitle={f({ id: 'starCounter.loading' })}
                     >
-                        <span data-testid="star-counter">{data}</span>
+                        <span data-testid="star-counter">{data as string}</span>
                     </RenderManager>
                 </a>
             </Tooltip.Trigger>

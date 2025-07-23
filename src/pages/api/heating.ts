@@ -19,6 +19,12 @@ export default allowCors(async function handler(
     _req: NextApiRequest,
     res: NextApiResponse<HeatingResponse>
 ) {
+    // Validate required environment variables
+    if (!process.env.NEXT_PUBLIC_HEATING) {
+        console.error('Missing NEXT_PUBLIC_HEATING environment variable');
+        return res.status(500).json({ error: 'Configuration error' });
+    }
+
     try {
         const value = await fetch('https://www.ariston-net.remotethermo.com/R2/Account/Login?returnUrl=%2FR2%2FHome', {
             method: 'POST',

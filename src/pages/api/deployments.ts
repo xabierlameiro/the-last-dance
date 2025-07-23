@@ -23,6 +23,12 @@ export type DeploymentResponseType = DeploymentResponse | { error: string };
  * @example localhost:3000/api/deployments
  */
 export default allowCors(async function handler(_request: NextApiRequest, res: NextApiResponse<DeploymentResponseType>) {
+    // Validate required environment variables
+    if (!process.env.NEXT_PROJECT_ID || !process.env.NEXT_TOKEN || !process.env.NEXT_PUBLIC_ENV) {
+        console.error('Missing required environment variables for Vercel API');
+        return res.status(500).json({ error: 'Configuration error' });
+    }
+
     try {
         const result = await fetch(
             `https://api.vercel.com/v6/deployments?projectId=${process.env.NEXT_PROJECT_ID}&target=${process.env.NEXT_PUBLIC_ENV}&limit=1`,

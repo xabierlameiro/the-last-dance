@@ -26,11 +26,11 @@ const IndexedCounter = () => {
                         errorTitle={f({ id: 'indexedCounter.error' })}
                         loadingTitle={f({ id: 'indexedCounter.loading' })}
                     >
-                        <span>{data.num}</span>
+                        <span>{data?.num ?? 0}</span>
                     </RenderManager>
                 </div>
             </Tooltip.Trigger>
-            <Tooltip.Content>{f({ id: 'indexedCounter.tooltip' }, { num: data.num })}</Tooltip.Content>
+            <Tooltip.Content>{f({ id: 'indexedCounter.tooltip' }, { num: data?.num ?? 0 })}</Tooltip.Content>
         </Tooltip>
     );
 };
