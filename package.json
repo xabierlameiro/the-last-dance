@@ -42,7 +42,7 @@
         "dotenv-load": "^2.0.1",
         "googleapis": "^110.0.0",
         "gray-matter": "^4.0.3",
-        "next": "^15.4.3",
+        "next": "^15.5.2",
         "next-env": "^1.1.1",
         "next-mdx-remote": "^5.0.0",
         "nodemailer": "^6.9.9",
