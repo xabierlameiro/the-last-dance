@@ -90,7 +90,7 @@
         "jsdoc-babel": "^0.5.0",
         "lighthouse": "^12.2.1",
         "prettier": "^2.8.3",
-        "storybook": "^8.4.7",
+        "storybook": "^8.6.15",
         "storybook-react-intl": "^1.1.1"
     },
     "engines": {
