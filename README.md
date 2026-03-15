@@ -1,48 +1,48 @@
-# This is my personal website
+# the-last-dance — Personal Website
 
--   **Framework**: [Next.js](https://nextjs.org/)
--   **React**: [React](https://reactjs.org/)
--   **Mdxjs**: [Mdxjs](https://mdxjs.com/)
--   **TypeScript**: [TypeScript](https://www.typescriptlang.org/)
--   **Storybook**: [Storybook](https://storybook.js.org/)
--   **Testing**: [Jest](https://jestjs.io/)
--   **Deployment**: [Vercel](https://vercel.com)
--   **Package Manager**: Yarn (Berry)
+My personal website and blog, built with Next.js, MDX, TypeScript, Storybook, and Jest. Deployed on Vercel.
 
-## Overview
+[![CI](https://github.com/xabierlameiro/the-last-dance/actions/workflows/ci.yml/badge.svg)](https://github.com/xabierlameiro/the-last-dance/actions/workflows/ci.yml)
 
--   `.github/workflows/*` - CI/CD workflows.
--   `data/*` - The folder when contain all of my blog posts and other data in mdx format.
--   `public/*` - The folder where all of my static assets live.
--   `public/coverage/*` - The folder where all of my coverage reports live.
--   `public/docs/*` - The folder where all of my documentation live.
--   `public/posts/*` - The folder where all pictures for my blog posts live.
--   `src/components/*` - The folder where all of my components live.
--   `src/pages/*` - The folder where all of my pages live.
--   `src/pages/api` - The folder for API.
--   `src/pages/_app.tsx` - Global configuration for the application.
--   `src/pages/_document.tsx` - Global configuration for the document.
--   `src/constants/*` - The folder where all of my constants live.
--   `src/context/*` - The folder where all of my context providers live.
--   `src/helpers/*` - The folder where all of my helper functions live.
--   `src/hooks/*` - The folder where all of my custom hooks live.
--   `src/intl/*` - The folder where all of my translations live.
--   `styles/*` - The folder where all of my global styles live.
+## Stack
 
-## Running Locally
+| Layer           | Choice                                    |
+| --------------- | ----------------------------------------- |
+| Framework       | Next.js (Pages Router)                    |
+| Language        | TypeScript                                |
+| Content         | MDX                                       |
+| Testing         | Jest + Testing Library + Storybook        |
+| Package manager | Yarn (Berry)                              |
+| CI/CD           | GitHub Actions + Vercel                   |
+| Node.js         | v18.20.0 (pinned in `.nvmrc`)             |
 
-This application requires **Node.js v18.20.0** (see `.nvmrc`).
-Until the Next.js 15 migration is complete, other versions are not supported.
-Yarn (Berry) is the official package manager for this project.
+## Project structure
+
+```
+data/             # Blog posts and content in MDX format
+public/           # Static assets, coverage reports, docs
+src/
+  components/     # Reusable components (with Storybook stories + Jest tests)
+  constants/      # App-wide constants
+  context/        # React context providers
+  helpers/        # Utility functions
+  hooks/          # Custom React hooks
+  intl/           # i18n translations (en + es)
+  pages/          # Next.js pages and API routes
+styles/           # Global CSS styles
+```
+
+## Running locally
 
 ```bash
 git clone https://github.com/xabierlameiro/the-last-dance.git
+cd the-last-dance
 
-# Create your environment file
-cp .env.example .env.development # or .env.local
-
-# Use the correct Node.js version (if you have nvm installed)
+# Use the correct Node.js version
 nvm use
+
+# Copy environment variables
+cp .env.example .env.development
 
 # Install dependencies
 yarn install
@@ -51,20 +51,23 @@ yarn install
 yarn dev
 ```
 
-### Node.js Version
+Open [http://localhost:3000](http://localhost:3000).
 
-This project is pinned to Node.js v18.20.0 until the Next.js 15 migration is complete.
-If you have `nvm` installed, you can use:
+## Scripts
 
-```bash
-nvm use
-```
+| Script         | Description                  |
+| -------------- | ---------------------------- |
+| `yarn dev`     | Start development server     |
+| `yarn build`   | Production build             |
+| `yarn start`   | Start production server      |
+| `yarn lint`    | ESLint                       |
+| `yarn test`    | Jest unit tests              |
+| `yarn storybook` | Start Storybook dev server |
 
-This will automatically use the Node.js version specified in `.nvmrc`.
+## Deployment
 
-## Pending tasks
+Deployed automatically to [Vercel](https://vercel.com) on every push to `master`.
 
--   Complete coverage
--   Complete storybook
--   Move storybook to a separate repo
--   Move lighthouse to a separate repo
+## License
+
+[MIT](./LICENSE)
