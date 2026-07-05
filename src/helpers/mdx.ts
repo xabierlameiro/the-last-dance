@@ -20,6 +20,12 @@ export const serializePath = (route: string, fileName: string) => {
     const mdx = fs.readFileSync(filePath, 'utf8');
 
     return sz(mdx, {
+        // MDX content is first-party (authored in this repo), so JS expressions
+        // are trusted. next-mdx-remote v6 blocks them by default, which breaks
+        // Code Hike's compiled output; re-enable JS while keeping the guard
+        // against dangerous globals (eval/Function/require/...).
+        blockJS: false,
+        blockDangerousJS: true,
         mdxOptions: {
             remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
             useDynamicImport: true,
@@ -39,6 +45,10 @@ export const serializePath = (route: string, fileName: string) => {
  */
 export const serialize = (mdx: string) =>
     sz(mdx, {
+        // See serializePath: trusted first-party MDX, so allow JS expressions
+        // (required by Code Hike) while blocking dangerous globals.
+        blockJS: false,
+        blockDangerousJS: true,
         mdxOptions: {
             remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
             useDynamicImport: true,
