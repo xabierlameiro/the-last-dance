@@ -46,7 +46,7 @@ const Document = (props: Props) => {
                             sameAs: socialNetworks,
                             email: 'mailto:xabier.lameiro@gmail.com',
                             image: '/profile.png',
-                            jobTitle: 'Front-end Developer',
+                            jobTitle: 'Software Architect',
                             address: {
                                 '@type': 'PostalAddress',
                                 addressLocality: 'As Cortiñas, Moraña',
