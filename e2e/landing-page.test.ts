@@ -14,7 +14,7 @@ test.afterAll(async () => {
 test.describe('Landing page', () => {
     test('should navigate to landing page', async () => {
         await page.goto('/');
-        await expect(page).toHaveTitle(/Front end developer, microcomputing and networks Technician/);
+        await expect(page).toHaveTitle(/Software Architect, microcomputing and networks Technician/);
     });
     test('should check if the header, main and footer are visible', async () => {
         await page.getByTestId('header').isVisible();
