@@ -17,7 +17,14 @@ type Props = {
         alternate?: Array<{ lang: string; url: string }>;
         slug?: string;
         url?: string;
+        date?: string | null;
     };
+};
+
+const OG_LOCALES: Record<string, string> = {
+    en: 'en_US',
+    es: 'es_ES',
+    gl: 'gl_ES',
 };
 
 /**
@@ -39,38 +46,57 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
     const author = meta?.author || auth;
     const description = meta?.description;
     const image = meta?.image ?? '/profile.png';
+    const imageUrl = `${process.env.NEXT_PUBLIC_DOMAIN}${image.startsWith('/') ? '' : '/'}${image}`;
+    const date = meta?.date;
+    // For blog posts, the English version is either the current page or listed in the alternates
+    const englishAlternate = meta?.alternate?.find(({ lang }) => lang === 'en');
+    const defaultBlogUrl =
+        l === 'en'
+            ? url
+            : englishAlternate
+            ? `${process.env.NEXT_PUBLIC_DOMAIN}/blog/${category}/${englishAlternate.url}`
+            : undefined;
 
     return (
         <>
             <Head>
                 {isBlog ? (
-                    <script
-                        data-testid="json-ld"
-                        type="application/ld+json"
-                        key="item-jsonld"
-                        // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
-                        dangerouslySetInnerHTML={{
-                            __html: JSON.stringify({
-                                '@context': 'https://schema.org',
-                                '@type': 'Article',
-                                headline: title,
-                                description,
-                                url,
-                                ...(image && { image: [`${process.env.NEXT_PUBLIC_DOMAIN}/${image}`] }),
-                                datePublished: new Date().toISOString(),
-                                dateModified: new Date().toISOString(),
-                                author: [
-                                    {
-                                        '@type': 'Person',
-                                        name: author,
-                                        url: process.env.NEXT_PUBLIC_DOMAIN,
-                                    },
-                                ],
-                            }),
-                        }}
-                    />
+                    <>
+                        <script
+                            data-testid="json-ld"
+                            type="application/ld+json"
+                            key="item-jsonld"
+                            // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
+                            dangerouslySetInnerHTML={{
+                                __html: JSON.stringify({
+                                    '@context': 'https://schema.org',
+                                    '@type': 'Article',
+                                    headline: title,
+                                    description,
+                                    url,
+                                    inLanguage: l,
+                                    ...(image && { image: [imageUrl] }),
+                                    ...(date && { datePublished: date, dateModified: date }),
+                                    author: [
+                                        {
+                                            '@type': 'Person',
+                                            name: author,
+                                            url: process.env.NEXT_PUBLIC_DOMAIN,
+                                        },
+                                    ],
+                                }),
+                            }}
+                        />
+                        {l && <link rel="alternate" hrefLang={l} href={url} />}
+                        {defaultBlogUrl && <link rel="alternate" hrefLang="x-default" href={defaultBlogUrl} />}
+                    </>
                 ) : (
                     <>
+                        <link
+                            hrefLang="en"
+                            rel="alternate"
+                            href={`${process.env.NEXT_PUBLIC_DOMAIN}${cleanTrailingSlash(path)}`}
+                        />
                         <link
                             hrefLang="es"
                             rel="alternate"
@@ -80,6 +106,11 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                             hrefLang="gl"
                             rel="alternate"
                             href={`${process.env.NEXT_PUBLIC_DOMAIN}/gl${cleanTrailingSlash(path)}`}
+                        />
+                        <link
+                            hrefLang="x-default"
+                            rel="alternate"
+                            href={`${process.env.NEXT_PUBLIC_DOMAIN}${cleanTrailingSlash(path)}`}
                         />
                     </>
                 )}
@@ -105,10 +136,12 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                 {noimage && (
                     <>
                         <meta name="image" content={image} />
-                        <meta property="og:image" content={`${process.env.NEXT_PUBLIC_DOMAIN}${image}`} />
+                        <meta property="og:image" content={imageUrl} />
+                        <meta name="twitter:image" content={imageUrl} />
                     </>
                 )}
                 <meta property="og:url" content={url} />
+                <meta property="og:locale" content={OG_LOCALES[l ?? 'en'] ?? 'en_US'} />
                 <link rel="canonical" href={url} title="Canonical url" />
                 {meta?.alternate?.map(({ lang, url }, index) => (
                     <link

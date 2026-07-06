@@ -134,8 +134,7 @@ export default allowCors(async function handler(
             newUsers: data?.newUsers || '0',
         });
     } catch (err: unknown) {
-        if (err instanceof Error) {
-            res.status(500).json({ error: err.message });
-        }
+        console.error('Analytics API Error:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
