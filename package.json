@@ -40,12 +40,13 @@
         "@types/react": "^19.1.8",
         "@types/react-dom": "^19.1.6",
         "dotenv-load": "^2.0.1",
-        "googleapis": "^110.0.0",
+        "googleapis": "^173.0.0",
         "gray-matter": "^4.0.3",
+        "jsdom": "^26.1.0",
         "next": "^15.5.9",
         "next-env": "^1.1.1",
         "next-mdx-remote": "^6.0.0",
-        "nodemailer": "^7.0.11",
+        "nodemailer": "^9.0.3",
         "octokit": "^3.1.2",
         "react": "^19.1.0",
         "react-confetti": "^6.1.0",
@@ -96,6 +97,14 @@
     "engines": {
         "node": ">=18.0.0",
         "npm": ">=8.0.0"
+    },
+    "overrides": {
+        "@storybook/addon-actions": {
+            "uuid": "^11.1.1"
+        },
+        "next": {
+            "postcss": "^8.5.16"
+        }
     },
     "resolutions": {
         "protobufjs": "^7.2.5",

@@ -19,9 +19,11 @@ export default allowCors(async function handler(
     _req: NextApiRequest,
     res: NextApiResponse<HeatingResponse>
 ) {
-    // Validate required environment variables
-    if (!process.env.NEXT_PUBLIC_HEATING) {
-        console.error('Missing NEXT_PUBLIC_HEATING environment variable');
+    // HEATING_CREDENTIALS must NOT use the NEXT_PUBLIC_ prefix: it holds the
+    // Ariston account login payload and would be inlined into the client bundle.
+    const credentials = process.env.HEATING_CREDENTIALS || process.env.NEXT_PUBLIC_HEATING;
+    if (!credentials) {
+        console.error('Missing HEATING_CREDENTIALS environment variable');
         return res.status(500).json({ error: 'Configuration error' });
     }
 
@@ -32,7 +34,7 @@ export default allowCors(async function handler(
                 'content-type': 'application/json; charset=UTF-8',
                 'x-requested-with': 'XMLHttpRequest',
             },
-            body: `${process.env.NEXT_PUBLIC_HEATING}`,
+            body: credentials,
         })
             .then(async (response) => {
                 const cookies = response.headers.get('set-cookie');
@@ -60,13 +62,11 @@ export default allowCors(async function handler(
                         zoneMeasuredTemp: zoneMeasuredTemp ?? 0,
                     };
                 });
-            })
-            .catch((error) => error);
+            });
 
         res.status(200).json(value);
     } catch (err: unknown) {
-        if (err instanceof Error) {
-            res.status(500).json({ error: err.message });
-        }
+        console.error('Heating API Error:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });

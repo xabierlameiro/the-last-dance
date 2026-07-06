@@ -8,7 +8,7 @@ export const messages = {
         'blog.tags': 'Tags',
         language: 'English',
         'home.breadcrumb': 'Code',
-        'home.seo.title': 'Software Architect, microcomputing and networks Technician',
+        'home.seo.title': 'Xabier Lameiro | Software Architect, microcomputing and networks Technician',
         'home.seo.description':
             "I'm a Software Architect with more than 8 years of experience working in the online banking sector, currently specialized in Nextjs and React. Passionate about technology and programming, I like to learn new things and share knowledge with the community.",
         'settings.seo.title': 'Customized language, theme and region preferences for a web application',
@@ -84,7 +84,7 @@ export const messages = {
         'blog.readHits': '{hits} visitas',
         'blog.breadcrumb': 'Notas',
         language: 'Español',
-        'home.seo.title': 'Software Architect, técnico en microinformática y redes',
+        'home.seo.title': 'Xabier Lameiro | Software Architect, técnico en microinformática y redes',
         'home.seo.description':
             'Software Architect con más de 8 años de experiencia trabajando en el sector de la banca online, actualmente especializado en Nextjs y React. Apasionado de la tecnología y la programación, me gusta aprender cosas nuevas y compartir conocimientos con la comunidad. ',
         'home.breadcrumb': 'Código',
@@ -162,7 +162,7 @@ export const messages = {
         'blog.readHits': '{hits} visitas',
         'blog.breadcrumb': 'Notas',
         language: 'Galego',
-        'home.seo.title': 'Software Architect, técnico en microinformática e redes',
+        'home.seo.title': 'Xabier Lameiro | Software Architect, técnico en microinformática e redes',
         'home.breadcrumb': 'Código',
         'home.seo.description':
             'Software Architect con máis de 8 anos de experiencia traballando no sector da banca online, actualmente especializado en Nextjs e React. Apasionado da tecnoloxía e a programación, gustame aprender cousas novas e compartir coñecemento coa comunidade. ',

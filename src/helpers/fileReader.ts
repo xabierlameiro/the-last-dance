@@ -72,6 +72,22 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
 };
 
 /**
+ * @description Extract the publication date from the `<Date date="MM-DD-YYYY" />`
+ * tag embedded in the post body. Returns an ISO date string (YYYY-MM-DD) or null,
+ * so it can be serialized in getStaticProps and used for JSON-LD datePublished.
+ *
+ * @param {string} content - Raw MDX content of the post.
+ * @returns {string | null} - ISO date string or null if not found/invalid.
+ */
+export const extractPostDate = (content: string): string | null => {
+    const match = content.match(/<Date\s+date="([^"]+)"/);
+    if (!match) return null;
+    const parsed = new Date(match[1]);
+    if (isNaN(parsed.getTime())) return null;
+    return parsed.toISOString().split('T')[0];
+};
+
+/**
  * @description Get post by slug.
  *
  * @example
@@ -90,6 +106,7 @@ export const getPostBySlug = (slug: string | { params: { slug: string } }) => {
         meta: {
             readTime,
             numberOfWords,
+            date: extractPostDate(content),
             slug: data.slug,
             title: data.title,
             locale: data.locale,

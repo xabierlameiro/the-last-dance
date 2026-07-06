@@ -20,6 +20,7 @@ const Document = (props: Props) => {
                 <meta name="twitter:creator" content="@xlameirodev" />
                 <meta name="google" content="notranslate" />
                 <link rel="icon" href="/favicon.png" title="The favicon" />
+                <link rel="apple-touch-icon" href="/favicon.png" />
                 <script
                     type="application/ld+json"
                     key="website-jsonld"
