@@ -147,7 +147,16 @@ export const getStaticProps = async (data: {
         params: { category },
         locale,
     } = data;
-    const post = await getPostBySlug(data);
+    // Unknown slugs must 404, not crash the render with a 500
+    let post;
+    try {
+        post = await getPostBySlug(data);
+    } catch {
+        return {
+            notFound: true as const,
+            revalidate: 10,
+        };
+    }
 
     // Tag-based paths duplicate the canonical category URL — consolidate with a 301
     const canonicalCategory = post.meta.category.toLowerCase();

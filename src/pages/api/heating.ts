@@ -38,8 +38,12 @@ export default allowCors(async function handler(
         })
             .then(async (response) => {
                 const cookies = response.headers.get('set-cookie');
-                const token = cookies?.split('ar.loggedUser=')[1].split(';')[0];
-                const appCookie = cookies?.split('.AspNet.ApplicationCookie=')[1].split(';')[0];
+                const token = cookies?.split('ar.loggedUser=')[1]?.split(';')[0];
+                const appCookie = cookies?.split('.AspNet.ApplicationCookie=')[1]?.split(';')[0];
+
+                if (!token || !appCookie) {
+                    throw new Error(`Ariston login failed (status ${response.status}): session cookies missing`);
+                }
 
                 const data = await fetch(
                     'https://www.ariston-net.remotethermo.com/R2/PlantHome/GetData/A8032A1A96D4?umsys=si',
@@ -53,7 +57,10 @@ export default allowCors(async function handler(
                 );
 
                 return await data.json().then((res) => {
-                    const terms: Array<{ id: string; value: number }> = res['data']['items'];
+                    const terms: Array<{ id: string; value: number }> | undefined = res?.data?.items;
+                    if (!terms) {
+                        throw new Error('Ariston response missing data.items');
+                    }
                     const outsideTemp = terms.find((item) => item.id === 'OutsideTemp')?.value;
                     const zoneMeasuredTemp = terms.find((item) => item.id === 'ZoneMeasuredTemp')?.value;
 
