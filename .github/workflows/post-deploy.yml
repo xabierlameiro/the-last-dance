@@ -35,6 +35,8 @@ jobs:
               run: |
                   cd performance-report
                   cp -r ../lighthouse .
+                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"
                   git add .

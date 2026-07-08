@@ -62,6 +62,8 @@ jobs:
               run: |
                   cd unit-report
                   cp -r ../public/coverage/ .
+                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"
                   git add .
@@ -88,6 +90,8 @@ jobs:
               run: |
                   cd e2e-report
                   cp -r ../playwright-report/index.html index.html
+                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"
                   git add .
@@ -123,6 +127,8 @@ jobs:
               run: |
                   cd doc
                   cp -r ../public/docs/ .
+                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"
                   git add .
@@ -139,6 +145,8 @@ jobs:
                   npm run build-storybook
                   cd stb-report
                   cp -r ../storybook-static/ .
+                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"
                   git add .
