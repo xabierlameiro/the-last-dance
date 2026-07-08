@@ -8,6 +8,7 @@ import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCatego
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
 import { createSiteMap } from '@/helpers/fileWritter';
+import { defaultLocale } from '@/constants/site';
 import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
@@ -147,6 +148,21 @@ export const getStaticProps = async (data: {
         locale,
     } = data;
     const post = await getPostBySlug(data);
+
+    // Tag-based paths duplicate the canonical category URL — consolidate with a 301
+    const canonicalCategory = post.meta.category.toLowerCase();
+    if (category !== canonicalCategory) {
+        return {
+            redirect: {
+                destination: `${locale === defaultLocale ? '' : `/${locale}`}/blog/${canonicalCategory}/${
+                    post.meta.slug
+                }`,
+                permanent: true,
+            },
+            revalidate: 10,
+        };
+    }
+
     const mdxSource = await serialize(post.content);
     const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);
@@ -168,35 +184,6 @@ export const getStaticProps = async (data: {
 export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
     const posts = await getAllPosts();
 
-    const tags = posts.reduce(
-        (
-            acc: {
-                params: {
-                    category: string;
-                    slug: string;
-                };
-                locale: string;
-            }[],
-            post: {
-                meta: {
-                    tags: string[];
-                    slug: string;
-                    locale: string;
-                };
-            }
-        ) => {
-            const paths = post.meta.tags.map((tag: string) => ({
-                params: {
-                    category: tag.toLowerCase(),
-                    slug: post.meta.slug,
-                },
-                locale: post.meta.locale,
-            }));
-            return [...acc, ...paths];
-        },
-        []
-    );
-
     const categories = posts.map(
         (post: {
             meta: {
@@ -213,10 +200,13 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
         })
     );
 
-    createSiteMap([...tags, ...categories], locales);
+    // Only canonical (category) URLs are prerendered and submitted in the sitemap.
+    // Tag-based URLs resolve on demand via fallback: 'blocking' and 301 to the
+    // canonical path in getStaticProps.
+    createSiteMap(categories, locales);
 
     return {
-        paths: [...tags, ...categories],
+        paths: categories,
         fallback: 'blocking',
     };
 };
