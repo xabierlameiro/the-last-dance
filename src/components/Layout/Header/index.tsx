@@ -120,7 +120,7 @@ const Header = ({ children }: { children?: ReactNode }) => {
 
     return (
         <header data-testid="header" className={styles.header}>
-            <SiBitcoincash />
+            <SiBitcoincash aria-hidden="true" />
             <Route />
             <NavLinks />
             <CountDown date="2025-11-14T00:00:00+00:00" caption={f({ id: 'countdown.caption' })} />

@@ -117,6 +117,8 @@ export const getPostBySlug = (slug: string | { params: { slug: string } }) => {
             image: data.image,
             description: data.description,
             alternate: data.alternate,
+            // null (not undefined) so the meta object survives getStaticProps serialization
+            faq: data.faq ?? null,
         },
     };
 };

@@ -9,6 +9,11 @@ excerpt: 'Como evitar perder 2 horas de tu vida por un error de NPM, que no deja
 description: 'Cómo arreglar en un minuto el error de npm/yarn "Failed to replace env in config: ${NPM_TOKEN}": define la variable de entorno que espera tu .npmrc o elimina la entrada obsoleta.'
 image: '/posts/npm-token.png'
 alternate: [{ lang: 'en', url: 'npm-token-solution-error' }, { lang: 'gl', url: 'npm-token-solucion-erro' }]
+faq:
+    - question: '¿Por qué npm dice "Failed to replace env in config: ${NPM_TOKEN}"?'
+      answer: 'Un fichero .npmrc referencia la variable de entorno NPM_TOKEN pero no está definida en tu shell, así que npm o yarn no pueden expandirla y abortan el comando.'
+    - question: '¿Cómo se arregla "Failed to replace env in config"?'
+      answer: 'Define la variable que falta (export NPM_TOKEN=tu_token) o localiza el .npmrc que la referencia — en la raíz del proyecto o en tu carpeta de usuario — y elimina la entrada obsoleta. Ejecutar la instalación con --verbose muestra qué ficheros .npmrc se están leyendo.'
 ---
 
 # Posible solución para NPM - Failed to replace env in config: $\{NPM_TOKEN}
@@ -16,6 +21,10 @@ alternate: [{ lang: 'en', url: 'npm-token-solution-error' }, { lang: 'gl', url: 
 <Date date="01-03-2023" />
 
 <GoogleAdsense />
+
+## Respuesta rápida
+
+npm o yarn han encontrado un fichero `.npmrc` que referencia una variable de entorno (`NPM_TOKEN`) que no está definida en tu shell, así que no pueden expandirla. Exporta la variable (`export NPM_TOKEN=tu_token`) o localiza el `.npmrc` que la referencia — en la raíz del proyecto o en tu carpeta de usuario — y elimina la entrada obsoleta. Ejecuta la instalación con `--verbose` para ver exactamente qué ficheros `.npmrc` se están leyendo.
 
 En este breve post voy a enseñar una solución para el error `Failed to replace env in config: ${NPM_TOKEN}` que se produce cuando se intenta ejecutar un comando de yarn o npm.
 

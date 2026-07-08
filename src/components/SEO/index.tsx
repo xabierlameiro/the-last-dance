@@ -18,6 +18,7 @@ type Props = {
         slug?: string;
         url?: string;
         date?: string | null;
+        faq?: Array<{ question: string; answer: string }> | null;
     };
 };
 
@@ -87,6 +88,28 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                                 }),
                             }}
                         />
+                        {meta?.faq && meta.faq.length > 0 && (
+                            <script
+                                data-testid="faq-jsonld"
+                                type="application/ld+json"
+                                key="faq-jsonld"
+                                // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
+                                dangerouslySetInnerHTML={{
+                                    __html: JSON.stringify({
+                                        '@context': 'https://schema.org',
+                                        '@type': 'FAQPage',
+                                        mainEntity: meta.faq.map(({ question, answer }) => ({
+                                            '@type': 'Question',
+                                            name: question,
+                                            acceptedAnswer: {
+                                                '@type': 'Answer',
+                                                text: answer,
+                                            },
+                                        })),
+                                    }),
+                                }}
+                            />
+                        )}
                         {l && <link rel="alternate" hrefLang={l} href={url} />}
                         {defaultBlogUrl && <link rel="alternate" hrefLang="x-default" href={defaultBlogUrl} />}
                     </>

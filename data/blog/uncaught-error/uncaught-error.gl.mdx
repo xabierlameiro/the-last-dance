@@ -13,13 +13,22 @@ alternate:
         { lang: 'en', url: 'uncaught-error-minified-react-error' },
         { lang: 'es', url: 'error-no-detectado-react-minificado' },
     ]
+faq:
+    - question: 'Que significa o erro Minified React error #425?'
+      answer: 'É un erro de hidratación: o texto renderizado no servidor non coincide co renderizado no navegador. Adoita estar causado por datas, horas ou valores dependentes do idioma que difiren entre ambos os contornos.'
+    - question: 'Como se arranxa o erro Minified React error #425?'
+      answer: 'Engade o atributo suppressHydrationWarning aos elementos cuxo contido difire lexitimamente entre servidor e cliente, ou renderiza ese valor só despois de que o compoñente se montase no cliente.'
 ---
 
-# Erro non detectado: erro de reacción minimizado
+# Como arranxar Minified React error #425 (erro de hidratación)
 
 <Date date="01-05-2023" />
 
 <GoogleAdsense />
+
+## Resposta rápida
+
+O erro #425 de React ("Text content does not match server-rendered HTML") é un **desaxuste de hidratación**: o servidor renderizou un valor e o navegador outro, normalmente unha data ou unha hora. A solución máis rápida é engadir o atributo `suppressHydrationWarning` ao elemento cuxo texto difire lexitimamente entre servidor e cliente, ou renderizar ese valor só cando o compoñente xa se montou.
 
 Ao usar React, pode atopar o seguinte erro: `Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.`
 Este erro é causado polo uso de datas na aplicación. O erro aparece cando a data e a hora do navegador non teñen o mesmo formato que a data e a hora do servidor.
@@ -62,7 +71,7 @@ const DateAndHour = () => {
 ## Código sen o erro
 
 Utilice o atributo `suppressHydrationWarning` para evitar o erro. Este atributo úsase para evitar o erro cando o servidor e o cliente presentan contido diferente.
-Pode atopar máis información sobre este atributo na [documentación de React](https://reactjs.org/docs/dom-elements.html#suppresshydrationwarning 'Documentación de React').
+Pode atopar máis información sobre este atributo na [documentación de React](https://react.dev/reference/react-dom/components/common#common-props 'Documentación de React').
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 

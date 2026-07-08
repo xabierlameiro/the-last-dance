@@ -58,16 +58,19 @@ export const createSiteMap = (
                 page !== 'legal' &&
                 page !== '404.tsx' &&
                 page !== '500.tsx' &&
-                page !== 'survey.tsx'
+                page !== 'survey.tsx' &&
+                // Utility pages with no search value
+                page !== 'settings.tsx' &&
+                page !== 'comments.tsx'
         )
         .map((page) => {
             page = page.replace('.tsx', '');
             return {
                 url: page === 'index' ? '' : `${page}`,
-                lastmod: new Date().toISOString(),
             };
         });
 
+    // No <lastmod>: stamping the build date on every URL misleads crawlers
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
         <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
         ${sitemap
@@ -75,7 +78,6 @@ export const createSiteMap = (
                 return `
                     <url>
                         <loc>${url}</loc>
-                        <lastmod>${new Date().toISOString()}</lastmod>
                     </url>
                 `;
             })
@@ -83,7 +85,7 @@ export const createSiteMap = (
         ${locales
             .map((locale: string) => {
                 return pages
-                    .map((page: { url: string; lastmod: string }) => {
+                    .map((page: { url: string }) => {
                         return `
                         <url>
                             <loc>${removeTrailingSlash(
@@ -91,14 +93,13 @@ export const createSiteMap = (
                                     ? `${process.env.NEXT_PUBLIC_DOMAIN}/${page.url}`
                                     : `${process.env.NEXT_PUBLIC_DOMAIN}/${locale}/${page.url}`
                             )}</loc>
-                            <lastmod>${page.lastmod}</lastmod>
                         </url>
                     `;
                     })
                     .join('');
             })
             .join('')}
- 
+
         </urlset>
     `;
 
