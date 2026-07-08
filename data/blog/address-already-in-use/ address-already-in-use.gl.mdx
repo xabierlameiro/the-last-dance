@@ -9,13 +9,22 @@ excerpt: 'Significa que a combinación de dirección de rede e porto especificad
 description: 'Como arranxar o erro de Node.js "listen EADDRINUSE: address already in use": atopa o proceso que ocupa o porto con lsof e mátao, en macOS, Linux e Windows.'
 image: '/posts/address-in-use.png'
 alternate: [{ lang: 'en', url: 'solve-address-in-use-error' }, { lang: 'es', url: 'resolver-direccion-en-uso-error' }]
+faq:
+    - question: 'Que significa "listen EADDRINUSE: address already in use"?'
+      answer: 'Outro proceso xa está a escoitar nese porto, así que o teu servidor non pode usalo. Adoita ocorrer cando un servidor de desenvolvemento anterior non se pechou correctamente.'
+    - question: 'Como libero un porto que xa está en uso?'
+      answer: 'Atopa o proceso con lsof -i :PORTO en macOS/Linux (ou netstat -ano | findstr :PORTO en Windows) e termínao con kill -9 PID (ou taskkill /PID pid /F), ou arrinca o teu servidor noutro porto.'
 ---
 
-# Error: listen EADDRINUSE: address already in use 0.0.0.0:XXXX
+# EADDRINUSE: address already in use — como liberar o porto
 
 <Date date="01-02-2023" />
 
 <GoogleAdsense />
+
+## Resposta rápida
+
+Outro proceso xa está a escoitar no porto. Atópao con `lsof -i :3000` (macOS/Linux) ou `netstat -ano | findstr :3000` (Windows), termínao con `kill -9 <PID>` (ou `taskkill /PID <pid> /F` en Windows) e volve arrincar o teu servidor — ou simplemente execútao noutro porto.
 
 Se tenta iniciar un servidor nun porto que xa está a ser utilizado por outro programa, obterá o seguinte erro:
 

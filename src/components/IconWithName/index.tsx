@@ -28,7 +28,7 @@ const IconWithName = ({ icon, alt, name, horizontal, onClick }: Props) => {
             className={clx(styles.option, horizontal ? styles.horizontal : '')}
             onClick={onClick}
         >
-            <Image src={icon} alt={alt} width={44} height={42} />
+            <Image src={icon} alt={alt} width={44} height={44} />
             <p className={styles.optionText}>{name}</p>
         </div>
     );

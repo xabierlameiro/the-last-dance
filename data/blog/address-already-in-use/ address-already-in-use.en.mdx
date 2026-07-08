@@ -10,13 +10,22 @@ description: 'How to fix the Node.js error "listen EADDRINUSE: address already i
 image: '/posts/address-in-use.png'
 alternate:
     [{ lang: 'es', url: 'resolver-direccion-en-uso-error' }, { lang: 'gl', url: 'arranxar-direccion-en-uso-erro' }]
+faq:
+    - question: 'What does "listen EADDRINUSE: address already in use" mean?'
+      answer: 'Another process is already listening on that port, so your server cannot bind to it. It usually happens when a previous dev server did not shut down cleanly.'
+    - question: 'How do I free a port that is already in use?'
+      answer: 'Find the process with lsof -i :PORT on macOS/Linux (or netstat -ano | findstr :PORT on Windows) and terminate it with kill -9 PID (or taskkill /PID pid /F), or start your server on a different port.'
 ---
 
-# Error: listen EADDRINUSE: address already in use 0.0.0.0:XXXX
+# EADDRINUSE: address already in use — how to free the port
 
 <Date date="01-02-2023" />
 
 <GoogleAdsense />
+
+## Quick answer
+
+Another process is already listening on the port. Find it with `lsof -i :3000` (macOS/Linux) or `netstat -ano | findstr :3000` (Windows), kill it with `kill -9 <PID>` (or `taskkill /PID <pid> /F` on Windows), and start your server again — or simply run it on a different port.
 
 When you try to start a server on a port that is already being used by another program, you will get the following error:
 

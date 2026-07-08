@@ -113,6 +113,11 @@ a {
     font-size: 12px;
 }
 
+/* one-dark-pro line numbers fail WCAG AA contrast on the dark background */
+#__next .ch-code-line-number {
+    color: #9da5b4 !important;
+}
+
 .emoji {
     font-size: 2em;
 }
