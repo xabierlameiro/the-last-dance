@@ -63,9 +63,7 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
         const document = fs.readFileSync(filePath, 'utf8');
         const { data } = matter(document);
         const fileName = filePath.split('/').pop();
-        if (data.slug?.normalize('NFC') === normalizedSlug || fileName?.normalize('NFC') === `${normalizedSlug}.mdx`) {
-            return true;
-        }
+        return data.slug?.normalize('NFC') === normalizedSlug || fileName?.normalize('NFC') === `${normalizedSlug}.mdx`;
     });
     
     if (!route) {
