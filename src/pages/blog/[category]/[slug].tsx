@@ -150,7 +150,7 @@ export const getStaticProps = async (data: {
     // Unknown slugs must 404, not crash the render with a 500
     let post;
     try {
-        post = await getPostBySlug(data);
+        post = getPostBySlug(data);
     } catch {
         return {
             notFound: true as const,
