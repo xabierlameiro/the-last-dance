@@ -114,7 +114,7 @@ export default allowCors(async function handler(
 
     // Validate each city name (basic validation)
     const invalidCities = citiesArray.filter(city => 
-        !city || city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s-]+$/.test(city)
+        !city || city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s+-]+$/.test(city)
     );
     
     if (invalidCities.length > 0) {
