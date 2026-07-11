@@ -31,6 +31,10 @@ jobs:
                   npm install --legacy-peer-deps
             - name: Linter
               run: npm run lint
+            - name: Type check
+              run: npx tsc --noEmit
+            - name: Security audit (production dependencies)
+              run: npm audit --omit=dev --audit-level=high
     testing:
         name: Testing
         runs-on: ubuntu-22.04
