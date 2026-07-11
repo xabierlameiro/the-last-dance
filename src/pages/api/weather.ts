@@ -1,6 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { JSDOM } from 'jsdom';
 import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
 
@@ -16,69 +15,112 @@ interface WeatherData {
 
 type WeatherResponse = WeatherData[] | { error: string };
 
+type GeocodingResponse = {
+    results?: Array<{ latitude: number; longitude: number; name: string; country?: string }>;
+};
+
+type ForecastResponse = {
+    current?: {
+        temperature_2m: number;
+        relative_humidity_2m: number;
+        precipitation: number;
+        wind_speed_10m: number;
+        weather_code: number;
+    };
+};
+
+// Minimal WMO weather-code → description map, used as the image alt / name.
+const WEATHER_CODE_TEXT: Record<number, string> = {
+    0: 'Clear sky',
+    1: 'Mainly clear',
+    2: 'Partly cloudy',
+    3: 'Overcast',
+    45: 'Fog',
+    48: 'Depositing rime fog',
+    51: 'Light drizzle',
+    53: 'Moderate drizzle',
+    55: 'Dense drizzle',
+    61: 'Slight rain',
+    63: 'Moderate rain',
+    65: 'Heavy rain',
+    71: 'Slight snow',
+    73: 'Moderate snow',
+    75: 'Heavy snow',
+    80: 'Slight rain showers',
+    81: 'Moderate rain showers',
+    82: 'Violent rain showers',
+    95: 'Thunderstorm',
+    96: 'Thunderstorm with slight hail',
+    99: 'Thunderstorm with heavy hail',
+};
+
+const emptyWeather = (city: string): WeatherData => ({
+    city,
+    name: null,
+    precipitation: null,
+    humidity: null,
+    windSpeed: null,
+    grades: null,
+    imageUrl: undefined,
+});
+
+/**
+ * @description Get current weather for a city from Open-Meteo (free, no API key).
+ * City names arrive as "limerick+ireland"; the first token is used to geocode,
+ * then the resulting coordinates feed the forecast endpoint.
+ */
 const getWeatherData = async (city: string): Promise<WeatherData> => {
-    // const { JSDOM } = jsdom; // Already imported above
-    const response = await fetch(`https://www.google.com/search?q=tiempo+${city}`, {
-        method: 'GET',
-        headers: {
-            authority: 'www.google.com',
-            'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
-            'cache-control': 'no-cache',
-            'user-agent':
-                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
-        },
-        redirect: 'follow',
-    });
+    const query = city.split('+')[0].trim();
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    const geoUrl = new URL('https://geocoding-api.open-meteo.com/v1/search');
+    geoUrl.searchParams.set('name', query);
+    geoUrl.searchParams.set('count', '1');
+    geoUrl.searchParams.set('language', 'en');
+    geoUrl.searchParams.set('format', 'json');
+
+    const geoRes = await fetch(geoUrl.toString());
+    if (!geoRes.ok) {
+        throw new Error(`Geocoding HTTP error! status: ${geoRes.status}`);
+    }
+    const geo = (await geoRes.json()) as GeocodingResponse;
+    const place = geo?.results?.[0];
+    if (!place) {
+        console.warn(`No geocoding result for city: ${city}`);
+        return emptyWeather(city);
     }
 
-    const raw = await response.text();
-    const dom = new JSDOM(raw);
-    const weatherBox = dom.window.document.querySelector('#wob_wc') as HTMLImageElement;
+    const forecastUrl = new URL('https://api.open-meteo.com/v1/forecast');
+    forecastUrl.searchParams.set('latitude', String(place.latitude));
+    forecastUrl.searchParams.set('longitude', String(place.longitude));
+    forecastUrl.searchParams.set(
+        'current',
+        'temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code'
+    );
 
-    if (!weatherBox) {
-        console.warn(`Weather widget not found for city: ${city}`);
-        // Return basic structure with city name only if weather widget is not found
-        return {
-            city,
-            name: null,
-            precipitation: null,
-            humidity: null,
-            windSpeed: null,
-            grades: null,
-            imageUrl: undefined,
-        };
+    const forecastRes = await fetch(forecastUrl.toString());
+    if (!forecastRes.ok) {
+        throw new Error(`Forecast HTTP error! status: ${forecastRes.status}`);
+    }
+    const forecast = (await forecastRes.json()) as ForecastResponse;
+    const current = forecast?.current;
+    if (!current) {
+        console.warn(`No forecast data for city: ${city}`);
+        return emptyWeather(city);
     }
 
-    try {
-        const grades = weatherBox.querySelector('#wob_tm')?.textContent;
-        const name = weatherBox.querySelector('#wob_dc')?.textContent;
-        const precipitation = weatherBox.querySelector('#wob_pp')?.textContent;
-        const humidity = weatherBox.querySelector('#wob_hm')?.textContent;
-        const windSpeed = weatherBox.querySelector('#wob_ws')?.textContent;
-        const imageUrl = (weatherBox.querySelector('#dimg_1') as HTMLImageElement)?.src;
-
-        return {
-            city,
-            name,
-            precipitation,
-            humidity,
-            windSpeed,
-            grades,
-            imageUrl,
-        };
-    } catch (err: unknown) {
-        if (err instanceof Error) {
-            throw new Error(err.message);
-        }
-        throw new Error('Unknown error occurred');
-    }
+    return {
+        city,
+        name: WEATHER_CODE_TEXT[current.weather_code] ?? null,
+        grades: `${Math.round(current.temperature_2m)}`,
+        precipitation: `${current.precipitation} mm`,
+        humidity: `${current.relative_humidity_2m}%`,
+        windSpeed: `${Math.round(current.wind_speed_10m)} km/h`,
+        imageUrl: undefined,
+    };
 };
 
 /**
- * @description Get weather data from google
+ * @description Get weather data from Open-Meteo
  * @param req {NextApiRequest}
  * @param res {NextApiResponse}
  * @returns Promise<void>
