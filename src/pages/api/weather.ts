@@ -17,7 +17,6 @@ interface WeatherData {
 type WeatherResponse = WeatherData[] | { error: string };
 
 const getWeatherData = async (city: string): Promise<WeatherData> => {
-    // const { JSDOM } = jsdom; // Already imported above
     const response = await fetch(`https://www.google.com/search?q=tiempo+${city}`, {
         method: 'GET',
         headers: {

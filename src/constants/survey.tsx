@@ -31,6 +31,7 @@ const SCHEDULE: Array<{ day: string; hours: string[] }> = [
 const SuccessResult = () => (
     <>
         <h1>¡¡¡ OMG !!! Somos compatibles</h1>
+        {/* eslint-disable-next-line @next/next/no-img-element -- animated gif, next/image would strip the animation */}
         <img src="/celebration.gif" alt="celebration" width="100%" />
         <h2>
             ¿ Quieres contarme más ? <a href="tel:+34603018268">603018268</a>
@@ -79,6 +80,7 @@ const SuccessResult = () => (
 const FailureResult = ({ name }: { name: string }) => (
     <>
         <h1> Lo siento mucho {name} </h1>
+        {/* eslint-disable-next-line @next/next/no-img-element -- animated gif, next/image would strip the animation */}
         <img src="/disappointed.gif" alt="disappointed" width="100%" />
         <p> Pero parece que la posición y yo no somos compatibles en estos momentos! </p>
         <p> Te agradezco mucho tu tiempo y espero que encuentres lo que buscas muy pronto. </p>

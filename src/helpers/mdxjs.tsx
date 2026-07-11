@@ -1,6 +1,5 @@
 import { useDialog } from '@/context/dialog';
 import { default as CButtons } from '@/components/ControlButtons';
-// @ts-ignore
 import { CH } from '@code-hike/mdx/dist/components.cjs.js';
 import dynamic from 'next/dynamic';
 import VisibilityManager from '@/components/VisibilityManager';

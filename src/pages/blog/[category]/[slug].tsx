@@ -71,6 +71,10 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     } = useRouter();
     const close = () => dispatch({ type: 'close' });
 
+    let sideClass = '';
+    if (left && !right) sideClass = styles.openPosts;
+    else if (right) sideClass = styles.openCategories;
+
     return (
         <>
             <Script
@@ -84,10 +88,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                 open={open}
                 body={
                     <div
-                        className={clx(
-                            styles.container,
-                            left && !right ? styles.openPosts : right ? styles.openCategories : ''
-                        )}
+                        className={clx(styles.container, sideClass)}
                         onTouchStart={onSideShiftLeft}
                     >
                         <nav className={styles.nav} onTouchStart={onSideShiftRight}>
@@ -152,11 +153,10 @@ export const getStaticProps = async (data: {
     // Tag-based paths duplicate the canonical category URL — consolidate with a 301
     const canonicalCategory = post.meta.category.toLowerCase();
     if (category !== canonicalCategory) {
+        const localePrefix = locale === defaultLocale ? '' : `/${locale}`;
         return {
             redirect: {
-                destination: `${locale === defaultLocale ? '' : `/${locale}`}/blog/${canonicalCategory}/${
-                    post.meta.slug
-                }`,
+                destination: `${localePrefix}/blog/${canonicalCategory}/${post.meta.slug}`,
                 permanent: true,
             },
             revalidate: 10,

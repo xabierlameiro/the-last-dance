@@ -44,20 +44,15 @@ const NavList = ({ title, list, category, isCategory }: Props) => {
                         },
                         index: number
                     ) => {
+                        const isSelected = isCategory
+                            ? category === item.category.toLowerCase()
+                            : category === item.tag.toLowerCase();
                         return (
                             <li key={index}>
                                 <Link
                                     href={item.href}
                                     title={isCategory ? item.category : item.tag}
-                                    className={
-                                        isCategory
-                                            ? category == item.category.toLowerCase()
-                                                ? styles.selected
-                                                : ''
-                                            : category == item.tag.toLowerCase()
-                                            ? styles.selected
-                                            : ''
-                                    }
+                                    className={isSelected ? styles.selected : ''}
                                 >
                                     {isCategory ? <BsFolder2 /> : <BsTag />}
                                     <div className={styles.tag}>{isCategory ? item.category : item.tag}</div>

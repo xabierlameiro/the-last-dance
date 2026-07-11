@@ -1,3 +1,5 @@
+import type { IntlShape } from 'react-intl';
+
 export const MAX_STEPS = 10;
 export const defaultLocale = 'en';
 export const author = 'Xabier Lameiro Cardama';
@@ -58,7 +60,7 @@ export const socialLinks = [
     },
 ];
 
-export const translateRoute = (pathname: string, f: Function) => {
+export const translateRoute = (pathname: string, f: IntlShape['formatMessage']) => {
     let route = '';
     switch (pathname) {
         case '/':
