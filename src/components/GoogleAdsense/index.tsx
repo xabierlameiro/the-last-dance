@@ -7,6 +7,9 @@ type AdComponent = FC<{
     horizontal?: boolean;
 }>;
 
+// Temporarily hidden: AdSense ads are not serving. Flip to true to restore.
+const ADSENSE_ENABLED = false;
+
 /**
  * @description - The adsense will be rendered only in production mode and horizontal only on mobile
  *
@@ -20,6 +23,9 @@ type AdComponent = FC<{
 
 const GoogleAdsense: AdComponent = ({ client = 'ca-pub-3537017956623483', slot }) => {
     const id = useId();
+
+    if (!ADSENSE_ENABLED) return null;
+
     return (
         <>
             <ins

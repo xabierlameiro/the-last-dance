@@ -19,7 +19,6 @@ import { clx } from '@/helpers';
 import dynamic from 'next/dynamic';
 import useWindowResize from '@/hooks/useWindowResize';
 import SEO from '@/components/SEO';
-import Script from 'next/script';
 
 const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
     loading: () => <Loading />,
@@ -77,11 +76,8 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
 
     return (
         <>
-            <Script
-                async
-                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-                crossOrigin="anonymous"
-            />
+            {/* AdSense temporarily hidden — the ads are not serving, so we skip
+                loading the library. Restore alongside ADSENSE_ENABLED in GoogleAdsense. */}
             <SEO meta={{ ...post.meta }} isBlog />
             <Dialog
                 modalMode={isMobile}
@@ -148,7 +144,17 @@ export const getStaticProps = async (data: {
         params: { category },
         locale,
     } = data;
-    const post = await getPostBySlug(data);
+
+    // Unknown slugs must 404, not crash the render with a 500
+    let post;
+    try {
+        post = getPostBySlug(data);
+    } catch {
+        return {
+            notFound: true as const,
+            revalidate: 10,
+        };
+    }
 
     // Tag-based paths duplicate the canonical category URL — consolidate with a 301
     const canonicalCategory = post.meta.category.toLowerCase();
@@ -163,6 +169,9 @@ export const getStaticProps = async (data: {
         };
     }
 
+    // Tag-based URLs render normally so tag navigation stays selectable; the
+    // <link rel="canonical"> (built from the post category in the SEO component)
+    // consolidates the duplicate content for search engines.
     const mdxSource = await serialize(post.content);
     const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);
@@ -201,8 +210,8 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
     );
 
     // Only canonical (category) URLs are prerendered and submitted in the sitemap.
-    // Tag-based URLs resolve on demand via fallback: 'blocking' and 301 to the
-    // canonical path in getStaticProps.
+    // Tag-based URLs resolve on demand via fallback: 'blocking' and rely on the
+    // SEO rel=canonical to consolidate the duplicate content.
     createSiteMap(categories, locales);
 
     return {
