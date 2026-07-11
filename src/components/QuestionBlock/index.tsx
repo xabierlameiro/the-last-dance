@@ -2,8 +2,6 @@ import React from 'react';
 import styles from '@/styles/survey.module.css';
 import type { Question } from '@/constants/survey';
 
-export type { Question, AnswerOption } from '@/constants/survey';
-
 type Props = {
     question: Question;
     index: number;

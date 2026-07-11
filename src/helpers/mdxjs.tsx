@@ -30,7 +30,7 @@ const DateComponent = dynamic(() => import('@/components/Date'), {
     loading: () => <Loading />,
 });
 
-export const ControlButtons = () => {
+const ControlButtons = () => {
     const { dispatch } = useDialog();
     const closeHandler = () => dispatch({ type: 'close' });
     return <CButtons disabled withPadding onClickClose={closeHandler} onClickMinimise={closeHandler} />;

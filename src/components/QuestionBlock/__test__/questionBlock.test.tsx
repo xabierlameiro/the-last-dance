@@ -1,4 +1,5 @@
-import QuestionBlock, { Question } from '..';
+import QuestionBlock from '..';
+import type { Question } from '@/constants/survey';
 import { fireEvent, render, screen } from '@/test';
 
 describe('QuestionBlock component', () => {
