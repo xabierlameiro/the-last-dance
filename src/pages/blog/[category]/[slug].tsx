@@ -142,7 +142,16 @@ export const getStaticProps = async (data: {
         params: { category },
         locale,
     } = data;
-    const post = await getPostBySlug(data);
+    // Unknown slugs must 404, not crash the render with a 500
+    let post;
+    try {
+        post = getPostBySlug(data);
+    } catch {
+        return {
+            notFound: true as const,
+            revalidate: 10,
+        };
+    }
 
     // Tag-based URLs render normally so tag navigation stays selectable; the
     // <link rel="canonical"> (built from the post category in the SEO component)
@@ -185,8 +194,8 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
     );
 
     // Only canonical (category) URLs are prerendered and submitted in the sitemap.
-    // Tag-based URLs resolve on demand via fallback: 'blocking' and 301 to the
-    // canonical path in getStaticProps.
+    // Tag-based URLs resolve on demand via fallback: 'blocking' and rely on the
+    // SEO rel=canonical to consolidate the duplicate content.
     createSiteMap(categories, locales);
 
     return {

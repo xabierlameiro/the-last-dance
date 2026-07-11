@@ -49,19 +49,21 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
     if (!slug || typeof slug !== 'string' || slug.includes('..') || slug.includes('/') || slug.includes('\\')) {
         throw new Error('Invalid slug parameter');
     }
-    
+
+    // Slugs with non-ASCII characters (e.g. "compoñentes") may arrive NFD-decomposed
+    // from some clients/crawlers while the frontmatter stores them NFC-composed
+    const normalizedSlug = slug.normalize('NFC');
+
     const [route] = paths.filter((filePath) => {
         // Ensure the file path is within the POST_PATH directory
         if (!filePath.startsWith(POST_PATH)) {
             return false;
         }
-        
+
         const document = fs.readFileSync(filePath, 'utf8');
         const { data } = matter(document);
         const fileName = filePath.split('/').pop();
-        if (data.slug === slug || fileName === `${slug}.mdx`) {
-            return true;
-        }
+        return data.slug?.normalize('NFC') === normalizedSlug || fileName?.normalize('NFC') === `${normalizedSlug}.mdx`;
     });
     
     if (!route) {
