@@ -8,7 +8,6 @@ import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCatego
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
 import { createSiteMap } from '@/helpers/fileWritter';
-import { defaultLocale } from '@/constants/site';
 import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
@@ -149,20 +148,9 @@ export const getStaticProps = async (data: {
     } = data;
     const post = await getPostBySlug(data);
 
-    // Tag-based paths duplicate the canonical category URL — consolidate with a 301
-    const canonicalCategory = post.meta.category.toLowerCase();
-    if (category !== canonicalCategory) {
-        return {
-            redirect: {
-                destination: `${locale === defaultLocale ? '' : `/${locale}`}/blog/${canonicalCategory}/${
-                    post.meta.slug
-                }`,
-                permanent: true,
-            },
-            revalidate: 10,
-        };
-    }
-
+    // Tag-based URLs render normally so tag navigation stays selectable; the
+    // <link rel="canonical"> (built from the post category in the SEO component)
+    // consolidates the duplicate content for search engines.
     const mdxSource = await serialize(post.content);
     const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);
