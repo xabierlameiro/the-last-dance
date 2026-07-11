@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from '@/test';
 describe('QuestionBlock component', () => {
     const question: Question = {
         questionText: 'Sample question',
-        questionHtml: '<h1>Sample question?</h1>',
+        questionContent: <h1>Sample question?</h1>,
         answerOptions: [
             { answerText: 'Yes', isCorrect: true },
             { answerText: 'No', isCorrect: false },
@@ -52,5 +52,20 @@ describe('QuestionBlock component', () => {
             />
         );
         expect(screen.queryByTestId('question-block')).not.toBeInTheDocument();
+    });
+
+    it('Should render string content as inert text, never as HTML', () => {
+        const payload = '<img src=x onerror="alert(1)">';
+        render(
+            <QuestionBlock
+                question={{ questionContent: payload }}
+                index={0}
+                currentQuestionNum={0}
+                answers={[]}
+                handleAnswerOptionClick={jest.fn()}
+            />
+        );
+        expect(screen.getByText(payload)).toBeInTheDocument();
+        expect(document.querySelector('img')).toBeNull();
     });
 });
