@@ -8,6 +8,7 @@ import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCatego
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
 import { createSiteMap } from '@/helpers/fileWritter';
+import { defaultLocale } from '@/constants/site';
 import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
@@ -69,6 +70,10 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     } = useRouter();
     const close = () => dispatch({ type: 'close' });
 
+    let sideClass = '';
+    if (left && !right) sideClass = styles.openPosts;
+    else if (right) sideClass = styles.openCategories;
+
     return (
         <>
             {/* AdSense temporarily hidden — the ads are not serving, so we skip
@@ -79,10 +84,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                 open={open}
                 body={
                     <div
-                        className={clx(
-                            styles.container,
-                            left && !right ? styles.openPosts : right ? styles.openCategories : ''
-                        )}
+                        className={clx(styles.container, sideClass)}
                         onTouchStart={onSideShiftLeft}
                     >
                         <nav className={styles.nav} onTouchStart={onSideShiftRight}>
@@ -142,6 +144,7 @@ export const getStaticProps = async (data: {
         params: { category },
         locale,
     } = data;
+
     // Unknown slugs must 404, not crash the render with a 500
     let post;
     try {
@@ -149,6 +152,19 @@ export const getStaticProps = async (data: {
     } catch {
         return {
             notFound: true as const,
+            revalidate: 10,
+        };
+    }
+
+    // Tag-based paths duplicate the canonical category URL — consolidate with a 301
+    const canonicalCategory = post.meta.category.toLowerCase();
+    if (category !== canonicalCategory) {
+        const localePrefix = locale === defaultLocale ? '' : `/${locale}`;
+        return {
+            redirect: {
+                destination: `${localePrefix}/blog/${canonicalCategory}/${post.meta.slug}`,
+                permanent: true,
+            },
             revalidate: 10,
         };
     }

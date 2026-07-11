@@ -40,7 +40,7 @@ const Document = (props: Props) => {
                     // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify({
-                            '@context': 'http://schema.org',
+                            '@context': 'https://schema.org',
                             '@type': 'Person',
                             name: author,
                             url: process.env.NEXT_PUBLIC_DOMAIN,

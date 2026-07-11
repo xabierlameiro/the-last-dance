@@ -26,7 +26,7 @@ export const createSiteMap = (
     }[],
     locales: string[]
 ) => {
-    let sitemap = routes.reduce(
+    const sitemap = routes.reduce(
         (
             acc: string[],
             path: {

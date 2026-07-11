@@ -51,12 +51,10 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
     const date = meta?.date;
     // For blog posts, the English version is either the current page or listed in the alternates
     const englishAlternate = meta?.alternate?.find(({ lang }) => lang === 'en');
-    const defaultBlogUrl =
-        l === 'en'
-            ? url
-            : englishAlternate
-            ? `${process.env.NEXT_PUBLIC_DOMAIN}/blog/${category}/${englishAlternate.url}`
-            : undefined;
+    const englishAlternateUrl = englishAlternate
+        ? `${process.env.NEXT_PUBLIC_DOMAIN}/blog/${category}/${englishAlternate.url}`
+        : undefined;
+    const defaultBlogUrl = l === 'en' ? url : englishAlternateUrl;
 
     return (
         <>

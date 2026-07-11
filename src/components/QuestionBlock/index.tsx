@@ -1,16 +1,6 @@
 import React from 'react';
 import styles from '@/styles/survey.module.css';
-
-export type AnswerOption = {
-    answerText: string;
-    isCorrect: boolean;
-};
-
-export type Question = {
-    questionText?: string;
-    questionHtml?: string;
-    answerOptions?: AnswerOption[];
-};
+import type { Question } from '@/constants/survey';
 
 type Props = {
     question: Question;
@@ -25,22 +15,12 @@ type Props = {
     }) => void;
 };
 
-const QuestionBlock = ({
-    question,
-    index,
-    currentQuestionNum,
-    answers,
-    handleAnswerOptionClick,
-}: Props) => {
+const QuestionBlock = ({ question, index, currentQuestionNum, answers, handleAnswerOptionClick }: Props) => {
     if (currentQuestionNum !== index) return null;
 
     return (
         <div data-testid="question-block" className={styles.question}>
-            <div
-                // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here as questionHtml is sanitized content
-                dangerouslySetInnerHTML={{ __html: question.questionHtml || '' }}
-                className={styles.questionHtml}
-            />
+            <div>{question.questionContent}</div>
             {question.answerOptions?.map((answerOption) => (
                 <label htmlFor={answerOption.answerText} key={answerOption.answerText}>
                     <input

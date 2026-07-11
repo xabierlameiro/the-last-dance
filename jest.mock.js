@@ -1,5 +1,3 @@
-/* global jest */
-
 // Mock environment variables
 process.env.NEXT_PUBLIC_DOMAIN = 'https://xabierlameiro.com';
 

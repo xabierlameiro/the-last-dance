@@ -73,7 +73,7 @@ const DateAndHour = ({ children, minutes = 1 }: { children?: ReactNode; minutes?
 const Route = () => {
     const { pathname } = useRouter();
     const { formatMessage } = useIntl();
-    let route = translateRoute(pathname, formatMessage);
+    const route = translateRoute(pathname, formatMessage);
 
     return <span className={styles.route}>{route}</span>;
 };

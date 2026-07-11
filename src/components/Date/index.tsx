@@ -13,7 +13,7 @@ type Props = {
  * @param {Date} string
  * @returns {JSX.Element}
  */
-const Date = ({ date }: Props) => {
+const FormattedDate = ({ date }: Props) => {
     const { formatDate } = useIntl();
 
     return (
@@ -28,4 +28,4 @@ const Date = ({ date }: Props) => {
     );
 };
 
-export default Date;
+export default FormattedDate;

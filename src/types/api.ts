@@ -4,16 +4,6 @@ export interface XRPData {
     todayPorcentage: string;
 }
 
-export interface XRPError {
-    error: string;
-}
-
-export type XRPResponse = XRPData | XRPError;
-
-export const isXRPError = (data: XRPResponse): data is XRPError => {
-    return 'error' in data;
-};
-
 // Deployment types
 export type DeploymentStatus = 'BUILDING' | 'ERROR' | 'INITIALIZING' | 'QUEUED' | 'READY' | 'CANCELED';
 export type DeploymentEnvironment = 'production' | 'preview';

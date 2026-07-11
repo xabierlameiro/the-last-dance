@@ -23,7 +23,7 @@ const fetchDeployment = async (url: string): Promise<DeploymentData> => {
  * @description - Fetches the deployment status
  * @example - const { data, isLoading, isError } = useDeploymentStatus();
  */
-export const useDeploymentStatus = () => {
+const useDeploymentStatus = () => {
     const { data, error } = useSWR<DeploymentData>(url, fetchDeployment);
     return {
         data,
