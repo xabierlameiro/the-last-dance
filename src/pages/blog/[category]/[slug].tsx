@@ -194,8 +194,8 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
     );
 
     // Only canonical (category) URLs are prerendered and submitted in the sitemap.
-    // Tag-based URLs resolve on demand via fallback: 'blocking' and 301 to the
-    // canonical path in getStaticProps.
+    // Tag-based URLs resolve on demand via fallback: 'blocking' and rely on the
+    // SEO rel=canonical to consolidate the duplicate content.
     createSiteMap(categories, locales);
 
     return {
