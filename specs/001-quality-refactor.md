@@ -1,8 +1,9 @@
 # SDD-001: Quality Refactor — SonarQube / Fallow Audit Remediation
 
-- **Status:** Draft — awaiting owner approval (see §8 Decision points)
+- **Status:** Implemented on branch `feat/quality-refactor` (see §9 Results)
 - **Date:** 2026-07-11
 - **Scope:** whole repo (`the-last-dance` personal site, Next.js 15 pages router)
+- **Decisions taken** (owner delegated "lo que sea mejor"): (1) email feature **removed**; (2) `/survey` **kept**, XSS eliminated; (3) `fileReader` and other dead exports **removed/made private**; (4) `lighthouse/assets/**` and `data/**` **excluded** from analysis.
 
 ## 1. Audit baseline (reproduced locally, 2026-07-11)
 
@@ -134,8 +135,31 @@ Global `Access-Control-*` headers in `next.config.js` **and** the per-route `all
 - **Dead-export removal**: `fileReader` helpers might be intended future API → confirm before deleting (Decision point 3).
 - **Removing `sharp`**: verify Vercel image optimization on preview deploy before merging.
 
-## 8. Decision points (owner input needed)
-1. **Email/survey notification (F2/D2):** remove for good (default) or reimplement with a mail provider?
-2. **`/survey` page:** still wanted? If obsolete, deleting the page + hook + QuestionBlock resolves F1/F10 by removal.
-3. **`fileReader` dead exports:** future API (keep + `fallow-ignore`) or delete?
-4. **SonarQube exclusions (D5):** confirm `lighthouse/assets/**` and `data/**` are agreed out of analysis scope.
+## 8. Decision points (resolved)
+1. **Email/survey notification (F2/D2):** removed — the route was empty and the client call silently swallowed failures for months.
+2. **`/survey` page:** kept; XSS removed by rendering questions as JSX.
+3. **`fileReader` dead exports:** internal-only helpers made private; genuinely unused symbols/types deleted.
+4. **SonarQube exclusions (D5):** `lighthouse/assets/**` and `data/**` excluded.
+
+## 9. Results (verified 2026-07-11)
+
+Baselines were re-measured after implementation on `feat/quality-refactor`:
+
+| Metric | Before | After |
+| --- | --- | --- |
+| `fallow health --score` | 56 (C) | **89 (A)** |
+| `tsc --noEmit` | 1 error (empty email module) | **0 errors** |
+| `eslint` (SonarQube-parity ruleset) | 15 (hidden by old config) | **0 errors, 0 warnings** |
+| `jest` | 45 suites / 81 tests | **46 suites / 87 tests** (added XSS + name-validation tests) |
+| `npm audit` (production, `--omit=dev`) | — | **0 vulnerabilities** |
+| `next build` with gates on | failed silently (gates off) | **passes, 65 pages** |
+| Fallow unused dependencies | 15 | **0** (2 kept: `@mdx-js/*` peers of `@next/mdx`) |
+
+**What landed** (14 commits): reflected-XSS fix (F1), empty email route + client call + `nodemailer` removed (F2), `indexed-pages` hardened — no Google scraping, no fabricated `127`, serves last-known or 503 (F6), recursive `console` helper fixed, single-source CORS restricted to `GET,OPTIONS` (F12), build gates re-enabled (F3), ESLint 9 flat config with SonarJS replacing the legacy `.eslintrc` (F4/F13), dependency restructure + jest 29 alignment (F5/F7), tsconfig ES2017 + bundler (F13), 15 SonarJS smells fixed (F9), `useSurvey` split (questions → `constants/survey.tsx`) (F10), dead exports/CSS pruned (F11), Sonar + Fallow scoping (F8), CI type-check + production audit gates.
+
+### Accepted / deferred (honest caveats)
+- **`npm install` still needs `--legacy-peer-deps`.** Not a config defect: React 19 is ahead of the peer ranges declared by `@code-hike/mdx`, `react-intl`, `react-confetti`, etc. Production audit is clean and the tree resolves correctly; the flag is the standard way to run React 19 with not-yet-updated libraries. The *removable* conflicts (bogus `eslint-plugin-next@0.0.0`, misplaced deps) were fixed.
+- **Dev-tooling vulnerabilities remain** (`npm audit` full: 6 low, 17 moderate, 2 high) — all transitive through Storybook (`node-polyfill-webpack-plugin → crypto-browserify → elliptic`) and lighthouse (`@sentry/node → @opentelemetry/*`). Fixing requires breaking major upgrades of Storybook and lighthouse; none of these packages ship in the production bundle.
+- **`npm run build-storybook` fails** (`TypeError: compilation … must be an instance of Compilation`). Verified this fails identically on the pre-refactor commit `23bcafb` — it is a **pre-existing** break (Storybook 8 + React 19), not caused by this work. Tracked separately; out of scope for the audit remediation.
+- **Dead CSS module classes** (5, e.g. `viewCounter.spinner`, `header.button`) left in place — CSS-module dead-class detection risks false positives on dynamically composed names, and they carry no runtime cost (health impact −0.5).
+- **`SEO` component (143 LOC) not split** — the `useSurvey` split was the high-value one; `SEO` is data-heavy but low cyclomatic complexity, so the JsonLd/AlternateLinks extraction was deferred as optional polish.
