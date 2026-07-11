@@ -40,12 +40,6 @@ export default withMDX({
         ];
     },
     // Append the default value with md extensions
-    typescript: {
-        ignoreBuildErrors: true,
-    },
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {
         largePageDataBytes: 800 * 1000,

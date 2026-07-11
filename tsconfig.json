@@ -52,6 +52,8 @@
         "**/__tests__/**/*",
         "./jest.setup.js",
         "custom-reporter.js",
-        "migration/**/*"
+        "migration/**/*",
+        "e2e/**/*",
+        "playwright.config.ts"
     ]
 }
