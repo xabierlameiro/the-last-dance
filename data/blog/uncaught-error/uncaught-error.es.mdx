@@ -49,8 +49,6 @@ Eso solo ocurre con renderizado en servidor (Next.js, Remix, `renderToString`): 
 
 Como el mensaje está minificado, el paso de depuración más útil es reproducirlo en una **build de desarrollo**: ahí React imprime el mensaje completo _y señala el elemento exacto_, lo que convierte las conjeturas en un arreglo de una línea (ver "Cómo ver el error real" más abajo).
 
-{/* TODO(xabier): captura del error #425 minificado en la consola de producción frente al mensaje completo en dev — el momento E-E-A-T de "esto es lo que vi de verdad". */}
-
 ## Por qué ocurren los errores de hidratación
 
 Todo #425 se reduce a _salida del servidor ≠ primera salida del cliente_. Los sospechosos habituales:
@@ -64,11 +62,11 @@ Todo #425 se reduce a _salida del servidor ≠ primera salida del cliente_. Los 
 | Anidamiento HTML inválido                 | El navegador "arregla" tu HTML, así que el DOM ≠ lo que renderizó React |
 | Extensiones del navegador                 | Modifican el DOM antes de que React hidrate                           |
 
-El ejemplo de abajo es el caso de la fecha, el que me tocó a mí en el widget de reloj de esta misma web.
+![Diagrama de un error de hidratación: el servidor renderiza la hora como 14:32, el navegador la vuelve a renderizar como 14:33 al hidratar, el texto no coincide y React lanza el error #425.](/posts/hydration-mismatch.png)
+
+El ejemplo de abajo es el caso clásico: un reloj en vivo.
 
 ## El código que provocaba el error
-
-{/* TODO(xabier): una frase con tu voz — dónde te mordió esto (el reloj del escritorio) y cuánto tardaste en localizarlo. Concreto y en primera persona. */}
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -186,8 +184,6 @@ Nunca depures el #425 desde el número minificado. Reprodúcelo donde React sí 
 -   **Build de producción en local:** `next build && next start`, pero lee el mensaje en la consola del navegador, donde React imprime el texto completo y un diff del elemento que no cuadra.
 
 React registra algo como _"Warning: Text content did not match. Server: '14:32' Client: '14:33'"_, señalando el nodo exacto. A partir de ahí la causa suele ser obvia.
-
-{/* TODO(xabier): captura del aviso en modo dev "Text content did not match. Server: … Client: …" señalando el elemento. */}
 
 ## #418, #422, #423, #425 — la familia de errores de hidratación
 

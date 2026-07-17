@@ -49,8 +49,6 @@ That only happens with server-side rendering (Next.js, Remix, `renderToString`):
 
 Because the message is minified, the single most useful debugging step is to reproduce it in a **development build** — there React prints the full message _and points at the exact element_, which turns guesswork into a one-line fix (see "How to see the real error message" below).
 
-{/* TODO(xabier): screenshot of the minified #425 error in the production console vs. the full dev message — this is the E-E-A-T "here is what I actually saw" moment. */}
-
 ## Why hydration mismatches happen
 
 Every #425 comes down to _server output ≠ first client output_. The usual culprits:
@@ -64,11 +62,11 @@ Every #425 comes down to _server output ≠ first client output_. The usual culp
 | Invalid HTML nesting                    | The browser "fixes" your HTML, so the DOM ≠ what React rendered |
 | Browser extensions                      | They mutate the DOM before React hydrates                      |
 
-The example below is the date case — the one I hit on this very site's clock widget.
+![Diagram of a hydration mismatch: the server renders the time as 14:32, the browser re-renders it as 14:33 while hydrating, the text does not match and React throws error #425.](/posts/hydration-mismatch.png)
+
+The example below is the classic case: a live clock.
 
 ## The code that caused the error
-
-{/* TODO(xabier): one sentence in your own voice — where this bit you (the desktop clock widget) and how long it took to track down. Keep it specific and first-hand. */}
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -186,8 +184,6 @@ Never debug #425 from the minified number. Reproduce it where React talks to you
 -   **Production build locally:** `next build && next start`, but read the message in the browser console where React prints the full text and a diff of the mismatched element.
 
 React logs something like _"Warning: Text content did not match. Server: '14:32' Client: '14:33'"_, pointing at the exact node. From there the cause is usually obvious.
-
-{/* TODO(xabier): screenshot of the dev-mode "Text content did not match. Server: … Client: …" warning pointing at the element. */}
 
 ## #418, #422, #423, #425 — the hydration error family
 
