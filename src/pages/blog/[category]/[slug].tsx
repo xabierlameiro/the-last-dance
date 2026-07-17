@@ -9,7 +9,7 @@ import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCatego
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
 import { createSiteMap } from '@/helpers/fileWritter';
-import { author, defaultLocale } from '@/constants/site';
+import { author } from '@/constants/site';
 import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
@@ -161,22 +161,11 @@ export const getStaticProps = async (data: {
         };
     }
 
-    // Tag-based paths duplicate the canonical category URL — consolidate with a 301
-    const canonicalCategory = post.meta.category.toLowerCase();
-    if (category !== canonicalCategory) {
-        const localePrefix = locale === defaultLocale ? '' : `/${locale}`;
-        return {
-            redirect: {
-                destination: `${localePrefix}/blog/${canonicalCategory}/${post.meta.slug}`,
-                permanent: true,
-            },
-            revalidate: 10,
-        };
-    }
-
-    // Tag-based URLs render normally so tag navigation stays selectable; the
-    // <link rel="canonical"> (built from the post category in the SEO component)
-    // consolidates the duplicate content for search engines.
+    // Tag URLs (/blog/<tag>/<slug>) render the post inside the full-screen blog so the
+    // tag submenu keeps navigating between posts — no redirect out to a separate page.
+    // The SEO <link rel="canonical"> (built from the post's real category) consolidates
+    // the duplicate content for search engines. A 301 here used to bounce tag clicks out
+    // of the blog, which broke tag navigation (SDD-009).
     const mdxSource = await serialize(post.content);
     const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);
