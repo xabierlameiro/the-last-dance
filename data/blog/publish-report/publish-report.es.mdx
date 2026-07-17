@@ -3,12 +3,17 @@ title: 'Como publicar el reporte de cobertura de testing en tu aplicación de Re
 slug: 'publicar-reporte-pruebas-react'
 author: 'Xabier Lameiro'
 category: 'React'
-tags: ['jest']
+tags: ['jest', 'testing', 'react', 'ci']
 locale: 'es'
 excerpt: 'En este post vamos a ver como publicar el reporte de cobertura de testing en tu aplicación de React.'
 description: 'Muestro como publicar el reporte de cobertura de testing con jest en tu aplicación de React o Nextjs, para que tu mismo o la gente pueda ver la cobertura de testing de tu proyecto.'
 image: '/posts/publish-report.png'
 alternate: [{ lang: 'en', url: 'publish-report-testing-react' }, { lang: 'gl', url: 'publicar-informe-probas-react' }]
+faq:
+    - question: '¿Cómo publico un reporte de cobertura de Jest?'
+      answer: 'Apunta coverageDirectory a una carpeta pública, pon coverageReporters en html, genéralo en un paso postbuild y añade un rewrite para que el host sirva la carpeta. Luego despliégalo como cualquier sitio estático.'
+    - question: '¿Debería hacer público mi reporte de cobertura?'
+      answer: 'Está bien para un proyecto open source para que los que contribuyen vean lo cubierto que está, pero añade noindex para que los buscadores no traten esas páginas generadas como contenido pobre, que puede perjudicar el SEO de tus páginas de verdad.'
 ---
 
 # Como publicar el reporte de cobertura de testing en tu aplicación de React
@@ -17,25 +22,19 @@ alternate: [{ lang: 'en', url: 'publish-report-testing-react' }, { lang: 'gl', u
 
 <GoogleAdsense />
 
-En este post vamos a ver como publicar el reporte de cobertura de testing en tu aplicación de React. Para ello vamos a utilizar:
+Ejecutas `jest --coverage`, obtienes un informe HTML majo en `coverage/`, y ahí muere, en tu máquina. Este post convierte ese informe en una página que cualquiera puede abrir — útil para un proyecto open source donde quien contribuye quiere ver cómo de cubierto está todo, o simplemente para enseñar tu trabajo. El stack es mínimo:
 
 -   [Jest](https://jestjs.io/ 'Enlace a jestjs.io')
 
-> Una "alternativa" perfecta a SonarQube para pequeños proyectos.
+> Una "alternativa" perfecta a SonarQube para proyectos pequeños.
 
-No es común ni necesario publicar tu reporte de testing de tu aplicación, incluso habrá quien opine que es algo inprudente por que
-puedes exponer información sensible de tu aplicación. Pero la idea principal de esto es que si tienes un proyecto open source y quieres
-que la gente pueda contribuir, es una buena idea que puedan ver el reporte de testing para que sepan que tan bien esta cubierto tu proyecto o
-por que quieres enseñar a la gente como hacer testing en de una aplicación.
+Publicar un reporte de testing no lo hace todo el mundo, y alguno lo considera imprudente porque puedes filtrar detalle interno. El caso de uso honesto es un repo open source donde el reporte ayuda a contribuir, o un post didáctico. Si lo quieres cerrado, una ruta protegida con usuario y contraseña es suficiente.
 
-Sin embargo, para tener un extra de seguridad, es tan sencillo como tenerlo en una ruta protegida con usuario y contraseña.
-
-PD: Este ejemplo está desarrollado en una aplicación web hecha con **Nextjs** pero sirve para cualquier aplicación web que
-use **jest**.
+PD: este ejemplo está hecho con **Next.js**, pero sirve para cualquier aplicación web que use **jest**.
 
 ## 1. Ruta para el reporte
 
-Lo primero que debemos hacer es asignar el outputDirectory de jest a una carpeta publica
+Lo primero es apuntar el `coverageDirectory` de jest a una carpeta pública:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -61,12 +60,13 @@ const customJestConfig = {
 
 </CH.Code>
 
+`collectCoverageFrom` importa más de lo que parece: sin él, la cobertura se calcula solo sobre los ficheros que algún test importó, lo que infla tus números. Apúntalo a los globs reales del código para que los ficheros sin test cuenten como 0, no como ausentes.
+
 ## 2. Script para modificar el reporte
 
-Este escript lo que hace es modificar la ruta de los archivos estáticos que el reporte necesita para funcionar como imágnes, css, javascript, etc.
-Además se customizan algunos textos del reporte.
+El reporte referencia su CSS/JS/imágenes con rutas relativas que se rompen al servirlo desde una sub-ruta. Este script reescribe esas rutas y personaliza un par de textos:
 
-> La alternativa si usa la clase es usar la clase [CustomReporter](https://jestjs.io/docs/configuration 'Página de configuración de Jest') e implementar el método onRunComplete.
+> Si prefieres una clase, usa un [CustomReporter](https://jestjs.io/docs/configuration 'Configuración de Jest') de Jest e implementa `onRunComplete`.
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -109,9 +109,9 @@ glob('public/coverage/**/*.?(html|css)', function (err, files) {
 
 </CH.Code>
 
-## 3. Comando para generar el reporte cuando se genera el build
+## 3. Genera el reporte al hacer build
 
-Para que el reporte se genere en la carpeta public cuando se termina la build, debemos agregar los siguientes comandos en el package.json
+Añade un paso `postbuild` para que el reporte caiga en la carpeta pública cada vez que compilas:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -135,9 +135,9 @@ Para que el reporte se genere en la carpeta public cuando se termina la build, d
 
 </CH.Code>
 
-## 4. Crear una redirección en el servidor/ plafatorma en la nube
+## 4. Crea un redirect en el host
 
-En mi caso uso Vercel pero cualquier plataforma que uses, debes crear una redirección para que cuando se acceda a la ruta /coverage
+Para que una URL limpia sirva el `index.html` de la carpeta:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -154,4 +154,13 @@ En mi caso uso Vercel pero cualquier plataforma que uses, debes crear una redire
 
 </CH.Code>
 
-> Aquí puedes ver el ejemplo de como se ve el reporte de testing de este blog [xabierlameiro.com/coverage](https://coverage.xabierlameiro.com/ 'Sección de coverage')
+## Una cosa que hice mal: mantenlo fuera de Google
+
+Aquí está la parte que ningún tutorial te avisa, y que le pasó a este mismo sitio. Una vez el reporte de cobertura fue público, Google indexó cada una de esas páginas HTML generadas — decenas de ficheros casi idénticos y con poco texto. Eso es _contenido de poco valor_ de manual, y diluye las señales de ranking de tus páginas de verdad; fue parte de lo que hizo que AdSense marcara este dominio. Publicar el reporte está bien, pero dile a los buscadores que lo ignoren:
+
+- Inyecta `<meta name="robots" content="noindex">` en el HTML generado (el mismo script del reporter que arregla las rutas puede añadirlo), o
+- Sirve una cabecera `X-Robots-Tag: noindex` para la ruta o subdominio del reporte.
+
+Un reporte de cobertura es para las personas que lo buscan, no para los resultados de búsqueda. Publícalo, y luego escóndelo de los crawlers.
+
+> Aquí un ejemplo de cómo se ve el reporte de este blog: [coverage.xabierlameiro.com](https://coverage.xabierlameiro.com/ 'Sección de cobertura')
