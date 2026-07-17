@@ -12,6 +12,6 @@ global.console.warn = jest.fn();
 
 // jsdom (the npm package, used by API routes) needs TextEncoder/TextDecoder,
 // which the jest-environment-jsdom sandbox does not provide
-const { TextEncoder, TextDecoder } = require('util');
-global.TextEncoder = global.TextEncoder || TextEncoder;
-global.TextDecoder = global.TextDecoder || TextDecoder;
+const { TextEncoder: NodeTextEncoder, TextDecoder: NodeTextDecoder } = require('util');
+global.TextEncoder = global.TextEncoder || NodeTextEncoder;
+global.TextDecoder = global.TextDecoder || NodeTextDecoder;
