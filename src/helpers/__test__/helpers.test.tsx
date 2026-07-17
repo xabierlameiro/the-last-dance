@@ -1,4 +1,4 @@
-import { clx, isNotEng, cleanTrailingSlash, removeTrailingSlash, getLang, fetcher } from '..';
+import { clx, isNotEng, cleanTrailingSlash, removeTrailingSlash, getLang } from '..';
 
 describe('clx', () => {
     it('Should return empty string', () => {

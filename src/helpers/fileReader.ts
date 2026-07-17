@@ -81,7 +81,7 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
  * @param {string} content - Raw MDX content of the post.
  * @returns {string | null} - ISO date string or null if not found/invalid.
  */
-export const extractPostDate = (content: string): string | null => {
+const extractPostDate = (content: string): string | null => {
     const match = content.match(/<Date\s+date="([^"]+)"/);
     if (!match) return null;
     const parsed = new Date(match[1]);
@@ -175,7 +175,7 @@ export const getAllPosts = () => {
  * @returns {Object} - Object with posts.
  */
 
-export const getPostsByLocale = (locale: string) => {
+const getPostsByLocale = (locale: string) => {
     const posts = getAllPosts();
     return posts.filter((post) => post.meta.locale === locale);
 };
@@ -219,7 +219,7 @@ export const getPostsByLocaleAndCategory = (locale: string, category: string) =>
  * @param {string} locale - Locale of the posts.
  * @returns {Object} - Object with posts.
  */
-export const getPostsByTag = (tag: string, locale: string) => {
+const getPostsByTag = (tag: string, locale: string) => {
     const posts = getPostsByLocale(locale);
     return posts.filter((post) => post.meta.tags.includes(tag));
 };
@@ -240,7 +240,7 @@ export const getPostsByTag = (tag: string, locale: string) => {
  * @param {string} locale - Locale of the posts.
  * @returns {Object} - Object with posts.
  */
-export const getPostsByCategory = (category: string, locale: string) => {
+const getPostsByCategory = (category: string, locale: string) => {
     const posts = getPostsByLocale(locale);
     return posts.filter((post) => post.meta.category === category);
 };
@@ -261,7 +261,7 @@ export const getPostsByCategory = (category: string, locale: string) => {
  * @param {string} locale - Locale of the posts.
  * @returns {Object} - Object with tags.
  */
-export const getAllTags = (locale: string) => {
+const getAllTags = (locale: string) => {
     const posts = getPostsByLocale(locale);
     const tags = posts.map((post) => post.meta.tags);
     return [...new Set(tags.flat())].map((tag) => {

@@ -5,9 +5,9 @@ import { clx } from '@/helpers';
 type Props = {
     disabled?: boolean;
     withPadding?: boolean;
-    onClickClose?: () => Function | void;
-    onClickMinimise?: () => Function | void;
-    onClickMaximise?: () => Function | void;
+    onClickClose?: () => void;
+    onClickMinimise?: () => void;
+    onClickMaximise?: () => void;
 };
 
 /**

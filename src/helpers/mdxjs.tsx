@@ -1,6 +1,5 @@
 import { useDialog } from '@/context/dialog';
 import { default as CButtons } from '@/components/ControlButtons';
-// @ts-ignore
 import { CH } from '@code-hike/mdx/dist/components.cjs.js';
 import dynamic from 'next/dynamic';
 import VisibilityManager from '@/components/VisibilityManager';
@@ -31,7 +30,7 @@ const DateComponent = dynamic(() => import('@/components/Date'), {
     loading: () => <Loading />,
 });
 
-export const ControlButtons = () => {
+const ControlButtons = () => {
     const { dispatch } = useDialog();
     const closeHandler = () => dispatch({ type: 'close' });
     return <CButtons disabled withPadding onClickClose={closeHandler} onClickMinimise={closeHandler} />;

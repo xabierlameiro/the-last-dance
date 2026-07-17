@@ -21,7 +21,7 @@ const ADSENSE_ENABLED = false;
  * @returns {JSX.Element}
  */
 
-export const GoogleAdsense: AdComponent = ({ client = 'ca-pub-3537017956623483', slot }) => {
+const GoogleAdsense: AdComponent = ({ client = 'ca-pub-3537017956623483', slot }) => {
     const id = useId();
 
     if (!ADSENSE_ENABLED) return null;

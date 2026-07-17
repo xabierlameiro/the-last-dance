@@ -3,27 +3,27 @@
  * It will only log to the console if the NODE_ENV is set to development.
  *
  */
-const console = {
+const devConsole = {
     log: (...args: unknown[]) => {
         if (process.env.NODE_ENV === 'development') {
-            console.log(...args);
+            globalThis.console.log(...args);
         }
     },
     error: (...args: unknown[]) => {
         if (process.env.NODE_ENV === 'development') {
-            console.error(...args);
+            globalThis.console.error(...args);
         }
     },
     warn: (...args: unknown[]) => {
         if (process.env.NODE_ENV === 'development') {
-            console.warn(...args);
+            globalThis.console.warn(...args);
         }
     },
     info: (...args: unknown[]) => {
         if (process.env.NODE_ENV === 'development') {
-            console.info(...args);
+            globalThis.console.info(...args);
         }
     },
 };
 
-export default console;
+export default devConsole;

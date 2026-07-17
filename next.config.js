@@ -30,12 +30,6 @@ export default withMDX({
         ];
     },
     // Append the default value with md extensions
-    typescript: {
-        ignoreBuildErrors: true,
-    },
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {
         largePageDataBytes: 800 * 1000,
@@ -83,7 +77,6 @@ export default withMDX({
                     { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
                     { key: "X-Frame-Options", value: "DENY" },
                     { key: "X-Content-Type-Options", value: "nosniff" },
-                    { key: "X-XSS-Protection", value: "1; mode=block" },
                     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
                     { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
                     // More restrictive CSP
@@ -93,10 +86,7 @@ export default withMDX({
                         key: "Content-Security-Policy",
                         value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep2.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google; connect-src 'self' https://api.vercel.com https://api.coingecko.com https://www.ariston-net.remotethermo.com https://www.google.com https://news.google.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://ep1.adtrafficquality.google https://csi.gstatic.com;"
                     },
-                    // CORS headers (more restrictive)
-                    { key: "Access-Control-Allow-Credentials", value: "true" },
-                    { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS,POST" },
-                    { key: "Access-Control-Allow-Headers", value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-Type, Date" },
+                    // CORS for API routes is handled per-route by src/helpers/cors.ts
                 ],
             }
         ];

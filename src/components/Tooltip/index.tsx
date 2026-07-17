@@ -23,7 +23,7 @@ interface TooltipOptions {
     onOpenChange?: (open: boolean) => void;
 }
 
-export function useTooltip({
+function useTooltip({
     initialOpen = false,
     placement = 'top',
     open: controlledOpen,
@@ -78,7 +78,7 @@ type ContextType = ReturnType<typeof useTooltip> | null;
 
 const TooltipContext = React.createContext<ContextType>(null);
 
-export const useTooltipContext = () => {
+const useTooltipContext = () => {
     const context = React.useContext(TooltipContext);
 
     if (context === null) {

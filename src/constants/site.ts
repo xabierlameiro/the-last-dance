@@ -1,3 +1,5 @@
+import type { IntlShape } from 'react-intl';
+
 export const MAX_STEPS = 10;
 export const defaultLocale = 'en';
 // SDD-004 A1: one canonical name form everywhere; the full legal name stays as alternateName
@@ -61,7 +63,7 @@ export const socialLinks = [
     },
 ];
 
-export const translateRoute = (pathname: string, f: Function) => {
+export const translateRoute = (pathname: string, f: IntlShape['formatMessage']) => {
     let route = '';
     switch (pathname) {
         case '/':

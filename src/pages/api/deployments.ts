@@ -13,7 +13,7 @@ export type DeploymentResponse = {
     username: string;
 };
 
-export type DeploymentResponseType = DeploymentResponse | { error: string };
+type DeploymentResponseType = DeploymentResponse | { error: string };
 
 /**
  * @description Get the last deployment status
