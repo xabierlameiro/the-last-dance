@@ -24,9 +24,16 @@ The loader in `src/helpers/fileReader.ts` was quadratic:
 All of this ran inside every `getStaticProps`. And by design (SDD-009 faceted navigation),
 `getStaticPaths` prerendered only the canonical category URLs; **tag-faceted URLs**
 (`/blog/<tag>/<slug>`) fell through to `fallback: 'blocking'` → they rendered **on-demand inside a
-request-time serverless function**. A ~32 s render in a function with Vercel's ~10 s timeout =
-`FUNCTION_INVOCATION_TIMEOUT`. `revalidate: 10` made it worse by marking even prerendered pages
-stale every 10 s, re-running the whole thing constantly.
+request-time serverless function**. Per the Pages Router docs, with `fallback: 'blocking'`
+`getStaticProps` "is called **before the initial render**" — i.e. the user waits for it. A ~32 s
+render vs the function timeout = `FUNCTION_INVOCATION_TIMEOUT`.
+
+**Nuance (corrected after checking the official docs):** `revalidate: 10` did **not** cause the
+user-facing 504s on prerendered pages — ISR regeneration is stale-while-revalidate (the `STALE`
+cache state serves the cached page and updates in the background, and a failed background regen
+keeps serving the last good page). What `revalidate: 10` did do is re-run the ~32 s function in
+the background up to every 10 s per page — wasted compute and constant near-timeout invocations —
+so raising it to 86400 is hygiene and cost, not the 504 fix. The 504 fix is making the render fast.
 
 So: **a complexity bug** (O(N²)), an **anti-pattern** (no corpus caching; re-reading disk thousands
 of times per render), and **fragile architecture** (heavy work in on-demand serverless renders with
@@ -55,6 +62,14 @@ of the sitemap. They are simply fast now.
 | `revalidate` | 10 s | 1 day |
 
 `tsc` 0 errors · ESLint clean · 102 tests pass.
+
+## Verified against official docs & community (2026-07-18)
+
+- **`fallback: 'blocking'` semantics** — [Next.js Pages Router, getStaticProps](https://nextjs.org/docs/pages/building-your-application/data-fetching/get-static-props): runs at build time and "in the background" for ISR; for `fallback: 'blocking'` it is "called before the initial render". Confirms the 504 comes from the blocking on-demand render, not from ISR regens.
+- **ISR is stale-while-revalidate** — same docs (`x-nextjs-cache: STALE` updates in background; a failed background regen keeps serving the last successful page). This corrected the initial claim about `revalidate: 10` (see nuance above).
+- **Reading files from the FS in `getStaticProps` with `process.cwd()`** is the documented pattern — [getStaticProps API reference](https://nextjs.org/docs/pages/api-reference/functions/get-static-props).
+- **Module-scope caching**: [vercel/next.js#10933](https://github.com/vercel/next.js/issues/10933) documents that in `next dev`, pages with `getStaticPaths` re-import modules per request (module cache doesn't persist) while production keeps module state — matching this fix's design (cache gated to production; dev re-reads anyway).
+- **Vercel's official guidance for `FUNCTION_INVOCATION_TIMEOUT`** — [error reference](https://vercel.com/docs/errors/FUNCTION_INVOCATION_TIMEOUT): first recommendation is to make execution fit the plan's max duration (what this fix does); alternatives are Fluid compute / raising `maxDuration` ([configurable per function](https://vercel.com/docs/functions/configuring-functions/duration)) — kept as fallback levers only, since masking a quadratic loader with a longer timeout would be treating the symptom.
 
 ## Follow-ups (optional, not required to fix the 504)
 
