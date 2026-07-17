@@ -27,8 +27,12 @@ type Props = {
 const NavList = ({ title, list, category, isCategory }: Props) => {
     if (!list) return null;
 
-    if (category && typeof category == 'object') category = category[0];
-    if (isCategory && typeof isCategory == 'object') isCategory = isCategory[0];
+    const isCategoryList = Array.isArray(isCategory) ? Boolean(isCategory[0]) : Boolean(isCategory);
+    // `category` carries the currently active value(s): the route category for the category list,
+    // or the post's own tags (an array) for the tag list — both highlight via membership.
+    const selectedValues = (Array.isArray(category) ? category : [category])
+        .filter((value): value is string => typeof value === 'string')
+        .map((value) => value.toLowerCase());
 
     return (
         <>
@@ -44,18 +48,17 @@ const NavList = ({ title, list, category, isCategory }: Props) => {
                         },
                         index: number
                     ) => {
-                        const isSelected = isCategory
-                            ? category === item.category.toLowerCase()
-                            : category === item.tag.toLowerCase();
+                        const compareValue = (isCategoryList ? item.category : item.tag).toLowerCase();
+                        const isSelected = selectedValues.includes(compareValue);
                         return (
                             <li key={index}>
                                 <Link
                                     href={item.href}
-                                    title={isCategory ? item.category : item.tag}
+                                    title={isCategoryList ? item.category : item.tag}
                                     className={isSelected ? styles.selected : ''}
                                 >
-                                    {isCategory ? <BsFolder2 /> : <BsTag />}
-                                    <div className={styles.tag}>{isCategory ? item.category : item.tag}</div>
+                                    {isCategoryList ? <BsFolder2 /> : <BsTag />}
+                                    <div className={styles.tag}>{isCategoryList ? item.category : item.tag}</div>
                                     <div className={styles.number}>{item.total}</div>
                                 </Link>
                             </li>

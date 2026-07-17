@@ -204,24 +204,16 @@ export const getPostsByLocaleAndCategory = (locale: string, category: string) =>
 };
 
 /**
- * @description Get all posts by tag and locale.
+ * @description Get all posts that carry a given tag, for a locale. Tag matching is
+ * case-insensitive so it works with the lowercased tag slug used in `/blog/tag/<tag>` URLs.
  *
- * @example
- *     getPostsByTag('JavaScript', 'en');
- *     returns[
- *         {
- *             content: '...',
- *             meta: '...',
- *         }
- *     ];
- *
- * @param {string} tag - Tag of the posts.
  * @param {string} locale - Locale of the posts.
- * @returns {Object} - Object with posts.
+ * @param {string} tag - Tag slug (any case).
+ * @returns {Object[]} - Posts tagged with `tag` in `locale`.
  */
-const getPostsByTag = (tag: string, locale: string) => {
+export const getPostsByLocaleAndTag = (locale: string, tag: string) => {
     const posts = getPostsByLocale(locale);
-    return posts.filter((post) => post.meta.tags.includes(tag));
+    return posts.filter((post) => post.meta.tags.some((postTag: string) => postTag.toLowerCase() === tag?.toLowerCase()));
 };
 
 /**
@@ -252,9 +244,9 @@ const getPostsByCategory = (category: string, locale: string) => {
  *     getAllTags('en');
  *     returns[
  *         {
- *             tag: 'JavaScript',
+ *             tag: 'javascript',
  *             total: 2,
- *             href: '/blog/javascript/first-post',
+ *             href: '/blog/tag/javascript',
  *         }
  *     ];
  *
@@ -263,15 +255,13 @@ const getPostsByCategory = (category: string, locale: string) => {
  */
 const getAllTags = (locale: string) => {
     const posts = getPostsByLocale(locale);
-    const tags = posts.map((post) => post.meta.tags);
-    return [...new Set(tags.flat())].map((tag) => {
-        const postsBytag = getPostsByTag(tag, locale);
-        return {
-            tag,
-            total: tags.flat().filter((t) => t === tag).length,
-            href: `/blog/${tag.toLowerCase()}/${postsBytag[0].meta.slug}`,
-        };
-    });
+    const tags = posts.map((post) => post.meta.tags).flat();
+    return [...new Set(tags)].map((tag) => ({
+        tag,
+        total: tags.filter((t) => t === tag).length,
+        // Tags are self-canonical listing pages, not post URLs — see SDD-009.
+        href: `/blog/tag/${tag.toLowerCase()}`,
+    }));
 };
 
 /**

@@ -33,4 +33,15 @@ describe('NavList', () => {
         expect(screen.getByTestId('nav-list')).toBeInTheDocument();
         expect(screen.getByTestId('nav-list').children[0].children[0].className).toBe('selected');
     });
+
+    it('should mark a tag as selected when the post carries it (case-insensitive, array of tags)', () => {
+        const list = [
+            { category: 'React', total: 2, href: '/blog/tag/react', tag: 'React' },
+            { category: 'Node', total: 1, href: '/blog/tag/node', tag: 'Node' },
+        ];
+        render(<NavList title="Tags" list={list} category={['react']} />);
+        const items = screen.getByTestId('nav-list').children;
+        expect(items[0].children[0].className).toBe('selected');
+        expect(items[1].children[0].className).toBe('');
+    });
 });
