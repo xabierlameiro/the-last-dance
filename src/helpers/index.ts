@@ -48,6 +48,13 @@ export const isNotEng = (locale: string | undefined) => locale !== defaultLocale
 export const cleanTrailingSlash = (path: string) => (path !== '/' ? path : '');
 
 /**
+ * @description Serialize a value for a JSON-LD <script> block. Escaping '<'
+ * prevents breaking out of the script tag (XSS) when values derive from
+ * user-influenced input such as the router locale or slugs.
+ */
+export const jsonLdString = (value: unknown): string => JSON.stringify(value).replace(/</g, '\\u003c');
+
+/**
  * @description Utility function to remove trailing slash of a string.
  *
  * @example

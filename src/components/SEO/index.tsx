@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import React from 'react';
 import { author as auth } from '@/constants/site';
-import { getLang, cleanTrailingSlash } from '@/helpers';
+import { getLang, cleanTrailingSlash, jsonLdString } from '@/helpers';
 import Head from 'next/head';
 
 type Props = {
@@ -70,7 +70,7 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                             key="item-jsonld"
                             // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
                             dangerouslySetInnerHTML={{
-                                __html: JSON.stringify({
+                                __html: jsonLdString({
                                     '@context': 'https://schema.org',
                                     '@type': 'Article',
                                     headline: title,
@@ -97,7 +97,7 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                             key="breadcrumb-jsonld"
                             // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
                             dangerouslySetInnerHTML={{
-                                __html: JSON.stringify({
+                                __html: jsonLdString({
                                     '@context': 'https://schema.org',
                                     '@type': 'BreadcrumbList',
                                     itemListElement: [
@@ -131,7 +131,7 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                                 key="faq-jsonld"
                                 // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
                                 dangerouslySetInnerHTML={{
-                                    __html: JSON.stringify({
+                                    __html: jsonLdString({
                                         '@context': 'https://schema.org',
                                         '@type': 'FAQPage',
                                         mainEntity: meta.faq.map(({ question, answer }) => ({
