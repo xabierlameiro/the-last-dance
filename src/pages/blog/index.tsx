@@ -6,15 +6,8 @@ import ControlButtons from '@/components/ControlButtons';
 import SEO from '@/components/SEO';
 import { useDialog } from '@/context/dialog';
 import { getPostsByLocale } from '@/helpers/fileReader';
+import PostSummaryList, { type PostSummary } from '@/components/Blog/PostSummaryList';
 import styles from '@/styles/blogIndex.module.css';
-
-type PostSummary = {
-    title: string;
-    excerpt: string;
-    slug: string;
-    category: string;
-    date: string | null;
-};
 
 type CategorySummary = {
     category: string;
@@ -63,17 +56,7 @@ const BlogIndex = ({ posts, categories }: Props) => {
                                 </Link>
                             ))}
                         </nav>
-                        <ul className={styles.posts}>
-                            {posts.map((post) => (
-                                <li key={post.slug} className={styles.post}>
-                                    <Link href={`/blog/${post.category.toLowerCase()}/${post.slug}`}>
-                                        <h2>{post.title}</h2>
-                                    </Link>
-                                    {post.date && <span className={styles.date}>{post.date}</span>}
-                                    <p>{post.excerpt}</p>
-                                </li>
-                            ))}
-                        </ul>
+                        <PostSummaryList posts={posts} />
                         <p className={styles.links}>
                             <Link href="/about">{f({ id: 'about.title' })}</Link>
                             {' · '}

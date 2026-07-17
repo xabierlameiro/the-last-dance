@@ -27,12 +27,6 @@
     margin-right: 10px;
 }
 
-.list .selectedPost {
-    background-color: rgba(var(--blue-color));
-    color: rgba(var(--white-color));
-    border-radius: 5px;
-}
-
 .selected a::after {
     content: unset !important;
 }

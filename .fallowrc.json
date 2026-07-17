@@ -22,6 +22,6 @@
         "public/**",
         ".next/**"
     ],
-    "ignoreDependencies": ["@mdx-js/loader", "@mdx-js/react"],
+    "ignoreDependencies": ["@mdx-js/loader", "@mdx-js/react", "@storybook/addons", "@storybook/theming"],
     "ignoreExportsUsedInFile": true
 }
