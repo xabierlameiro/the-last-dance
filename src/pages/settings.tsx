@@ -63,7 +63,7 @@ const Content = ({ lang, toggleLang }: { lang: boolean; toggleLang: () => void }
             <div className={styles.content}>
                 <Avatar
                     img="/settings/avatar.png"
-                    name="Xabier Lameiro Cardama"
+                    name="Xabier Lameiro"
                     alt={f({ id: 'settings.avatar' })}
                     description={f({ id: 'settings.desc' })}
                 />

@@ -1,10 +1,13 @@
 export const MAX_STEPS = 10;
 export const defaultLocale = 'en';
-export const author = 'Xabier Lameiro Cardama';
+// SDD-004 A1: one canonical name form everywhere; the full legal name stays as alternateName
+export const author = 'Xabier Lameiro';
+export const authorAlternateName = 'Xabier Lameiro Cardama';
 export const socialNetworks = [
     'https://www.linkedin.com/in/xlameiro',
     'https://github.com/xabierlameiro',
     'https://www.reddit.com/user/xlameiro',
+    'https://x.com/xlameirodev',
 ];
 
 export const socialLinks = [

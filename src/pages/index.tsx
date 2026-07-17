@@ -6,8 +6,6 @@ import { MDXRemote, type MDXRemoteProps } from 'next-mdx-remote';
 import { components } from '@/helpers/mdxjs';
 import { serializePath } from '@/helpers/mdx';
 import SEO from '@/components/SEO';
-import { author, socialNetworks } from '@/constants/site';
-import Head from 'next/head';
 import path from 'path';
 
 type Props = {
@@ -36,35 +34,7 @@ const Home = ({ content }: Props) => {
                     description: f({ id: 'home.seo.description' }),
                 }}
             />
-            <Head>
-                <script
-                    data-testid="home-jsonld"
-                    type="application/ld+json"
-                    key="home-jsonld"
-                    // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
-                    dangerouslySetInnerHTML={{
-                        __html: JSON.stringify([
-                            {
-                                '@context': 'https://schema.org',
-                                '@type': 'Person',
-                                name: author,
-                                url: process.env.NEXT_PUBLIC_DOMAIN,
-                                image: `${process.env.NEXT_PUBLIC_DOMAIN}/profile.png`,
-                                jobTitle: 'Software Architect',
-                                sameAs: socialNetworks,
-                            },
-                            {
-                                '@context': 'https://schema.org',
-                                '@type': 'WebSite',
-                                name: author,
-                                url: process.env.NEXT_PUBLIC_DOMAIN,
-                                inLanguage: ['en', 'es', 'gl'],
-                            },
-                        ]),
-                    }}
-                />
-            </Head>
-
+            {/* Person/WebSite JSON-LD lives once in _document (SDD-002 D4) — no per-page copies */}
             <Dialog
                 className="home"
                 modalMode

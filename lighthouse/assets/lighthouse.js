@@ -62,7 +62,8 @@ for (const lang of Object.keys(translations)) {
         // write report in output folder
         fs.writeFileSync(
             lang === 'en' ? `lighthouse/${fileName}.html` : `lighthouse/${lang}/${fileName}.html`,
-            result.report
+            // SDD-002 D1: auto-generated report pages must never be indexed
+            String(result.report).replace(/<head>/, '<head><meta name="robots" content="noindex">')
         );
 
         const cleanUrl = url.replace(/https:\/\/xabierlameiro.com\//, '');

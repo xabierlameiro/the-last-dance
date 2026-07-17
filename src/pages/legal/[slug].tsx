@@ -144,7 +144,8 @@ export const getStaticProps = async ({
     return {
         props: {
             source: mdxSource,
-            meta: data,
+            // url feeds the SEO canonical — router.pathname would render "/legal/[slug]"
+            meta: { ...data, url: `/legal/${slug}` },
         },
     };
 };

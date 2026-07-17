@@ -26,6 +26,9 @@ glob('public/coverage/**/*.?(html|css)', (globErr, files) => {
 
             replaced = replaced.replace(/<title>(.*)<\/title>/, '<title>Code coverage by Xabier Lameiro</title>');
 
+            // SDD-002 D1: auto-generated report pages must never be indexed
+            replaced = replaced.replace(/<head>/, '<head><meta name="robots" content="noindex">');
+
             replaced = replaced.replace(
                 /(.*)<link rel="shortcut icon" (.*)\s* href="(.*)" \/>/,
                 '<link rel="shortcut icon" type="image/x-icon" href="https://pre.xabierlameiro.com/favicon.png">'

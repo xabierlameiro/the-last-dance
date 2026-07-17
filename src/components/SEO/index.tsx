@@ -40,9 +40,12 @@ const OG_LOCALES: Record<string, string> = {
 const SEO = ({ meta, isBlog, noimage = true }: Props) => {
     const { locale: l, pathname: path } = useRouter();
     const category = meta?.category?.toLowerCase();
+    // meta.url lets dynamic non-blog routes (/legal/[slug], /blog/[category]) provide their
+    // real path — router.pathname would leak the bracket placeholder into the canonical URL
+    const pagePath = meta?.url ?? path;
     const url = isBlog
         ? `${process.env.NEXT_PUBLIC_DOMAIN}${getLang(l)}/blog/${category}/${meta?.slug}`
-        : `${process.env.NEXT_PUBLIC_DOMAIN}${getLang(l)}${cleanTrailingSlash(path)}`;
+        : `${process.env.NEXT_PUBLIC_DOMAIN}${getLang(l)}${cleanTrailingSlash(pagePath)}`;
     const title = meta?.title;
     const author = meta?.author || auth;
     const description = meta?.description;
@@ -81,9 +84,44 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                                     author: [
                                         {
                                             '@type': 'Person',
+                                            '@id': `${process.env.NEXT_PUBLIC_DOMAIN}/#person`,
                                             name: author,
                                             url: process.env.NEXT_PUBLIC_DOMAIN,
                                         },
+                                    ],
+                                    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+                                }),
+                            }}
+                        />
+                        <script
+                            data-testid="breadcrumb-jsonld"
+                            type="application/ld+json"
+                            key="breadcrumb-jsonld"
+                            // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
+                            dangerouslySetInnerHTML={{
+                                __html: JSON.stringify({
+                                    '@context': 'https://schema.org',
+                                    '@type': 'BreadcrumbList',
+                                    itemListElement: [
+                                        {
+                                            '@type': 'ListItem',
+                                            position: 1,
+                                            name: 'Home',
+                                            item: `${process.env.NEXT_PUBLIC_DOMAIN}${getLang(l)}` || '/',
+                                        },
+                                        {
+                                            '@type': 'ListItem',
+                                            position: 2,
+                                            name: 'Blog',
+                                            item: `${process.env.NEXT_PUBLIC_DOMAIN}${getLang(l)}/blog`,
+                                        },
+                                        {
+                                            '@type': 'ListItem',
+                                            position: 3,
+                                            name: meta?.category,
+                                            item: `${process.env.NEXT_PUBLIC_DOMAIN}${getLang(l)}/blog/${category}`,
+                                        },
+                                        { '@type': 'ListItem', position: 4, name: title, item: url },
                                     ],
                                 }),
                             }}
@@ -118,22 +156,22 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                         <link
                             hrefLang="en"
                             rel="alternate"
-                            href={`${process.env.NEXT_PUBLIC_DOMAIN}${cleanTrailingSlash(path)}`}
+                            href={`${process.env.NEXT_PUBLIC_DOMAIN}${cleanTrailingSlash(pagePath)}`}
                         />
                         <link
                             hrefLang="es"
                             rel="alternate"
-                            href={`${process.env.NEXT_PUBLIC_DOMAIN}/es${cleanTrailingSlash(path)}`}
+                            href={`${process.env.NEXT_PUBLIC_DOMAIN}/es${cleanTrailingSlash(pagePath)}`}
                         />
                         <link
                             hrefLang="gl"
                             rel="alternate"
-                            href={`${process.env.NEXT_PUBLIC_DOMAIN}/gl${cleanTrailingSlash(path)}`}
+                            href={`${process.env.NEXT_PUBLIC_DOMAIN}/gl${cleanTrailingSlash(pagePath)}`}
                         />
                         <link
                             hrefLang="x-default"
                             rel="alternate"
-                            href={`${process.env.NEXT_PUBLIC_DOMAIN}${cleanTrailingSlash(path)}`}
+                            href={`${process.env.NEXT_PUBLIC_DOMAIN}${cleanTrailingSlash(pagePath)}`}
                         />
                     </>
                 )}
@@ -156,9 +194,11 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                 <meta name="twitter:description" content={description} />
                 <meta property="og:title" content={title} />
                 <meta name="twitter:title" content={title} />
+                <meta property="og:type" content={isBlog ? 'article' : 'website'} />
+                {isBlog && date && <meta property="article:published_time" content={date} />}
+                {isBlog && meta?.category && <meta property="article:section" content={meta.category} />}
                 {noimage && (
                     <>
-                        <meta name="image" content={image} />
                         <meta property="og:image" content={imageUrl} />
                         <meta name="twitter:image" content={imageUrl} />
                     </>

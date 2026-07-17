@@ -1,5 +1,5 @@
 import { Html, Head, Main, NextScript } from 'next/document';
-import { author, socialNetworks } from '@/constants/site';
+import { author, authorAlternateName, socialNetworks } from '@/constants/site';
 
 type Props = {
     __NEXT_DATA__: {
@@ -12,7 +12,6 @@ const Document = (props: Props) => {
             <Head>
                 <meta charSet="utf-8" />
                 <meta name="theme-color" content="#FFF" />
-                <meta property="og:type" content="website" />
                 <meta property="og:site_name" content={author} />
                 <meta property="og:image:type" content="image/png" />
                 <meta name="twitter:card" content="summary_large_image" />
@@ -29,9 +28,11 @@ const Document = (props: Props) => {
                         __html: JSON.stringify({
                             '@context': 'https://schema.org',
                             '@type': 'WebSite',
+                            '@id': `${process.env.NEXT_PUBLIC_DOMAIN}/#website`,
                             url: process.env.NEXT_PUBLIC_DOMAIN,
                             name: author,
-                            alternateName: author,
+                            inLanguage: ['en', 'es', 'gl'],
+                            publisher: { '@id': `${process.env.NEXT_PUBLIC_DOMAIN}/#person` },
                         }),
                     }}
                 />
@@ -40,18 +41,26 @@ const Document = (props: Props) => {
                     // skipcq: JS-0440 - dangerouslySetInnerHTML is safe here for JSON-LD structured data
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify({
-                            '@context': 'http://schema.org',
+                            '@context': 'https://schema.org',
                             '@type': 'Person',
+                            '@id': `${process.env.NEXT_PUBLIC_DOMAIN}/#person`,
                             name: author,
+                            alternateName: authorAlternateName,
                             url: process.env.NEXT_PUBLIC_DOMAIN,
                             sameAs: socialNetworks,
                             email: 'mailto:xabier.lameiro@gmail.com',
-                            image: '/profile.png',
+                            image: {
+                                '@type': 'ImageObject',
+                                url: `${process.env.NEXT_PUBLIC_DOMAIN}/xabier-lameiro.png`,
+                                caption: author,
+                            },
                             jobTitle: 'Software Architect',
+                            knowsAbout: ['Web development', 'React', 'Next.js', 'TypeScript', 'JavaScript', 'IoT'],
                             address: {
                                 '@type': 'PostalAddress',
-                                addressLocality: 'As Cortiñas, Moraña',
-                                addressRegion: 'Pontevedra (Spain)',
+                                addressLocality: 'Moraña',
+                                addressRegion: 'Pontevedra',
+                                addressCountry: 'ES',
                             },
                         }),
                     }}
