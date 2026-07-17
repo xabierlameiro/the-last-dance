@@ -3,10 +3,10 @@ title: 'Cómo arreglar Minified React error #425 (error de hidratación)'
 slug: 'error-no-detectado-react-minificado'
 author: 'Xabier Lameiro'
 category: 'Error'
-tags: ['node']
+tags: ['react', 'nextjs', 'hydration', 'ssr']
 locale: 'es'
-excerpt: 'Error no detectado: error de reacción minimizado, visite https://reactjs.org/docs/error-decoder.html?invariant=425 para ver el mensaje completo o use el entorno de desarrollo no minimizado para errores completos y advertencias útiles adicionales.'
-description: 'Solución paso a paso al error Uncaught Error: Minified React error #425 en producción: un desajuste de hidratación causado por fechas distintas entre servidor y navegador, con ejemplo en Next.js.'
+excerpt: 'Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.'
+description: 'Arregla el Minified React error #425 ("Text content does not match server-rendered HTML"): todas las causas de un error de hidratación —fechas, valores aleatorios, formato por locale, APIs del navegador, HTML inválido— y el arreglo correcto para cada una, con ejemplos en Next.js.'
 image: '/posts/uncaught-error.png'
 alternate:
     [
@@ -14,10 +14,14 @@ alternate:
         { lang: 'gl', url: 'erro-non-detectado-react-minificado' },
     ]
 faq:
-    - question: '¿Qué significa el error Minified React error #425?'
-      answer: 'Es un error de hidratación: el texto renderizado en el servidor no coincide con el renderizado en el navegador. Suele estar causado por fechas, horas o valores dependientes del idioma que difieren entre ambos entornos.'
-    - question: '¿Cómo se arregla el error Minified React error #425?'
-      answer: 'Añade el atributo suppressHydrationWarning a los elementos cuyo contenido difiere legítimamente entre servidor y cliente, o renderiza ese valor solo después de que el componente se haya montado en el cliente.'
+    - question: '¿Qué significa Minified React error #425?'
+      answer: 'Es un error de hidratación: el HTML que React renderizó en el servidor no coincide con el que renderizó en el navegador. React 18 lo muestra como "Text content does not match server-rendered HTML". Solo aparece minificado —y con el número #425— en las builds de producción; ejecuta una build de desarrollo para leer el mensaje completo y el elemento exacto.'
+    - question: '¿Cómo arreglo el Minified React error #425?'
+      answer: 'Encuentra el valor que difiere entre servidor y cliente y elige el arreglo correspondiente: añade suppressHydrationWarning para una diferencia de texto legítima (fechas, horas), renderiza los valores del navegador tras el montaje, carga los componentes solo-cliente con next/dynamic y ssr:false, o corrige el anidamiento HTML inválido. suppressHydrationWarning no lo arregla todo.'
+    - question: '¿Qué causa un error de hidratación además de las fechas?'
+      answer: 'Math.random(), el formato de números/moneda por locale, leer window/localStorage/navigator durante el render, Date.now(), el anidamiento HTML inválido (un <div> dentro de un <p>) y las extensiones del navegador que modifican el DOM antes de que React hidrate.'
+    - question: '¿Son el mismo error el #418, el #422 y el #425?'
+      answer: 'Son la misma familia de errores de hidratación. El #418 y el #423 son fallos de hidratación, el #422 es "la hidratación terminó pero contenía discrepancias" y el #425 es la discrepancia de texto. La forma de depurarlos es idéntica: ejecuta una build de desarrollo y reconcilia la salida del servidor y la del cliente.'
 ---
 
 # Cómo arreglar Minified React error #425 (error de hidratación)
@@ -28,18 +32,45 @@ faq:
 
 ## Respuesta rápida
 
-El error #425 de React ("Text content does not match server-rendered HTML") es un **desajuste de hidratación**: el servidor renderizó un valor y el navegador otro, normalmente una fecha o una hora. La solución más rápida es añadir el atributo `suppressHydrationWarning` al elemento cuyo texto difiere legítimamente entre servidor y cliente, o renderizar ese valor solo cuando el componente ya se ha montado.
+El error #425 de React —**"Text content does not match server-rendered HTML"**— es un **error de hidratación**: el servidor renderizó un valor y el navegador otro distinto, así que React descarta el HTML del servidor para ese subárbol. El arreglo depende de _por qué_ difieren:
 
-Al usar React, puede encontrar el siguiente error: `Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.`
-Este error es causado por el uso de fechas en la aplicación. El error aparece cuando la fecha y la hora del navegador no tienen el mismo formato que la fecha y la hora del servidor.
+-   El valor difiere de forma legítima (una fecha, una hora) → añade `suppressHydrationWarning` (Arreglo 1).
+-   El valor solo existe en el navegador (`window`, `localStorage`) → renderízalo tras el montaje (Arreglo 2).
+-   El componente entero es solo-cliente → cárgalo con `next/dynamic` y `ssr: false` (Arreglo 3).
+-   Tu HTML es inválido (un `<div>` dentro de un `<p>`) → corrige el anidamiento (Arreglo 4).
 
-¿Cómo resolví el problema?
+El error completo en producción es: `Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.`
 
-## Código con el error
+## Qué significa realmente "Minified React error #425"
+
+En una build de producción React envía los mensajes de error **minificados** para mantener el bundle pequeño, así que en vez de una frase recibes un número y un enlace descodificador (`invariant=425`). El #425 descodifica a **"Text content does not match server-rendered HTML"**.
+
+Eso solo ocurre con renderizado en servidor (Next.js, Remix, `renderToString`): React renderiza el HTML una vez en el servidor, lo envía al navegador y luego **hidrata** —reutiliza ese HTML y solo engancha los manejadores de eventos, esperando que el primer render del cliente produzca _exactamente_ la misma salida—. Cuando un trozo de texto sale distinto, la hidratación de ese subárbol falla y aparece el #425.
+
+Como el mensaje está minificado, el paso de depuración más útil es reproducirlo en una **build de desarrollo**: ahí React imprime el mensaje completo _y señala el elemento exacto_, lo que convierte las conjeturas en un arreglo de una línea (ver "Cómo ver el error real" más abajo).
+
+## Por qué ocurren los errores de hidratación
+
+Todo #425 se reduce a _salida del servidor ≠ primera salida del cliente_. Los sospechosos habituales:
+
+| Causa                                     | Por qué difiere                                                        |
+| ----------------------------------------- | --------------------------------------------------------------------- |
+| `new Date()` / `toLocaleString`           | El reloj/zona del servidor ≠ el reloj/zona del navegador              |
+| `Math.random()`, `Date.now()`, `uuid()`   | Un valor nuevo en cada render, servidor y cliente nunca coinciden     |
+| Formato de número/moneda por locale       | El locale del servidor ≠ el del navegador del usuario                 |
+| `window`, `localStorage`, `navigator`     | Indefinidos en el servidor, presentes en el navegador                 |
+| Anidamiento HTML inválido                 | El navegador "arregla" tu HTML, así que el DOM ≠ lo que renderizó React |
+| Extensiones del navegador                 | Modifican el DOM antes de que React hidrate                           |
+
+![Diagrama de un error de hidratación: el servidor renderiza la hora como 14:32, el navegador la vuelve a renderizar como 14:33 al hidratar, el texto no coincide y React lanza el error #425.](/posts/hydration-mismatch.png)
+
+El ejemplo de abajo es el caso clásico: un reloj en vivo.
+
+## El código que provocaba el error
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```tsx DateAndHour.tsx mark=18,19,20,21
+```tsx DateAndHour.tsx
 const DateAndHour = () => {
     const { locale } = useRouter();
     const [date, setDate] = React.useState(new Date());
@@ -68,14 +99,15 @@ const DateAndHour = () => {
 
 </CH.Code>
 
-## Código sin el error
+El servidor renderiza la hora para _su_ reloj y zona horaria; un segundo después el navegador renderiza la _suya_ —el texto difiere y React lanza el #425—.
 
-Utilice el atributo `suppressHydrationWarning` para evitar el error. Este atributo se usa para evitar el error cuando el servidor y el cliente presentan contenido diferente.
-Puede encontrar más información sobre este atributo en la [documentación de React](https://react.dev/reference/react-dom/components/common#common-props 'Documentación de React').
+## Arreglo 1 — `suppressHydrationWarning` para diferencias de texto legítimas
+
+Cuando la diferencia es real y esperada (un reloj, un "hace 2 minutos"), dile a React que la acepte en ese elemento con [`suppressHydrationWarning`](https://react.dev/reference/react-dom/components/common#common-props). Solo silencia una diferencia de **texto** **un nivel de profundidad**: es un bisturí, no una manta, así que no lo esparzas por todas partes.
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```tsx DateAndHour.tsx mark=18,19,20,21
+```tsx DateAndHour.tsx mark=14,15,16,17
 const DateAndHour = () => {
     const { locale } = useRouter();
     const [date, setDate] = React.useState(new Date());
@@ -85,9 +117,7 @@ const DateAndHour = () => {
     const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
 
     React.useEffect(() => {
-        const interval = setInterval(() => {
-            setDate(new Date());
-        }, 60000);
+        const interval = setInterval(() => setDate(new Date()), 60000);
         return () => clearInterval(interval);
     }, []);
 
@@ -103,3 +133,69 @@ const DateAndHour = () => {
 ```
 
 </CH.Code>
+
+## Arreglo 2 — Renderiza los valores del navegador tras el montaje
+
+Si el valor sencillamente no existe en el servidor (`window`, `localStorage`, `matchMedia`), renderiza primero un marcador estable y sustitúyelo por el valor real **después** de que el componente se monte. El servidor y el primer render del cliente ya coinciden, y el valor del navegador aparece en el siguiente pintado.
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```tsx useMounted.tsx
+// Renderiza lo mismo en el servidor y en el primer render del cliente,
+// y revela el valor solo-navegador una vez que sabemos que estamos en el cliente.
+const useMounted = () => {
+    const [mounted, setMounted] = React.useState(false);
+    React.useEffect(() => setMounted(true), []);
+    return mounted;
+};
+
+const Theme = () => {
+    const mounted = useMounted();
+    if (!mounted) return null; // misma salida en servidor y primer render del cliente
+    return <span>{localStorage.getItem('theme')}</span>;
+};
+```
+
+</CH.Code>
+
+## Arreglo 3 — Carga los componentes solo-cliente con `next/dynamic`
+
+Cuando un componente entero no puede renderizarse nunca en el servidor (una gráfica que lee `window`, un mapa, un editor), sáltate el SSR por completo en vez de proteger cada línea:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```tsx dynamic.tsx
+import dynamic from 'next/dynamic';
+
+const ClientOnlyChart = dynamic(() => import('./Chart'), { ssr: false });
+```
+
+</CH.Code>
+
+## Arreglo 4 — Corrige el anidamiento HTML inválido
+
+Este sorprende porque no hay ninguna fecha ni valor aleatorio a la vista. Si anidas un elemento de bloque dentro de un `<p>` (o un `<a>` dentro de un `<a>`, o un `<div>` dentro de una `<table>` sin `<tbody>`), el navegador _repara_ el HTML en silencio al parsearlo. React hidrata entonces contra un DOM que ya no coincide con lo que renderizó, y aparece el #425. No hay atributo que silencie esto: **haz que el HTML sea válido** (un `<p>` solo puede contener contenido en línea).
+
+## Cómo ver el error real
+
+Nunca depures el #425 desde el número minificado. Reprodúcelo donde React sí te habla:
+
+-   **Next.js:** ejecuta `next dev` —el desarrollo nunca está minificado—.
+-   **Build de producción en local:** `next build && next start`, pero lee el mensaje en la consola del navegador, donde React imprime el texto completo y un diff del elemento que no cuadra.
+
+React registra algo como _"Warning: Text content did not match. Server: '14:32' Client: '14:33'"_, señalando el nodo exacto. A partir de ahí la causa suele ser obvia.
+
+## #418, #422, #423, #425 — la familia de errores de hidratación
+
+Si tus búsquedas trajeron números vecinos, son el mismo problema visto desde ángulos distintos:
+
+| Error | Significado                                                |
+| ----- | --------------------------------------------------------- |
+| #418  | La hidratación falló porque la UI inicial difería         |
+| #422  | La hidratación terminó pero contenía discrepancias        |
+| #423  | Error al hidratar; el árbol cayó a renderizado en cliente |
+| #425  | El contenido de texto no coincide con el HTML del servidor |
+
+El arreglo es siempre la misma disciplina: ejecuta una build de desarrollo, encuentra el valor que difiere entre servidor y cliente, y reconcílialo con uno de los cuatro arreglos de arriba.
+
+Puedes leer más sobre el atributo en la [documentación de React](https://react.dev/reference/react-dom/components/common#common-props 'Documentación de React').

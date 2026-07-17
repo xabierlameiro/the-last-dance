@@ -76,6 +76,25 @@ export const scoreItem = (item, now) => {
     return { score: popularity * affinity * recencyFactor(item.createdAt, now), matched };
 };
 
+// Labels that mark an issue as triage noise rather than a topic worth writing about.
+const JUNK_ISSUE_LABELS = new Set(['duplicate', 'invalid', 'wontfix', 'spam', 'stale']);
+const MIN_ISSUE_ENGAGEMENT = 15;
+
+/**
+ * @description Keep only GitHub issues worth writing about (SDD-011): real, engaged
+ * discussions, not triage noise. Drops junk-labelled issues and low-engagement ones.
+ * @param {{comments?: number, reactions?: {total_count?: number}, labels?: Array}} issue
+ * @returns {boolean}
+ */
+export const isDiscussionWorthy = (issue) => {
+    const labels = (issue?.labels ?? []).map((label) =>
+        (typeof label === 'string' ? label : label?.name ?? '').toLowerCase()
+    );
+    if (labels.some((label) => JUNK_ISSUE_LABELS.has(label))) return false;
+    const engagement = (issue?.comments ?? 0) + (issue?.reactions?.total_count ?? 0);
+    return engagement >= MIN_ISSUE_ENGAGEMENT;
+};
+
 /** @description Normalizers: raw API payload → {title, url, source, evidence, popularity, createdAt, tags} */
 export const normalize = {
     hn: (json) =>
@@ -118,6 +137,24 @@ export const normalize = {
             createdAt: repo.created_at,
             tags: (repo.topics ?? []).join(' '),
         })),
+    // Recurring/evergreen developer pain in the stack's own repos (SDD-011). Recency is
+    // keyed off `updated_at`, not `created_at`: a valuable recurring issue is old but
+    // still active, and a 7-day decay on its creation date would wrongly drop it.
+    githubIssues: (json) =>
+        (json?.items ?? []).filter(isDiscussionWorthy).map((issue) => {
+            const repo = (issue.repository_url ?? '').split('/repos/')[1] ?? '';
+            const reactions = issue.reactions?.total_count ?? 0;
+            const labels = (issue.labels ?? []).map((label) => (typeof label === 'string' ? label : label?.name ?? ''));
+            return {
+                title: repo ? `${repo}: ${issue.title ?? ''}`.trim() : issue.title ?? '',
+                url: issue.html_url ?? '',
+                source: 'GitHub issue',
+                evidence: `${issue.comments ?? 0} comments, ${reactions} reactions`,
+                popularity: (issue.comments ?? 0) + reactions,
+                createdAt: issue.updated_at ?? issue.created_at,
+                tags: `${repo} ${labels.join(' ')}`.trim(),
+            };
+        }),
 };
 
 /**
@@ -142,6 +179,9 @@ const claudePrompt = (topic) =>
         '1) qué está pasando y por qué importa, 2) MI experiencia de primera mano con esto (pídeme los',
         'detalles concretos que necesites: proyectos, métricas, errores), 3) ejemplo práctico reproducible,',
         '4) conclusión con opinión. Prohibido el relleno genérico que cualquier blog podría publicar.',
+        'Sigue el estándar editorial del repo (docs/editorial-standard.md): E-E-A-T con experiencia',
+        'de primera mano, mi voz (sin muletillas de IA), estructura problema→solución y título/meta',
+        'benefit-led. No inventes salidas de terminal ni capturas.',
         'No lo publiques: es un borrador para que yo lo revise y lo traduzca a los tres idiomas.',
     ].join(' ');
 

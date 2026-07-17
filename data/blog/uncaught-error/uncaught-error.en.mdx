@@ -3,10 +3,10 @@ title: 'How to fix Minified React error #425 (hydration mismatch)'
 slug: 'uncaught-error-minified-react-error'
 author: 'Xabier Lameiro'
 category: 'Error'
-tags: ['node']
+tags: ['react', 'nextjs', 'hydration', 'ssr']
 locale: 'en'
 excerpt: 'Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.'
-description: 'Step-by-step fix for Uncaught Error: Minified React error #425 in production: a hydration mismatch caused by dates rendered differently on server and client, with a working Next.js example.'
+description: 'Fix Minified React error #425 ("Text content does not match server-rendered HTML"): every common cause of a hydration mismatch — dates, random values, locale formatting, browser-only APIs, invalid HTML — and the right fix for each, with Next.js examples.'
 image: '/posts/uncaught-error.png'
 alternate:
     [
@@ -15,9 +15,13 @@ alternate:
     ]
 faq:
     - question: 'What does Minified React error #425 mean?'
-      answer: 'It is a hydration mismatch: the text rendered on the server does not match the text rendered in the browser. It is usually caused by dates, times or locale-dependent values that differ between the two environments.'
+      answer: 'It is a hydration mismatch: the HTML React rendered on the server does not match what it rendered in the browser. React 18 shows it as "Text content does not match server-rendered HTML". It is only minified — and numbered #425 — in production builds; run a development build to read the full message and the exact element.'
     - question: 'How do I fix Minified React error #425?'
-      answer: 'Add the suppressHydrationWarning attribute to the elements whose content legitimately differs between server and client, or render that value only after the component has mounted on the client.'
+      answer: 'Find the value that differs between server and client and pick the matching fix: add suppressHydrationWarning for a legitimate text difference (dates, times), render browser-only values after mount, load client-only components with next/dynamic and ssr:false, or fix invalid HTML nesting. suppressHydrationWarning is not a catch-all.'
+    - question: 'What causes a hydration mismatch besides dates?'
+      answer: 'Math.random(), locale/number/currency formatting, reading window/localStorage/navigator during render, Date.now(), invalid HTML nesting (a <div> inside a <p>), and browser extensions that mutate the DOM before React hydrates.'
+    - question: 'Are #418, #422 and #425 the same error?'
+      answer: 'They are the same family of hydration errors. #418 and #423 are hydration failures, #422 is "hydration completed but contained mismatches", and #425 is the text-content mismatch. The debugging approach is identical: run a dev build and reconcile server and client output.'
 ---
 
 # How to fix Minified React error #425 (hydration mismatch)
@@ -28,18 +32,45 @@ faq:
 
 ## Quick answer
 
-React error #425 ("Text content does not match server-rendered HTML") is a **hydration mismatch**: the server rendered one value and the browser rendered another, typically a date or time. The fastest fix is to add the `suppressHydrationWarning` attribute to the element whose text legitimately differs between server and client, or to render that value only after the component has mounted.
+React error #425 — **"Text content does not match server-rendered HTML"** — is a **hydration mismatch**: the server rendered one value and the browser rendered a different one, so React throws away the server markup for that subtree. The fix depends on _why_ they differ:
 
-When using React, you may encounter the following error: `Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.`
-This error is caused by the use of dates in the application. The error appears when the browser date and time are not in the same format as the date and time of the server.
+-   The value legitimately differs (a date, a time) → add `suppressHydrationWarning` (Fix 1).
+-   The value only exists in the browser (`window`, `localStorage`) → render it after mount (Fix 2).
+-   The whole component is client-only → load it with `next/dynamic` and `ssr: false` (Fix 3).
+-   Your HTML is invalid (a `<div>` inside a `<p>`) → fix the nesting (Fix 4).
 
-How I solved the problem?
+The full production error reads: `Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.`
 
-## Code with the error
+## What "Minified React error #425" actually means
+
+In a production build React ships **minified** error messages to keep the bundle small, so instead of a sentence you get a number and a decoder link (`invariant=425`). #425 decodes to **"Text content does not match server-rendered HTML"**.
+
+That only happens with server-side rendering (Next.js, Remix, `renderToString`): React renders the HTML once on the server, sends it to the browser, and then **hydrates** — it reuses that HTML and only attaches the event handlers, expecting the client's first render to produce _exactly_ the same output. When a piece of text comes out different, hydration for that subtree fails and you get #425.
+
+Because the message is minified, the single most useful debugging step is to reproduce it in a **development build** — there React prints the full message _and points at the exact element_, which turns guesswork into a one-line fix (see "How to see the real error message" below).
+
+## Why hydration mismatches happen
+
+Every #425 comes down to _server output ≠ first client output_. The usual culprits:
+
+| Cause                                   | Why it differs                                                  |
+| --------------------------------------- | -------------------------------------------------------------- |
+| `new Date()` / `toLocaleString`         | Server clock/timezone ≠ browser clock/timezone                 |
+| `Math.random()`, `Date.now()`, `uuid()` | A new value on each render, server and client never agree      |
+| Locale / number / currency formatting   | Server locale ≠ the user's browser locale                      |
+| `window`, `localStorage`, `navigator`   | Undefined on the server, present in the browser                |
+| Invalid HTML nesting                    | The browser "fixes" your HTML, so the DOM ≠ what React rendered |
+| Browser extensions                      | They mutate the DOM before React hydrates                      |
+
+![Diagram of a hydration mismatch: the server renders the time as 14:32, the browser re-renders it as 14:33 while hydrating, the text does not match and React throws error #425.](/posts/hydration-mismatch.png)
+
+The example below is the classic case: a live clock.
+
+## The code that caused the error
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```tsx DateAndHour.tsx mark=18,19,20,21
+```tsx DateAndHour.tsx
 const DateAndHour = () => {
     const { locale } = useRouter();
     const [date, setDate] = React.useState(new Date());
@@ -68,14 +99,15 @@ const DateAndHour = () => {
 
 </CH.Code>
 
-## Code without the error
+The server renders the time for _its_ clock and timezone; a second later the browser renders _its_ own — the text differs and React raises #425.
 
-Use the `suppressHydrationWarning` attribute to avoid the error. This attribute is used to avoid the error when the server and the client render different content.
-More information about this attribute can be found in the [React documentation](https://react.dev/reference/react-dom/components/common#common-props 'React Documentation').
+## Fix 1 — `suppressHydrationWarning` for legitimate text differences
+
+When the difference is real and expected (a clock, a relative "2 minutes ago"), tell React to accept it on that element with [`suppressHydrationWarning`](https://react.dev/reference/react-dom/components/common#common-props). It only silences a **text** difference **one level deep** — it is a scalpel, not a blanket, so don't sprinkle it everywhere.
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```tsx DateAndHour.tsx mark=18,19,20,21
+```tsx DateAndHour.tsx mark=14,15,16,17
 const DateAndHour = () => {
     const { locale } = useRouter();
     const [date, setDate] = React.useState(new Date());
@@ -85,9 +117,7 @@ const DateAndHour = () => {
     const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
 
     React.useEffect(() => {
-        const interval = setInterval(() => {
-            setDate(new Date());
-        }, 60000);
+        const interval = setInterval(() => setDate(new Date()), 60000);
         return () => clearInterval(interval);
     }, []);
 
@@ -103,3 +133,69 @@ const DateAndHour = () => {
 ```
 
 </CH.Code>
+
+## Fix 2 — Render browser-only values after mount
+
+If the value simply does not exist on the server (`window`, `localStorage`, `matchMedia`), render a stable placeholder first and swap in the real value **after** the component mounts. The server and the first client render now agree, and the browser value appears on the next paint.
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```tsx useMounted.tsx
+// Render the same thing on the server and on the first client render,
+// then reveal the browser-only value once we know we are on the client.
+const useMounted = () => {
+    const [mounted, setMounted] = React.useState(false);
+    React.useEffect(() => setMounted(true), []);
+    return mounted;
+};
+
+const Theme = () => {
+    const mounted = useMounted();
+    if (!mounted) return null; // same output on server and first client render
+    return <span>{localStorage.getItem('theme')}</span>;
+};
+```
+
+</CH.Code>
+
+## Fix 3 — Load client-only components with `next/dynamic`
+
+When a whole component can never render on the server (a chart that reads `window`, a map, an editor), skip SSR for it entirely instead of guarding every line:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```tsx dynamic.tsx
+import dynamic from 'next/dynamic';
+
+const ClientOnlyChart = dynamic(() => import('./Chart'), { ssr: false });
+```
+
+</CH.Code>
+
+## Fix 4 — Fix invalid HTML nesting
+
+This one surprises people because there is no date or random value in sight. If you nest a block element inside a `<p>` (or an `<a>` inside an `<a>`, or a `<div>` inside a `<table>` without a `<tbody>`), the browser silently _repairs_ the HTML on parse. React then hydrates against a DOM that no longer matches what it rendered — and you get #425. There is no attribute to suppress this: **make the HTML valid** (a `<p>` may only contain inline content).
+
+## How to see the real error message
+
+Never debug #425 from the minified number. Reproduce it where React talks to you:
+
+-   **Next.js:** run `next dev` — development is never minified.
+-   **Production build locally:** `next build && next start`, but read the message in the browser console where React prints the full text and a diff of the mismatched element.
+
+React logs something like _"Warning: Text content did not match. Server: '14:32' Client: '14:33'"_, pointing at the exact node. From there the cause is usually obvious.
+
+## #418, #422, #423, #425 — the hydration error family
+
+If your searches turned up neighbouring numbers, they are the same problem seen from different angles:
+
+| Error | Meaning                                          |
+| ----- | ------------------------------------------------ |
+| #418  | Hydration failed because the initial UI differed |
+| #422  | Hydration completed but contained mismatches     |
+| #423  | Error while hydrating; the tree fell back to CSR |
+| #425  | Text content does not match server-rendered HTML |
+
+The fix is always the same discipline: run a dev build, find the value that differs between server and client, and reconcile it with one of the four fixes above.
+
+You can read more about the attribute in the [React documentation](https://react.dev/reference/react-dom/components/common#common-props 'React Documentation').

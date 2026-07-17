@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Hydration mismatch flow: the server renders 14:32, the browser re-renders 14:33 while hydrating, the text does not match and React throws error #425">
+  <style>
+    .card { fill: #ffffff; stroke: #e2e8f0; }
+    .box { fill: #f8fafc; stroke: #cbd5e1; }
+    .title { fill: #0f172a; font: 700 15px system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .label { fill: #334155; font: 600 13px system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .mono { fill: #0f172a; font: 700 15px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .muted { fill: #64748b; font: 400 12px system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .err { fill: #b91c1c; font: 700 14px system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .arrow { stroke: #94a3b8; stroke-width: 2; fill: none; }
+    .errbox { fill: #fef2f2; stroke: #fecaca; }
+    @media (prefers-color-scheme: dark) {
+      .card { fill: #0b1220; stroke: #1e293b; }
+      .box { fill: #111a2e; stroke: #334155; }
+      .title, .mono { fill: #e2e8f0; }
+      .label { fill: #cbd5e1; }
+      .muted { fill: #94a3b8; }
+      .errbox { fill: #2a0f12; stroke: #7f1d1d; }
+      .err { fill: #f87171; }
+      .arrow { stroke: #475569; }
+    }
+  </style>
+  <rect class="card" x="1" y="1" width="758" height="298" rx="14"/>
+
+  <!-- Server -->
+  <rect class="box" x="28" y="60" width="200" height="110" rx="10"/>
+  <text class="title" x="128" y="92" text-anchor="middle">Server render</text>
+  <text class="label" x="128" y="120" text-anchor="middle">renders the HTML once</text>
+  <rect x="78" y="132" width="100" height="26" rx="6" class="errbox"/>
+  <text class="mono" x="128" y="150" text-anchor="middle">14:32</text>
+
+  <!-- Client -->
+  <rect class="box" x="532" y="60" width="200" height="110" rx="10"/>
+  <text class="title" x="632" y="92" text-anchor="middle">Client hydrate</text>
+  <text class="label" x="632" y="120" text-anchor="middle">re-renders in the browser</text>
+  <rect x="582" y="132" width="100" height="26" rx="6" class="errbox"/>
+  <text class="mono" x="632" y="150" text-anchor="middle">14:33</text>
+
+  <!-- middle: HTML sent -->
+  <path class="arrow" d="M232 115 H360" marker-end="url(#a)"/>
+  <text class="muted" x="296" y="105" text-anchor="middle">HTML sent</text>
+  <path class="arrow" d="M528 115 H400" marker-end="url(#a)"/>
+  <text class="muted" x="464" y="105" text-anchor="middle">reuses HTML</text>
+
+  <!-- compare -->
+  <text class="label" x="380" y="150" text-anchor="middle">compare</text>
+  <text class="muted" x="380" y="168" text-anchor="middle">server ≠ client</text>
+
+  <!-- error -->
+  <rect class="errbox" x="230" y="212" width="300" height="52" rx="10"/>
+  <text class="err" x="380" y="235" text-anchor="middle">React error #425</text>
+  <text class="muted" x="380" y="253" text-anchor="middle">Text content does not match server-rendered HTML</text>
+  <path class="arrow" d="M380 172 V208" marker-end="url(#a)"/>
+
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+      <path d="M0 0 L8 4 L0 8 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+</svg>

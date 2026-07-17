@@ -8,6 +8,16 @@ const OWNER = 'xabierlameiro';
 const QUERY_KEYWORDS = ['nextjs', 'react', 'claude ai', 'mcp server', 'playwright'];
 const SUBREDDITS = ['reactjs', 'nextjs', 'webdev', 'ClaudeAI'];
 const USER_AGENT = 'trending-radar/1.0 (+https://xabierlameiro.com)';
+// Stack repos to mine for recurring, high-engagement open issues (SDD-011).
+const ISSUE_REPOS = [
+    'vercel/next.js',
+    'facebook/react',
+    'microsoft/TypeScript',
+    'nodejs/node',
+    'jestjs/jest',
+    'storybookjs/storybook',
+    'microsoft/playwright',
+];
 
 const fetchJson = async (url) => {
     const response = await fetch(url, { headers: { 'user-agent': USER_AGENT, accept: 'application/json' } });
@@ -54,6 +64,19 @@ const collectors = {
             )
         );
         return batches.flatMap(normalize.github);
+    },
+    githubIssues: async () => {
+        // Most-commented open issues per stack repo — recurring, evergreen developer pain.
+        const batches = await Promise.all(
+            ISSUE_REPOS.map((repo) =>
+                fetchJson(
+                    `https://api.github.com/search/issues?q=${encodeURIComponent(
+                        `repo:${repo} type:issue state:open`
+                    )}&sort=comments&order=desc&per_page=8`
+                )
+            )
+        );
+        return batches.flatMap(normalize.githubIssues);
     },
 };
 
@@ -106,17 +129,18 @@ const runCollector = async (name, collector) => {
 
 const main = async () => {
     const now = Date.now();
-    const [hn, devto, reddit, github, recentRepos, risingQueries] = await Promise.all([
+    const [hn, devto, reddit, github, githubIssues, recentRepos, risingQueries] = await Promise.all([
         runCollector('hackerNews', collectors.hackerNews),
         runCollector('devto', collectors.devto),
         runCollector('reddit', collectors.reddit),
         runCollector('github', collectors.github),
+        runCollector('githubIssues', collectors.githubIssues),
         runCollector('recentRepos', collectRecentRepos),
         runCollector('risingQueries', collectRisingQueries),
     ]);
 
     const topics = dedupeByUrl(
-        [...hn, ...devto, ...reddit, ...github]
+        [...hn, ...devto, ...reddit, ...github, ...githubIssues]
             .map((item) => ({ ...item, ...scoreItem(item, now) }))
             .filter(({ score }) => score > 0)
     )

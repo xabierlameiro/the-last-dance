@@ -1,0 +1,126 @@
+---
+title: 'EADDRINUSE: address already in use — como liberar o porto'
+slug: 'arranxar-direccion-en-uso-erro'
+author: 'Xabier Lameiro'
+category: 'Error'
+tags: ['node', 'error', 'cli']
+locale: 'gl'
+excerpt: 'Significa que a combinación de dirección de rede e porto especificada na mensaxe de erro xa está a ser utilizada por outro proceso que se está executando no seu computador. Isto pode ocorrer cando se tenta iniciar un servidor nun porto que xa está a ser utilizado por outro programa.'
+description: 'Arranxa o erro de Node.js "listen EADDRINUSE: address already in use": atopa e mata o proceso que ocupa o porto en macOS, Linux e Windows, libérao cun comando, ou arrinca noutro porto.'
+image: '/posts/address-in-use.png'
+alternate: [{ lang: 'en', url: 'solve-address-in-use-error' }, { lang: 'es', url: 'resolver-direccion-en-uso-error' }]
+faq:
+    - question: 'Que significa "listen EADDRINUSE: address already in use"?'
+      answer: 'Outro proceso xa está a escoitar nese porto, así que o teu servidor non pode usalo. Adoita ocorrer cando un servidor de desenvolvemento anterior non se pechou correctamente.'
+    - question: 'Como libero un porto que xa está en uso?'
+      answer: 'Atopa o proceso con lsof -i :PORTO en macOS/Linux (ou netstat -ano | findstr :PORTO en Windows) e termínao con kill -9 PID (ou taskkill /PID pid /F en Windows). Ou libérao dun paso con npx kill-port PORTO, ou arrinca o teu servidor noutro porto.'
+    - question: 'Como arrinco o meu servidor noutro porto?'
+      answer: 'Define a variable de contorno PORT (PORT=3001 npm run dev) ou pasa o flag do framework, por exemplo next dev -p 3001.'
+---
+
+# EADDRINUSE: address already in use — como liberar o porto
+
+<Date date="01-02-2023" />
+
+<GoogleAdsense />
+
+## Resposta rápida
+
+Outro proceso xa está a escoitar no porto. Atópao e mátao:
+
+-   **macOS / Linux:** `lsof -i :3000` → `kill -9 <PID>`
+-   **Windows:** `netstat -ano | findstr :3000` → `taskkill /PID <pid> /F`
+-   **Calquera SO, un só comando:** `npx kill-port 3000`
+
+…ou simplemente arrinca o teu servidor noutro porto. O erro completo ten esta pinta:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+MAKINOTE$ yarn start
+yarn run v1.22.19
+$ next start
+Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at Server.setupListenHandle [as _listen2] (node:net:1432:16)
+    at listenInCluster (node:net:1480:12)
+    at doListen (node:net:1629:7)
+    at processTicksAndRejections (node:internal/process/task_queues:84:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+```
+
+</CH.Code>
+
+## Por que ocorre
+
+`EADDRINUSE` significa que a dirección e o porto que quere o teu servidor xa están ocupados. Nunha máquina de desenvolvemento a causa habitual é un **servidor de desenvolvemento anterior que non se pechou ben** — un proceso que crasheou, un traballo en segundo plano solto, ou unha segunda terminal que o segue executando. Menos a miúdo, outra aplicación ocupa o porto de verdade: outro servizo, un contedor de Docker ou un daemon do sistema.
+
+## Liberar o porto en macOS e Linux
+
+Atopa o proceso que ocupa o porto con `lsof` (en Linux tamén serven `ss -ltnp` ou `fuser 3000/tcp`):
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+MAKINOTE$ lsof -i :3000
+COMMAND   PID                 USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+node    38091 xabier.lameirocardam   24u  IPv6 0xee02297dd086ebc1      0t0  TCP *:hbci (LISTEN)
+```
+
+</CH.Code>
+
+Despois termínao. Proba primeiro un `kill <PID>` limpo, e recorre a `kill -9 <PID>` só se o proceso o ignora:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+MAKINOTE$ kill -9 38091
+```
+
+</CH.Code>
+
+## Liberar o porto en Windows
+
+Lista o PID asociado ao porto e despois mátao:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```powershell
+netstat -ano | findstr :3000
+taskkill /PID 38091 /F
+```
+
+</CH.Code>
+
+## Un só comando en calquera SO
+
+Se prefires non buscar PIDs, `kill-port` faino por ti — sen instalar nada:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+npx kill-port 3000
+```
+
+</CH.Code>
+
+## Ou usa outro porto
+
+Moitas veces o máis rápido é non pelexar polo porto:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+PORT=3001 npm run dev   # apps que len process.env.PORT
+next dev -p 3001        # Next.js
+```
+
+</CH.Code>
+
+## Dentro de Docker
+
+Se o servidor corre nun contedor, o porto do host ocúpao o mapeo de portos, non un PID local — `lsof` apuntará a `com.docker`. Para o contedor (`docker ps` e logo `docker stop <id>`) ou cambia o mapeo (`-p 3001:3000`).
