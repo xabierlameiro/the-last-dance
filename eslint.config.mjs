@@ -78,13 +78,17 @@ export default tseslint.config(
         },
     },
     {
-        // Node ESM scripts (trending radar etc.)
-        files: ['scripts/**/*.js'],
+        // Node ESM scripts (trending radar, poster generation, etc.)
+        files: ['scripts/**/*.{js,mjs}'],
         languageOptions: {
             sourceType: 'module',
             globals: {
                 ...globals.node,
             },
+        },
+        rules: {
+            // Utility scripts favour terse expressions; a nested ternary is fine here.
+            'sonarjs/no-nested-conditional': 'off',
         },
     }
 );

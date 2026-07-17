@@ -26,51 +26,68 @@ const findMdxFiles = (dir: string): string[] => {
     return files;
 };
 
-/**
- * @description Find post by slug.
- *
- * @example
- *     findPostBySlug('first-post')
- *     returns [{ content: '...', meta: {...} }]
- *
- * @param {string} slug - Slug of the post.
- * @returns {Object} - Object with post content and meta data.
- */
-const findPostBySlug = (slug: string | { params: { slug: string } }) => {
-    const paths = findMdxFiles(POST_PATH);
+type ParsedPost = {
+    content: string;
+    fileName: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: Record<string, any>;
+};
 
-    if (typeof slug === 'object') {
-        slug = slug.params.slug;
-    } else {
-        slug = slug.split('/')[slug.split('/').length - 1];
+/**
+ * @description Read and gray-matter-parse a single MDX file into its raw post shape.
+ * @param {string} filePath - Absolute path to the .mdx file.
+ * @returns {ParsedPost}
+ */
+const buildPost = (filePath: string): ParsedPost => {
+    const { data, content } = matter(fs.readFileSync(filePath, 'utf8'));
+    return { content, data, fileName: filePath.split('/').pop() ?? '' };
+};
+
+// The blog corpus is static per deploy, so read + parse every file ONCE and reuse it.
+// Before this, `findPostBySlug` scanned and gray-matter-parsed the WHOLE corpus to resolve a
+// single slug (O(N)); `getAllPosts` called it per slug (O(N²)); and `getAllCategories` called
+// `getAllPosts` once per category/tag (O(C·N²)) — thousands of disk parses per page render.
+// On-demand (fallback: 'blocking') tag URLs ran all of it inside a request-time serverless
+// function, which blew past Vercel's timeout (FUNCTION_INVOCATION_TIMEOUT). Cache only in
+// production so `next dev` still hot-reloads content edits.
+let corpusCache: ParsedPost[] | null = null;
+
+const loadCorpus = (): ParsedPost[] => {
+    if (corpusCache && process.env.NODE_ENV === 'production') {
+        return corpusCache;
     }
+    corpusCache = findMdxFiles(POST_PATH).map(buildPost);
+    return corpusCache;
+};
+
+/**
+ * @description Find a parsed post by slug in the cached corpus.
+ * @param {string | { params: { slug: string } }} slug - Slug or route params.
+ * @returns {ParsedPost}
+ */
+const findPostBySlug = (slug: string | { params: { slug: string } }): ParsedPost => {
+    let raw = typeof slug === 'object' ? slug.params.slug : slug;
+    raw = raw.split('/').pop() ?? raw;
 
     // Validate slug to prevent directory traversal
-    if (!slug || typeof slug !== 'string' || slug.includes('..') || slug.includes('/') || slug.includes('\\')) {
+    if (!raw || raw.includes('..') || raw.includes('/') || raw.includes('\\')) {
         throw new Error('Invalid slug parameter');
     }
 
-    // Slugs with non-ASCII characters (e.g. "compoñentes") may arrive NFD-decomposed
-    // from some clients/crawlers while the frontmatter stores them NFC-composed
-    const normalizedSlug = slug.normalize('NFC');
+    // Slugs with non-ASCII characters (e.g. "compoñentes") may arrive NFD-decomposed from some
+    // clients/crawlers while the frontmatter stores them NFC-composed.
+    const normalizedSlug = raw.normalize('NFC');
 
-    const [route] = paths.filter((filePath) => {
-        // Ensure the file path is within the POST_PATH directory
-        if (!filePath.startsWith(POST_PATH)) {
-            return false;
-        }
+    const post = loadCorpus().find(
+        ({ data, fileName }) =>
+            data.slug?.normalize('NFC') === normalizedSlug || fileName.normalize('NFC') === `${normalizedSlug}.mdx`
+    );
 
-        const document = fs.readFileSync(filePath, 'utf8');
-        const { data } = matter(document);
-        const fileName = filePath.split('/').pop();
-        return data.slug?.normalize('NFC') === normalizedSlug || fileName?.normalize('NFC') === `${normalizedSlug}.mdx`;
-    });
-
-    if (!route) {
+    if (!post) {
         throw new Error('Post not found');
     }
 
-    return matter(fs.readFileSync(route, 'utf8'));
+    return post;
 };
 
 /**
@@ -99,48 +116,36 @@ const extractPostDate = (content: string): string | null => {
  * @param {string} slug - Slug of the post.
  * @returns {Object} - Object with post content and meta data.
  */
-export const getPostBySlug = (slug: string | { params: { slug: string } }) => {
-    const { data, content } = findPostBySlug(slug);
-    const readTime = readingTime(content);
-    const numberOfWords = countWords(content);
-    return {
-        content,
-        meta: {
-            readTime,
-            numberOfWords,
-            date: extractPostDate(content),
-            slug: data.slug,
-            title: data.title,
-            locale: data.locale,
-            category: data.category,
-            author: data.author,
-            tags: data.tags,
-            excerpt: data.excerpt,
-            image: data.image,
-            description: data.description,
-            alternate: data.alternate,
-            // null (not undefined) so the meta object survives getStaticProps serialization
-            faq: data.faq ?? null,
-        },
-    };
-};
-
 /**
- * @description Get all post slugs.
- *
- * @example
- *     getPostSlugs();
- *     returns[('first-post', 'second-post')];
- *
- * @returns {Array} - Array with slugs.
+ * @description Shape a parsed corpus entry into the public { content, meta } post form.
+ * @param {ParsedPost} parsed - Raw parsed post from the corpus.
+ * @returns {Object} - Object with post content and derived meta.
  */
-const getPostSlugs = () => {
-    const paths = findMdxFiles(POST_PATH);
-    return paths.map((filePath) => filePath.replace(`${POST_PATH}/`, '').replace(/\.mdx$/, ''));
-};
+const toPost = ({ content, data }: ParsedPost) => ({
+    content,
+    meta: {
+        readTime: readingTime(content),
+        numberOfWords: countWords(content),
+        date: extractPostDate(content),
+        slug: data.slug,
+        title: data.title,
+        locale: data.locale,
+        category: data.category,
+        author: data.author,
+        tags: data.tags,
+        excerpt: data.excerpt,
+        image: data.image,
+        description: data.description,
+        alternate: data.alternate,
+        // null (not undefined) so the meta object survives getStaticProps serialization
+        faq: data.faq ?? null,
+    },
+});
+
+export const getPostBySlug = (slug: string | { params: { slug: string } }) => toPost(findPostBySlug(slug));
 
 /**
- * @description Get all posts.
+ * @description Get all posts (read + parsed once, cached per deploy in production).
  *
  * @example
  *     getAllPosts();
@@ -153,11 +158,7 @@ const getPostSlugs = () => {
  *
  * @returns {Object} - Object with posts.
  */
-
-export const getAllPosts = () => {
-    const slugs = getPostSlugs();
-    return slugs.map((slug) => getPostBySlug(slug));
-};
+export const getAllPosts = () => loadCorpus().map(toPost);
 
 /**
  * @description Get all posts by locale.
