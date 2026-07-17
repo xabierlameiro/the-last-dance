@@ -1,11 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
-import { google } from 'googleapis';
 import console from '@/helpers/console';
+import { getSearchConsoleClient, SITE_URL } from '@/helpers/searchConsole';
 import allowCors from '../../helpers/cors';
-
-const SITE_URL = 'sc-domain:xabierlameiro.com';
 
 /**
  * @description Count the pages Google surfaced for the site in the last 28 days,
@@ -15,19 +13,10 @@ const SITE_URL = 'sc-domain:xabierlameiro.com';
  * @returns {Promise<number | null>} - Page count, or null when credentials are missing
  */
 const countFromSearchConsole = async (): Promise<number | null> => {
-    if (!process.env.ANALYTICS_CLIENT_EMAIL || !process.env.ANALYTICS_PRIVATE_KEY) {
+    const webmasters = getSearchConsoleClient();
+    if (!webmasters) {
         return null;
     }
-
-    const auth = new google.auth.GoogleAuth({
-        credentials: {
-            client_email: process.env.ANALYTICS_CLIENT_EMAIL,
-            private_key: process.env.ANALYTICS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        },
-        scopes: 'https://www.googleapis.com/auth/webmasters.readonly',
-    });
-
-    const webmasters = google.webmasters({ version: 'v3', auth });
 
     const toDay = (date: Date) => date.toISOString().slice(0, 10);
     const end = new Date();

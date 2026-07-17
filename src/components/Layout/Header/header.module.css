@@ -57,7 +57,3 @@
     color: rgba(var(--blog-icons));
     text-decoration: none;
 }
-
-.button {
-    cursor: pointer;
-}

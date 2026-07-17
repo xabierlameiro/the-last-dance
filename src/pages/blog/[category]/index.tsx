@@ -6,15 +6,8 @@ import ControlButtons from '@/components/ControlButtons';
 import SEO from '@/components/SEO';
 import { useDialog } from '@/context/dialog';
 import { getAllPosts, getPostsByLocaleAndCategory } from '@/helpers/fileReader';
+import PostSummaryList, { type PostSummary } from '@/components/Blog/PostSummaryList';
 import styles from '@/styles/blogIndex.module.css';
-
-type PostSummary = {
-    title: string;
-    excerpt: string;
-    slug: string;
-    category: string;
-    date: string | null;
-};
 
 type Props = {
     posts: PostSummary[];
@@ -49,17 +42,7 @@ const CategoryIndex = ({ posts, categoryName, categorySlug }: Props) => {
                         <ControlButtons onClickClose={close} onClickMinimise={close} />
                         <h1>{categoryName}</h1>
                         <p className={styles.intro}>{f({ id: 'blog.category.intro' }, { category: categoryName })}</p>
-                        <ul className={styles.posts}>
-                            {posts.map((post) => (
-                                <li key={post.slug} className={styles.post}>
-                                    <Link href={`/blog/${categorySlug}/${post.slug}`}>
-                                        <h2>{post.title}</h2>
-                                    </Link>
-                                    {post.date && <span className={styles.date}>{post.date}</span>}
-                                    <p>{post.excerpt}</p>
-                                </li>
-                            ))}
-                        </ul>
+                        <PostSummaryList posts={posts} />
                         <p className={styles.links}>
                             <Link href="/blog">{f({ id: 'blog.index.title' })}</Link>
                         </p>

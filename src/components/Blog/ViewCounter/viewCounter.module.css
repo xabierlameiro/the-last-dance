@@ -12,29 +12,10 @@
     width: 19px;
 }
 
-.spinner {
-    animation: spin 1s linear infinite;
-    width: 16px;
-    height: 16px;
-}
-
-.all {
-    font-size: 14px;
-}
-
 .users {
     padding-left: 12px;
     display: flex;
     font-size: 14px;
     user-select: none;
     gap: 8px;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
 }
