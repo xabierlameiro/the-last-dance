@@ -96,7 +96,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                     category={category}
                                     isCategory
                                 />
-                                <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
+                                <NavList title={f({ id: 'blog.tags' })} list={tags} category={post.meta.tags} />
                             </div>
                             <aside className={styles.navAd}>
                                 <GoogleAdsense slot="2616692922" />
@@ -161,7 +161,9 @@ export const getStaticProps = async (data: {
         };
     }
 
-    // Tag-based paths duplicate the canonical category URL — consolidate with a 301
+    // Safety net for legacy/external `/blog/<tag>/<slug>` post URLs that Google still holds:
+    // any non-canonical category segment 301s to the post's canonical category URL (SDD-009).
+    // On-site tag navigation no longer points here — tags link to `/blog/tag/<tag>` listings.
     const canonicalCategory = post.meta.category.toLowerCase();
     if (category !== canonicalCategory) {
         const localePrefix = locale === defaultLocale ? '' : `/${locale}`;
@@ -174,9 +176,6 @@ export const getStaticProps = async (data: {
         };
     }
 
-    // Tag-based URLs render normally so tag navigation stays selectable; the
-    // <link rel="canonical"> (built from the post category in the SEO component)
-    // consolidates the duplicate content for search engines.
     const mdxSource = await serialize(post.content);
     const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);

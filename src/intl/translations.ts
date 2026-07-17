@@ -11,6 +11,9 @@ export const messages = {
         'blog.category.intro': 'All the articles filed under {category}.',
         'blog.category.seo.title': '{category} articles | Xabier Lameiro',
         'blog.category.seo.description': 'All the articles about {category} published by Xabier Lameiro.',
+        'blog.tag.intro': 'All the articles tagged {tag}.',
+        'blog.tag.seo.title': '{tag} articles | Xabier Lameiro',
+        'blog.tag.seo.description': 'All the articles tagged {tag} published by Xabier Lameiro.',
         'about.title': 'About me',
         'about.seo.title': 'About Xabier Lameiro | Software Architect',
         'about.seo.description':
@@ -112,6 +115,9 @@ export const messages = {
         'blog.category.intro': 'Todos los artículos de la categoría {category}.',
         'blog.category.seo.title': 'Artículos de {category} | Xabier Lameiro',
         'blog.category.seo.description': 'Todos los artículos sobre {category} publicados por Xabier Lameiro.',
+        'blog.tag.intro': 'Todos los artículos etiquetados como {tag}.',
+        'blog.tag.seo.title': 'Artículos de {tag} | Xabier Lameiro',
+        'blog.tag.seo.description': 'Todos los artículos etiquetados como {tag} publicados por Xabier Lameiro.',
         'about.title': 'Sobre mí',
         'about.seo.title': 'Sobre Xabier Lameiro | Arquitecto de software',
         'about.seo.description':
@@ -214,6 +220,9 @@ export const messages = {
         'blog.category.intro': 'Todos os artigos da categoría {category}.',
         'blog.category.seo.title': 'Artigos de {category} | Xabier Lameiro',
         'blog.category.seo.description': 'Todos os artigos sobre {category} publicados por Xabier Lameiro.',
+        'blog.tag.intro': 'Todos os artigos etiquetados como {tag}.',
+        'blog.tag.seo.title': 'Artigos de {tag} | Xabier Lameiro',
+        'blog.tag.seo.description': 'Todos os artigos etiquetados como {tag} publicados por Xabier Lameiro.',
         'about.title': 'Sobre min',
         'about.seo.title': 'Sobre Xabier Lameiro | Arquitecto de software',
         'about.seo.description':
