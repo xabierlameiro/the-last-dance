@@ -3,7 +3,7 @@ title: 'Continuous Integration with Github Actions workflow'
 slug: 'continuous-integration-with-github-actions-workflow'
 author: 'Xabier Lameiro'
 category: 'Nextjs'
-tags: ['devops']
+tags: ['github-actions', 'ci', 'nextjs', 'devops']
 locale: 'en'
 excerpt: 'Continuous integration and continuous deployment with using the github workflow actions in a nextjs project and deploying to vercel'
 description: 'Set up CI/CD for a Next.js project with GitHub Actions: lint, test and build on every push, then deploy to Vercel. The workflow YAML explained step by step.'
@@ -13,6 +13,11 @@ alternate:
         { lang: 'es', url: 'integracion-continua-con-github-actions-workflow' },
         { lang: 'gl', url: 'integracion-continua-con-github-actions-workflow' },
     ]
+faq:
+    - question: 'How do I run lint, test and build on every push with GitHub Actions?'
+      answer: 'Add a .github/workflows/*.yml file that triggers on push, checks out the code, sets up Node, installs dependencies and runs your lint/test/build scripts as steps. Split it into parallel jobs so a failure is easy to locate.'
+    - question: 'Why split into pre-deploy and post-deploy workflows?'
+      answer: 'Pre-deploy runs the fast gates (lint, test, build) before anything ships. Post-deploy runs the slow checks that only make sense against the live site, like a Lighthouse performance report, so they never block the deploy.'
 ---
 
 # Continuous Integration with Github Actions workflow
@@ -21,17 +26,17 @@ alternate:
 
 <GoogleAdsense />
 
-Each project is different and so are its priorities, but what they have in common is that they all need to be deployed and tested. This part can always be done manually, but it ends up being repetitive and tedious. That's why it's convenient to automate it, and that's why continuous integration and continuous deployment tools exist.
+Every project is different and so are its priorities, but they all have one thing in common: they need to be tested and deployed. You can do that by hand, but it gets repetitive and tedious fast — which is exactly what continuous integration and continuous deployment exist to remove.
 
-In this case we are going to use [Github Actions](https://docs.github.com/en/actions/using-workflows 'Link to github Actions') to automate the deployment of this project in [Vercel](https://vercel.com/ 'Link to vercel'), but also to do a series of previous tasks such as testing, code formatting and documentation generation.
+Here I use [GitHub Actions](https://docs.github.com/en/actions/using-workflows 'Link to github Actions') to automate deploying this project to [Vercel](https://vercel.com/ 'Link to vercel'), plus the checks that run before it: testing, linting, type-checking and documentation generation.
 
 ## Design
 
-The most time-consuming thing is to plan what your pipeline is going to look like, i.e. what tasks you are going to execute and in what order. In my case I started to draw in escalidraw how my task flow could look like and after several attempts one was the one that convinced me the most. Once you have this part more or less thought what you have to do is to go to your project and create a folder in the following route .github/workflows once inside you can create the file with the name you want with the format .yml in my case I have two pre-deploy.yml and post-deploy.yml, here I am not going to go into detail of how the format .yml works, but I am going to explain what does each of the jobs that I have in each of the workflows.
+The part that takes the most thought is the pipeline itself — which tasks run, and in what order. I sketched the flow in Excalidraw and iterated until one shape stuck. Then it is mechanical: create a `.github/workflows/` folder and drop your `.yml` files in it. I keep two, `pre-deploy.yml` and `post-deploy.yml`, and instead of explaining YAML syntax I will explain what each job does.
 
-First I run the cancel redundancy, code checking, testing and documentation jobs in parallel and if everything goes well, versioning and deployment in pre-production. After checking that everything went well and was deployed correctly in pre-production, I do my manual tests on the featuring developed or on the bugfixing and after checking that everything is correct and there is no problem, I can make the decision to deploy or not in production. For this it would only be necessary to create a pull request to merge the develop branch in master and merge it but, in my workflow the jobs don't end here. After all this and once merged in production a last performance test is executed using lighthouse and generating a page by page report that I publish once the job is finished.
+`pre-deploy` runs four jobs in parallel — cancel-redundant-runs, linting, testing and docs — and only if they all pass does it version and deploy to pre-production. I then test the feature or bugfix manually against that preview. If it holds up, deploying to production is just a pull request from `dev` to `master`. But the pipeline does not end at the merge: once it is live, `post-deploy` runs a Lighthouse pass and publishes a page-by-page performance report. Splitting it this way keeps the fast gates blocking (nothing ships broken) and the slow, live-site checks out of the critical path.
 
-Here you can see it in a more graphical way:
+Here it is graphically:
 
 <Image
     src="/continuos-integration.svg"
@@ -42,7 +47,7 @@ Here you can see it in a more graphical way:
     style={{ margin: '20px 0 20px 0' }}
 />
 
-This is a snippet of what my pre-deploy workflow looks like:
+This is a snippet of what the pre-deploy workflow looks like (Node 22, npm — update the versions to match your project, this is the kind of thing that goes stale):
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -57,36 +62,42 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Cancel previous redundant workflow runs
-              uses: styfle/cancel-workflow-action@0.11.0
+              uses: styfle/cancel-workflow-action@0.12.1
               with:
                   access_token: ${{ secrets.TOKEN_GITHUB }}
     code_checking:
         name: Linting
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
               with:
-                  node-version: 18
-                  cache: yarn
+                  node-version: 22
+                  cache: npm
             - name: Install dependencies
+              env:
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
               run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
+                  npm install --legacy-peer-deps
             - name: Linter
-              run: yarn run lint
+              run: npm run lint
 ```
 
 </CH.Code>
 
-Workflow complete [in my github](https://github.com/xabierlameiro/the-last-dance/actions/workflows/pre-deploy.yml 'in my github')
+Full workflow [in my github](https://github.com/xabierlameiro/the-last-dance/actions/workflows/pre-deploy.yml 'in my github')
+
+## Three things worth doing from day one
+
+- **Cache the install.** `actions/setup-node` with `cache: npm` restores `node_modules`-worth of downloads between runs and cuts minutes off every job. Point it at your real lockfile.
+- **Cancel redundant runs.** Pushing three times in a row should not run three full pipelines. The cancel step above (or the built-in `concurrency:` key) kills superseded runs.
+- **Keep secrets in secrets.** The registry token comes from `${{ secrets.NPM_TOKEN }}`, never from the file. If a token ever lands in a committed `.npmrc`, rotate it — the runner reads it from the environment, not the repo.
 
 ## Results
 
-Each of these reports has its own repository on github and that's where the results of each of the tests are published.
-
-Here I can see the results of my jobs every time I make changes to my project:
+Each report has its own repository on GitHub, and that is where the output of every run is published:
 
 -   [Unit test report](https://coverage.xabierlameiro.com/ 'Link to Unit test report')
 -   [End to end testing report](https://e2e.xabierlameiro.com/ 'Link to End to end testing report')
@@ -96,6 +107,6 @@ Here I can see the results of my jobs every time I make changes to my project:
 
 ## Conclusions
 
-Every time I develop a new component in React, or create a new page with Nextjs I'm assured that a battery of tests thoroughly checks that what I've added to my project hasn't broken any of the previous work. This is partly because you are the one who has to create the tests in the most delicate and critical parts of your application.
+Every time I add a component in React or a page in Next.js, a battery of tests checks that I have not broken the work already there — which only works because you are the one who has to write the tests for the delicate, critical parts. The pipeline does not invent coverage; it enforces the coverage you decided to have.
 
-> You can find all this code in my github repository and if you liked this content you can help me with a [⭐️](https://github.com/xabierlameiro/the-last-dance 'Link to my github') Thanks !
+> You can find all this code in my github repository, and if you liked it you can help me with a [⭐️](https://github.com/xabierlameiro/the-last-dance 'Link to my github'). Thanks!

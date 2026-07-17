@@ -3,7 +3,7 @@ title: 'Integración continua con Github Actions workflow'
 slug: 'integracion-continua-con-github-actions-workflow'
 author: 'Xabier Lameiro'
 category: 'Nextjs'
-tags: ['devops']
+tags: ['github-actions', 'ci', 'nextjs', 'devops']
 locale: 'gl'
 excerpt: 'Integración continua e despregamento continuo con usando as github workflow actions nun proxecto de nextjs e despregando en vercel'
 description: 'Configura CI/CD para un proxecto Next.js con GitHub Actions: lint, tests e build en cada push, e despregamento en Vercel. O YAML do workflow explicado paso a paso.'
@@ -13,6 +13,11 @@ alternate:
         { lang: 'en', url: 'continuous-integration-with-github-actions-workflow' },
         { lang: 'es', url: 'integracion-continua-con-github-actions-workflow' },
     ]
+faq:
+    - question: 'Como executo lint, tests e build en cada push con GitHub Actions?'
+      answer: 'Engade un ficheiro .github/workflows/*.yml que se dispare en push, faga checkout do código, configure Node, instale dependencias e execute os teus scripts de lint/test/build como pasos. Divídeo en jobs paralelos para localizar un fallo rápido.'
+    - question: 'Por que separar en pre-deploy e post-deploy?'
+      answer: 'O pre-deploy corre as verificacións rápidas (lint, tests, build) antes de que se despregue nada. O post-deploy corre as lentas que só teñen sentido contra o sitio en vivo, como un informe de rendemento con Lighthouse, para que nunca bloqueen o despregamento.'
 ---
 
 # Integración continua con Github Actions workflow para este Proxecto
@@ -21,17 +26,17 @@ alternate:
 
 <GoogleAdsense />
 
-Cada un proxecto é un mundo e as súas prioridades tamén o son, pero o que teñen en común é que todos necesitan ser despregados e probados. Esta parte sempre se pode facer de forma manual, pero acaba sendo algo repetitivo e tedioso. Por iso é conveniente automatizalo, e para iso existen as ferramentas de integración continua e despregamento continuo.
+Cada proxecto é un mundo e as súas prioridades tamén, pero todos teñen algo en común: hai que probalos e despregalos. Podes facelo a man, pero acaba sendo repetitivo e tedioso — que é xusto o que a integración e o despregamento continuos existen para quitar.
 
-Neste caso imos usar as [Github Actions](https://docs.github.com/en/actions/using-workflows 'Ligazón as github Actions') para automatizar o despregamento deste proxecto en [Vercel](https://vercel.com/ 'Ligazón a Vercel'), pero tamén facer unha serie de tarefas previas como son os testing, o formato do código e a xeración da documentación.
+Aquí uso as [Github Actions](https://docs.github.com/en/actions/using-workflows 'Ligazón á documentación de github Actions') para automatizar o despregamento deste proxecto en [Vercel](https://vercel.com/ 'Ligazón a vercel'), máis as verificacións previas: testing, linting, type-checking e xeración de documentación.
 
 ## Deseño
 
-O que máis tempo pode levar é, planificar como vai ser o teu pipeline, osea que tarefas vas executar e en que orde. No meu caso púxenme a debuxar en escalidraw como podería ser o meu fluxo de tarefas e tras varios intentos uno foi o que máis me convenceu. Unha vez tes esta parte mais ou menos pensada o que tes que facer é ir ao teu proxecto e crear un cartafol no seguinte roteiro .github/workflows unha vez dentro podes crear o arquivo co nome que desexes co formato .yml no meu caso teño dous pre-deploy.yml e post-deploy.yml, aquí non vou entrar en detalle de como funciona o formato .yml, pero se que vou explicar que fai cada un dos jobs que teño en cada un dos workflows.
+A parte que máis se pensa é o propio pipeline: que tarefas corren e en que orde. Debuxei o fluxo en Excalidraw e fun iterando ata que unha forma me convenceu. A partir de aí é mecánico: creas un cartafol `.github/workflows/` e soltas os teus ficheiros `.yml`. Eu teño dous, `pre-deploy.yml` e `post-deploy.yml`, e en vez de explicar a sintaxe do YAML vou explicar que fai cada job.
 
-Primeiro executo os jobs de cancel redundacy, code checking, testing e documentation en paralelo e se todo vai ben, feito unha versión e despregamento en pre-produción. Despois de ver que todo foi ben e despregouse correctamente en pre-produción, fago as miñas probas manuais sobre o featuring desenvolvido ou sobre o bugfixing e tras revisar que todo esta correctamente e non hai ningún problema, podo tomar a decisión de despregar ou non en produción. Para iso só sería necesario crear unha pull request para mergear a rama de develop en master e mergearla pero, no meu workflow non acaban aquí os jobs. Despois de todo isto e unha vez mergeado en produción execútase un último test de performance usando lighthouse e xerando un reporte pagina por pagina que publico unha vez o job ha finalizado.
+O `pre-deploy` corre catro jobs en paralelo — cancelar runs redundantes, linting, testing e docs — e só se todos pasan versiona e desprega en pre-produción. Logo probo a feature ou o bugfix a man contra esa preview. Se aguanta, despregar a produción é só un pull request de `dev` a `master`. Pero o pipeline non acaba no merge: unha vez en vivo, o `post-deploy` corre un pase de Lighthouse e publica un informe de rendemento páxina a páxina. Separalo así mantén as verificacións rápidas bloqueando (nada se desprega roto) e as lentas contra o sitio en vivo fóra do camiño crítico.
 
-Aquí pódese ver dunha forma máis gráfica:
+Aquí de forma máis gráfica:
 
 <Image
     src="/continuos-integration.svg"
@@ -42,7 +47,7 @@ Aquí pódese ver dunha forma máis gráfica:
     style={{ margin: '20px 0 20px 0' }}
 />
 
-Este é un fragmento do aspecto que ten o meu workflow de pre-deploy:
+Este é un fragmento de como se ve o workflow de pre-deploy (Node 22, npm — axusta as versións ao teu proxecto, isto é do que queda desactualizado):
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -57,45 +62,51 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Cancel previous redundant workflow runs
-              uses: styfle/cancel-workflow-action@0.11.0
+              uses: styfle/cancel-workflow-action@0.12.1
               with:
                   access_token: ${{ secrets.TOKEN_GITHUB }}
     code_checking:
         name: Linting
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
               with:
-                  node-version: 18
-                  cache: yarn
+                  node-version: 22
+                  cache: npm
             - name: Install dependencies
+              env:
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
               run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  yarn install --frozen-lockfile
+                  npm install --legacy-peer-deps
             - name: Linter
-              run: yarn run lint
+              run: npm run lint
 ```
 
 </CH.Code>
 
 Workflow completo [no meu github](https://github.com/xabierlameiro/the-last-dance/actions/workflows/pre-deploy.yml 'no meu github')
 
+## Tres cousas que paga a pena facer desde o día un
+
+- **Cachea a instalación.** `actions/setup-node` con `cache: npm` restaura as descargas entre runs e recorta minutos de cada job. Apúntao ao teu lockfile real.
+- **Cancela runs redundantes.** Facer push tres veces seguidas non debería lanzar tres pipelines enteiros. O paso de cancelación de arriba (ou a clave `concurrency:` nativa) mata os runs superados.
+- **Garda os segredos en secrets.** O token do rexistro sae de `${{ secrets.NPM_TOKEN }}`, nunca do ficheiro. Se un token chega a un `.npmrc` subido, rótao — o runner léeo do contorno, non do repo.
+
 ## Resultados
 
-Cada un destes reportes dispón do seu propio repositorio en github e é aí onde se publican os resultados de cada un dos test.
+Cada informe ten o seu propio repositorio en GitHub, e aí é onde se publica a saída de cada run:
 
-Aquí podo ver o resultado dos meus jobs cada vez que fago cambios no meu proxecto:
-
--   [Reporte de testing unitario](https://coverage.xabierlameiro.com/ 'Ligazón a Reporte de testing unitario')
--   [Reporte de testing end to end](https://e2e.xabierlameiro.com/ 'Ligazón a Reporte de testing end to end')
--   [Reporte de performance](https://performance.xabierlameiro.com/ 'Ligazón a Reporte de performance')
--   [Documentación](https://docs.xabierlameiro.com/ 'Ligazón a Documentación')
--   [Biblioteca de compoñentes](https://storybook.xabierlameiro.com/ 'Ligazón a Biblioteca de compoñentes')
+-   [Informe de tests unitarios](https://coverage.xabierlameiro.com/ 'Ligazón ao informe de tests unitarios')
+-   [Informe de tests end to end](https://e2e.xabierlameiro.com/ 'Ligazón ao informe end to end')
+-   [Informe de rendemento](https://performance.xabierlameiro.com/ 'Ligazón ao informe de rendemento')
+-   [Documentación](https://docs.xabierlameiro.com/ 'Ligazón á documentación')
+-   [Biblioteca de compoñentes](https://storybook.xabierlameiro.com/ 'Ligazón á biblioteca de compoñentes')
 
 ## Conclusións
 
-Cada vez que desenvolvo un novo compoñente en React, ou creo unha páxina nova con Nextjs teño a seguridade de que unha batería de probas comproba a fondo que o que engadín ao meu proxecto non rompeu nada do traballo anterior. Isto é así en parte, xa que o teu es o que ten que crear os test nas partes máis delicadas e criticas da túa aplicativo.
+Cada vez que engado un compoñente en React ou unha páxina en Next.js, unha batería de tests comproba que non rompín o traballo que xa estaba — o cal só funciona porque es ti quen ten que escribir os tests das partes delicadas e críticas. O pipeline non inventa cobertura; fai cumprir a que decidiches ter.
 
-> Podes atopar todo este código no meu repositorio de github e se che gustou este contido podes axudarme cunha [⭐️](https://github.com/xabierlameiro/the-last-dance 'Ligazón a O meu github') Grazas !
+> Podes atopar todo este código no meu repositorio de github, e se che gustou podes axudarme cunha [⭐️](https://github.com/xabierlameiro/the-last-dance 'Ligazón ao meu github'). Grazas!
