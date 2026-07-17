@@ -86,10 +86,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                 modalMode={isMobile}
                 open={open}
                 body={
-                    <div
-                        className={clx(styles.container, sideClass)}
-                        onTouchStart={onSideShiftLeft}
-                    >
+                    <div className={clx(styles.container, sideClass)} onTouchStart={onSideShiftLeft}>
                         <nav className={styles.nav} onTouchStart={onSideShiftRight}>
                             <ControlButtons onClickClose={close} onClickMinimise={close} />
                             <div className={styles.navListContainer}>

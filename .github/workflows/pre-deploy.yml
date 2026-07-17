@@ -4,7 +4,7 @@ on:
         branches: [dev]
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
     cancel_redundancy:

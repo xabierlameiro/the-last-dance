@@ -44,7 +44,7 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
     } else {
         slug = slug.split('/')[slug.split('/').length - 1];
     }
-    
+
     // Validate slug to prevent directory traversal
     if (!slug || typeof slug !== 'string' || slug.includes('..') || slug.includes('/') || slug.includes('\\')) {
         throw new Error('Invalid slug parameter');
@@ -65,11 +65,11 @@ const findPostBySlug = (slug: string | { params: { slug: string } }) => {
         const fileName = filePath.split('/').pop();
         return data.slug?.normalize('NFC') === normalizedSlug || fileName?.normalize('NFC') === `${normalizedSlug}.mdx`;
     });
-    
+
     if (!route) {
         throw new Error('Post not found');
     }
-    
+
     return matter(fs.readFileSync(route, 'utf8'));
 };
 
@@ -317,13 +317,13 @@ export const countWords = (content: string) => {
     // Split by triple backticks and count words only in non-code sections
     const parts = content.split('```');
     let nonCodeContent = '';
-    
+
     // Take every other part (non-code sections)
     for (let i = 0; i < parts.length; i += 2) {
         nonCodeContent += parts[i] || '';
     }
-    
-    const nonCodeWords = nonCodeContent.split(/\s/g).filter(word => word.length > 0);
+
+    const nonCodeWords = nonCodeContent.split(/\s/g).filter((word) => word.length > 0);
     return nonCodeWords.length;
 };
 

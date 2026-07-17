@@ -76,10 +76,7 @@ const getCityNews = async (city: string): Promise<NewsData> => {
  * @returns Promise<void>
  * @example http://localhost:3000/api/news?city=London
  */
-export default allowCors(async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<NewsResponse>
-) {
+export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse<NewsResponse>) {
     // Only allow GET requests
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });

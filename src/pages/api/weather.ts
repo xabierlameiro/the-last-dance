@@ -153,10 +153,7 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
  * @returns Promise<void>
  * @example http://localhost:3000/api/weather?cities=Madrid,Barcelona
  */
-export default allowCors(async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<WeatherResponse>
-) {
+export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse<WeatherResponse>) {
     // Only allow GET requests
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -171,27 +168,29 @@ export default allowCors(async function handler(
     }
 
     // Validate cities format and length
-    const citiesArray = String(cities).split(',').map(city => city.trim()).filter(Boolean);
-    
+    const citiesArray = String(cities)
+        .split(',')
+        .map((city) => city.trim())
+        .filter(Boolean);
+
     if (citiesArray.length === 0) {
         return res.status(400).json({ error: 'At least one city must be provided' });
     }
-    
+
     if (citiesArray.length > 5) {
         return res.status(400).json({ error: 'Maximum 5 cities allowed' });
     }
 
     // Validate each city name (basic validation)
-    const invalidCities = citiesArray.filter(city => 
-        !city || city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s+-]+$/.test(city)
+    const invalidCities = citiesArray.filter(
+        (city) => !city || city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s+-]+$/.test(city)
     );
-    
+
     if (invalidCities.length > 0) {
         return res.status(400).json({ error: `Invalid city names: ${invalidCities.join(', ')}` });
     }
 
     try {
-
         await Promise.allSettled(citiesArray.map((city) => getWeatherData(city)))
             .then((raw) => {
                 const results = raw

@@ -1,23 +1,23 @@
 # SDD-004: "Xabier Lameiro" as a Google entity (Knowledge Panel + photo)
 
-- **Goal**: searching "Xabier Lameiro" shows a Knowledge Panel with photo, like a public figure.
-- **Status**: on-site workstream A implemented 2026-07-17 (canonical name, ProfilePage at
-  /about, enriched Person with `@id`, headshot at /xabier-lameiro.png, X added to sameAs).
-  Workstreams B (Wikidata + external corroboration) and C (demand + measurement) are
-  off-site, owner-driven, and remain open.
-- **Expectation setting**: Knowledge Panels are generated from Google's Knowledge Graph.
-  They cannot be requested or bought; structured data alone does not create one. Google must
-  be able to *reconcile* the entity across independent sources. Realistic horizon:
-  months to a year of sustained off-site work; success is probable-not-guaranteed.
+-   **Goal**: searching "Xabier Lameiro" shows a Knowledge Panel with photo, like a public figure.
+-   **Status**: on-site workstream A implemented 2026-07-17 (canonical name, ProfilePage at
+    /about, enriched Person with `@id`, headshot at /xabier-lameiro.png, X added to sameAs).
+    Workstreams B (Wikidata + external corroboration) and C (demand + measurement) are
+    off-site, owner-driven, and remain open.
+-   **Expectation setting**: Knowledge Panels are generated from Google's Knowledge Graph.
+    They cannot be requested or bought; structured data alone does not create one. Google must
+    be able to _reconcile_ the entity across independent sources. Realistic horizon:
+    months to a year of sustained off-site work; success is probable-not-guaranteed.
 
 ## Current state (measured 2026-07-17)
 
-- Google barely associates the domain with the name: "lameiro" = 6 impressions at
-  position ~46 over 6.5 months; "xabier lameiro" = zero recorded impressions.
-- `Person` JSON-LD exists but is duplicated and inconsistent (SDD-002 D4).
-- Name inconsistency: "Xabier Lameiro Cardama" (schema) vs "Xabier Lameiro" (title/brand).
-- `sameAs` covers only LinkedIn, GitHub, Reddit — while `twitter:site` references
-  `@xlameirodev`, which is absent from `sameAs`.
+-   Google barely associates the domain with the name: "lameiro" = 6 impressions at
+    position ~46 over 6.5 months; "xabier lameiro" = zero recorded impressions.
+-   `Person` JSON-LD exists but is duplicated and inconsistent (SDD-002 D4).
+-   Name inconsistency: "Xabier Lameiro Cardama" (schema) vs "Xabier Lameiro" (title/brand).
+-   `sameAs` covers only LinkedIn, GitHub, Reddit — while `twitter:site` references
+    `@xlameirodev`, which is absent from `sameAs`.
 
 ## Workstreams
 
@@ -48,9 +48,9 @@
 1. Generate brand-query demand: publish/share content under the exact name (talks,
    LinkedIn posts linking to the blog) so people search "xabier lameiro".
 2. Track monthly:
-   - GSC brand-query impressions/position (`query contains "lameiro"`).
-   - Knowledge Graph Search API (`kgsearch.googleapis.com`) for the entity.
-   - Manual SERP check per locale.
+    - GSC brand-query impressions/position (`query contains "lameiro"`).
+    - Knowledge Graph Search API (`kgsearch.googleapis.com`) for the entity.
+    - Manual SERP check per locale.
 3. The moment a panel appears → **"Claim this knowledge panel"** (Google account
    verification) → then suggest the headshot via the claimed-panel controls. The photo
    next to the name is granted at this stage, not before.

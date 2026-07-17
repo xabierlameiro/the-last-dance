@@ -22,7 +22,10 @@ type DeploymentResponseType = DeploymentResponse | { error: string };
  * @returns {Promise<DeploymentResponse>}
  * @example localhost:3000/api/deployments
  */
-export default allowCors(async function handler(_request: NextApiRequest, res: NextApiResponse<DeploymentResponseType>) {
+export default allowCors(async function handler(
+    _request: NextApiRequest,
+    res: NextApiResponse<DeploymentResponseType>
+) {
     // Validate required environment variables
     if (!process.env.NEXT_PROJECT_ID || !process.env.NEXT_TOKEN || !process.env.NEXT_PUBLIC_ENV) {
         console.error('Missing required environment variables for Vercel API');

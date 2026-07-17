@@ -42,7 +42,12 @@ const Home = ({ content }: Props) => {
                 body={
                     <>
                         <VisibilityManager hideOnDesktop hideOnTablet>
-                            <MDXRemote {...content.mobile} components={components as MDXComponents} frontmatter={undefined} scope={{}} />
+                            <MDXRemote
+                                {...content.mobile}
+                                components={components as MDXComponents}
+                                frontmatter={undefined}
+                                scope={{}}
+                            />
                         </VisibilityManager>
                         <VisibilityManager hideOnMobile>
                             <MDXRemote

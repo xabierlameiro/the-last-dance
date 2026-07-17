@@ -37,10 +37,10 @@ const ControlButtons = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const components: Record<string, any> = { 
-    CH, 
-    ControlButtons, 
-    Date: DateComponent, 
-    GoogleAdsense, 
-    Image 
+export const components: Record<string, any> = {
+    CH,
+    ControlButtons,
+    Date: DateComponent,
+    GoogleAdsense,
+    Image,
 };

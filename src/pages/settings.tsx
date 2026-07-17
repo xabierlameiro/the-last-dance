@@ -103,11 +103,11 @@ const Settings = () => {
                     description: f({ id: 'settings.seo.description' }),
                 }}
             />
-            <Dialog 
-                modalMode 
-                open 
-                body={<Content lang={lang} toggleLang={toggleLang} />} 
-                header={<Header lang={lang} toggleLang={toggleLang} />} 
+            <Dialog
+                modalMode
+                open
+                body={<Content lang={lang} toggleLang={toggleLang} />}
+                header={<Header lang={lang} toggleLang={toggleLang} />}
             />
         </>
     );

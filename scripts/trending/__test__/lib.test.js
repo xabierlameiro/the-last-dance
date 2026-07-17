@@ -33,7 +33,11 @@ describe('trending radar lib', () => {
         const hn = normalize.hn({
             hits: [{ title: 'A', objectID: '1', points: 10, num_comments: 2, created_at: '2026-07-16T00:00:00Z' }],
         });
-        expect(hn[0]).toMatchObject({ source: 'Hacker News', popularity: 12, url: expect.stringContaining('item?id=1') });
+        expect(hn[0]).toMatchObject({
+            source: 'Hacker News',
+            popularity: 12,
+            url: expect.stringContaining('item?id=1'),
+        });
 
         const devto = normalize.devto([
             {
@@ -50,7 +54,16 @@ describe('trending radar lib', () => {
         const reddit = normalize.reddit({
             data: {
                 children: [
-                    { data: { title: 'C', permalink: '/r/reactjs/1', score: 7, num_comments: 3, created_utc: 1784200000, subreddit: 'reactjs' } },
+                    {
+                        data: {
+                            title: 'C',
+                            permalink: '/r/reactjs/1',
+                            score: 7,
+                            num_comments: 3,
+                            created_utc: 1784200000,
+                            subreddit: 'reactjs',
+                        },
+                    },
                 ],
             },
         });
@@ -96,7 +109,9 @@ describe('trending radar lib', () => {
             {
                 generatedAt: '2026-07-17',
                 risingQueries: [{ query: 'claude mcp', delta: 40, impressions: 55 }],
-                recentRepos: [{ name: 'the-last-dance', url: 'https://github.com/x/y', pushedAt: '2026-07-17T00:00:00Z' }],
+                recentRepos: [
+                    { name: 'the-last-dance', url: 'https://github.com/x/y', pushedAt: '2026-07-17T00:00:00Z' },
+                ],
             }
         );
         expect(report).toContain('# Trending content radar — 2026-07-17');

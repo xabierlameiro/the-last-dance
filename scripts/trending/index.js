@@ -38,9 +38,7 @@ const collectors = {
     },
     reddit: async () => {
         const batches = await Promise.all(
-            SUBREDDITS.map((subreddit) =>
-                fetchJson(`https://www.reddit.com/r/${subreddit}/top.json?t=week&limit=15`)
-            )
+            SUBREDDITS.map((subreddit) => fetchJson(`https://www.reddit.com/r/${subreddit}/top.json?t=week&limit=15`))
         );
         return batches.flatMap(normalize.reddit);
     },

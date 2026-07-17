@@ -3,39 +3,39 @@
 name: Trending content radar
 
 on:
-  schedule:
-    - cron: '0 7 * * 1' # Mondays 07:00 UTC
-  workflow_dispatch: {}
+    schedule:
+        - cron: '0 7 * * 1' # Mondays 07:00 UTC
+    workflow_dispatch: {}
 
 permissions:
-  contents: read
-  issues: write
+    contents: read
+    issues: write
 
 jobs:
-  radar:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    radar:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
 
-      - name: Build report
-        # ANALYTICS_* secrets are optional — without them the GSC rising-queries
-        # section is skipped and the radar still works.
-        env:
-          ANALYTICS_CLIENT_EMAIL: ${{ secrets.ANALYTICS_CLIENT_EMAIL }}
-          ANALYTICS_PRIVATE_KEY: ${{ secrets.ANALYTICS_PRIVATE_KEY }}
-        run: |
-          npm install --legacy-peer-deps --no-audit --no-fund --omit=dev --ignore-scripts googleapis > /dev/null 2>&1 || true
-          node scripts/trending/index.js > trending-report.md
-          tail -5 trending-report.md
+            - name: Build report
+              # ANALYTICS_* secrets are optional — without them the GSC rising-queries
+              # section is skipped and the radar still works.
+              env:
+                  ANALYTICS_CLIENT_EMAIL: ${{ secrets.ANALYTICS_CLIENT_EMAIL }}
+                  ANALYTICS_PRIVATE_KEY: ${{ secrets.ANALYTICS_PRIVATE_KEY }}
+              run: |
+                  npm install --legacy-peer-deps --no-audit --no-fund --omit=dev --ignore-scripts googleapis > /dev/null 2>&1 || true
+                  node scripts/trending/index.js > trending-report.md
+                  tail -5 trending-report.md
 
-      - name: Open issue
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          TITLE="Trending radar $(date +%G-W%V)"
-          gh issue create --title "$TITLE" --body-file trending-report.md --label "content-radar" \
-            || gh issue create --title "$TITLE" --body-file trending-report.md
+            - name: Open issue
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  TITLE="Trending radar $(date +%G-W%V)"
+                  gh issue create --title "$TITLE" --body-file trending-report.md --label "content-radar" \
+                    || gh issue create --title "$TITLE" --body-file trending-report.md

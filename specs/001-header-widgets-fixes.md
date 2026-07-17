@@ -1,7 +1,7 @@
 # SDD-001: Header widgets & weather panel fixes
 
-- **Status**: Implemented on `fix/sdd-001-header-widgets` (2026-07-17) — see acceptance notes below
-- **Evidence**: 2026-07-17 — code audit + live-site DOM inspection + prod API probes
+-   **Status**: Implemented on `fix/sdd-001-header-widgets` (2026-07-17) — see acceptance notes below
+-   **Evidence**: 2026-07-17 — code audit + live-site DOM inspection + prod API probes
 
 ## Problems and root causes
 
@@ -43,13 +43,13 @@ The fix must allow `'+'` and normalize it to a space for the news query.
 
 **Options**:
 
-| Option | Notes |
-| ------ | ----- |
+| Option                                                             | Notes                                      |
+| ------------------------------------------------------------------ | ------------------------------------------ |
 | a) Google News RSS (`https://news.google.com/rss/search?q=<city>`) | Free, keyless, stable XML. **Recommended** |
-| b) Remove the news section | Simplest; loses a feature |
-| c) Paid news API | Overkill for a personal site |
+| b) Remove the news section                                         | Simplest; loses a feature                  |
+| c) Paid news API                                                   | Overkill for a personal site               |
 
-Additionally the client must treat `news: []` as an *empty state*, not an error.
+Additionally the client must treat `news: []` as an _empty state_, not an error.
 
 ### 4. Header "indexed pages" widget shows a red ✕
 
@@ -58,37 +58,37 @@ Additionally the client must treat `news: []` as an *empty state*, not an error.
 
 **Options**:
 
-| Option | Notes |
-| ------ | ----- |
+| Option                                                  | Notes                                                             |
+| ------------------------------------------------------- | ----------------------------------------------------------------- |
 | a) Search Console API with the existing service account | Real data, already authenticated for GSC tooling. **Recommended** |
-| b) Count URLs in `sitemap.xml` | Cheap approximation, no auth |
-| c) Remove the widget | If the metric no longer matters |
+| b) Count URLs in `sitemap.xml`                          | Cheap approximation, no auth                                      |
+| c) Remove the widget                                    | If the metric no longer matters                                   |
 
 ### 5. Cleanup after 2–4 land
 
-- Remove `serpapi.com` from the CSP `connect-src` in `next.config.js` (legacy of the old scrapers).
-- Delete dead SerpApi/scraping code paths and unused selectors.
+-   Remove `serpapi.com` from the CSP `connect-src` in `next.config.js` (legacy of the old scrapers).
+-   Delete dead SerpApi/scraping code paths and unused selectors.
 
 ## Acceptance criteria
 
-- Hovering every header widget shows its tooltip (jsdom regression test + one Playwright check).
-- Weather panel renders icon + data for the 3 cities; with the news request failing or empty,
-  an empty state is shown — no red error glyphs.
-- `/api/news` returns items in production; `/api/indexed-pages` returns 200 with a number.
-- No remaining SerpApi references in API routes or CSP.
+-   Hovering every header widget shows its tooltip (jsdom regression test + one Playwright check).
+-   Weather panel renders icon + data for the 3 cities; with the news request failing or empty,
+    an empty state is shown — no red error glyphs.
+-   `/api/news` returns items in production; `/api/indexed-pages` returns 200 with a number.
+-   No remaining SerpApi references in API routes or CSP.
 
 ## Implementation notes (2026-07-17)
 
-- Tooltip: `== null` fix + focus-open regression test. Verified live on `next dev`:
-  hovering the clock renders the tooltip ("Click above for weather and news updates").
-- Weather: WMO code → `public/weather/*.svg` (9 local icons); `<Img … unoptimized>` because
-  next/image refuses to optimize SVG without `dangerouslyAllowSVG`. Covered by
-  `src/__tests__/api/weather.test.ts`.
-- News: Google News RSS + `'+'` accepted in validation; outlet name used as description;
-  empty feed → localized empty state (`news.empty` en/es/gl). Covered by
-  `src/__tests__/api/news.test.ts`.
-- Indexed pages: Search Console API (same service account env as /api/analytics) with
-  sitemap-count fallback — local run without credentials returns `{"num":42}` (was HTTP 503).
-- Test suite: 47/47 suites, 87/87 tests green; `tsc --noEmit` 0 errors.
-- Pending in production: verify news items and Search Console counts once deployed with
-  real network/credentials (blocked locally by the sandboxed environment).
+-   Tooltip: `== null` fix + focus-open regression test. Verified live on `next dev`:
+    hovering the clock renders the tooltip ("Click above for weather and news updates").
+-   Weather: WMO code → `public/weather/*.svg` (9 local icons); `<Img … unoptimized>` because
+    next/image refuses to optimize SVG without `dangerouslyAllowSVG`. Covered by
+    `src/__tests__/api/weather.test.ts`.
+-   News: Google News RSS + `'+'` accepted in validation; outlet name used as description;
+    empty feed → localized empty state (`news.empty` en/es/gl). Covered by
+    `src/__tests__/api/news.test.ts`.
+-   Indexed pages: Search Console API (same service account env as /api/analytics) with
+    sitemap-count fallback — local run without credentials returns `{"num":42}` (was HTTP 503).
+-   Test suite: 47/47 suites, 87/87 tests green; `tsc --noEmit` 0 errors.
+-   Pending in production: verify news items and Search Console counts once deployed with
+    real network/credentials (blocked locally by the sandboxed environment).

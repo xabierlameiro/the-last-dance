@@ -1,7 +1,7 @@
 # SDD-006: Trending content radar (feeds the AdSense content phase)
 
-- **Status**: Implemented 2026-07-17 (radar + weekly GitHub issue). Owner runs the editorial loop.
-- **Feeds**: SDD-003 Phase 1–2 (content depth + cadence) and SDD-004 C (brand demand).
+-   **Status**: Implemented 2026-07-17 (radar + weekly GitHub issue). Owner runs the editorial loop.
+-   **Feeds**: SDD-003 Phase 1–2 (content depth + cadence) and SDD-004 C (brand demand).
 
 ## Goal
 
@@ -13,28 +13,28 @@ ready-to-write brief that combines: the trend evidence, the owner's professional
 ## The guardrail that shapes the whole design
 
 AdSense rejected the site for **low value content**. Google's spam policy explicitly
-targets *scaled content abuse* (mass-produced/AI-generated pages with little added value).
+targets _scaled content abuse_ (mass-produced/AI-generated pages with little added value).
 Therefore:
 
-- The radar **never publishes anything**. Output is a briefing, not a post.
-- Every post is written/edited by the owner (with Claude as drafting assistant), must add
-  first-hand experience ("what I did / measured / broke"), and respects the SDD-003
-  cadence (~2 substantive posts/month) — not one post per trend.
-- Value bar per post: 800+ words of original prose, at least one real artifact
-  (code from his repos, measurement, failure story), all three locales hand-reviewed.
+-   The radar **never publishes anything**. Output is a briefing, not a post.
+-   Every post is written/edited by the owner (with Claude as drafting assistant), must add
+    first-hand experience ("what I did / measured / broke"), and respects the SDD-003
+    cadence (~2 substantive posts/month) — not one post per trend.
+-   Value bar per post: 800+ words of original prose, at least one real artifact
+    (code from his repos, measurement, failure story), all three locales hand-reviewed.
 
 ## Design
 
 ### Sources (phase 1 — keyless, free)
 
-| Source | Endpoint | Signal |
-| ------ | -------- | ------ |
-| Hacker News | `hn.algolia.com/api/v1/search?query=<kw>&tags=story` (last 7 days) | points + comments |
-| dev.to | `dev.to/api/articles?tag=<kw>&top=7` | reactions + comments |
-| Reddit | `reddit.com/r/<sub>/top.json?t=week` (reactjs, nextjs, webdev, ClaudeAI) | score + comments |
-| GitHub | `api.github.com/search/repositories` (recent, by topic, sorted by stars) | stars velocity |
-| Own GSC | Search Console API rising queries (28d vs previous 28d) — optional, env-gated | impressions delta |
-| Own repos | `api.github.com/users/xabierlameiro/repos?sort=pushed` | the "recent projects" angle |
+| Source      | Endpoint                                                                      | Signal                      |
+| ----------- | ----------------------------------------------------------------------------- | --------------------------- |
+| Hacker News | `hn.algolia.com/api/v1/search?query=<kw>&tags=story` (last 7 days)            | points + comments           |
+| dev.to      | `dev.to/api/articles?tag=<kw>&top=7`                                          | reactions + comments        |
+| Reddit      | `reddit.com/r/<sub>/top.json?t=week` (reactjs, nextjs, webdev, ClaudeAI)      | score + comments            |
+| GitHub      | `api.github.com/search/repositories` (recent, by topic, sorted by stars)      | stars velocity              |
+| Own GSC     | Search Console API rising queries (28d vs previous 28d) — optional, env-gated | impressions delta           |
+| Own repos   | `api.github.com/users/xabierlameiro/repos?sort=pushed`                        | the "recent projects" angle |
 
 ### Scoring
 
@@ -67,8 +67,8 @@ prompt that demands first-hand experience and forbids generic filler.
 
 ## Acceptance criteria
 
-- `npm run trending` produces a markdown report locally (sources reachable) and never
-  exits non-zero because one source failed.
-- Weekly issue appears with ≥5 scored topics and a Claude prompt per topic.
-- Unit tests cover scoring, keyword matching, normalization and report building.
-- No automated publishing path exists from radar to blog.
+-   `npm run trending` produces a markdown report locally (sources reachable) and never
+    exits non-zero because one source failed.
+-   Weekly issue appears with ≥5 scored topics and a Claude prompt per topic.
+-   Unit tests cover scoring, keyword matching, normalization and report building.
+-   No automated publishing path exists from radar to blog.
