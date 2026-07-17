@@ -161,11 +161,12 @@ export const getStaticProps = async (data: {
         };
     }
 
-    // Tag URLs (/blog/<tag>/<slug>) render the post inside the full-screen blog so the
-    // tag submenu keeps navigating between posts — no redirect out to a separate page.
-    // The SEO <link rel="canonical"> (built from the post's real category) consolidates
-    // the duplicate content for search engines. A 301 here used to bounce tag clicks out
-    // of the blog, which broke tag navigation (SDD-009).
+    // Faceted URLs: a post is intentionally reachable at one URL per category/tag it
+    // carries (/blog/nextjs/<slug> AND /blog/css/<slug>). Each renders the post inside
+    // the full-screen blog so the tag submenu keeps navigating between posts — no redirect.
+    // The SEO <link rel="canonical"> (built from the post's primary category) consolidates
+    // these duplicates for search engines, per Google's faceted-navigation guidance. A 301
+    // here used to bounce tag clicks out of the blog, which broke tag navigation (SDD-009).
     const mdxSource = await serialize(post.content);
     const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);

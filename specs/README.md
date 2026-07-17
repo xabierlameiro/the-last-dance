@@ -15,6 +15,9 @@ live-site inspection (browser + prod API probes), and code audit of this repo.
 | [005](005-nextjs16-upgrade-decision.md)   | Next.js 16 upgrade go/no-go                                  | **Decided: NO-GO for now**                                 |
 | [006](006-trending-content-radar.md)      | Trending content radar (weekly briefs for the content phase) | **Implemented** — weekly issue via GitHub Action           |
 | [008](008-dev-audit-vulnerabilities.md)   | npm audit vulnerabilities (all dev-only)                     | **Resolved** — install audit silenced, prod audit clean    |
+| [009](009-technical-seo-audit.md)         | Tag navigation regression + canonical / duplicate-URL audit  | **Corrected** (2026-07-18) — faceted URLs, listing page reverted |
+| [010](010-content-audit-opportunity.md)   | Content audit + GSC opportunity map (enrich-first)           | **Investigation** — prioritized action list                 |
+| [011](011-content-engine-editorial.md)    | Content engine: recurring GitHub issues + anti-AI editorial  | **Investigation / design** — extends SDD-006                |
 
 All code lives on branch `fix/sdd-001-header-widgets` (specs + implementation).
 
