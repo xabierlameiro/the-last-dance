@@ -105,7 +105,7 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                                             '@type': 'ListItem',
                                             position: 1,
                                             name: 'Home',
-                                            item: `${process.env.NEXT_PUBLIC_DOMAIN}${getLang(l)}` || '/',
+                                            item: `${process.env.NEXT_PUBLIC_DOMAIN}${getLang(l)}`,
                                         },
                                         {
                                             '@type': 'ListItem',
