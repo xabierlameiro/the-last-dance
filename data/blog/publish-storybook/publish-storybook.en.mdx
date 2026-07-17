@@ -15,6 +15,8 @@ faq:
       answer: 'Run storybook build to produce a static site in storybook-static/, then serve that folder from any static host — Vercel, Netlify or GitHub Pages. On Vercel set the build command to npm run build-storybook and the output directory to storybook-static.'
     - question: 'Where does storybook build output the files?'
       answer: 'To the storybook-static/ folder by default. That folder is a plain static site you can host anywhere.'
+    - question: 'Why is my deployed Storybook blank or missing styles?'
+      answer: 'Almost always a base-path problem: the site is served from a sub-path but the assets are requested from the root. Host it at the domain root (a subdomain like storybook.example.com) or configure the base path, and check the browser console for 404s on the JS/CSS bundles.'
 ---
 
 # Deploying my storybook is very simple
@@ -23,7 +25,11 @@ faq:
 
 <GoogleAdsense />
 
-Once your components live in Storybook you can turn it into a **static site** and host it anywhere, so your team, your clients or your future self can browse the component library online — always up to date. Here is the whole flow: the build command, a real story, and how to deploy it to Vercel, Netlify or GitHub Pages.
+Once your components live in Storybook you can turn it into a **static site** and host it anywhere, so your team, your clients or your future self can browse the component library online — always up to date. Here is the whole flow: the build command, a real story, how to deploy it, and the gotchas that actually waste your afternoon.
+
+## Why deploy it at all?
+
+Storybook running on `localhost:6006` only helps the person who ran it. Deployed, it turns into a shared surface: designers review components without cloning the repo, QA can link a bug straight to the broken state, new teammates learn the design system by clicking through it, and you get a permanent URL for every component to paste into a pull request or a design ticket. It is the cheapest living style guide you can ship — the build already exists, you are only hosting the folder it produces. The one caveat: a public Storybook exposes your internal component API, so if the library is private, put it behind auth (an access-protected preview, basic auth, or a private host) instead of a public subdomain.
 
 ## 1. Storybook commands
 
@@ -40,7 +46,7 @@ Once your components live in Storybook you can turn it into a **static site** an
 
 ## 2. Write a story for a component
 
-A story is a single rendered state of a component. Keep one `.stories.tsx` file next to each component:
+A story is a single rendered state of a component. Keep one `.stories.tsx` file next to each component. This is the classic API most tutorials still show:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -50,18 +56,12 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import Avatar from '.';
 
 export default {
-    /* 👇 The title prop is optional.
-     * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
-     * to learn how to generate automatic titles
-     */
     title: 'Settings / Avatar',
     component: Avatar,
 } as ComponentMeta<typeof Avatar>;
 
-//👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof Avatar> = (args) => <Avatar {...args} />;
 
-// 👇 Each story then reuses that template
 export const Primary = Template.bind({});
 
 Primary.args = {
@@ -73,6 +73,38 @@ Primary.args = {
 ```
 
 </CH.Code>
+
+## Stories on current Storybook (CSF3)
+
+That `ComponentStory` / `ComponentMeta` pair is the Storybook 6 API and is **deprecated** from Storybook 7 onward. On Storybook 8 (the current major in 2026) the format is CSF3, which drops the template boilerplate — a story is just an object with `args`:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```tsx Avatar.stories.tsx
+import type { Meta, StoryObj } from '@storybook/react';
+import Avatar from '.';
+
+const meta: Meta<typeof Avatar> = {
+    title: 'Settings / Avatar',
+    component: Avatar,
+};
+export default meta;
+
+type Story = StoryObj<typeof Avatar>;
+
+export const Primary: Story = {
+    args: {
+        name: 'Juan Carlos de Borbón',
+        description: 'Rey emérito de España',
+        img: '/avatar.png',
+        alt: 'Quien bien se vive!',
+    },
+};
+```
+
+</CH.Code>
+
+If you are migrating, `npx storybook@latest migrate csf-2-to-3` does most of the mechanical work. Pin the version in your post or repo so readers know which API they are looking at — this is exactly the kind of thing that rots.
 
 ## 3. Build the static site
 
@@ -86,14 +118,37 @@ npx serve storybook-static  # optional: preview it locally first
 
 </CH.Code>
 
+Preview it locally before you deploy. If it looks wrong when served from `serve` (a plain static server), it will look wrong on the host too — better to find out now.
+
 ## 4. Deploy the `storybook-static` folder
 
 Point any static host at that folder:
 
 -   **Vercel:** import the repo, set **Build command** to `npm run build-storybook` and **Output directory** to `storybook-static`.
 -   **Netlify:** same build command, **Publish directory** `storybook-static`.
--   **GitHub Pages:** publish `storybook-static/` from a GitHub Action (`@storybook/storybook-deployer`, or the official `upload-pages-artifact` + `deploy-pages`).
+-   **GitHub Pages:** publish `storybook-static/` from a GitHub Action (the official `upload-pages-artifact` + `deploy-pages`).
 
-That is exactly how the example below is built on every push and served from a subdomain.
+To rebuild on every push, the shape of the CI job is short:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```yaml storybook.yml
+- uses: actions/setup-node@v4
+  with:
+      node-version: 22
+- run: npm ci
+- run: npm run build-storybook
+# then upload/deploy ./storybook-static with your host's action
+```
+
+</CH.Code>
+
+That is exactly how the example below is built and served from a subdomain.
+
+## Gotchas that waste an afternoon
+
+- **Blank page or missing styles**: a base-path mismatch. Host at the domain root (a subdomain works well) or set the base path; the browser console will show 404s on the bundles.
+- **Peer-dependency install failures**: Storybook majors lag behind the newest React. On React 19 you may need `--legacy-peer-deps` to install, and some addons will not have caught up — check the addon's support matrix before you upgrade, not after.
+- **Stale build**: hosts cache aggressively. If your changes do not show, confirm the deploy actually rebuilt `storybook-static` and bust the CDN cache.
 
 > Here is mine deployed on a subdomain: [https://storybook.xabierlameiro.com](https://storybook.xabierlameiro.com 'Link to my storybook')

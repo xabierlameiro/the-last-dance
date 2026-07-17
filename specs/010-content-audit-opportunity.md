@@ -1,7 +1,10 @@
 # SDD-010: Content audit + GSC opportunity map
 
--   **Status**: Investigation only (2026-07-17) — evidence gathered, **no content/code changed**.
-    Output is a prioritized action list to feed the enrichment work and SDD-011 (content engine).
+-   **Status**: Enrichment in progress. T1 (`uncaught-error` #425 + site-wide meta) shipped in #129.
+    T2 (`npm-token`) and the T3 cluster (`deploying-my-storybook`, `publish-report-testing-react`,
+    `continuous-integration-github-actions`) enriched 2026-07-18 on `content/sdd-010-t2-t3-enrichment`
+    (all en/es/gl: deeper content, current tooling, multi-tag taxonomy per D2). Remaining: owner's
+    4-week CTR/position re-measure in GSC; net-new topics belong to SDD-011.
 -   **Data**: GSC API (`sc-domain:xabierlameiro.com`), 90 days `2026-04-18 → 2026-07-17`,
     dimensions `page` (60 rows) and `query` (142 rows); repo inventory of `data/blog`.
 -   **Related**: [002](002-seo-technical-foundation.md), [003](003-adsense-content-remediation.md)

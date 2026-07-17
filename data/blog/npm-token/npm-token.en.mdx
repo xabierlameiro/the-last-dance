@@ -3,7 +3,7 @@ title: 'Fix "Failed to replace env in config: $\{NPM_TOKEN}" in npm and yarn'
 slug: 'npm-token-solution-error'
 author: 'Xabier Lameiro'
 category: 'Error'
-tags: ['npm']
+tags: ['npm', 'yarn', 'ci']
 locale: 'en'
 excerpt: "How to avoid losing 2 hours of your life because of an NPM bug, that doesn't let you run yarn or npm commands"
 description: 'How to fix the npm/yarn error "Failed to replace env in config: ${NPM_TOKEN}" in one minute: define the missing environment variable that your .npmrc expects, or remove the stale entry.'
@@ -14,6 +14,10 @@ faq:
       answer: 'An .npmrc file references the NPM_TOKEN environment variable but it is not defined in your shell, so npm or yarn cannot expand it and aborts the command.'
     - question: 'How do I fix "Failed to replace env in config"?'
       answer: 'Define the missing variable (export NPM_TOKEN=your_token), or locate the .npmrc that references it — in the project root or in your user home directory — and remove the stale entry. Running the install with --verbose shows which .npmrc files are being read.'
+    - question: 'Where does npm look for .npmrc files?'
+      answer: 'In order: the project folder, then your home directory (~/.npmrc), then the global prefix, then npm''s built-in config. Values are merged with the closest file winning, so a stale entry in your home .npmrc can break every project.'
+    - question: 'Why does it only fail in CI?'
+      answer: 'The .npmrc references ${NPM_TOKEN} but the CI job never received that secret in its environment. Expose it as an env var on the step that runs the install (for example NPM_TOKEN: ${{ secrets.NPM_TOKEN }} in GitHub Actions).'
 ---
 
 # Possible solution for NPM - Failed to replace env in config: $\{NPM_TOKEN}
@@ -26,13 +30,11 @@ faq:
 
 npm or yarn found an `.npmrc` file that references an environment variable (`NPM_TOKEN`) that is not defined in your shell, so it cannot expand it. Either export the variable (`export NPM_TOKEN=your_token`), or find the `.npmrc` that references it — in the project root or in your user home directory — and remove the stale entry. Run the install with `--verbose` to see exactly which `.npmrc` files are being read.
 
-In this short post I am going to show a solution for the `Failed to replace env in config: ${{NPM_TOKEN}` error that occurs when trying to run a yarn or npm command.
+The error text itself is the giveaway: `Failed to replace env in config: ${{NPM_TOKEN}`. npm is telling you it tried to substitute an `${...}` placeholder and there was nothing to put in its place.
 
-You may have encountered this error at some point when trying to run a yarn or npm command. In my case it was
-because I published one of my libraries on github and in order to install it from github, I needed a token.
-This token is generated in github and stored in the system environment variables.
+## Why it happens
 
-But it is necessary to create an .npmrc file in the root of the project and add the following content:
+To install a private package from the GitHub registry you point npm at that registry and give it a token. The token lives in an environment variable so it never ends up committed, and the `.npmrc` references it by name:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -43,10 +45,29 @@ But it is necessary to create an .npmrc file in the root of the project and add 
 
 </CH.Code>
 
-What can happen is that you leave this file outside the project folder and save it in the user folder,
-for example in my case I saved it in the folder `C:\Users\xabierlameiro\.npmrc` and that's why I got the error.
+When you run `npm install` or `yarn`, npm reads that file and expands every `${VAR}` against your current environment. If `NPM_TOKEN` is not set in that shell, it cannot replace the placeholder and aborts — that is the exact error.
 
-To solve it, what I did was:
+## The `.npmrc` files npm actually reads
+
+This is the part that turns a one-minute fix into a two-hour one. npm does not read a single `.npmrc`; it merges several, and the closest one wins. In order of precedence:
+
+1. Project: `./.npmrc`
+2. User: `~/.npmrc` (on Windows, `C:\Users\<you>\.npmrc`)
+3. Global: `$PREFIX/etc/npmrc`
+4. npm's built-in config
+
+So a line you added to your **home** `.npmrc` months ago is applied to **every** project you install, even ones that have no idea what `NPM_TOKEN` is. That is the usual reason the error shows up in a repo you never configured for the GitHub registry.
+
+## Common causes, ranked
+
+- The variable is genuinely not defined in the shell you ran the command from.
+- The `.npmrc` lives in your home folder, not the project — so it leaks into unrelated installs. This was my case: I had saved it in `C:\Users\xabierlameiro\.npmrc`, and every project inherited the `${NPM_TOKEN}` reference.
+- The variable is set in a GUI app or a different terminal tab that did not inherit the export.
+- In CI, the secret exists but was never exposed to the step's environment.
+
+## How I fixed it
+
+First I ran the install in verbose mode to see which files npm was reading:
 
 <CH.Code style={{maxWidth: 'max-content', height:'max-content', margin: '20px 0'}}>
 
@@ -56,8 +77,51 @@ yarn install --verbose
 
 </CH.Code>
 
-It showed me the paths where I was looking for the .npmrc file and I realised that I was using it from the user folder.
+The log lists the paths it checks for `.npmrc`, and that is where I saw it was pulling the config from my user folder. I **_deleted_** it from the user folder and recreated it in the root of the project, and the error was gone.
 
-I **_deleted_** it from the user folder and recreated it in the root of the project and it no longer gave me the error.
+If you instead want the token available everywhere, define it rather than removing the reference:
 
-> I hope that if the same thing happens to you, it will help.
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+export NPM_TOKEN=your_token   # macOS / Linux
+setx NPM_TOKEN your_token     # Windows, new shells only
+```
+
+</CH.Code>
+
+`npm config ls -l` prints the fully merged configuration, which is the fastest way to confirm whether the token was picked up.
+
+## Fixing it in CI
+
+The most common place this bites is continuous integration, because the runner is a fresh machine with none of your local exports. The fix is to hand the secret to the step as an environment variable — the same `NPM_TOKEN` name the `.npmrc` expects. In GitHub Actions:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```yaml workflow.yml
+- name: Install dependencies
+  env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  run: npm install --legacy-peer-deps
+```
+
+</CH.Code>
+
+If you generate the `.npmrc` on the runner instead of committing it, write the auth line straight into the home file before installing:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+echo "@your-scope:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+```
+
+</CH.Code>
+
+Same idea in every CI provider: the `.npmrc` reference and the environment variable have to agree on the name, and the value has to reach the process that runs the install.
+
+## Keep the token out of git
+
+One last thing, because it is a mistake I see often. The `.npmrc` that references `${NPM_TOKEN}` is safe to commit: it holds only the *name* of the variable, not its value. What must never reach git is an `.npmrc` with the literal token pasted in (`_authToken=ghp_...`). If you did that, the token is compromised the moment it is pushed — revoke and rotate it in GitHub, do not just delete the file, because git history keeps it. The rule of thumb: an `.npmrc` that only references env vars is fine to commit and actually helps your teammates; one with real secrets belongs in `.gitignore` and, better, should not exist.
+
+> Whether it happens locally or in a pipeline, the question is always the same: does the shell that runs npm actually have `NPM_TOKEN`, and is it reading the `.npmrc` you think it is? Answer those two and the error disappears.

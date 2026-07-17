@@ -3,12 +3,17 @@ title: 'How to publish the test coverage report in your React application'
 slug: 'publish-report-testing-react'
 author: 'Xabier Lameiro'
 category: 'React'
-tags: ['jest']
+tags: ['jest', 'testing', 'react', 'ci']
 locale: 'en'
 excerpt: 'In this post we are going to see how to publish the test coverage report in your React application.'
 description: 'I show you how to publish the testing coverage report with jest in your React or Nextjs application, so you or people can see the testing coverage of your project.'
 image: '/posts/publish-report.png'
 alternate: [{ lang: 'es', url: 'publicar-reporte-pruebas-react' }, { lang: 'gl', url: 'publicar-informe-probas-react' }]
+faq:
+    - question: 'How do I publish a Jest coverage report?'
+      answer: 'Point coverageDirectory at a public folder, set coverageReporters to html, generate it in a postbuild step, and add a rewrite so the host serves the folder. Then deploy it like any static site.'
+    - question: 'Should I make my coverage report public?'
+      answer: 'It is fine for an open-source project so contributors can see how well it is covered, but add noindex so search engines do not treat the machine-generated pages as thin content — that can hurt the SEO of your real pages.'
 ---
 
 # How to publish the test coverage report in your React application
@@ -17,24 +22,19 @@ alternate: [{ lang: 'es', url: 'publicar-reporte-pruebas-react' }, { lang: 'gl',
 
 <GoogleAdsense />
 
-In this post we are going to see how to publish the test coverage report in your React application. For this we will use:
+You run `jest --coverage`, get a nice HTML report in `coverage/`, and then it dies on your machine. This post turns that report into a page anyone can open — useful for an open-source project where contributors want to see how well things are tested, or just to show your work. The stack is minimal:
 
 -   [Jest](https://jestjs.io/ 'Link to jestjs website')
 
-> A Perfect "alternative" for SonarQube for a small projects.
+> A perfect "alternative" to SonarQube for small projects.
 
-It is not common or necessary to publish your test report of your application, there will even be those who think that it is somewhat imprudent because
-You can expose sensitive information from your application. But the main idea of this is that if you have an open source project and you want
-so that people can contribute, it's a good idea that they can see the test report so they know how well your project is covered or
-because you want to teach people how to test an application.
+Publishing a test report is not something everyone does, and some consider it imprudent because you can leak internal detail. The honest use case is an open-source repo where the report helps people contribute, or a teaching post. If you want it gated, a path protected by user and password is enough.
 
-However, to have extra security, it is as simple as having it in a protected path with a username and password.
-
-PD: This example is developed in a web application made with **Nextjs** but it works for any web application that uses **jest**.
+PD: this example is a **Next.js** app, but it works for any web app that uses **jest**.
 
 ## 1. Path for the report
 
-The first thing we need to do is assign the jest outputDirectory to a public folder
+First, point the jest `coverageDirectory` at a public folder:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -60,12 +60,13 @@ const customJestConfig = {
 
 </CH.Code>
 
+`collectCoverageFrom` matters more than people think: without it, coverage is computed only over files a test happened to import, which flatters your numbers. Point it at the real source globs so untested files count as 0, not as absent.
+
 ## 2. Script to modify the report
 
-What this script does is modify the path of the static files that the report needs to function as images, css, javascript, etc.
-In addition, some report texts are customized.
+The report references its CSS/JS/images with relative paths that break once it is served from a sub-path. This script rewrites those paths and customises a couple of texts:
 
-> The alternative if you use class is to use the class [CustomReporter](https://jestjs.io/docs/configuration 'Jest configuration') and implement the onRunComplete method.
+> If you prefer a class, use a Jest [CustomReporter](https://jestjs.io/docs/configuration 'Jest configuration') and implement `onRunComplete`.
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -108,9 +109,9 @@ glob('public/coverage/**/*.?(html|css)', function (err, files) {
 
 </CH.Code>
 
-## 3. Command to generate the report when the build is generated
+## 3. Generate the report on build
 
-In order for the report to be generated in the public folder when the build is finished, we need to add the following commands in the package.json
+Add a `postbuild` step so the report lands in the public folder every time you build:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -134,9 +135,9 @@ In order for the report to be generated in the public folder when the build is f
 
 </CH.Code>
 
-## 4. Create a redirect on the server/cloud platform
+## 4. Create a redirect on the host
 
-In my case I use Vercel but whatever platform you use, you must create a redirect so that any
+So a clean URL serves the folder's `index.html`:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -153,4 +154,13 @@ In my case I use Vercel but whatever platform you use, you must create a redirec
 
 </CH.Code>
 
-> Here you can see an example of what the test report of this blog looks like [xabierlameiro.com/coverage](https://coverage.xabierlameiro.com/ 'Coverage section')
+## One thing I got wrong: keep it out of Google
+
+Here is the part no tutorial warns you about, and it bit this very site. Once the coverage report was public, Google indexed every one of those generated HTML pages — dozens of near-identical, text-thin files. That is textbook _low value content_, and it dilutes the ranking signals of your real pages; it was part of what got this domain flagged by AdSense. Publishing the report is fine, but tell search engines to ignore it:
+
+- Inject `<meta name="robots" content="noindex">` into the generated HTML (the same reporter script that fixes the paths can add it), or
+- Serve an `X-Robots-Tag: noindex` header for the report path or subdomain.
+
+A coverage report is for humans who go looking for it, not for search results. Ship it, then hide it from crawlers.
+
+> Here is an example of what the report of this blog looks like: [coverage.xabierlameiro.com](https://coverage.xabierlameiro.com/ 'Coverage section')
