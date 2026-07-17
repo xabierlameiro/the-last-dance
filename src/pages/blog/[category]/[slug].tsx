@@ -155,9 +155,10 @@ export const getStaticProps = async (data: {
     try {
         post = getPostBySlug(data);
     } catch {
+        // Retry a missing slug within a minute (e.g. a just-added post), without hammering.
         return {
             notFound: true as const,
-            revalidate: 10,
+            revalidate: 60,
         };
     }
 
@@ -168,8 +169,8 @@ export const getStaticProps = async (data: {
     // these duplicates for search engines, per Google's faceted-navigation guidance. A 301
     // here used to bounce tag clicks out of the blog, which broke tag navigation (SDD-009).
     const mdxSource = await serialize(post.content);
-    const { categories, tags } = await getAllCategories(locale);
-    const posts = await getPostsByLocaleAndCategory(locale, category);
+    const { categories, tags } = getAllCategories(locale);
+    const posts = getPostsByLocaleAndCategory(locale, category);
 
     return {
         props: {
@@ -181,7 +182,9 @@ export const getStaticProps = async (data: {
                 content: mdxSource,
             },
         },
-        revalidate: 10,
+        // Content is static per deploy (git-based), so revalidate rarely instead of every 10s,
+        // which used to re-run getStaticProps on a serverless function constantly.
+        revalidate: 86400,
     };
 };
 
