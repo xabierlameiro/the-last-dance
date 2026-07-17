@@ -175,7 +175,7 @@ export const getAllPosts = () => {
  * @returns {Object} - Object with posts.
  */
 
-const getPostsByLocale = (locale: string) => {
+export const getPostsByLocale = (locale: string) => {
     const posts = getAllPosts();
     return posts.filter((post) => post.meta.locale === locale);
 };
