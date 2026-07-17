@@ -25,7 +25,8 @@
         "lighthouse-report": "node lighthouse/assets/lighthouse.js",
         "test:e2e": "playwright test",
         "test:e2e:report": "playwright test && node custom-report.js",
-        "next-info": "npx --no-install next info"
+        "next-info": "npx --no-install next info",
+        "trending": "node scripts/trending/index.js"
     },
     "dependencies": {
         "@code-hike/mdx": "^0.8.3",

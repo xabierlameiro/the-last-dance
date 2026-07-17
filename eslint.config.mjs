@@ -76,5 +76,15 @@ export default tseslint.config(
             'sonarjs/no-commented-code': 'off',
             'sonarjs/todo-tag': 'off',
         },
+    },
+    {
+        // Node ESM scripts (trending radar etc.)
+        files: ['scripts/**/*.js'],
+        languageOptions: {
+            sourceType: 'module',
+            globals: {
+                ...globals.node,
+            },
+        },
     }
 );
