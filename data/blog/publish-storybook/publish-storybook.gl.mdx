@@ -18,15 +18,21 @@ faq:
       answer: 'Executa storybook build para xerar un sitio estático en storybook-static/, e serve esa carpeta desde calquera host estático — Vercel, Netlify ou GitHub Pages. En Vercel pon o comando de build en npm run build-storybook e o directorio de saída en storybook-static.'
     - question: 'Onde deixa os ficheiros storybook build?'
       answer: 'Na carpeta storybook-static/ por defecto. Esa carpeta é un sitio estático que podes aloxar en calquera sitio.'
+    - question: 'Por que o meu Storybook despregado sae en branco ou sen estilos?'
+      answer: 'Case sempre é un problema de base path: o sitio sérvese desde unha sub-ruta pero os assets pídense desde a raíz. Aloxao na raíz do dominio (un subdominio como storybook.exemplo.com) ou configura o base path, e mira a consola do navegador por 404 nos bundles JS/CSS.'
 ---
 
-# Despregar o meu Storybook é moi sinxelo
+# Despregar o meu Storybook de compoñentes é moi sinxelo
 
 <Date date="01-04-2023" />
 
 <GoogleAdsense />
 
-Unha vez que os teus compoñentes viven en Storybook, podes convertelo nun **sitio estático** e aloxalo onde queiras, para que o teu equipo, os teus clientes ou ti mesmo no futuro poidades navegar a libraría de compoñentes en liña — sempre actualizada. Este é o fluxo completo: o comando de build, unha historia real, e como despregalo en Vercel, Netlify ou GitHub Pages.
+Cando os teus compoñentes viven en Storybook podes convertelo nun **sitio estático** e aloxalo onde queiras, para que o teu equipo, os teus clientes ou o teu eu do futuro naveguen a biblioteca de compoñentes en liña — sempre actualizada. Aquí está o fluxo enteiro: o comando de build, unha story de verdade, como despregalo e os detalles que de verdade che comen a tarde.
+
+## Para que despregalo?
+
+Storybook correndo en `localhost:6006` só axuda a quen o lanzou. Despregado, convértese nunha superficie compartida: os deseñadores revisan compoñentes sen clonar o repo, QA liga un bug directamente ao estado roto, a xente nova aprende o sistema de deseño navegándoo, e tes unha URL permanente de cada compoñente para pegar nun pull request ou nun ticket de deseño. É a guía de estilo viva máis barata que podes publicar — o build xa existe, só estás aloxando a carpeta que produce. A única pega: un Storybook público expón a API interna dos teus compoñentes, así que se a biblioteca é privada, ponno detrás de autenticación (unha preview protexida, basic auth ou un host privado) en vez de nun subdominio aberto.
 
 ## 1. Comandos de Storybook
 
@@ -41,9 +47,9 @@ Unha vez que os teus compoñentes viven en Storybook, podes convertelo nun **sit
 
 `storybook build` xera un sitio estático en `storybook-static/` — esa carpeta é o que despregas.
 
-## 2. Escribe unha historia para un compoñente
+## 2. Escribe unha story para un compoñente
 
-Unha historia é un único estado renderizado dun compoñente. Mantén un ficheiro `.stories.tsx` xunto a cada compoñente:
+Unha story é un único estado renderizado dun compoñente. Mantén un ficheiro `.stories.tsx` xunto a cada compoñente. Esta é a API clásica que a maioría de titoriais seguen ensinando:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -53,18 +59,12 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import Avatar from '.';
 
 export default {
-    /* 👇 The title prop is optional.
-     * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
-     * to learn how to generate automatic titles
-     */
     title: 'Settings / Avatar',
     component: Avatar,
 } as ComponentMeta<typeof Avatar>;
 
-//👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof Avatar> = (args) => <Avatar {...args} />;
 
-// 👇 Each story then reuses that template
 export const Primary = Template.bind({});
 
 Primary.args = {
@@ -77,26 +77,81 @@ Primary.args = {
 
 </CH.Code>
 
-## 3. Constrúe o sitio estático
+## Stories no Storybook actual (CSF3)
+
+Ese par `ComponentStory` / `ComponentMeta` é a API de Storybook 6 e está **deprecada** desde Storybook 7. En Storybook 8 (o major actual en 2026) o formato é CSF3, que elimina o boilerplate do template — unha story é só un obxecto con `args`:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```tsx Avatar.stories.tsx
+import type { Meta, StoryObj } from '@storybook/react';
+import Avatar from '.';
+
+const meta: Meta<typeof Avatar> = {
+    title: 'Settings / Avatar',
+    component: Avatar,
+};
+export default meta;
+
+type Story = StoryObj<typeof Avatar>;
+
+export const Primary: Story = {
+    args: {
+        name: 'Juan Carlos de Borbón',
+        description: 'Rey emérito de España',
+        img: '/avatar.png',
+        alt: 'Quien bien se vive!',
+    },
+};
+```
+
+</CH.Code>
+
+Se estás migrando, `npx storybook@latest migrate csf-2-to-3` fai case todo o traballo mecánico. Fixa a versión no post ou no repo para que quen o lea saiba que API está mirando — isto é xusto o que apodrece co tempo.
+
+## 3. Xera o sitio estático
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
 ```bash
 npm run build-storybook   # ou: yarn build-storybook
 # → xera o sitio en ./storybook-static
-npx serve storybook-static  # opcional: prevísao en local primeiro
+npx serve storybook-static  # opcional: próbao en local primeiro
 ```
 
 </CH.Code>
+
+Próbao en local antes de despregar. Se se ve mal servido con `serve` (un servidor estático pelado), verase mal no host tamén — mellor decatarte agora.
 
 ## 4. Desprega a carpeta `storybook-static`
 
 Apunta calquera host estático a esa carpeta:
 
--   **Vercel:** importa o repo, pon o **Build command** en `npm run build-storybook` e o **Output directory** en `storybook-static`.
--   **Netlify:** o mesmo comando de build, **Publish directory** `storybook-static`.
--   **GitHub Pages:** publica `storybook-static/` desde unha GitHub Action (`@storybook/storybook-deployer`, ou os oficiais `upload-pages-artifact` + `deploy-pages`).
+-   **Vercel:** importa o repo, pon **Build command** en `npm run build-storybook` e **Output directory** en `storybook-static`.
+-   **Netlify:** mesmo comando de build, **Publish directory** `storybook-static`.
+-   **GitHub Pages:** publica `storybook-static/` desde unha GitHub Action (a oficial `upload-pages-artifact` + `deploy-pages`).
 
-Así é exactamente como se constrúe o exemplo de abaixo en cada push e se serve desde un subdominio.
+Para reconstruír en cada push, o job de CI é curto:
 
-> Aquí podes ver o exemplo do meu Storybook despregado nun subdominio: [https://storybook.xabierlameiro.com](https://storybook.xabierlameiro.com 'Enlace a storybook.xabierlameiro.com')
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```yaml storybook.yml
+- uses: actions/setup-node@v4
+  with:
+      node-version: 22
+- run: npm ci
+- run: npm run build-storybook
+# logo sobe/desprega ./storybook-static coa action do teu host
+```
+
+</CH.Code>
+
+Así é exactamente como se constrúe o exemplo de abaixo e se serve desde un subdominio.
+
+## Detalles que che comen a tarde
+
+- **Páxina en branco ou sen estilos**: un desaxuste de base path. Aloxa na raíz do dominio (un subdominio vai moi ben) ou configura o base path; a consola do navegador ensinarache os 404 dos bundles.
+- **Fallos de instalación por peer dependencies**: os majors de Storybook van por detrás do React máis novo. En React 19 pode que precises `--legacy-peer-deps` para instalar, e algún addon non chegará aínda — mira a matriz de soporte do addon antes de actualizar, non despois.
+- **Build cacheado**: os hosts cachean agresivo. Se os teus cambios non aparecen, confirma que o deploy reconstruíu de verdade `storybook-static` e invalida a caché do CDN.
+
+> Aquí está o meu despregado nun subdominio: [https://storybook.xabierlameiro.com](https://storybook.xabierlameiro.com 'Ligazón ao meu storybook')
