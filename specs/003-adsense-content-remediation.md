@@ -1,6 +1,8 @@
 # SDD-003: AdSense "low value content" remediation
 
-- **Status**: Blocked on decision **D1** (is AdSense worth pursuing?) before any work starts
+- **Status**: Structural work implemented 2026-07-17 (Phase 0 code + /about + /contact +
+  post bylines). Remaining: owner decision D1, content expansion (Phase 1–2, editorial)
+  and the re-request (Phase 3)
 - **Trigger**: AdSense rejection received 2026-07 — policy "minimum content requirements /
   low value content", with "verify site ownership" also pending.
 

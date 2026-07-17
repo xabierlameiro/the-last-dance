@@ -130,3 +130,9 @@
     overflow: hidden;
     display: grid;
 }
+
+.byline {
+    font-size: 13px;
+    margin: 0 0 12px;
+    opacity: 0.75;
+}

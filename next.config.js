@@ -17,16 +17,6 @@ const withMDX = nextMDX({
 });
 
 export default withMDX({
-    redirects: async () => {
-        return [
-            // There is no blog index page — send crawlers and users home instead of a 404
-            {
-                source: '/blog',
-                destination: '/',
-                permanent: false,
-            },
-        ];
-    },
     rewrites: async () => {
         return [
             {

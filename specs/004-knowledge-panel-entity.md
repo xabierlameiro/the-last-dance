@@ -1,7 +1,10 @@
 # SDD-004: "Xabier Lameiro" as a Google entity (Knowledge Panel + photo)
 
 - **Goal**: searching "Xabier Lameiro" shows a Knowledge Panel with photo, like a public figure.
-- **Status**: long-horizon program. The on-site part can start now (depends on SDD-002 D4).
+- **Status**: on-site workstream A implemented 2026-07-17 (canonical name, ProfilePage at
+  /about, enriched Person with `@id`, headshot at /xabier-lameiro.png, X added to sameAs).
+  Workstreams B (Wikidata + external corroboration) and C (demand + measurement) are
+  off-site, owner-driven, and remain open.
 - **Expectation setting**: Knowledge Panels are generated from Google's Knowledge Graph.
   They cannot be requested or bought; structured data alone does not create one. Google must
   be able to *reconcile* the entity across independent sources. Realistic horizon:

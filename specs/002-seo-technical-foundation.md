@@ -1,6 +1,6 @@
 # SDD-002: Technical SEO foundation + Search Console anomalies
 
-- **Status**: Decisions D1–D5 proposed, awaiting owner sign-off
+- **Status**: Implemented (D1–D5) on `fix/sdd-001-header-widgets`, 2026-07-17 — see notes at the end
 - **Data**: GSC API (`sc-domain:xabierlameiro.com`), pulled 2026-07-17
 
 ## Search Console findings (last 90 days)
@@ -65,3 +65,23 @@
 - Rich Results Test: Article + Breadcrumb valid on posts; exactly one Person/WebSite node on home.
 - Follow-up GSC review (`compare_search_periods`) 4 weeks after deploy: junk-URL impressions → 0,
   main-domain CTR trending up.
+
+## Implementation notes (2026-07-17)
+
+- D1: `<meta name="robots" content="noindex">` now injected into every generated report
+  (coverage via custom-reporter.js, e2e via custom-report.js, Lighthouse reports via
+  lighthouse.js; docs and Storybook already had it). **Owner follow-ups that cannot be done
+  from this repo**: add `X-Robots-Tag: noindex` per subdomain Vercel project, trigger a
+  redeploy of each report project, then file GSC removal requests for `coverage.`,
+  `performance.` and `e2e.` URLs.
+- D2: sitemap now emits 72 URLs (was 42): home/about/contact ×3 locales, blog hub ×3,
+  4 category hubs ×3, legal ×9, 39 posts with `<lastmod>` from their publication date.
+  **Owner follow-up**: resubmit the sitemap in GSC after the production deploy.
+- D3: `/blog` hub and `/blog/[category]` pages shipped (crawlable Dialog UI, localized
+  en/es/gl); the `/blog → /` redirect was removed. Verified with `next build` + `next start`.
+- D4: single Person (`#person`) + WebSite (`#website`) JSON-LD in `_document`; home copies
+  removed; Article JSON-LD references the author by `@id` and adds `mainEntityOfPage`;
+  BreadcrumbList on posts. Verified: exactly one `"@type":"Person"` in served home HTML.
+- D5: posts emit `og:type=article`, `article:published_time` and `article:section`; the
+  `/legal/[slug]` canonical no longer renders the literal bracket placeholder (bug found
+  during implementation — SEO now accepts `meta.url` for dynamic non-blog routes).
