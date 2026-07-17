@@ -29,6 +29,27 @@
 (SDD-002 + phases below), not as a goal that drives engineering. The same work serves
 SEO, the Knowledge Panel program (SDD-004) and monetization optionality.
 
+### D1 resolution (2026-07-17)
+
+Owner asked whether a better passive-income channel than AdSense exists (lifetime AdSense
+earnings so far: ~€7). Researched against current network requirements:
+
+| Channel | Entry requirement | Verdict at current traffic |
+| ------- | ----------------- | -------------------------- |
+| EthicalAds (dev-focused) | ~50k pageviews/month, technical audience | Out of reach for now |
+| Carbon Ads | Invite-only, no public minimums | Out of reach for now |
+| Monumetric | ~10k pageviews/month (+ setup fee) | Out of reach for now |
+| Mediavine / Raptive | 50k sessions / 100k pageviews per month | Far out of reach |
+| Affiliates (hosting, tools, Amazon) | No minimum; needs purchase-intent content | Viable, ~passive once written |
+| GitHub Sponsors / Buy Me a Coffee | None | Viable today, zero maintenance |
+
+**Decision**: no ad network beats AdSense at this traffic level — the bottleneck is
+audience, not the network. Plan: (1) keep AdSense as the display channel and re-request
+after the content phase; (2) add zero-maintenance channels now: GitHub Sponsors link +
+a support link on /about, and affiliate links only where they fit naturally in posts;
+(3) revisit networks at milestones — Monumetric at 10k pageviews/month, EthicalAds at
+50k (better fit and RPM for a developer audience than AdSense).
+
 ## Plan (if D1 = pursue)
 
 - **Phase 0 — hygiene** (shared with SDD-002 D1/D2/D3): de-index subdomains, blog hub +
