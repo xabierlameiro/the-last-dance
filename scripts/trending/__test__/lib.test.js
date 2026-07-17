@@ -1,4 +1,12 @@
-import { matchKeywords, recencyFactor, scoreItem, normalize, dedupeByUrl, buildReport } from '../lib.js';
+import {
+    matchKeywords,
+    recencyFactor,
+    scoreItem,
+    normalize,
+    dedupeByUrl,
+    buildReport,
+    isDiscussionWorthy,
+} from '../lib.js';
 
 const NOW = Date.parse('2026-07-17T12:00:00Z');
 
@@ -82,6 +90,39 @@ describe('trending radar lib', () => {
             ],
         });
         expect(github[0]).toMatchObject({ source: 'GitHub (new repos)', popularity: 42, tags: 'mcp' });
+    });
+
+    it('keeps engaged issues and drops triage noise (isDiscussionWorthy)', () => {
+        expect(isDiscussionWorthy({ comments: 40, reactions: { total_count: 10 } })).toBe(true);
+        expect(isDiscussionWorthy({ comments: 2, reactions: { total_count: 1 } })).toBe(false);
+        expect(isDiscussionWorthy({ comments: 90, labels: [{ name: 'duplicate' }] })).toBe(false);
+        expect(isDiscussionWorthy({ comments: 20, labels: ['bug'] })).toBe(true);
+    });
+
+    it('normalizes GitHub issues, keying recency off updated_at and filtering noise', () => {
+        const issues = normalize.githubIssues({
+            items: [
+                {
+                    title: 'Development high memory usage',
+                    html_url: 'https://github.com/vercel/next.js/issues/1',
+                    repository_url: 'https://api.github.com/repos/vercel/next.js',
+                    comments: 176,
+                    reactions: { total_count: 149 },
+                    created_at: '2022-01-01T00:00:00Z',
+                    updated_at: '2026-07-16T00:00:00Z',
+                    labels: [{ name: 'bug' }],
+                },
+                { title: 'noise', comments: 1, reactions: { total_count: 0 } },
+            ],
+        });
+        expect(issues).toHaveLength(1);
+        expect(issues[0]).toMatchObject({
+            source: 'GitHub issue',
+            title: 'vercel/next.js: Development high memory usage',
+            popularity: 325,
+            createdAt: '2026-07-16T00:00:00Z',
+        });
+        expect(issues[0].tags).toContain('vercel/next.js');
     });
 
     it('dedupes by url keeping the highest score', () => {
