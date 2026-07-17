@@ -45,11 +45,17 @@ const collectors = {
         return batches.flatMap(normalize.reddit);
     },
     github: async () => {
+        // One request per topic: the search API rejects OR between topic qualifiers (422)
         const since = new Date(Date.now() - 14 * 86_400_000).toISOString().slice(0, 10);
-        const json = await fetchJson(
-            `https://api.github.com/search/repositories?q=created:%3E${since}+topic:nextjs+OR+topic:claude+OR+topic:mcp&sort=stars&order=desc&per_page=15`
+        const topics = ['nextjs', 'claude', 'mcp'];
+        const batches = await Promise.all(
+            topics.map((topic) =>
+                fetchJson(
+                    `https://api.github.com/search/repositories?q=created:%3E${since}+topic:${topic}&sort=stars&order=desc&per_page=10`
+                )
+            )
         );
-        return normalize.github(json);
+        return batches.flatMap(normalize.github);
     },
 };
 
