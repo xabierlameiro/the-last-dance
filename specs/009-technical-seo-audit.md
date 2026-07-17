@@ -1,7 +1,29 @@
 # SDD-009: Tag navigation regression + canonical / duplicate-URL audit
 
--   **Status**: **Implemented** (2026-07-17) on branch `fix/sdd-009-tag-navigation` — D1 applied and
-    verified end-to-end (see "Implementation" at the end). Investigation evidence retained below.
+-   **Status**: **Superseded/corrected** (2026-07-18). D1 (a separate `/blog/tag/<tag>` listing page)
+    shipped in PR #128 but the owner rejected it: it took the user OUT of the full-screen blog into a
+    standalone modal. **The intended design is _faceted URLs_** — a post is deliberately reachable at
+    one URL per category/tag it carries (`/blog/nextjs/<slug>` AND `/blog/css/<slug>`), each rendering
+    the post IN the blog, the tag left-nav being a submenu to browse posts; `rel=canonical` (already
+    built from the post's primary category) consolidates them, per Google's faceted-navigation
+    guidance. The only real bug was the 301 (from `137bc25`) bouncing variants out. **Correct fix =
+    remove that 301 and revert the listing page** (branch `fix/tags-faceted-urls`). See "Correction"
+    and "Implementation" below.
+
+## Correction (2026-07-18) — faceted URLs, not a listing page
+
+The redirect/listing-page instinct treated *intentional* faceted duplicate URLs as *accidental*
+duplicates to eliminate — the opposite of the design. Google's guidance: for faceted URLs you want
+crawlable, point `rel=canonical` at the unfiltered (primary-category) URL and keep the sitemap and
+canonical consistent (the sitemap already emits only canonical URLs). A 301 is a *destructive*
+canonicalization that removes the variant instead of consolidating it. The fix reverts every code
+change from PR #128 (the `/blog/tag/[tag]` page, `getPostsByLocaleAndTag`, `blog.tag.*` i18n keys,
+the NavList membership rewrite) back to the original in-blog behaviour, and additionally removes the
+301. Verified: `/blog/npm/<slug>` and `/blog/css/dark-theme` render the post in-blog (200) with the
+tag selected and `rel=canonical` → the primary-category URL; `/blog/tag/npm` now 404s; suite 49/100
+green.
+Sources: [Google faceted navigation](https://developers.google.com/search/docs/crawling-indexing/crawling-managing-faceted-navigation),
+[consolidate duplicate URLs](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls).
 -   **Data**: code audit of this repo + GSC API (`sc-domain:xabierlameiro.com`, live URL
     inspection, pulled 2026-07-17).
 -   **Related**: [002](002-seo-technical-foundation.md) (canonical/blog-hub work that introduced
