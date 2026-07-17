@@ -3,7 +3,7 @@ title: 'Despregar o meu Storybook de compoñentes é moi sinxelo'
 slug: 'despregar-storybook-facilmente'
 author: 'Xabier Lameiro'
 category: 'React'
-tags: ['storybook']
+tags: ['storybook', 'react', 'ci']
 locale: 'gl'
 excerpt: 'Implementación de compoñentes de React con Storybook: un xeito sinxelo de mostrar o teu traballo. Buscas un xeito sinxelo de mostrar os teus compoñentes de React e compartilos?'
 description: 'Desprega o teu Storybook como sitio estático para que calquera poida ver os teus compoñentes React en liña: o comando de build, onde aloxalo e como integralo en CI. Paso a paso.'
@@ -13,26 +13,22 @@ alternate:
         { lang: 'en', url: 'deploying-my-storybook-is-very-simple' },
         { lang: 'es', url: 'desplegar-storybook-facilmente' },
     ]
+faq:
+    - question: 'Como desprego Storybook?'
+      answer: 'Executa storybook build para xerar un sitio estático en storybook-static/, e serve esa carpeta desde calquera host estático — Vercel, Netlify ou GitHub Pages. En Vercel pon o comando de build en npm run build-storybook e o directorio de saída en storybook-static.'
+    - question: 'Onde deixa os ficheiros storybook build?'
+      answer: 'Na carpeta storybook-static/ por defecto. Esa carpeta é un sitio estático que podes aloxar en calquera sitio.'
 ---
 
-# Mostrar o meu storybook é moi sinxelo
+# Despregar o meu Storybook é moi sinxelo
 
 <Date date="01-04-2023" />
 
 <GoogleAdsense />
 
-Unha vez que creas os teus compoñentes do Storybook, podes compartilos de varias maneiras. Podes implementar Storybook en Vercel, GitHub ou Netlify ou Heroku e compartir o URL co teu equipo e clientes potenciais.
-Tamén podes crear unha versión estática do Storybook e implementala nun servidor web. Isto permíteche ter unha versión do Storybook que está sempre en liña e actualizada.
+Unha vez que os teus compoñentes viven en Storybook, podes convertelo nun **sitio estático** e aloxalo onde queiras, para que o teu equipo, os teus clientes ou ti mesmo no futuro poidades navegar a libraría de compoñentes en liña — sempre actualizada. Este é o fluxo completo: o comando de build, unha historia real, e como despregalo en Vercel, Netlify ou GitHub Pages.
 
-Storybook é fácil de configurar e xestionar. Necesitarás Node.js e algunhas dependencias de desenvolvemento instaladas para configurar o teu propio ambiente. Tamén podes usar generator-storybook para comezar a crear rapidamente un ficheiro de configuración de Storybook.
-
-Unha vez que configures o teu Storybook, podes comezar a escribir historias para os teus compoñentes. Unha historia é esencialmente unha breve explicación de como se usará o teu compoñente na aplicación. Podes escribir historias para os compoñentes que xa tes
-creado e tamén calquera compoñente no que esteas a traballar. Storybook tamén che permite crear variacións do teu compoñente, isto é útil para as probas A/B.
-
-Implementar compoñentes de React con Storybook é unha boa forma de mostrar o teu traballo e garantir que os teus compoñentes estean libres de erros. Permítelle crear guías de estilo en directo para os seus compoñentes e ofrece unha caixa de probas para probalos.
-Configurar Storybook pode parecer desalentador, pero é doado se segues a documentación. Unha vez que o teñas configurado, podes comezar a crear historias e variacións dos teus compoñentes e compartilas co teu equipo e clientes potenciais.
-
-## 1. Comandos do storybook
+## 1. Comandos de Storybook
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 ```javascript package.json
@@ -43,7 +39,11 @@ Configurar Storybook pode parecer desalentador, pero é doado se segues a docume
 ```
 </CH.Code>
 
-## 2. Fai un historial dos teus compoñentes
+`storybook build` xera un sitio estático en `storybook-static/` — esa carpeta é o que despregas.
+
+## 2. Escribe unha historia para un compoñente
+
+Unha historia é un único estado renderizado dun compoñente. Mantén un ficheiro `.stories.tsx` xunto a cada compoñente:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -77,22 +77,26 @@ Primary.args = {
 
 </CH.Code>
 
-## 3. Implementación do Storybook
-
-As cousas máis importantes son o comando de compilación, o directorio de saída e o comando de instalación. (fío, npm ou o que sexa) para as dependencias.
+## 3. Constrúe o sitio estático
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
 ```bash
-
-yard build-storybook
-
-./storybook-static
-
-yarn i || npm i || npx i
-
+npm run build-storybook   # ou: yarn build-storybook
+# → xera o sitio en ./storybook-static
+npx serve storybook-static  # opcional: prevísao en local primeiro
 ```
 
 </CH.Code>
+
+## 4. Desprega a carpeta `storybook-static`
+
+Apunta calquera host estático a esa carpeta:
+
+-   **Vercel:** importa o repo, pon o **Build command** en `npm run build-storybook` e o **Output directory** en `storybook-static`.
+-   **Netlify:** o mesmo comando de build, **Publish directory** `storybook-static`.
+-   **GitHub Pages:** publica `storybook-static/` desde unha GitHub Action (`@storybook/storybook-deployer`, ou os oficiais `upload-pages-artifact` + `deploy-pages`).
+
+Así é exactamente como se constrúe o exemplo de abaixo en cada push e se serve desde un subdominio.
 
 > Aquí podes ver o exemplo do meu Storybook despregado nun subdominio: [https://storybook.xabierlameiro.com](https://storybook.xabierlameiro.com 'Enlace a storybook.xabierlameiro.com')
