@@ -42,3 +42,7 @@
 - [ ] `@code-hike/mdx` replaced (e.g. `rehype-pretty-code`/shiki) or validated on Turbopack;
       `lint` script migrated off `next lint`
 - [ ] SDD-002/003 shipped and re-indexation confirmed in GSC
+
+> Note: the local unmerged branch `feat/quality-refactor` (2026-07-11) already re-enables the
+> build gates and modernizes Jest — merging it satisfies the first and third preconditions.
+> That merge is the recommended first move regardless of this upgrade decision.
