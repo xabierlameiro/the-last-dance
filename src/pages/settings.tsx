@@ -63,7 +63,7 @@ const Content = ({ lang, toggleLang }: { lang: boolean; toggleLang: () => void }
             <div className={styles.content}>
                 <Avatar
                     img="/settings/avatar.png"
-                    name="Xabier Lameiro Cardama"
+                    name="Xabier Lameiro"
                     alt={f({ id: 'settings.avatar' })}
                     description={f({ id: 'settings.desc' })}
                 />
@@ -103,11 +103,11 @@ const Settings = () => {
                     description: f({ id: 'settings.seo.description' }),
                 }}
             />
-            <Dialog 
-                modalMode 
-                open 
-                body={<Content lang={lang} toggleLang={toggleLang} />} 
-                header={<Header lang={lang} toggleLang={toggleLang} />} 
+            <Dialog
+                modalMode
+                open
+                body={<Content lang={lang} toggleLang={toggleLang} />}
+                header={<Header lang={lang} toggleLang={toggleLang} />}
             />
         </>
     );

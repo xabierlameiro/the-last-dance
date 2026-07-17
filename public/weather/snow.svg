@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Snow">
+  <g fill="#B0BEC5">
+    <circle cx="24" cy="24" r="9"/>
+    <circle cx="37" cy="21" r="11"/>
+    <rect x="15" y="24" width="34" height="10" rx="5"/>
+  </g>
+  <g fill="#E1F5FE" stroke="#81D4FA" stroke-width="1">
+    <circle cx="22" cy="46" r="3"/>
+    <circle cx="34" cy="52" r="3"/>
+    <circle cx="44" cy="44" r="3"/>
+  </g>
+</svg>

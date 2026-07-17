@@ -20,6 +20,7 @@ const News = ({ city }: WeatherProps) => {
     const handleMouseLeave = React.useRef<(() => void) | null>(null);
     const { data, error } = useNews(city);
     const { formatMessage: f } = useIntl();
+    const items = data?.news?.filter((item) => item.title && item.link) ?? [];
 
     React.useEffect(() => {
         let interval = setInverval(ref);
@@ -49,7 +50,8 @@ const News = ({ city }: WeatherProps) => {
                 onMouseEnter={handleMouseEnter.current || undefined}
                 onMouseLeave={handleMouseLeave.current || undefined}
             >
-                {data?.news?.map((news) => (
+                {items.length === 0 && <p className={styles.empty}>{f({ id: 'news.empty' })}</p>}
+                {items.map((news) => (
                     <a
                         href={news.link}
                         target="_blank"

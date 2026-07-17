@@ -52,10 +52,11 @@ function useTooltip({
 
     const hover = useHover(context, {
         move: false,
-        enabled: controlledOpen === null,
+        // == null: uncontrolled usage passes undefined, and strict === null kept these disabled
+        enabled: controlledOpen == null,
     });
     const focus = useFocus(context, {
-        enabled: controlledOpen === null,
+        enabled: controlledOpen == null,
     });
     const dismiss = useDismiss(context);
     const role = useRole(context, { role: 'tooltip' });

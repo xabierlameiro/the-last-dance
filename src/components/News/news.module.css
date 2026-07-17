@@ -59,3 +59,10 @@
     transition: all 1s ease-in;
     overflow: hidden;
 }
+
+.empty {
+    margin: 0;
+    padding: 4px 8px;
+    font-size: 12px;
+    opacity: 0.7;
+}

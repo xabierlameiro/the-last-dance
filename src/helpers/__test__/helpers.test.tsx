@@ -5,13 +5,13 @@ describe('clx', () => {
         expect(clx()).toBe('');
         expect(clx('')).toBe('');
     });
-    
+
     it('Should return class name', () => {
         expect(clx('a')).toBe('a');
         expect(clx('a', 'b')).toBe('a b');
         expect(clx('a', 'b', 'c')).toBe('a b c');
     });
-    
+
     it('Should return class name with condition', () => {
         const conditionTrue = true;
         const conditionFalse = false;

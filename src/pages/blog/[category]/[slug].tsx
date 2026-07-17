@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote';
 import { useDialog } from '@/context/dialog';
 import Dialog from '@/components/Dialog';
@@ -8,7 +9,7 @@ import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCatego
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
 import { createSiteMap } from '@/helpers/fileWritter';
-import { defaultLocale } from '@/constants/site';
+import { author, defaultLocale } from '@/constants/site';
 import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
@@ -34,6 +35,8 @@ type Props = {
             readTime: string;
             tags: string[];
             categories: string[];
+            author?: string;
+            date?: string | null;
         };
         content: {
             compiledSource: string;
@@ -83,10 +86,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                 modalMode={isMobile}
                 open={open}
                 body={
-                    <div
-                        className={clx(styles.container, sideClass)}
-                        onTouchStart={onSideShiftLeft}
-                    >
+                    <div className={clx(styles.container, sideClass)} onTouchStart={onSideShiftLeft}>
                         <nav className={styles.nav} onTouchStart={onSideShiftRight}>
                             <ControlButtons onClickClose={close} onClickMinimise={close} />
                             <div className={styles.navListContainer}>
@@ -114,6 +114,11 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                             <ArticlePanel readTime={post.meta.readTime} />
                             <div className={styles.body}>
                                 <div className={styles.mdx}>
+                                    {/* E-E-A-T byline (SDD-003): author linked to the entity page */}
+                                    <p className={styles.byline}>
+                                        <Link href="/about">{post.meta.author ?? author}</Link>
+                                        {post.meta.date ? ` · ${post.meta.date}` : ''}
+                                    </p>
                                     <MDXRemote
                                         frontmatter={undefined}
                                         {...post.content}
@@ -191,28 +196,39 @@ export const getStaticProps = async (data: {
 };
 
 export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
-    const posts = await getAllPosts();
+    type PathPost = {
+        meta: {
+            category: string;
+            slug: string;
+            locale: string;
+            date: string | null;
+        };
+    };
+    const posts = getAllPosts();
 
-    const categories = posts.map(
-        (post: {
-            meta: {
-                category: string;
-                slug: string;
-                locale: string;
-            };
-        }) => ({
+    const categories = posts.map((post: PathPost) => ({
+        params: {
+            category: post.meta.category.toLowerCase(),
+            slug: post.meta.slug,
+        },
+        locale: post.meta.locale,
+    }));
+
+    // Only canonical (category) URLs are prerendered and submitted in the sitemap.
+    // Tag-based URLs resolve on demand via fallback: 'blocking' and rely on the
+    // SEO rel=canonical to consolidate the duplicate content.
+    // The date travels separately from `paths` — Next.js rejects extra keys there.
+    createSiteMap(
+        posts.map((post: PathPost) => ({
             params: {
                 category: post.meta.category.toLowerCase(),
                 slug: post.meta.slug,
             },
             locale: post.meta.locale,
-        })
+            date: post.meta.date,
+        })),
+        locales
     );
-
-    // Only canonical (category) URLs are prerendered and submitted in the sitemap.
-    // Tag-based URLs resolve on demand via fallback: 'blocking' and rely on the
-    // SEO rel=canonical to consolidate the duplicate content.
-    createSiteMap(categories, locales);
 
     return {
         paths: categories,

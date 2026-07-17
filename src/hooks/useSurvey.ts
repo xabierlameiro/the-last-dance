@@ -1,11 +1,6 @@
 import { useRouter } from 'next/router';
 import { useMemo, useReducer } from 'react';
-import {
-    buildSurveyQuestions,
-    sanitizeSurveyName,
-    DEFAULT_SURVEY_NAME,
-    type Question,
-} from '@/constants/survey';
+import { buildSurveyQuestions, sanitizeSurveyName, DEFAULT_SURVEY_NAME, type Question } from '@/constants/survey';
 
 interface Answer {
     question: string;

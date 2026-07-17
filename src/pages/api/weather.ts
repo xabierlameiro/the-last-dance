@@ -54,6 +54,31 @@ const WEATHER_CODE_TEXT: Record<number, string> = {
     99: 'Thunderstorm with heavy hail',
 };
 
+// WMO weather-code → local icon under public/weather/ (SDD-001: no remote image hosts involved).
+const WEATHER_CODE_ICON: Record<number, string> = {
+    0: 'sun',
+    1: 'sun',
+    2: 'partly-cloudy',
+    3: 'cloud',
+    45: 'fog',
+    48: 'fog',
+    51: 'drizzle',
+    53: 'drizzle',
+    55: 'drizzle',
+    61: 'rain',
+    63: 'rain',
+    65: 'rain',
+    71: 'snow',
+    73: 'snow',
+    75: 'snow',
+    80: 'showers',
+    81: 'showers',
+    82: 'showers',
+    95: 'storm',
+    96: 'storm',
+    99: 'storm',
+};
+
 const emptyWeather = (city: string): WeatherData => ({
     city,
     name: null,
@@ -115,7 +140,9 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
         precipitation: `${current.precipitation} mm`,
         humidity: `${current.relative_humidity_2m}%`,
         windSpeed: `${Math.round(current.wind_speed_10m)} km/h`,
-        imageUrl: undefined,
+        imageUrl: WEATHER_CODE_ICON[current.weather_code]
+            ? `/weather/${WEATHER_CODE_ICON[current.weather_code]}.svg`
+            : undefined,
     };
 };
 
@@ -126,10 +153,7 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
  * @returns Promise<void>
  * @example http://localhost:3000/api/weather?cities=Madrid,Barcelona
  */
-export default allowCors(async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<WeatherResponse>
-) {
+export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse<WeatherResponse>) {
     // Only allow GET requests
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -144,27 +168,29 @@ export default allowCors(async function handler(
     }
 
     // Validate cities format and length
-    const citiesArray = String(cities).split(',').map(city => city.trim()).filter(Boolean);
-    
+    const citiesArray = String(cities)
+        .split(',')
+        .map((city) => city.trim())
+        .filter(Boolean);
+
     if (citiesArray.length === 0) {
         return res.status(400).json({ error: 'At least one city must be provided' });
     }
-    
+
     if (citiesArray.length > 5) {
         return res.status(400).json({ error: 'Maximum 5 cities allowed' });
     }
 
     // Validate each city name (basic validation)
-    const invalidCities = citiesArray.filter(city => 
-        !city || city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s+-]+$/.test(city)
+    const invalidCities = citiesArray.filter(
+        (city) => !city || city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s+-]+$/.test(city)
     );
-    
+
     if (invalidCities.length > 0) {
         return res.status(400).json({ error: `Invalid city names: ${invalidCities.join(', ')}` });
     }
 
     try {
-
         await Promise.allSettled(citiesArray.map((city) => getWeatherData(city)))
             .then((raw) => {
                 const results = raw

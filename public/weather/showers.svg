@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Rain showers">
+  <g fill="#78909C">
+    <circle cx="24" cy="24" r="9"/>
+    <circle cx="37" cy="21" r="11"/>
+    <rect x="15" y="24" width="34" height="10" rx="5"/>
+  </g>
+  <g stroke="#29B6F6" stroke-width="4" stroke-linecap="round">
+    <line x1="24" y1="42" x2="20" y2="52"/>
+    <line x1="34" y1="42" x2="30" y2="56"/>
+    <line x1="44" y1="42" x2="40" y2="52"/>
+  </g>
+</svg>

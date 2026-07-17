@@ -37,30 +37,29 @@ const Weather = ({ cities, open, handleClose }: { cities: string[]; open?: boole
                 errorTitle={f({ id: 'weather.error' })}
                 loadingTitle={f({ id: 'weather.loading' })}
             >
-                {data
-                    ?.map((city: WeatherData, index: number) => (
-                        <div className={styles.city} key={`${city?.city}-${city?.name}-${index}`}>
-                            <div className={styles.weather}>
-                                <div className={styles.cityName}>{city?.city?.replace(/\+/g, ' ')}</div>
-                                <div className={styles.cityGrade}>{`${city?.grades} ºC | ºF`}</div>
-                                {city?.imageUrl && (
-                                    <Img src={city?.imageUrl} width={70} height={70} alt={city?.name} />
-                                )}
-                                <div className={styles.info}>
-                                    <div className={styles.cityPrecipitation}>
-                                        {f({ id: 'weather.precipitation' }, { precipitation: city?.precipitation })}
-                                    </div>
-                                    <div className={styles.cityHumidity}>
-                                        {f({ id: 'weather.humidity' }, { humidity: city?.humidity })}
-                                    </div>
-                                        <div className={styles.cityWindSpeed}>
-                                            {f({ id: 'weather.windSpeed' }, { windSpeed: city?.windSpeed })}
-                                        </div>
-                                    </div>
+                {data?.map((city: WeatherData, index: number) => (
+                    <div className={styles.city} key={`${city?.city}-${city?.name}-${index}`}>
+                        <div className={styles.weather}>
+                            <div className={styles.cityName}>{city?.city?.replace(/\+/g, ' ')}</div>
+                            <div className={styles.cityGrade}>{`${city?.grades} ºC | ºF`}</div>
+                            {city?.imageUrl && (
+                                <Img src={city?.imageUrl} width={70} height={70} alt={city?.name} unoptimized />
+                            )}
+                            <div className={styles.info}>
+                                <div className={styles.cityPrecipitation}>
+                                    {f({ id: 'weather.precipitation' }, { precipitation: city?.precipitation })}
                                 </div>
-                                {city?.city && <News city={city.city} />}
+                                <div className={styles.cityHumidity}>
+                                    {f({ id: 'weather.humidity' }, { humidity: city?.humidity })}
+                                </div>
+                                <div className={styles.cityWindSpeed}>
+                                    {f({ id: 'weather.windSpeed' }, { windSpeed: city?.windSpeed })}
+                                </div>
                             </div>
-                        ))}
+                        </div>
+                        {city?.city && <News city={city.city} />}
+                    </div>
+                ))}
             </RenderManager>
         </Container>
     );

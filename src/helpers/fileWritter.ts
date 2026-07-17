@@ -6,47 +6,61 @@ import prettier from 'prettier';
 
 const PUBLIC_DIR = path.join(process.cwd(), 'public');
 
+type SitemapRoute = {
+    locale: string;
+    date?: string | null;
+    params: {
+        category: string;
+        slug: string;
+    };
+};
+
+const urlEntry = (loc: string, lastmod?: string | null) => `
+    <url>
+        <loc>${loc}</loc>
+        ${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}
+    </url>
+`;
+
 /**
- * @description - Function to create sitemap.xml file
+ * @description - Function to create sitemap.xml file: blog posts (with lastmod
+ * from their publication date), blog hub + category hubs, legal pages and the
+ * top-level pages, for every locale (SDD-002 D2).
  *
  * @example
  *     createSiteMap(routes, locales);
  *
- * @param {Array} routes - Array of routes
+ * @param {Array} routes - Array of blog post routes (locale, optional date, category/slug params)
  * @param {Array} locales - Array of locales
  * @returns {void}
  */
-export const createSiteMap = (
-    routes: {
-        locale: string;
-        params: {
-            category: string;
-            slug: string;
-        };
-    }[],
-    locales: string[]
-) => {
-    const sitemap = routes.reduce(
-        (
-            acc: string[],
-            path: {
-                locale: string;
-                params: {
-                    category: string;
-                    slug: string;
-                };
-            }
-        ) => {
-            const { locale, params } = path;
-            const { category, slug } = params;
-            const url = `${process.env.NEXT_PUBLIC_DOMAIN}${
-                locale !== defaultLocale ? `/${locale}` : ''
-            }/blog/${category}/${slug}`;
-            return [...acc, url];
-        },
-        []
+export const createSiteMap = (routes: SitemapRoute[], locales: string[]) => {
+    const domain = process.env.NEXT_PUBLIC_DOMAIN;
+    const localePrefix = (locale: string) => (locale !== defaultLocale ? `/${locale}` : '');
+
+    // Blog posts — lastmod comes from the <Date /> tag embedded in each post
+    const postEntries = routes.map(({ locale, date, params: { category, slug } }) =>
+        urlEntry(`${domain}${localePrefix(locale)}/blog/${category}/${slug}`, date)
     );
 
+    // Blog hub + category hub pages (SDD-002 D3)
+    const categories = [...new Set(routes.map(({ params }) => params.category))];
+    const hubEntries = locales.flatMap((locale) => [
+        urlEntry(`${domain}${localePrefix(locale)}/blog`),
+        ...categories.map((category) => urlEntry(`${domain}${localePrefix(locale)}/blog/${category}`)),
+    ]);
+
+    // Legal pages — previously missing from the sitemap
+    const legalSlugs = fs
+        .readdirSync(path.join(process.cwd(), 'data/legal'))
+        .filter((file) => file.endsWith('.mdx'))
+        .map((file) => file.replace('.mdx', ''));
+    const legalEntries = locales.flatMap((locale) =>
+        legalSlugs.map((slug) => urlEntry(`${domain}${localePrefix(locale)}/legal/${slug}`))
+    );
+
+    // Top-level pages (home, about, contact, …); utility pages stay excluded.
+    // No <lastmod> for evergreen pages: stamping the build date on every URL misleads crawlers
     const pages = fs
         .readdirSync(path.join(process.cwd(), '/src/pages'))
         .filter(
@@ -65,41 +79,15 @@ export const createSiteMap = (
         )
         .map((page) => {
             page = page.replace('.tsx', '');
-            return {
-                url: page === 'index' ? '' : `${page}`,
-            };
+            return page === 'index' ? '' : page;
         });
+    const pageEntries = locales.flatMap((locale) =>
+        pages.map((page) => urlEntry(removeTrailingSlash(`${domain}${localePrefix(locale)}/${page}`)))
+    );
 
-    // No <lastmod>: stamping the build date on every URL misleads crawlers
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
         <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${sitemap
-            .map((url: string) => {
-                return `
-                    <url>
-                        <loc>${url}</loc>
-                    </url>
-                `;
-            })
-            .join('')}
-        ${locales
-            .map((locale: string) => {
-                return pages
-                    .map((page: { url: string }) => {
-                        return `
-                        <url>
-                            <loc>${removeTrailingSlash(
-                                locale === defaultLocale
-                                    ? `${process.env.NEXT_PUBLIC_DOMAIN}/${page.url}`
-                                    : `${process.env.NEXT_PUBLIC_DOMAIN}/${locale}/${page.url}`
-                            )}</loc>
-                        </url>
-                    `;
-                    })
-                    .join('');
-            })
-            .join('')}
-
+        ${[...pageEntries, ...hubEntries, ...postEntries, ...legalEntries].join('')}
         </urlset>
     `;
 

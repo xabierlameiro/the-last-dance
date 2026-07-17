@@ -3,18 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import jsdom from 'jsdom';
 import allowCors from '../../helpers/cors';
 
-/**
- * @description Get weather data for a city
- * @param city {string}
- * @returns Promise<{city: string, news: {title: string, description: string, link: string, published: string}[]}>
- * @example getWeatherData('London')
- * @example getWeatherData('Madrid')
- */
 interface NewsItem {
-    title: string | null;
-    description: string | null;
-    link: string | undefined;
-    published: string | null;
+    title: string;
+    description: string;
+    link: string;
+    published: string;
 }
 
 interface NewsData {
@@ -24,40 +17,55 @@ interface NewsData {
 
 type NewsResponse = NewsData | { error: string };
 
-const getWeatherData = async (city: string): Promise<NewsData | null> => {
-    const { JSDOM } = jsdom;
+const MAX_NEWS_ITEMS = 10;
 
-    const response = await fetch(`https://www.google.com/search?q=${city}&tbm=nws&tbs=sbd:1`, {
-        method: 'GET',
-        headers: {
-            authority: 'www.google.com',
-            'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
-            'cache-control': 'no-cache',
-            'user-agent':
-                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
-            'access-control-allow-origin': '*',
-        },
+/**
+ * @description Get the latest news for a city from the Google News RSS feed.
+ * Replaces the old Google SERP scraper (hardcoded CSS selectors) that was
+ * blocked by bot detection and silently returned an empty list (SDD-001).
+ *
+ * @param city {string} - City as sent by the UI, e.g. "limerick+ireland"
+ * @returns Promise<NewsData>
+ * @example getCityNews('limerick+ireland')
+ */
+const getCityNews = async (city: string): Promise<NewsData> => {
+    const query = city.replace(/\+/g, ' ').trim();
+
+    const url = new URL('https://news.google.com/rss/search');
+    url.searchParams.set('q', query);
+    url.searchParams.set('hl', 'en-US');
+    url.searchParams.set('gl', 'US');
+    url.searchParams.set('ceid', 'US:en');
+
+    const response = await fetch(url.toString(), {
+        headers: { accept: 'application/rss+xml, application/xml, text/xml' },
         redirect: 'follow',
     });
+    if (!response.ok) {
+        throw new Error(`News RSS HTTP error! status: ${response.status}`);
+    }
+
     const raw = await response.text();
-    const dom = new JSDOM(raw);
-    const elements = dom.window.document.querySelectorAll('.SoaBEf');
+    const { JSDOM } = jsdom;
+    const document = new JSDOM(raw, { contentType: 'text/xml' }).window.document;
 
-    if (!elements) return null;
+    const news = Array.from(document.querySelectorAll('item'))
+        .slice(0, MAX_NEWS_ITEMS)
+        .map((item) => {
+            const pubDate = item.querySelector('pubDate')?.textContent?.trim() ?? '';
+            const parsedDate = pubDate ? new Date(pubDate) : null;
+            return {
+                title: item.querySelector('title')?.textContent?.trim() ?? '',
+                // The RSS <description> just repeats the headline as HTML; the outlet name is more useful
+                description: item.querySelector('source')?.textContent?.trim() ?? '',
+                link: item.querySelector('link')?.textContent?.trim() ?? '',
+                published:
+                    parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate.toISOString().slice(0, 10) : pubDate,
+            };
+        })
+        .filter((item) => item.title && item.link);
 
-    const news = Array.from(elements).map((element) => {
-        return {
-            title: element.querySelector('[role="heading"]')?.textContent || null,
-            description: element.querySelector('.GI74Re.nDgy9d')?.textContent || null,
-            link: element.querySelector('a')?.href || '',
-            published: element.querySelector('.OSrXXb.ZE0LJd.YsWzw')?.textContent || null,
-        };
-    });
-
-    return {
-        city,
-        news,
-    };
+    return { city, news };
 };
 
 /**
@@ -68,10 +76,7 @@ const getWeatherData = async (city: string): Promise<NewsData | null> => {
  * @returns Promise<void>
  * @example http://localhost:3000/api/news?city=London
  */
-export default allowCors(async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<NewsResponse>
-) {
+export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse<NewsResponse>) {
     // Only allow GET requests
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -85,18 +90,13 @@ export default allowCors(async function handler(
         return res.status(400).json({ error: 'City parameter is required and must be a string' });
     }
 
-    // Validate city format
-    if (city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s-]+$/.test(city)) {
+    // Validate city format — '+' is allowed because the UI sends "city+region" pairs
+    if (city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s+-]+$/.test(city)) {
         return res.status(400).json({ error: 'Invalid city name format' });
     }
 
     try {
-        const data = await getWeatherData(city);
-
-        if (!data || !data.city || !data.news) {
-            return res.status(500).json({ error: 'Error getting weather data' });
-        }
-
+        const data = await getCityNews(city);
         res.status(200).json(data);
     } catch (error) {
         console.error('News API Error:', error);
