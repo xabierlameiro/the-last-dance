@@ -204,7 +204,7 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
             date: string | null;
         };
     };
-    const posts = await getAllPosts();
+    const posts = getAllPosts();
 
     const categories = posts.map((post: PathPost) => ({
         params: {

@@ -96,7 +96,7 @@ export const getStaticProps = async ({ params, locale }: { params: { category: s
 };
 
 export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
-    const posts = await getAllPosts();
+    const posts = getAllPosts();
     const categories = [...new Set(posts.map((post) => post.meta.category.toLowerCase()))];
 
     return {
