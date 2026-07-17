@@ -49,7 +49,7 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
     const title = meta?.title;
     const author = meta?.author || auth;
     const description = meta?.description;
-    const image = meta?.image ?? '/profile.png';
+    const image = meta?.image ?? '/og-home.jpg';
     const imageUrl = `${process.env.NEXT_PUBLIC_DOMAIN}${image.startsWith('/') ? '' : '/'}${image}`;
     const date = meta?.date;
     // For blog posts, the English version is either the current page or listed in the alternates

@@ -13,7 +13,6 @@ const Document = (props: Props) => {
                 <meta charSet="utf-8" />
                 <meta name="theme-color" content="#FFF" />
                 <meta property="og:site_name" content={author} />
-                <meta property="og:image:type" content="image/png" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@xlameirodev" />
                 <meta name="twitter:creator" content="@xlameirodev" />
@@ -51,7 +50,9 @@ const Document = (props: Props) => {
                             email: 'mailto:xabier.lameiro@gmail.com',
                             image: {
                                 '@type': 'ImageObject',
-                                url: `${process.env.NEXT_PUBLIC_DOMAIN}/xabier-lameiro.png`,
+                                url: `${process.env.NEXT_PUBLIC_DOMAIN}/xabier-lameiro.jpg`,
+                                width: 1000,
+                                height: 1000,
                                 caption: author,
                             },
                             jobTitle: 'Software Architect',

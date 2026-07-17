@@ -53,7 +53,7 @@ const About = () => {
                         <h1>{f({ id: 'about.title' })}</h1>
                         <Img
                             className={styles.headshot}
-                            src="/xabier-lameiro.png"
+                            src="/xabier-lameiro.jpg"
                             width={160}
                             height={160}
                             alt={author}
