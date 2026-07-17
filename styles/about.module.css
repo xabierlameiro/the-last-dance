@@ -19,6 +19,9 @@
 
 .headshot {
     border-radius: 50%;
+    /* Source is already square; cover guards against distortion if the asset ever changes */
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
 }
 
 .list {
