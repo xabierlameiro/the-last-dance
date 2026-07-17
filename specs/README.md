@@ -17,6 +17,9 @@ live-site inspection (browser + prod API probes), and code audit of this repo.
 
 All code lives on branch `fix/sdd-001-header-widgets` (specs + implementation).
 
+> Note: [001-quality-refactor.md](001-quality-refactor.md) is the earlier quality-refactor
+> spec shipped separately in PR #122 — it predates this numbering and is kept as-is.
+
 ## Key metrics baseline (90 days, 2026-04-18 → 2026-07-17)
 
 -   Clicks: **36** · Impressions: **9,385** · CTR: **0.38%** · Avg. position: **11.4**
