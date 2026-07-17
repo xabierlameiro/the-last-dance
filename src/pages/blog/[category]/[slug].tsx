@@ -9,7 +9,7 @@ import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCatego
 import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
 import { createSiteMap } from '@/helpers/fileWritter';
-import { author, defaultLocale } from '@/constants/site';
+import { author } from '@/constants/site';
 import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
@@ -96,7 +96,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                     category={category}
                                     isCategory
                                 />
-                                <NavList title={f({ id: 'blog.tags' })} list={tags} category={post.meta.tags} />
+                                <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
                             <aside className={styles.navAd}>
                                 <GoogleAdsense slot="2616692922" />
@@ -161,21 +161,12 @@ export const getStaticProps = async (data: {
         };
     }
 
-    // Safety net for legacy/external `/blog/<tag>/<slug>` post URLs that Google still holds:
-    // any non-canonical category segment 301s to the post's canonical category URL (SDD-009).
-    // On-site tag navigation no longer points here — tags link to `/blog/tag/<tag>` listings.
-    const canonicalCategory = post.meta.category.toLowerCase();
-    if (category !== canonicalCategory) {
-        const localePrefix = locale === defaultLocale ? '' : `/${locale}`;
-        return {
-            redirect: {
-                destination: `${localePrefix}/blog/${canonicalCategory}/${post.meta.slug}`,
-                permanent: true,
-            },
-            revalidate: 10,
-        };
-    }
-
+    // Faceted URLs: a post is intentionally reachable at one URL per category/tag it
+    // carries (/blog/nextjs/<slug> AND /blog/css/<slug>). Each renders the post inside
+    // the full-screen blog so the tag submenu keeps navigating between posts — no redirect.
+    // The SEO <link rel="canonical"> (built from the post's primary category) consolidates
+    // these duplicates for search engines, per Google's faceted-navigation guidance. A 301
+    // here used to bounce tag clicks out of the blog, which broke tag navigation (SDD-009).
     const mdxSource = await serialize(post.content);
     const { categories, tags } = await getAllCategories(locale);
     const posts = await getPostsByLocaleAndCategory(locale, category);
