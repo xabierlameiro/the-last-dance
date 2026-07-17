@@ -1,6 +1,6 @@
 # SDD-001: Header widgets & weather panel fixes
 
-- **Status**: Ready to implement — no open decisions
+- **Status**: Implemented on `fix/sdd-001-header-widgets` (2026-07-17) — see acceptance notes below
 - **Evidence**: 2026-07-17 — code audit + live-site DOM inspection + prod API probes
 
 ## Problems and root causes
@@ -35,6 +35,11 @@ Verified live on 2026-07-17: the ✕ are **not** broken images — the panel con
 component once per city. `/api/news` scrapes `google.com/search?tbm=nws` with hardcoded
 CSS class selectors (`.SoaBEf`, `.GI74Re`, …); in production it returns
 `{"city":"limerick","news":[]}` — the scraper is dead (bot detection + volatile markup).
+
+Found during implementation: there is a second, earlier failure — the UI passes
+`"city+region"` values (e.g. `limerick+ireland`) and the route's validation regex rejected
+`'+'` → HTTP 400 → the client rendered the error glyph before the scraper even ran.
+The fix must allow `'+'` and normalize it to a space for the news query.
 
 **Options**:
 
@@ -71,3 +76,19 @@ Additionally the client must treat `news: []` as an *empty state*, not an error.
   an empty state is shown — no red error glyphs.
 - `/api/news` returns items in production; `/api/indexed-pages` returns 200 with a number.
 - No remaining SerpApi references in API routes or CSP.
+
+## Implementation notes (2026-07-17)
+
+- Tooltip: `== null` fix + focus-open regression test. Verified live on `next dev`:
+  hovering the clock renders the tooltip ("Click above for weather and news updates").
+- Weather: WMO code → `public/weather/*.svg` (9 local icons); `<Img … unoptimized>` because
+  next/image refuses to optimize SVG without `dangerouslyAllowSVG`. Covered by
+  `src/__tests__/api/weather.test.ts`.
+- News: Google News RSS + `'+'` accepted in validation; outlet name used as description;
+  empty feed → localized empty state (`news.empty` en/es/gl). Covered by
+  `src/__tests__/api/news.test.ts`.
+- Indexed pages: Search Console API (same service account env as /api/analytics) with
+  sitemap-count fallback — local run without credentials returns `{"num":42}` (was HTTP 503).
+- Test suite: 47/47 suites, 87/87 tests green; `tsc --noEmit` 0 errors.
+- Pending in production: verify news items and Search Console counts once deployed with
+  real network/credentials (blocked locally by the sandboxed environment).

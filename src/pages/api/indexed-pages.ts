@@ -1,98 +1,82 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import fs from 'fs';
+import path from 'path';
+import { google } from 'googleapis';
 import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
 
+const SITE_URL = 'sc-domain:xabierlameiro.com';
+
 /**
- * @description Get the number of indexed pages using SerpAPI (more reliable than scraping)
- * Falls back to a reasonable estimate if API fails
+ * @description Count the pages Google surfaced for the site in the last 28 days,
+ * using the Search Console API with the same service account as /api/analytics.
+ * Replaces the old SerpAPI/Google-scraping approach that 503'd in production (SDD-001).
  *
- * @returns {Promise<{ num: string } | { error: string } | void>}
+ * @returns {Promise<number | null>} - Page count, or null when credentials are missing
  */
-export default allowCors(async function handler(
-    _req: NextApiRequest,
-    res: NextApiResponse
-): Promise<{ num: string } | { error: string } | void> {
+const countFromSearchConsole = async (): Promise<number | null> => {
+    if (!process.env.ANALYTICS_CLIENT_EMAIL || !process.env.ANALYTICS_PRIVATE_KEY) {
+        return null;
+    }
+
+    const auth = new google.auth.GoogleAuth({
+        credentials: {
+            client_email: process.env.ANALYTICS_CLIENT_EMAIL,
+            private_key: process.env.ANALYTICS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        },
+        scopes: 'https://www.googleapis.com/auth/webmasters.readonly',
+    });
+
+    const webmasters = google.webmasters({ version: 'v3', auth });
+
+    const toDay = (date: Date) => date.toISOString().slice(0, 10);
+    const end = new Date();
+    const start = new Date(end.getTime() - 28 * 24 * 60 * 60 * 1000);
+
+    const response = await webmasters.searchanalytics.query({
+        siteUrl: SITE_URL,
+        requestBody: {
+            startDate: toDay(start),
+            endDate: toDay(end),
+            dimensions: ['page'],
+            rowLimit: 25000,
+        },
+    });
+
+    return response.data.rows?.length ?? 0;
+};
+
+/**
+ * @description Fallback when Search Console is unavailable: count the URLs we
+ * publish in the sitemap instead of fabricating a number.
+ *
+ * @returns {number} - Number of <loc> entries in public/sitemap.xml
+ */
+const countFromSitemap = (): number => {
+    const sitemap = fs.readFileSync(path.join(process.cwd(), 'public', 'sitemap.xml'), 'utf8');
+    return sitemap.match(/<loc>/g)?.length ?? 0;
+};
+
+/**
+ * @description Get the number of pages indexed/surfaced by Google
+ * @param _req {NextApiRequest}
+ * @param res {NextApiResponse}
+ * @returns Promise<void>
+ * @example http://localhost:3000/api/indexed-pages
+ */
+export default allowCors(async function handler(_req: NextApiRequest, res: NextApiResponse) {
     try {
-        // Try to use SerpAPI if available, otherwise use a fallback method
-        const serpApiKey = process.env.SERP_API_KEY;
-        
-        if (serpApiKey) {
-            const response = await fetch(
-                `https://serpapi.com/search?q=site%3Axabierlameiro.com&api_key=${serpApiKey}&num=1`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                    },
-                }
-            );
-
-            if (response.ok) {
-                const data = await response.json();
-                const resultsCount = data.search_information?.total_results;
-                
-                if (resultsCount) {
-                    res.status(200).json({ num: resultsCount });
-                    return;
-                }
-            }
+        const num = await countFromSearchConsole();
+        if (num !== null && num > 0) {
+            return res.status(200).json({ num });
         }
-
-        // Fallback: Try a simple fetch with better headers and parsing
-        const response = await fetch('https://www.google.com/search?q=site%3Axabierlameiro.com&num=1', {
-            method: 'GET',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'DNT': '1',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'none',
-                'Cache-Control': 'no-cache',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(`Google search failed: ${response.status}`);
-        }
-
-        const text = await response.text();
-        
-        // Try multiple patterns to extract the count
-        const patterns = [
-            /About ([\d,]+) results/i,
-            /([\d,]+) results/i,
-            /約 ([\d,]+) 件/i,
-            /Approximately ([\d,]+) results/i,
-        ];
-
-        let num = 0;
-        for (const pattern of patterns) {
-            const match = text.match(pattern);
-            if (match) {
-                num = parseInt(match[1].replace(/,/g, ''), 10);
-                break;
-            }
-        }
-
-        // If we couldn't parse anything, provide a reasonable fallback
-        if (num === 0) {
-            // Based on the blog structure and pages, estimate around 100+ pages
-            num = 127; // Reasonable estimate based on the project structure
-        }
-
-        res.status(200).json({ num });
     } catch (err) {
-        if (process.env.NODE_ENV === 'development') {
-            console.error('Indexed pages API Error:', err);
-        }
-        
-        // Provide a fallback number instead of erroring completely
-        const fallbackNum = 127; // Based on visible project structure
-        res.status(200).json({ num: fallbackNum });
+        console.error(`Search Console count failed, falling back to sitemap: ${err}`);
+    }
+
+    try {
+        return res.status(200).json({ num: countFromSitemap() });
+    } catch {
+        return res.status(500).json({ error: 'Unable to count indexed pages' });
     }
 });

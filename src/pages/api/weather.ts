@@ -54,6 +54,31 @@ const WEATHER_CODE_TEXT: Record<number, string> = {
     99: 'Thunderstorm with heavy hail',
 };
 
+// WMO weather-code → local icon under public/weather/ (SDD-001: no remote image hosts involved).
+const WEATHER_CODE_ICON: Record<number, string> = {
+    0: 'sun',
+    1: 'sun',
+    2: 'partly-cloudy',
+    3: 'cloud',
+    45: 'fog',
+    48: 'fog',
+    51: 'drizzle',
+    53: 'drizzle',
+    55: 'drizzle',
+    61: 'rain',
+    63: 'rain',
+    65: 'rain',
+    71: 'snow',
+    73: 'snow',
+    75: 'snow',
+    80: 'showers',
+    81: 'showers',
+    82: 'showers',
+    95: 'storm',
+    96: 'storm',
+    99: 'storm',
+};
+
 const emptyWeather = (city: string): WeatherData => ({
     city,
     name: null,
@@ -115,7 +140,9 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
         precipitation: `${current.precipitation} mm`,
         humidity: `${current.relative_humidity_2m}%`,
         windSpeed: `${Math.round(current.wind_speed_10m)} km/h`,
-        imageUrl: undefined,
+        imageUrl: WEATHER_CODE_ICON[current.weather_code]
+            ? `/weather/${WEATHER_CODE_ICON[current.weather_code]}.svg`
+            : undefined,
     };
 };
 

@@ -9,3 +9,9 @@ process.env.NEXT_PUBLIC_ENV = 'test';
 
 // Suppress console.warn for cleaner test output
 global.console.warn = jest.fn();
+
+// jsdom (the npm package, used by API routes) needs TextEncoder/TextDecoder,
+// which the jest-environment-jsdom sandbox does not provide
+const { TextEncoder, TextDecoder } = require('util');
+global.TextEncoder = global.TextEncoder || TextEncoder;
+global.TextDecoder = global.TextDecoder || TextDecoder;

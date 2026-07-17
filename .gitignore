@@ -45,3 +45,5 @@ storybook-static/
 
 migration/node_modules
 migration/.next
+# lean-ctx tool artifacts
+.lean-ctx/
