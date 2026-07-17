@@ -3,7 +3,7 @@ title: 'Solución ao erro "Failed to replace env in config: $\{NPM_TOKEN}" en np
 slug: 'npm-token-solucion-erro'
 author: 'Xabier Lameiro'
 category: 'Error'
-tags: ['npm']
+tags: ['npm', 'yarn', 'ci']
 locale: 'gl'
 excerpt: 'Como evitar perder duas horas da túa vida por un erro de NPM, que non deixa executar comandos de yarn ou npm. Este erro producíase cando se intentaba executar un comando de yarn ou npm e aparecía o seguinte erro: Failed to replace env in config: ${NPM_TOKEN}'
 description: 'Como arranxar nun minuto o erro de npm/yarn "Failed to replace env in config: ${NPM_TOKEN}": define a variable de contorno que espera o teu .npmrc ou elimina a entrada obsoleta.'
@@ -14,6 +14,10 @@ faq:
       answer: 'Un ficheiro .npmrc referencia a variable de contorno NPM_TOKEN pero non está definida na túa shell, así que npm ou yarn non poden expandila e abortan o comando.'
     - question: 'Como se arranxa "Failed to replace env in config"?'
       answer: 'Define a variable que falta (export NPM_TOKEN=o_teu_token) ou localiza o .npmrc que a referencia — na raíz do proxecto ou no teu cartafol de usuario — e elimina a entrada obsoleta. Executar a instalación con --verbose mostra que ficheiros .npmrc se están a ler.'
+    - question: 'Onde busca npm os ficheiros .npmrc?'
+      answer: 'Nesta orde: o cartafol do proxecto, logo o teu directorio de usuario (~/.npmrc), logo o prefixo global e por último a configuración interna de npm. Os valores combínanse e gaña o ficheiro máis próximo, así que unha entrada obsoleta no teu .npmrc de usuario pode romper todos os proxectos.'
+    - question: 'Por que só falla en CI?'
+      answer: 'O .npmrc referencia ${NPM_TOKEN} pero o traballo de CI nunca recibiu ese segredo no seu contorno. Exponno como variable de contorno no paso que executa a instalación (por exemplo NPM_TOKEN: ${{ secrets.NPM_TOKEN }} en GitHub Actions).'
 ---
 
 # Posible solución para NPM - Failed to replace env in config: $\{NPM_TOKEN}
@@ -26,13 +30,11 @@ faq:
 
 npm ou yarn atoparon un ficheiro `.npmrc` que referencia unha variable de contorno (`NPM_TOKEN`) que non está definida na túa shell, así que non poden expandila. Exporta a variable (`export NPM_TOKEN=o_teu_token`) ou localiza o `.npmrc` que a referencia — na raíz do proxecto ou no teu cartafol de usuario — e elimina a entrada obsoleta. Executa a instalación con `--verbose` para ver exactamente que ficheiros `.npmrc` se están a ler.
 
-Neste breve post vou ensinar unha solución para o erro `Failed to replace env in config: ${NPM_TOKEN}` que se produce cando se tenta executar un comando de yarn ou npm.
+O propio texto do erro dío: `Failed to replace env in config: ${NPM_TOKEN}`. npm está avisándote de que tentou substituír un marcador `${...}` e non había nada co que enchelo.
 
-Pode ser que nalgún momento atopáchesche con este erro ao tentar executar un comando de yarn ou npm. No meu caso foi
-por que publique unha das miñas librerias en github e para poder instalala desde github, necesitaba un token.
-Este token xérase en github e se garda nas variables de contorna do sistema.
+## Por que pasa
 
-Pero é necesario crear un arquivo .npmrc na raiz do proxecto e engadir o seguinte contido:
+Para instalar un paquete privado do rexistro de GitHub apuntas npm a ese rexistro e dáslle un token. O token vive nunha variable de contorno para que nunca acabe no repositorio, e o `.npmrc` referéncialo polo seu nome:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -43,10 +45,29 @@ Pero é necesario crear un arquivo .npmrc na raiz do proxecto e engadir o seguin
 
 </CH.Code>
 
-O que pode ocorrer é que deixes est arquivo fóra do cartafol do proyeccto e gárdelo no cartafol de usuario,
-por exemplo no meu caso gardeino no cartafol `C:\Users\xabierlameiro\.npmrc` e por iso dábame o erro.
+Cando executas `npm install` ou `yarn`, npm le ese ficheiro e expande cada `${VAR}` contra o teu contorno actual. Se `NPM_TOKEN` non está definida nesa shell, non pode substituír o marcador e aborta: ese é o erro exacto.
 
-Para solucionalo, o que fixen foi:
+## Os ficheiros .npmrc que npm le de verdade
+
+Esta é a parte que converte un arranxo dun minuto nun de dúas horas. npm non le un único `.npmrc`; combina varios, e gaña o máis próximo. Por orde de precedencia:
+
+1. Proxecto: `./.npmrc`
+2. Usuario: `~/.npmrc` (en Windows, `C:\Users\<ti>\.npmrc`)
+3. Global: `$PREFIX/etc/npmrc`
+4. Configuración interna de npm
+
+Así que unha liña que engadiches hai meses ao teu `.npmrc` de **usuario** aplícase a **todos** os proxectos que instalas, mesmo os que non teñen nin idea de que é `NPM_TOKEN`. Esa é a razón habitual de que o erro apareza nun repo que nunca configuraches para o rexistro de GitHub.
+
+## Causas habituais, ordenadas
+
+- A variable non está realmente definida na shell desde a que lanzaches o comando.
+- O `.npmrc` está no teu cartafol de usuario, non no proxecto, e cólase en instalacións que non teñen nada que ver. Este foi o meu caso: gardárao en `C:\Users\xabierlameiro\.npmrc`, e todos os proxectos herdaban a referencia a `${NPM_TOKEN}`.
+- A variable está definida nunha aplicación gráfica ou noutra pestana de terminal que non herdou o export.
+- En CI, o segredo existe pero nunca se expuxo ao contorno do paso.
+
+## Como o arranxei
+
+Primeiro lancei a instalación en modo verbose para ver que ficheiros estaba a ler npm:
 
 <CH.Code style={{maxWidth: 'max-content', height:'max-content', margin: '20px 0'}}>
 
@@ -56,8 +77,51 @@ yarn install --verbose
 
 </CH.Code>
 
-Ensinoume os roteiros onde estaba a buscar o arquivo .npmrc e deime conta que o estaba usando desde no cartafol de usuario.
+O log lista as rutas onde busca o `.npmrc`, e aí vin que estaba collendo a configuración do meu cartafol de usuario. **_Elimineino_** do cartafol de usuario e volvino a crear na raíz do proxecto, e o erro desapareceu.
 
-**_Elimineino_** do cartafol de usuario e volvino a crear na raiz do proxecto e xa non me daba o erro.
+Se en cambio queres o token dispoñible en todas partes, defínea en vez de quitar a referencia:
 
-> Espero que se vos pasa o mesmo, sírvavos de axuda.
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+export NPM_TOKEN=o_teu_token   # macOS / Linux
+setx NPM_TOKEN o_teu_token     # Windows, só shells novas
+```
+
+</CH.Code>
+
+`npm config ls -l` imprime a configuración combinada completa, que é a forma máis rápida de confirmar se o token se colleu.
+
+## Como arranxalo en CI
+
+O sitio onde máis morde isto é a integración continua, porque o runner é unha máquina nova sen ningún dos teus exports locais. A solución é entregar o segredo ao paso como variable de contorno, co mesmo nome `NPM_TOKEN` que espera o `.npmrc`. En GitHub Actions:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```yaml workflow.yml
+- name: Install dependencies
+  env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  run: npm install --legacy-peer-deps
+```
+
+</CH.Code>
+
+Se xeras o `.npmrc` no runner en vez de subilo ao repo, escribe a liña de autenticación directamente no ficheiro de usuario antes de instalar:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```bash
+echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+echo "@o-teu-scope:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+```
+
+</CH.Code>
+
+A idea é a mesma en calquera provedor de CI: a referencia do `.npmrc` e a variable de contorno teñen que coincidir no nome, e o valor ten que chegar ao proceso que executa a instalación.
+
+## Mantén o token fóra de git
+
+Unha última cousa, porque é un fallo que vexo a miúdo. O `.npmrc` que referencia `${NPM_TOKEN}` pódese subir sen problema: só contén o *nome* da variable, non o seu valor. O que nunca debe chegar a git é un `.npmrc` co token literal pegado (`_authToken=ghp_...`). Se o fixeches, o token queda comprometido no momento en que se sobe — revócao e rótao en GitHub, non abonda con borrar o ficheiro, porque o historial de git consérvao. A regra: un `.npmrc` que só referencia variables de contorno pódese subir e ata axuda aos teus compañeiros; un con segredos reais vai ao `.gitignore` e, mellor aínda, non debería existir.
+
+> Xa pase en local ou nun pipeline, a pregunta é sempre a mesma: ten a shell que executa npm realmente `NPM_TOKEN`, e está a ler o `.npmrc` que cres? Responde a esas dúas e o erro desaparece.
