@@ -1,4 +1,5 @@
 import { remarkCodeHike } from '@code-hike/mdx';
+import remarkGfm from 'remark-gfm';
 import theme from 'shiki/themes/one-dark-pro.json' with { type: 'json' };
 import { serialize as sz } from 'next-mdx-remote/serialize';
 import path from 'path';
@@ -27,7 +28,10 @@ export const serializePath = (route: string, fileName: string) => {
         blockJS: false,
         blockDangerousJS: true,
         mdxOptions: {
-            remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
+            // GFM tables/autolinks are not CommonMark — without remark-gfm the pipes
+            // render as plain text. singleTilde off so "~1M"-style approximations in
+            // prose can never pair up into accidental strikethrough.
+            remarkPlugins: [[remarkGfm, { singleTilde: false }], [remarkCodeHike, { autoImport: false, theme }]],
             useDynamicImport: true,
         },
     });
@@ -50,7 +54,8 @@ export const serialize = (mdx: string) =>
         blockJS: false,
         blockDangerousJS: true,
         mdxOptions: {
-            remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
+            // See serializePath: GFM support with singleTilde disabled.
+            remarkPlugins: [[remarkGfm, { singleTilde: false }], [remarkCodeHike, { autoImport: false, theme }]],
             useDynamicImport: true,
         },
     });
