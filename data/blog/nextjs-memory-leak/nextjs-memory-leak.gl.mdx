@@ -1,0 +1,150 @@
+---
+title: 'Como atopar unha fuga de memoria de Next.js en produción'
+slug: 'fuga-de-memoria-nextjs-en-producion'
+author: 'Xabier Lameiro'
+category: 'Nextjs'
+tags: ['nextjs', 'memory-leak', 'node', 'performance']
+locale: 'gl'
+updated: '2026-07-18'
+excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
+description: 'Tres fugas de memoria abertas en Next.js 15.5–16.3, como identificar a túa con heap snapshots e por que en serverless a fuga se disfraza dun 504.'
+image: '/posts/nextjs-memory-leak.png'
+alternate:
+    [
+        { lang: 'en', url: 'nextjs-memory-leak-in-production' },
+        { lang: 'es', url: 'fuga-de-memoria-nextjs-en-produccion' },
+    ]
+faq:
+    - question: 'Por que a memoria do meu servidor Next.js non para de medrar?'
+      answer: 'A xullo de 2026 hai tres fugas abertas no propio framework (Next.js 15.5–16.3): a caché LRU do router non contabiliza as súas chaves (issue 94890), a árbore RSC queda retida por request cando o cliente corta o stream (issue 94919) e os timeouts do middleware quedan retidos polo sandbox (issue 95094). Antes de auditar o teu código, compara a curva de heap coas URLs únicas, o tráfico total e as rutas concretas: cada fuga ten unha forma distinta.'
+    - question: 'Como fago un heap snapshot de Next.js en produción?'
+      answer: 'Arranca o servidor con NODE_OPTIONS=--inspect, conecta Chrome DevTools ao porto do inspector e toma dous snapshots separados por tráfico na pestana Memory; a vista Comparison e os retainers din que obxecto medra e quen o suxeita. Para a build, next build --experimental-debug-memory-usage volca snapshots automaticamente e responde ao sinal SIGUSR2.'
+    - question: 'Serve --max-old-space-size para arranxar unha fuga de memoria?'
+      answer: 'Non. Subir o límite do heap só dá marxe: convén dimensionar o heap ao contedor para evitar OOM prematuros, pero un crecemento monótono acabará chocando igual contra o novo límite. É un paliativo mentres localizas a retención real con snapshots.'
+    - question: 'Afectan estas fugas a Vercel ou a outro serverless?'
+      answer: 'Poucas veces como OOM: as instancias recíclanse antes de acumular días de heap. En serverless o mesmo malgasto aparece como latencia, custo e erros 504 FUNCTION_INVOCATION_TIMEOUT. No meu blog, un loader O(N²) tardaba 32 segundos en renderizar unha páxina fronte ao límite duns 10 da función; o arranxo foi cachear o corpus a nivel de módulo.'
+---
+
+# Como atopar unha fuga de memoria de Next.js en produción
+
+<Date date="07-18-2026" />
+
+<GoogleAdsense />
+
+## Resposta rápida
+
+Se o teu servidor Next.js autoaloxado medra en memoria ata morrer con `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — ou o contedor cae con `OOMKilled` (exit code 137) — non empeces auditando o teu código. A xullo de 2026 hai tres fugas de memoria documentadas e **abertas no propio framework**, de Next.js 15.5 a 16.3:
+
+-   **A caché LRU do router non contabiliza as súas chaves** ([#94890](https://github.com/vercel/next.js/issues/94890)): deriva lenta durante días, proporcional ás URLs únicas que recibes, non ao teu tráfico.
+-   **A árbore RSC queda retida por request** ([#94919](https://github.com/vercel/next.js/issues/94919)): medra co tráfico, moito peor en Node 22/24 e cando o cliente corta a conexión a medio stream.
+-   **Os `setTimeout` do middleware quedan rexistrados para sempre** ([#95094](https://github.com/vercel/next.js/issues/95094)): crecemento a chanzos ligado ao tráfico que atravesa o middleware.
+
+En serverless (Vercel) case nunca o verás como OOM: a instancia recíclase antes. Alí o mesmo problema de fondo asoma como un `504 FUNCTION_INVOCATION_TIMEOUT` — pasoume neste blog e máis abaixo están os meus números.
+
+## A forma do crecemento diche onde mirar
+
+Antes de tocar nada, grafica `process.memoryUsage()` (ou a métrica equivalente do teu APM) durante horas ou días: `heapUsed`, `rss` e `external`. Se `external` se mantén plano mentres `heapUsed` sobe, o retido vive no heap de V8, non en memoria nativa — exactamente a firma coa que o autor de #94890 acoutou o seu caso tras sete días de métricas (+154 MB de heap medio, sen reinicios, en 3 hosts á vez).
+
+Coa curva diante, compáraa con tres cousas: o número de **URLs únicas** servidas, o **tráfico total** e as **rutas concretas**. Cada fuga ten unha forma distinta:
+
+| Forma do crecemento                              | Correlaciona con                   | Sospeitoso                       |
+| ------------------------------------------------ | ---------------------------------- | -------------------------------- |
+| Deriva lenta e monótona durante días             | URLs únicas (bots, slugs longos)   | Caché LRU do router (#94890)     |
+| Proporcional ao tráfico; peor en páxinas pesadas | Payload RSC e aborts do cliente    | Retención da árbore RSC (#94919) |
+| Chanzos que o GC nunca recupera                  | Requests que pasan polo middleware | Timeouts do sandbox (#95094)     |
+| Sen OOM, pero 504 esporádicos en serverless      | Custo de render, non memoria       | O teu render é caro (o meu caso) |
+
+Para confirmar o diagnóstico, toma dous heap snapshots separados por un anaco de carga e compáraos na pestana Memory de Chrome DevTools, mirando os _retainers_ do que medra. A [guía oficial de memoria de Next.js](https://nextjs.org/docs/app/guides/memory-usage) documenta como expoñer o inspector:
+
+```bash
+NODE_OPTIONS='--inspect' next start
+```
+
+Para fugas da _build_ (non do runtime), esa mesma guía engade `next build --experimental-debug-memory-usage`, que imprime estatísticas de heap e GC e volca un snapshot ao recibir o sinal `SIGUSR2`.
+
+Os nomes que aparezan como retedores son o diagnóstico: `LRUNode` apunta á fuga 1, `reactServerStream` e obxectos Flight á 2, e o `TimeoutsManager` do sandbox á 3.
+
+## Fuga 1: a caché LRU do router non conta as súas chaves
+
+O router de Next.js mantén unha caché LRU de resolución de rutas (`getItemsLru`, en `packages/next/src/server/lib/router-utils/filesystem.ts`) con `maxSize = 1024 * 1024`. O problema, segundo documenta #94890: a función de tamaño só suma os strings do _valor_ (`fsPath`, `itemPath`, `type`) e conta `1` para as entradas negativas — **a URL que fai de chave non se contabiliza nunca**, aínda que adoita ser o custo dominante de cada entrada.
+
+O resultado é unha caché que se cre diminuta mentres retén ata ~1.048.576 chaves cos seus strings completos: centos de MB nun proceso que leva días levantado. O autor do issue mediuno en produción (Next 15.5.x autoaloxado, e verificou que o comportamento persiste en 16.2.9 e canary): +154 MB de heap medio nunha semana, coa memoria externa plana e o crecemento seguindo a **cardinalidade de URLs únicas**, non o volume de requests. A súa traza de retedores acababa sempre en `LRUNode`.
+
+De aí a pista non obvia: se sospeitas desta fuga, non grafiques o heap contra as requests por segundo — grafícao contra as **rutas distintas** servidas. Os bots que rastrexan URLs con colas infinitas de parámetros e os slugs longos de i18n son o amplificador perfecto.
+
+A regresión vén da migración a unha LRU propia (a función de tamaño perdeu o parámetro `key` que si tiña na v14), e o fix proposto no issue é restauralo. Mentres chega, o que podes facer:
+
+-   Reducir a cardinalidade que chega ao router: normaliza ou corta no proxy/CDN as URLs lixo de bots antes de que Next as resolva.
+-   Vixiar o heap contra URLs únicas e asumir unha cadencia de reinicio se o teu proceso vive semanas.
+
+## Fuga 2: a árbore RSC queda retida cando o cliente corta
+
+No App Router, #94919 documenta que baixo tráfico sostido o heap medra de forma monótona, non se recupera tras o GC e acaba en `OOMKilled`. O disparador forte son os **streams que non rematan con normalidade**: clientes que se desconectan a metade de resposta (redes móbiles, crawlers, usuarios que navegan a outra páxina). Na súa repro, doce roldas de carga con aborts duplican o `heapUsed` (46 → 92 MB) e case triplican o RSS, mentres que a mesma carga lida ata o final volve limpa á liña base.
+
+Dous datos do informe que axudan a recoñecela:
+
+-   É **moito máis forte en Node 22/24** ca en Node 20 (polo cambio a AsyncContextFrame en AsyncLocalStorage).
+-   Na súa app de produción a magnitude escala co tamaño da árbore RSC serializada: as páxinas pesadas de listaxe fugaban ~2 MB por request; as lixeiras, nada.
+
+O diff de snapshots do autor mostra que queda suxeito: o stream RSC (`reactServerStream`), retido vía `AbortController` e o `cacheController` da request de Flight, que á súa vez suxeita a árbore de elementos completa; ademais de contextos de compresión zlib e listeners de socket por request.
+
+Mentres o issue segue aberto, as mitigacións razoables: recorta o payload RSC das túas páxinas máis pesadas (pagina as listaxes longas — boa idea de todos os xeitos), e se autoaloxas cun server custom en Node 22/24, ten presente que o reporter observou a fuga bastante máis débil en Node 20 ao comparar.
+
+## Fuga 3: os `setTimeout` do middleware que o sandbox non solta
+
+O middleware corre nun sandbox cuxo `TimeoutsManager` (introducido para poder desmontar contextos vellos do Edge runtime en dev, PR #57235) rexistra cada id de `setTimeout`. Segundo #95094, ese rexistro só se libera se o teu código chama explicitamente a `clearTimeout(id)` ou se se desmonta o contexto enteiro — **un timeout que completa con normalidade deixa o seu id retido para sempre**. Nun servidor standalone de vida longa, cada request que atravesa un middleware con timeouts "fire and forget" suma retención: crecemento a chanzos ata o OOM. Reportado sobre next 16.3.0-canary.50.
+
+A parte útil: a vía de escape existe e está na túa man. Se o teu middleware programa timeouts dun só uso, libera o id ti mesmo ao rematar:
+
+```ts
+// middleware.ts — mentres chega o fix: libera o id explicitamente,
+// a retirada do TimeoutsManager só ocorre con clearTimeout(id)
+const timeoutId = setTimeout(() => {
+    fireAndForgetWork();
+    clearTimeout(timeoutId);
+}, 0);
+```
+
+Chamar a `clearTimeout` sobre un timeout xa executado é inocuo para Node, e saca o id do xestor do sandbox.
+
+## En serverless a fuga disfrázase de 504: o meu caso
+
+Nada disto me pillou nun servidor de vida longa: pilloume en Vercel, e non como OOM senón como `504 FUNCTION_INVOCATION_TIMEOUT` ao navegar as páxinas de etiquetas deste mesmo blog, en xullo de 2026.
+
+A causa non era unha fuga senón malgasto algorítmico, que en serverless doe igual: o meu loader de posts parseaba **todo** o corpus MDX para resolver un só slug, `getAllPosts` chamábao por cada slug (O(N²)) e `getAllCategories` repetía iso por cada categoría e etiqueta (O(C·N²)): unhas 18.000 lecturas e parses de disco por páxina. As URLs de etiqueta renderízanse baixo demanda (`fallback: 'blocking'`) dentro dunha función serverless, e un render de ~32 segundos contra un límite duns ~10 é un 504 garantido. Ao perfilar, só `getAllCategories` tardaba entre 3,9 e 11,2 segundos; a serialización MDX, o meu primeiro sospeitoso, resultou ser un red herring de 94 ms.
+
+O arranxo foi gastar memoria **a propósito**: ler e parsear o corpus unha única vez por instancia, nunha caché a nivel de módulo:
+
+```ts
+// src/helpers/fileReader.ts — o corpus é estático por deploy: parsear UNHA vez
+let corpusCache: ParsedPost[] | null = null;
+
+const loadCorpus = (): ParsedPost[] => {
+    if (corpusCache && process.env.NODE_ENV === 'production') {
+        return corpusCache;
+    }
+    corpusCache = findMdxFiles(POST_PATH).map(buildPost);
+    return corpusCache;
+};
+```
+
+Os números medidos antes e despois, neste repo:
+
+|                                   | Antes         | Despois   |
+| --------------------------------- | ------------- | --------- |
+| `next build`                      | ~17,5 min     | 34 s      |
+| Prerender por páxina de post      | ~32.000 ms    | ~1.600 ms |
+| Render baixo demanda dunha faceta | 504 (timeout) | ~134 ms   |
+
+A moralexa que conecta coas tres fugas de arriba: **serverless non te libra dos problemas de memoria — transfórmaos**. O reciclado de instancias esconde a retención acumulativa, pero calquera malgasto por request reaparece como latencia, custo e timeouts. E unha caché a nivel de módulo é memoria por instancia que escolles gastar: acoutada e estática por deploy é un arranxo; sen límite e medrando co tráfico sería a fuga 4.
+
+## É Next.js ou é o teu código?
+
+A miña checklist despois desta viaxe:
+
+1. **Mira os retedores, non os presentimentos.** `LRUNode`, `reactServerStream` ou o `TimeoutsManager` do sandbox na traza → é unha das tres fugas do framework; súmate ao issue cos teus datos. Closures e estruturas dos teus módulos → é teu.
+2. **Correlaciona antes de culpar.** Heap que segue as URLs únicas → fuga 1. Heap que segue o tráfico e os aborts → fuga 2. Chanzos con middleware → fuga 3. Unha ruta concreta que dispara a curva → case seguro o teu código.
+3. **`--max-old-space-size` non arranxa nada** — dimensiona o heap ao teu contedor para non morrer antes de tempo, pero unha pendente monótona acabará chocando contra calquera límite.
+4. **En serverless, perfila tempo en vez de memoria.** Se ves 504, busca o traballo cuadrático ou repetido por request; o meu caso enteiro está no punto anterior.
+
+As versións citadas son as dos informes (Next 15.5.11–16.3.0-canary.50, Node 20/22/24, xullo de 2026); se les isto meses despois, revisa os tres issues ligados — con sorte, algún estará pechado.

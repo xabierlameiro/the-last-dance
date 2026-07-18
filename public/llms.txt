@@ -27,6 +27,7 @@
 - [Counter for github stars repository](https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository): Build a GitHub stars counter for your site with a Next.js API route and Octokit — cache the GitHub API to dodge rate limits and render a live star count. Full code included.
 - [Dark theme with Nextjs](https://xabierlameiro.com/blog/nextjs/dark-theme): Build a dark theme in Next.js with CSS variables and a theme-toggle event — no flash of the wrong theme and no heavy library. A step-by-step guide with the full code.
 - [Make a views counter with google analytics](https://xabierlameiro.com/blog/nextjs/make-a-views-counter-with-google-analytics): Add a page-views counter to your Next.js blog using the Google Analytics Data API (BetaAnalyticsDataClient) behind an API route — auth, the report query and caching explained.
+- [How to find a Next.js memory leak in production](https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production): Three open memory leaks in Next.js 15.5–16.3, how to tell which one you have from heap snapshots, and why on serverless a leak shows up as a 504 timeout.
 - [How to translate URL slugs in a Next.js site](https://xabierlameiro.com/blog/nextjs/translate-slugs-web-pages): Translate your URLs per language for a fully internationalized Next.js site using static MDX pages — map localized slugs, keep canonicals clean, and link locales with hreflang.
 
 ## Blog: React
