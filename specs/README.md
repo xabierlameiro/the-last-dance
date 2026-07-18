@@ -19,6 +19,7 @@ live-site inspection (browser + prod API probes), and code audit of this repo.
 | [010](010-content-audit-opportunity.md)   | Content audit + GSC opportunity map (enrich-first)           | **Investigation** — prioritized action list                 |
 | [011](011-content-engine-editorial.md)    | Content engine: recurring GitHub issues + anti-AI editorial  | **Investigation / design** — extends SDD-006                |
 | [012](012-blog-render-timeout.md)         | Blog navigation timeouts (FUNCTION_INVOCATION_TIMEOUT)       | **Fixed** (2026-07-18) — O(N²) loader cached, 32s→1.6s      |
+| [013](013-llm-visibility-geo.md)          | LLM engine visibility (GEO): llms.txt, IndexNow, freshness   | **Implemented** — owner: register in Bing Webmaster Tools   |
 
 All code lives on branch `fix/sdd-001-header-widgets` (specs + implementation).
 

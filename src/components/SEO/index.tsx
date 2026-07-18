@@ -18,6 +18,7 @@ type Props = {
         slug?: string;
         url?: string;
         date?: string | null;
+        updated?: string | null;
         faq?: Array<{ question: string; answer: string }> | null;
     };
 };
@@ -78,7 +79,7 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                                     url,
                                     inLanguage: l,
                                     ...(image && { image: [imageUrl] }),
-                                    ...(date && { datePublished: date, dateModified: date }),
+                                    ...(date && { datePublished: date, dateModified: meta?.updated ?? date }),
                                     author: [
                                         {
                                             '@type': 'Person',
@@ -194,6 +195,7 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                 <meta name="twitter:title" content={title} />
                 <meta property="og:type" content={isBlog ? 'article' : 'website'} />
                 {isBlog && date && <meta property="article:published_time" content={date} />}
+                {isBlog && meta?.updated && <meta property="article:modified_time" content={meta.updated} />}
                 {isBlog && meta?.category && <meta property="article:section" content={meta.category} />}
                 {noimage && (
                     <>

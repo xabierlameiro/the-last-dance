@@ -1,0 +1,1751 @@
+# Xabier Lameiro — full blog content
+
+> Auto-generated from the site source on build. English versions (canonical URLs).
+
+---
+
+# Fix "Failed to replace env in config: $\{NPM_TOKEN}" in npm and yarn
+
+- URL: https://xabierlameiro.com/blog/error/npm-token-solution-error
+- Author: Xabier Lameiro
+- Category: Error · Tags: npm, yarn, ci
+- Summary: How to fix the npm/yarn error "Failed to replace env in config: ${NPM_TOKEN}" in one minute: define the missing environment variable that your .npmrc expects, or remove the stale entry.
+
+# Possible solution for NPM - Failed to replace env in config: $\{NPM_TOKEN}
+
+Published: 01-03-2023
+
+## Quick answer
+
+npm or yarn found an `.npmrc` file that references an environment variable (`NPM_TOKEN`) that is not defined in your shell, so it cannot expand it. Either export the variable (`export NPM_TOKEN=your_token`), or find the `.npmrc` that references it — in the project root or in your user home directory — and remove the stale entry. Run the install with `--verbose` to see exactly which `.npmrc` files are being read.
+
+The error text itself is the giveaway: `Failed to replace env in config: ${{NPM_TOKEN}`. npm is telling you it tried to substitute an `${...}` placeholder and there was nothing to put in its place.
+
+## Why it happens
+
+To install a private package from the GitHub registry you point npm at that registry and give it a token. The token lives in an environment variable so it never ends up committed, and the `.npmrc` references it by name:
+
+```bash .npmrc
+@xabierlameiro:registry=https://npm.pkg.github.com/
+//npm.pkg.github.com/:_authToken=${NPM_TOKEN}
+```
+
+When you run `npm install` or `yarn`, npm reads that file and expands every `${VAR}` against your current environment. If `NPM_TOKEN` is not set in that shell, it cannot replace the placeholder and aborts — that is the exact error.
+
+## The `.npmrc` files npm actually reads
+
+This is the part that turns a one-minute fix into a two-hour one. npm does not read a single `.npmrc`; it merges several, and the closest one wins. In order of precedence:
+
+1. Project: `./.npmrc`
+2. User: `~/.npmrc` (on Windows, `C:\Users\<you>\.npmrc`)
+3. Global: `$PREFIX/etc/npmrc`
+4. npm's built-in config
+
+So a line you added to your **home** `.npmrc` months ago is applied to **every** project you install, even ones that have no idea what `NPM_TOKEN` is. That is the usual reason the error shows up in a repo you never configured for the GitHub registry.
+
+## Common causes, ranked
+
+- The variable is genuinely not defined in the shell you ran the command from.
+- The `.npmrc` lives in your home folder, not the project — so it leaks into unrelated installs. This was my case: I had saved it in `C:\Users\xabierlameiro\.npmrc`, and every project inherited the `${NPM_TOKEN}` reference.
+- The variable is set in a GUI app or a different terminal tab that did not inherit the export.
+- In CI, the secret exists but was never exposed to the step's environment.
+
+## How I fixed it
+
+First I ran the install in verbose mode to see which files npm was reading:
+
+```bash
+yarn install --verbose
+```
+
+The log lists the paths it checks for `.npmrc`, and that is where I saw it was pulling the config from my user folder. I **_deleted_** it from the user folder and recreated it in the root of the project, and the error was gone.
+
+If you instead want the token available everywhere, define it rather than removing the reference:
+
+```bash
+export NPM_TOKEN=your_token   # macOS / Linux
+setx NPM_TOKEN your_token     # Windows, new shells only
+```
+
+`npm config ls -l` prints the fully merged configuration, which is the fastest way to confirm whether the token was picked up.
+
+## Fixing it in CI
+
+The most common place this bites is continuous integration, because the runner is a fresh machine with none of your local exports. The fix is to hand the secret to the step as an environment variable — the same `NPM_TOKEN` name the `.npmrc` expects. In GitHub Actions:
+
+```yaml workflow.yml
+- name: Install dependencies
+  env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  run: npm install --legacy-peer-deps
+```
+
+If you generate the `.npmrc` on the runner instead of committing it, write the auth line straight into the home file before installing:
+
+```bash
+echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+echo "@your-scope:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+```
+
+Same idea in every CI provider: the `.npmrc` reference and the environment variable have to agree on the name, and the value has to reach the process that runs the install.
+
+## Keep the token out of git
+
+One last thing, because it is a mistake I see often. The `.npmrc` that references `${NPM_TOKEN}` is safe to commit: it holds only the *name* of the variable, not its value. What must never reach git is an `.npmrc` with the literal token pasted in (`_authToken=ghp_...`). If you did that, the token is compromised the moment it is pushed — revoke and rotate it in GitHub, do not just delete the file, because git history keeps it. The rule of thumb: an `.npmrc` that only references env vars is fine to commit and actually helps your teammates; one with real secrets belongs in `.gitignore` and, better, should not exist.
+
+> Whether it happens locally or in a pipeline, the question is always the same: does the shell that runs npm actually have `NPM_TOKEN`, and is it reading the `.npmrc` you think it is? Answer those two and the error disappears.
+
+---
+
+# EADDRINUSE: address already in use — how to free the port
+
+- URL: https://xabierlameiro.com/blog/error/solve-address-in-use-error
+- Author: Xabier Lameiro
+- Category: Error · Tags: node, error, cli
+- Summary: Fix the Node.js error "listen EADDRINUSE: address already in use": find and kill the process holding the port on macOS, Linux and Windows, free it with one command, or just run on another port.
+
+# EADDRINUSE: address already in use — how to free the port
+
+Published: 01-02-2023
+
+## Quick answer
+
+Another process is already listening on the port. Find it and kill it:
+
+-   **macOS / Linux:** `lsof -i :3000` → `kill -9 <PID>`
+-   **Windows:** `netstat -ano | findstr :3000` → `taskkill /PID <pid> /F`
+-   **Any OS, one command:** `npx kill-port 3000`
+
+…or just start your server on a different port. The full error looks like this:
+
+```bash
+MAKINOTE$ yarn start
+yarn run v1.22.19
+$ next start
+Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at Server.setupListenHandle [as _listen2] (node:net:1432:16)
+    at listenInCluster (node:net:1480:12)
+    at doListen (node:net:1629:7)
+    at processTicksAndRejections (node:internal/process/task_queues:84:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+```
+
+## Why it happens
+
+`EADDRINUSE` means the address and port your server wants are already taken. On a dev machine the usual cause is a **previous dev server that did not shut down cleanly** — a crashed process, a detached background job, or a second terminal still running it. Less often another app genuinely owns the port: another service, a Docker container, or a system daemon.
+
+## Free the port on macOS and Linux
+
+Find the process holding the port with `lsof` (on Linux `ss -ltnp` or `fuser 3000/tcp` work too):
+
+```bash
+MAKINOTE$ lsof -i :3000
+COMMAND   PID                 USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+node    38091 xabier.lameirocardam   24u  IPv6 0xee02297dd086ebc1      0t0  TCP *:hbci (LISTEN)
+```
+
+Then terminate it. Try a clean `kill <PID>` first, and fall back to `kill -9 <PID>` only if the process ignores it:
+
+```bash
+MAKINOTE$ kill -9 38091
+```
+
+## Free the port on Windows
+
+List the PID bound to the port, then kill it:
+
+```powershell
+netstat -ano | findstr :3000
+taskkill /PID 38091 /F
+```
+
+## One command on any OS
+
+If you would rather not look up PIDs, `kill-port` does it for you — no install needed:
+
+```bash
+npx kill-port 3000
+```
+
+## Or just use another port
+
+Often the fastest fix is not to fight for the port at all:
+
+```bash
+PORT=3001 npm run dev   # apps that read process.env.PORT
+next dev -p 3001        # Next.js
+```
+
+## Inside Docker
+
+If the server runs in a container, the host port is held by the port mapping, not by a local PID — `lsof` will point at `com.docker`. Stop the container (`docker ps` then `docker stop <id>`) or change the mapping (`-p 3001:3000`).
+
+---
+
+# How to fix Minified React error #425 (hydration mismatch)
+
+- URL: https://xabierlameiro.com/blog/error/uncaught-error-minified-react-error
+- Author: Xabier Lameiro
+- Category: Error · Tags: react, nextjs, hydration, ssr
+- Summary: Fix Minified React error #425 ("Text content does not match server-rendered HTML"): every common cause of a hydration mismatch — dates, random values, locale formatting, browser-only APIs, invalid HTML — and the right fix for each, with Next.js examples.
+
+# How to fix Minified React error #425 (hydration mismatch)
+
+Published: 01-05-2023
+
+## Quick answer
+
+React error #425 — **"Text content does not match server-rendered HTML"** — is a **hydration mismatch**: the server rendered one value and the browser rendered a different one, so React throws away the server markup for that subtree. The fix depends on _why_ they differ:
+
+-   The value legitimately differs (a date, a time) → add `suppressHydrationWarning` (Fix 1).
+-   The value only exists in the browser (`window`, `localStorage`) → render it after mount (Fix 2).
+-   The whole component is client-only → load it with `next/dynamic` and `ssr: false` (Fix 3).
+-   Your HTML is invalid (a `<div>` inside a `<p>`) → fix the nesting (Fix 4).
+
+The full production error reads: `Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.`
+
+## What "Minified React error #425" actually means
+
+In a production build React ships **minified** error messages to keep the bundle small, so instead of a sentence you get a number and a decoder link (`invariant=425`). #425 decodes to **"Text content does not match server-rendered HTML"**.
+
+That only happens with server-side rendering (Next.js, Remix, `renderToString`): React renders the HTML once on the server, sends it to the browser, and then **hydrates** — it reuses that HTML and only attaches the event handlers, expecting the client's first render to produce _exactly_ the same output. When a piece of text comes out different, hydration for that subtree fails and you get #425.
+
+Because the message is minified, the single most useful debugging step is to reproduce it in a **development build** — there React prints the full message _and points at the exact element_, which turns guesswork into a one-line fix (see "How to see the real error message" below).
+
+## Why hydration mismatches happen
+
+Every #425 comes down to _server output ≠ first client output_. The usual culprits:
+
+| Cause                                   | Why it differs                                                  |
+| --------------------------------------- | -------------------------------------------------------------- |
+| `new Date()` / `toLocaleString`         | Server clock/timezone ≠ browser clock/timezone                 |
+| `Math.random()`, `Date.now()`, `uuid()` | A new value on each render, server and client never agree      |
+| Locale / number / currency formatting   | Server locale ≠ the user's browser locale                      |
+| `window`, `localStorage`, `navigator`   | Undefined on the server, present in the browser                |
+| Invalid HTML nesting                    | The browser "fixes" your HTML, so the DOM ≠ what React rendered |
+| Browser extensions                      | They mutate the DOM before React hydrates                      |
+
+![Diagram of a hydration mismatch: the server renders the time as 14:32, the browser re-renders it as 14:33 while hydrating, the text does not match and React throws error #425.](/posts/hydration-mismatch.png)
+
+The example below is the classic case: a live clock.
+
+## The code that caused the error
+
+```tsx DateAndHour.tsx
+const DateAndHour = () => {
+    const { locale } = useRouter();
+    const [date, setDate] = React.useState(new Date());
+    const day = date.toLocaleDateString(locale, { weekday: 'short' });
+    const dayNumber = date.toLocaleDateString(locale, { day: 'numeric' });
+    const month = date.toLocaleDateString(locale, { month: 'short' });
+    const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
+
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setDate(new Date());
+        }, 60000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className={styles.dateAndHour}>
+            <span>{day}</span>
+            <span>{dayNumber}</span>
+            <span>{month}</span>
+            <span>{hour}</span>
+        </div>
+    );
+};
+```
+
+The server renders the time for _its_ clock and timezone; a second later the browser renders _its_ own — the text differs and React raises #425.
+
+## Fix 1 — `suppressHydrationWarning` for legitimate text differences
+
+When the difference is real and expected (a clock, a relative "2 minutes ago"), tell React to accept it on that element with [`suppressHydrationWarning`](https://react.dev/reference/react-dom/components/common#common-props). It only silences a **text** difference **one level deep** — it is a scalpel, not a blanket, so don't sprinkle it everywhere.
+
+```tsx DateAndHour.tsx mark=14,15,16,17
+const DateAndHour = () => {
+    const { locale } = useRouter();
+    const [date, setDate] = React.useState(new Date());
+    const day = date.toLocaleDateString(locale, { weekday: 'short' });
+    const dayNumber = date.toLocaleDateString(locale, { day: 'numeric' });
+    const month = date.toLocaleDateString(locale, { month: 'short' });
+    const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
+
+    React.useEffect(() => {
+        const interval = setInterval(() => setDate(new Date()), 60000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className={styles.dateAndHour}>
+            <span suppressHydrationWarning>{day}</span>
+            <span suppressHydrationWarning>{dayNumber}</span>
+            <span suppressHydrationWarning>{month}</span>
+            <span suppressHydrationWarning>{hour}</span>
+        </div>
+    );
+};
+```
+
+## Fix 2 — Render browser-only values after mount
+
+If the value simply does not exist on the server (`window`, `localStorage`, `matchMedia`), render a stable placeholder first and swap in the real value **after** the component mounts. The server and the first client render now agree, and the browser value appears on the next paint.
+
+```tsx useMounted.tsx
+// Render the same thing on the server and on the first client render,
+// then reveal the browser-only value once we know we are on the client.
+const useMounted = () => {
+    const [mounted, setMounted] = React.useState(false);
+    React.useEffect(() => setMounted(true), []);
+    return mounted;
+};
+
+const Theme = () => {
+    const mounted = useMounted();
+    if (!mounted) return null; // same output on server and first client render
+    return <span>{localStorage.getItem('theme')}</span>;
+};
+```
+
+## Fix 3 — Load client-only components with `next/dynamic`
+
+When a whole component can never render on the server (a chart that reads `window`, a map, an editor), skip SSR for it entirely instead of guarding every line:
+
+```tsx dynamic.tsx
+import dynamic from 'next/dynamic';
+
+const ClientOnlyChart = dynamic(() => import('./Chart'), { ssr: false });
+```
+
+## Fix 4 — Fix invalid HTML nesting
+
+This one surprises people because there is no date or random value in sight. If you nest a block element inside a `<p>` (or an `<a>` inside an `<a>`, or a `<div>` inside a `<table>` without a `<tbody>`), the browser silently _repairs_ the HTML on parse. React then hydrates against a DOM that no longer matches what it rendered — and you get #425. There is no attribute to suppress this: **make the HTML valid** (a `<p>` may only contain inline content).
+
+## How to see the real error message
+
+Never debug #425 from the minified number. Reproduce it where React talks to you:
+
+-   **Next.js:** run `next dev` — development is never minified.
+-   **Production build locally:** `next build && next start`, but read the message in the browser console where React prints the full text and a diff of the mismatched element.
+
+React logs something like _"Warning: Text content did not match. Server: '14:32' Client: '14:33'"_, pointing at the exact node. From there the cause is usually obvious.
+
+## #418, #422, #423, #425 — the hydration error family
+
+If your searches turned up neighbouring numbers, they are the same problem seen from different angles:
+
+| Error | Meaning                                          |
+| ----- | ------------------------------------------------ |
+| #418  | Hydration failed because the initial UI differed |
+| #422  | Hydration completed but contained mismatches     |
+| #423  | Error while hydrating; the tree fell back to CSR |
+| #425  | Text content does not match server-rendered HTML |
+
+The fix is always the same discipline: run a dev build, find the value that differs between server and client, and reconcile it with one of the four fixes above.
+
+You can read more about the attribute in the [React documentation](https://react.dev/reference/react-dom/components/common#common-props 'React Documentation').
+
+---
+
+# Lighthouse report automation
+
+- URL: https://xabierlameiro.com/blog/javascript/lighthouse-reporting-automation
+- Author: Xabier Lameiro
+- Category: Javascript · Tags: node
+- Summary: Automation of Lighthouse reporting using playwright and the lightouse api on a deployed website in a real example
+
+# Lighthouse report automation
+
+Published: 01-24-2023
+
+An easy way to have automated Lighthouse reports is using the Google tool called [Lighthouse CI](https://github.com/GoogleChrome/lighthouse 'Ligthouse repository') that allows us to pass the ligthouse test to a website and save the results on a server to compare them with the results of other executions.
+
+You can see the improvements in performance, accessibility, SEO, etc. of your website. You can even add new rules with custom plugins, for example, to check that no html has been added that does not comply with the accessibility rules.
+
+In a future post the idea is to create a lighthouse plugin from scratch to check some unwritten SEO "rules" in each of my posts.
+
+To always have a current snapshot of the sitemap of my site I use playwright to check the sitemap, have the link tree and create a flowchart using Treant.js as you can see here [lighthouse report](https://lighthouse.xabierlameiro.com 'Lighthouse report example').
+
+## How did I do it?
+
+## 1. Get all urls from your sitemap
+
+```javascript main.js
+const browser = await chromium.launch();
+const page = await browser.newPage();
+await page.goto('https://xabierlameiro.com/sitemap.xml');
+// get site map inside a body
+const sitemap = await page.$eval('body', (el) => el.innerHTML);
+// get all urls inside sitemap - Fixed: Use safer regex pattern
+const urls = sitemap.match(/<loc>([^<]+)<\/loc>/g)?.map((url) => url.replace(/<\/?loc>/g, '')) || [];
+// split urls in locales bearing in mind that 'en' is the default locale and it's not included in the url
+let locales = urls.reduce((acc, url) => {
+    let locale = url.split('/')[3];
+    if (locale !== 'gl' && locale !== 'es') {
+        locale = 'en';
+    }
+    if (!acc[locale]) {
+        acc[locale] = [];
+    }
+    acc[locale].push(url);
+    return acc;
+}, {});
+
+const index = locales.en.indexOf('https://xabierlameiro.com');
+locales.en[index] = 'https://xabierlameiro.com/home';
+
+await browser.close();
+```
+
+## 2. Run lighthouse on each of the urls and save the report.
+
+```javascript main.js
+for (const url of locales[lang]) {
+    // Report
+    const result = await launchChromeAndRunLighthouse(
+        url === 'https://xabierlameiro.com/home' ? 'https://xabierlameiro.com' : url,
+        options
+    );
+    let fileName = url.split('/').pop();
+
+    if (fileName === 'es' || fileName === 'gl') {
+        fileName = 'home';
+    }
+    // write report in output folder
+    fs.writeFileSync(lang === 'en' ? `output/${fileName}.html` : `output/${lang}/${fileName}.html`, result.report);
+}
+```
+
+## 3. Create an organisation chart using Treant.js
+
+> Example of the first level of the tree only
+
+```javascript main.js
+const chart = {
+    chart: {
+        container: '#OrganiseChart-big-commpany',
+        levelSeparation: 40,
+        siblingSeparation: 20,
+        subTeeSeparation: 30,
+        rootOrientation: 'NORTH',
+        nodeAlign: 'BOTTOM',
+
+        connectors: {
+            type: 'step',
+            style: {
+                'stroke-width': 2,
+            },
+        },
+        node: {
+            HTMLclass: 'big-commpany',
+        },
+    },
+};
+```
+
+> All the code is available in my [github](https://github.com/xabierlameiro/lighthouse-report/blob/master/main.js 'Link to github repository') repository
+
+## Run your script and deploy the files to a static server like Vercel.
+
+```bash
+
+node main.js
+
+```
+
+If you want to see the results just click on "Lightouse" in the top navigation bar.
+
+---
+
+# Continuous Integration with Github Actions workflow
+
+- URL: https://xabierlameiro.com/blog/nextjs/continuous-integration-with-github-actions-workflow
+- Author: Xabier Lameiro
+- Category: Nextjs · Tags: github-actions, ci, nextjs, devops
+- Summary: Set up CI/CD for a Next.js project with GitHub Actions: lint, test and build on every push, then deploy to Vercel. The workflow YAML explained step by step.
+
+# Continuous Integration with Github Actions workflow
+
+Published: 05-09-2023
+
+Every project is different and so are its priorities, but they all have one thing in common: they need to be tested and deployed. You can do that by hand, but it gets repetitive and tedious fast — which is exactly what continuous integration and continuous deployment exist to remove.
+
+Here I use [GitHub Actions](https://docs.github.com/en/actions/using-workflows 'Link to github Actions') to automate deploying this project to [Vercel](https://vercel.com/ 'Link to vercel'), plus the checks that run before it: testing, linting, type-checking and documentation generation.
+
+## Design
+
+The part that takes the most thought is the pipeline itself — which tasks run, and in what order. I sketched the flow in Excalidraw and iterated until one shape stuck. Then it is mechanical: create a `.github/workflows/` folder and drop your `.yml` files in it. I keep two, `pre-deploy.yml` and `post-deploy.yml`, and instead of explaining YAML syntax I will explain what each job does.
+
+`pre-deploy` runs four jobs in parallel — cancel-redundant-runs, linting, testing and docs — and only if they all pass does it version and deploy to pre-production. I then test the feature or bugfix manually against that preview. If it holds up, deploying to production is just a pull request from `dev` to `master`. But the pipeline does not end at the merge: once it is live, `post-deploy` runs a Lighthouse pass and publishes a page-by-page performance report. Splitting it this way keeps the fast gates blocking (nothing ships broken) and the slow, live-site checks out of the critical path.
+
+Here it is graphically:
+
+This is a snippet of what the pre-deploy workflow looks like (Node 22, npm — update the versions to match your project, this is the kind of thing that goes stale):
+
+```yaml pre-deploy.yml
+name: Workflow Pre-Deploy
+on:
+    push:
+        branches: [dev]
+jobs:
+    cancel_redundancy:
+        name: Cancel Redundant Workflow Runs
+        runs-on: ubuntu-latest
+        steps:
+            - name: Cancel previous redundant workflow runs
+              uses: styfle/cancel-workflow-action@0.12.1
+              with:
+                  access_token: ${{ secrets.TOKEN_GITHUB }}
+    code_checking:
+        name: Linting
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+            - name: Install dependencies
+              env:
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  npm install --legacy-peer-deps
+            - name: Linter
+              run: npm run lint
+```
+
+Full workflow [in my github](https://github.com/xabierlameiro/the-last-dance/actions/workflows/pre-deploy.yml 'in my github')
+
+## Three things worth doing from day one
+
+- **Cache the install.** `actions/setup-node` with `cache: npm` restores `node_modules`-worth of downloads between runs and cuts minutes off every job. Point it at your real lockfile.
+- **Cancel redundant runs.** Pushing three times in a row should not run three full pipelines. The cancel step above (or the built-in `concurrency:` key) kills superseded runs.
+- **Keep secrets in secrets.** The registry token comes from `${{ secrets.NPM_TOKEN }}`, never from the file. If a token ever lands in a committed `.npmrc`, rotate it — the runner reads it from the environment, not the repo.
+
+## Results
+
+Each report has its own repository on GitHub, and that is where the output of every run is published:
+
+-   [Unit test report](https://coverage.xabierlameiro.com/ 'Link to Unit test report')
+-   [End to end testing report](https://e2e.xabierlameiro.com/ 'Link to End to end testing report')
+-   [Performance report](https://performance.xabierlameiro.com/ 'Link to Performance report')
+-   [Documentation](https://docs.xabierlameiro.com/ 'Link to Documentation')
+-   [Component Library](https://storybook.xabierlameiro.com/ 'Link to Component Library')
+
+## Conclusions
+
+Every time I add a component in React or a page in Next.js, a battery of tests checks that I have not broken the work already there — which only works because you are the one who has to write the tests for the delicate, critical parts. The pipeline does not invent coverage; it enforces the coverage you decided to have.
+
+> You can find all this code in my github repository, and if you liked it you can help me with a [⭐️](https://github.com/xabierlameiro/the-last-dance 'Link to my github'). Thanks!
+
+---
+
+# Counter for github stars repository
+
+- URL: https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository
+- Author: Xabier Lameiro
+- Category: Nextjs · Tags: node
+- Summary: Build a GitHub stars counter for your site with a Next.js API route and Octokit — cache the GitHub API to dodge rate limits and render a live star count. Full code included.
+
+# Counter for github stars repository
+
+Published: 01-11-2023
+
+This is a simple counter for github stars repository. You can use it in your website or blog.
+
+How to use it? Just fetch the api and you will get the number of stars.
+
+## 1. Create a github token
+
+> Please use the environment variable to store the token.
+
+```ts github.ts
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+```
+
+## 2. Write the GET method
+
+```ts github.ts
+const REPOSITORY = {
+    owner: 'xabierlameiro',
+    repo: 'the-last-dance',
+};
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        const {
+            data: { stargazers_count },
+        } = await octokit.rest.repos.get(REPOSITORY);
+        res.status(200).json(stargazers_count);
+    } catch (err: Error) {
+        res.status(500).json({ statusCode: 500, message: err.message });
+    }
+}
+```
+
+## 3. Use it in your component
+
+Not is necessary to use the `useEffect` hook for fetch information. You can use the `getStaticProps` or `getServerSideProps` hooks.
+In my case, I use this hook because the blog is a static site and the endpoint is not available in the build time.
+
+```tsx StarCounter.tsx
+const StarCounter = () => {
+    const [stars, setStars] = React.useState(0);
+
+    React.useEffect(() => {
+        (async () => {
+            try {
+                const stars = await fetch('/api/github').then((res) => res.json());
+                setStars(stars);
+            } catch (e) {
+                setStars(-1);
+            }
+        })();
+    }, []);
+
+    if (stars === -2)
+        return (
+            <Container>
+                <AiFillStar className={styles.starred} title="Starred" />
+            </Container>
+        );
+
+    if (stars === -1)
+        return (
+            <Container>
+                <RxCross2 className={styles.error} title="Error endpoint" />
+            </Container>
+        );
+
+    if (stars === 0)
+        return (
+            <Container>
+                <FaSpinner className={styles.spinner} title="Loading stars" />
+            </Container>
+        );
+
+    return (
+        <Container>
+            <span>{stars}</span>
+        </Container>
+    );
+};
+
+export default StarCounter;
+```
+
+Right now you only have to look up to see the result, the counter is highlighted with a yellow star.
+
+Please if you think this content has helped you or you like it, please give me your star. <span className="emoji">🤩</span>
+
+---
+
+# Dark theme with Nextjs
+
+- URL: https://xabierlameiro.com/blog/nextjs/dark-theme
+- Author: Xabier Lameiro
+- Category: Nextjs · Tags: css
+- Summary: Build a dark theme in Next.js with CSS variables and a theme-toggle event — no flash of the wrong theme and no heavy library. A step-by-step guide with the full code.
+
+# Dark theme with Nextjs
+
+Published: 02-03-2023
+
+There are many ways to manage style themes in React and Nextjs, but all of them involve having an array/object with all the styles of each of the different themes.
+another way is to use css or scss variables _these last ones are in more and more disuse_. I, in particular, am going to use css variables and set a default theme in my \_document. Why here ?
+
+Because \_document runs on server not like \_app which runs on client and if you use a useEffect to set your default theme or detect the one the user has on their operating system,
+in the time it takes to do this check and add it, there can be a flicker in the page styles. That can be strange.
+
+I did it like this:
+
+## 1 - css variables
+
+```css globals.css
+:root {
+    /* commons */
+    --white-color: 255, 255, 255;
+    --color-available-arrow: 95, 91 98;
+    ...;
+}
+
+[data-theme='dark'] {
+    --blog-nav: 48, 41, 51;
+    --blog-header: 53, 45, 55;
+    ...;
+}
+
+[data-theme='light'] {
+    --blog-nav: 204, 202, 219;
+    --blog-header: 255, 255, 255;
+    ...;
+}
+```
+
+## 2 - Set default theme
+
+```tsx _document.tsx mark=4
+
+const Document = (props: Props) => {
+    return (
+        <Html lang={props.__NEXT_DATA__.locale} data-theme="light">
+    )
+}
+
+```
+
+## 3 - Custom hook to change theme
+
+```ts useDarkMode.ts
+import React from 'react';
+
+const scheme = {
+    light: 'light' as const,
+    dark: 'dark' as const,
+};
+
+const useDarkMode = (): { theme: null | 'dark' | 'light'; toggleTheme: () => void; scheme: typeof scheme } => {
+    const [theme, setTheme] = React.useState<null | 'dark' | 'light'>(null);
+
+    React.useEffect(() => {
+        if (typeof window !== 'undefined' && window.matchMedia) {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const handler = (event: MediaQueryListEvent) => {
+                setTheme(event.matches ? scheme.dark : scheme.light);
+            };
+            mediaQuery.addEventListener('change', handler);
+            return () => mediaQuery.removeEventListener('change', handler);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        if (typeof window !== 'undefined' && theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(theme === scheme.dark ? scheme.light : scheme.dark);
+    };
+
+    return { theme, scheme, toggleTheme };
+};
+
+export default useDarkMode;
+```
+
+## 4 - Using the hook
+
+```tsx settings.tsx mark=3,4,5,6,15,16
+const Content = () => {
+    const { formatMessage: f } = useIntl();
+    const {
+        theme,
+        scheme: { dark },
+        toggleTheme,
+    } = useDarkMode();
+
+    return (
+        <div className={styles.container}>
+            <section className={styles.confg}>
+                <IconWithName
+                    icon="/theme.png"
+                    alt={f({ id: 'settings.langAlt' })}
+                    name={f({ id: theme === dark ? 'settings.dark' : 'settings.light' })}
+                    onClick={toggleTheme}
+                />
+            </section>
+            <section className={styles.confg}></section>
+        </div>
+    );
+};
+```
+
+To do the live test, you can change the theme on your operating system and you will see that my website updates automatically or you can also go to my settings page and change the theme.
+
+> All the code in my github repository, if you like this project, or if the content has helped you in any way you can reward me with a ⭐️, Thanks!
+
+---
+
+# Make a views counter with google analytics
+
+- URL: https://xabierlameiro.com/blog/nextjs/make-a-views-counter-with-google-analytics
+- Author: Xabier Lameiro
+- Category: Nextjs · Tags: node
+- Summary: Add a page-views counter to your Next.js blog using the Google Analytics Data API (BetaAnalyticsDataClient) behind an API route — auth, the report query and caching explained.
+
+# Make a views counter with google analytics
+
+Published: 01-10-2023
+
+Is not necessary make a complex system to count the views of your blog. You can use google analytics to do it, you dont need persiste the data in a database.
+
+Here we dont explain how to create a Google analytics account, you can follow this [tutorial](https://support.google.com/analytics/answer/1008015?hl=en 'Google analytics link') to do it.
+
+## 1. Create a endpoint to get the data using the class BetaAnalyticsDataClient
+
+```ts .analytics.ts
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+    const { query } = req;
+    const { slug = '/' } = query;
+
+    const analyticsDataClient = new BetaAnalyticsDataClient({
+        credentials: {
+            client_email: process.env.ANALYTICS_CLIENT_EMAIL,
+            private_key: process.env.ANALYTICS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        },
+        projectId: process.env.ANALYTICS_PROJECT_ID,
+    });
+
+    const [response] = await analyticsDataClient.runReport({
+        property: `properties/348472560`,
+        dateRanges: [
+            {
+                startDate: '2023-01-01',
+                endDate: 'today',
+            },
+        ],
+        dimensions: [
+            {
+                name: 'date',
+            },
+            {
+                name: 'pagePath',
+            },
+        ],
+        metrics: [
+            {
+                name: 'screenPageViews',
+            },
+        ],
+        dimensionFilter: {
+            filter: {
+                fieldName: 'pagePath',
+                stringFilter: {
+                    matchType: 'EXACT',
+                    value: slug.toString(),
+                },
+            },
+        },
+        orderBys: [
+            {
+                dimension: {
+                    dimensionName: 'date',
+                },
+            },
+        ],
+    });
+
+    if (!response || !response.rows) {
+        res.status(500).json({ error: 'Error while parsing analytics data' });
+        return;
+    }
+
+    let total = response.rows.reduce((prev: Object, curr: Object) => {
+        return prev + parseInt(curr.metricValues[0].value, 0);
+    }, 0);
+
+    try {
+        res.status(200).json({ total });
+    } catch (err: Error) {
+        res.status(500).json({ error: err });
+    }
+}
+```
+
+## 2. Create a component to show the data
+
+> You can create a component to consume the api from the client using useEffect or from a page retrieving the data from the server. It is your choice
+
+In my case I am going to make 3 different renderings, one for when it is loading, one for the error and the last one for the information.
+
+```tsx ViewCounter.tsx mark=29,36,43
+type Props = {
+    children?: React.ReactNode;
+};
+
+const Container = ({ children }: Props) => {
+    return (
+        <div className={styles.views} title="Number of views in this post from Google analytics">
+            <BsBook />
+            {children}
+        </div>
+    );
+};
+
+const StarCounter = () => {
+    const [views, setViews] = React.useState(-1);
+    const { asPath } = useRouter();
+
+    React.useEffect(() => {
+        (async () => {
+            try {
+                const { total } = await fetch(`/api/analytics?slug=${asPath}`).then((res) => res.json());
+                setViews(total);
+            } catch (e) {
+                setViews(-2);
+            }
+        })();
+    }, [asPath]);
+
+    if (views === -2)
+        return (
+            <Container>
+                <RxCross2 className={styles.error} title="Error on endpoint" />
+            </Container>
+        );
+
+    if (views === -1)
+        return (
+            <Container>
+                <FaSpinner className={styles.spinner} title="Loading views" />
+            </Container>
+        );
+
+    return (
+        <Container>
+            <span>{views}</span>
+        </Container>
+    );
+};
+
+export default StarCounter;
+```
+
+## 3. Include your component wherever you want to display it
+
+To see the result of the above code just look at the top of the page and you will see a book icon with a counter on the right hand side.
+
+You can see the complete code in my repository if you need it, and if you find it useful or like it you can give me a star
+
+---
+
+# How to translate URL slugs in a Next.js site
+
+- URL: https://xabierlameiro.com/blog/nextjs/translate-slugs-web-pages
+- Author: Xabier Lameiro
+- Category: Nextjs · Tags: intl
+- Summary: Translate your URLs per language for a fully internationalized Next.js site using static MDX pages — map localized slugs, keep canonicals clean, and link locales with hreflang.
+
+# How to translate URL slugs in a Next.js site
+
+Published: 01-12-2023
+
+I wanted to make a blog and I was wondering how to internationalise my site including its urls.
+The challenge is to make the pages are created at build time are assigned to each of its translated slugs.
+
+This is my solution:
+
+## 1. Create a mdx file for each language, for example:
+
+-   `data/blog/translate-the-slugs/translate-the-slugs.en.mdx`
+-   `data/blog/translate-the-slugs/translate-the-slugs.es.mdx`
+-   `data/blog/translate-the-slugs/translate-the-slugs.gl.mdx`
+
+## 2. Inside each mdx file, the important thigs are:
+
+```mdx translate-the-slugs.en.mdx mark=3,7,11
+---
+title: 'How to translate URL slugs in a Next.js site'
+slug: 'translate-slugs-web-pages'
+author: 'Xabier Lameiro'
+category: 'Nextjs'
+tags: ['intl']
+locale: 'en'
+excerpt: 'Translate the urls of my website, to have a 100% internationalised site using nextjs and static pages with mdxjs files.'
+description: 'Translate your URLs per language for a fully internationalized Next.js site using static MDX pages — map localized slugs, keep canonicals clean, and link locales with hreflang.'
+image: '/posts/translate-slugs-web-pages.png'
+alternate: [{ lang: 'es', url: 'como-traducir-las-urls' }, { lang: 'gl', url: 'como-traducir-as-urls' }]
+---
+
+# How to translate URL slugs in a Next.js site
+
+Published: 01-12-2023
+```
+
+## 3. With getStaticPaths we created the pages for each language:
+
+In my case I create different pages for each tag and category, but you can create the pages you want.
+
+```mdx translate-the-slugs.en.mdx mark=4,17
+export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
+    const posts = await getAllPosts();
+
+    const tags = posts.reduce((...code) => {
+            const paths = post.meta.tags.map((tag: string) => ({
+                params: {
+                    category: tag.toLowerCase(),
+                    slug: post.meta.slug,
+                },
+                locale: post.meta.locale,
+            }));
+            return [...acc, ...paths];
+        },
+        []
+    );
+
+    const categories = posts.map((...code) => ({
+            params: {
+                category: post.meta.category.toLowerCase(),
+                slug: post.meta.slug,
+            },
+            locale: post.meta.locale,
+        })
+    );
+
+    return {
+        paths: [...tags, ...categories],
+        fallback: 'blocking',
+    };
+
+};
+```
+
+## 4. With getStaticProps we get the data of the mdx file:
+
+When getStaticPaths is executed, it passes the locale to getStaticProps, in this moment we have the category, slug and locale, so we can get the data of the mdx file.
+
+```mdx translate-the-slugs.en.mdx mark=12,13,14,15
+export const getStaticProps = async (data: {
+    params: {
+        category: string;
+        slug: string;
+    };
+    locale: string;
+}) => {
+    const {
+        params: { category },
+        locale,
+    } = data;
+    const post = await getPostBySlug(data);
+    const mdxSource = await serialize(post.content);
+    const { categories, tags } = await getAllCategories(locale);
+    const posts = await getPostsByLocaleAndCategory(locale, category);
+
+    return {
+        props: {
+            tags,
+            categories,
+            posts,
+            post: {
+                ...post,
+                content: mdxSource,
+            },
+        },
+    };
+
+};
+```
+
+### 4.1. Get the data of the mdx file with help from gray-matter and fs:
+
+We need create functions to help us to get the data of the mdx file.
+
+```ts findPostBySlug
+const findPostBySlug = (slug: string | { params: { slug: string } }) => {
+    let paths = glob.sync(`${POST_PATH}/**/*.mdx`);
+
+    if (typeof slug === 'object') {
+        slug = slug.params.slug;
+    } else {
+        slug = slug.split('/')[slug.split('/').length - 1];
+    }
+    const [route] = paths.filter((path) => {
+        const document = fs.readFileSync(path, 'utf8');
+        const { data } = matter(document);
+        const fileName = path.split('/').pop();
+        if (data.slug === slug || fileName == `${slug}.mdx`) {
+            return true;
+        }
+    });
+    return matter(fs.readFileSync(route, 'utf8'));
+};
+```
+
+```ts getPostBySlug
+export const getPostBySlug = (slug: string | { params: { slug: string } }) => {
+    const { data, content } = findPostBySlug(slug);
+    const readTime = readingTime(content);
+    const numberOfWords = countWords(content);
+    return {
+        content,
+        meta: {...},
+    };
+};
+```
+
+### 4.2. Serialize the mdx file with help from @next-mdx-remote/serialize:
+
+```ts
+import { serialize as sz } from 'next-mdx-remote/serialize';
+
+/**
+ * @description Serialize MDX file with Code Hike.
+ *
+ * @example
+ *     serialize('# Hello World');
+ *     returns { content: '...', meta: {...} }
+ *
+ * @param {string} mdx - MDX file.
+ * @returns {Object} - Object with MDX content and meta data.
+ */
+export const serialize = (mdx: string) =>
+    sz(mdx, {
+        mdxOptions: {
+            remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
+            useDynamicImport: true,
+        },
+    });
+```
+
+### 4.3. Get the data finally into your component for the presentation layer.
+
+```tsx [slug].tsx
+    const PostPage = ({ post, tags, categories, posts }: Props) => {
+        ...print your magic here...
+    };
+```
+
+You can see the result by looking at the url of this post and changing the language in settings and looking at the same post again.
+
+---
+
+# Deploying my storybook is very simple
+
+- URL: https://xabierlameiro.com/blog/react/deploying-my-storybook-is-very-simple
+- Author: Xabier Lameiro
+- Category: React · Tags: storybook, react, ci
+- Summary: Deploy your Storybook as a static site so anyone can browse your React components online — the build command, where to host it, and how to wire it into CI. Step by step.
+
+# Deploying my storybook is very simple
+
+Published: 01-04-2023
+
+Once your components live in Storybook you can turn it into a **static site** and host it anywhere, so your team, your clients or your future self can browse the component library online — always up to date. Here is the whole flow: the build command, a real story, how to deploy it, and the gotchas that actually waste your afternoon.
+
+## Why deploy it at all?
+
+Storybook running on `localhost:6006` only helps the person who ran it. Deployed, it turns into a shared surface: designers review components without cloning the repo, QA can link a bug straight to the broken state, new teammates learn the design system by clicking through it, and you get a permanent URL for every component to paste into a pull request or a design ticket. It is the cheapest living style guide you can ship — the build already exists, you are only hosting the folder it produces. The one caveat: a public Storybook exposes your internal component API, so if the library is private, put it behind auth (an access-protected preview, basic auth, or a private host) instead of a public subdomain.
+
+## 1. Storybook commands
+
+```javascript package.json
+"scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+}
+```
+
+`storybook build` outputs a static site to `storybook-static/` — that folder is what you deploy.
+
+## 2. Write a story for a component
+
+A story is a single rendered state of a component. Keep one `.stories.tsx` file next to each component. This is the classic API most tutorials still show:
+
+```tsx Avatar.stories.tsx
+import React from 'react';
+import { ComponentStory, ComponentMeta } from '@storybook/react';
+import Avatar from '.';
+
+export default {
+    title: 'Settings / Avatar',
+    component: Avatar,
+} as ComponentMeta<typeof Avatar>;
+
+const Template: ComponentStory<typeof Avatar> = (args) => <Avatar {...args} />;
+
+export const Primary = Template.bind({});
+
+Primary.args = {
+    name: 'Juan Carlos de Borbón',
+    description: 'Rey emérito de España',
+    img: '/avatar.png',
+    alt: 'Quien bien se vive!',
+};
+```
+
+## Stories on current Storybook (CSF3)
+
+That `ComponentStory` / `ComponentMeta` pair is the Storybook 6 API and is **deprecated** from Storybook 7 onward. On Storybook 8 (the current major in 2026) the format is CSF3, which drops the template boilerplate — a story is just an object with `args`:
+
+```tsx Avatar.stories.tsx
+import type { Meta, StoryObj } from '@storybook/react';
+import Avatar from '.';
+
+const meta: Meta<typeof Avatar> = {
+    title: 'Settings / Avatar',
+    component: Avatar,
+};
+export default meta;
+
+type Story = StoryObj<typeof Avatar>;
+
+export const Primary: Story = {
+    args: {
+        name: 'Juan Carlos de Borbón',
+        description: 'Rey emérito de España',
+        img: '/avatar.png',
+        alt: 'Quien bien se vive!',
+    },
+};
+```
+
+If you are migrating, `npx storybook@latest migrate csf-2-to-3` does most of the mechanical work. Pin the version in your post or repo so readers know which API they are looking at — this is exactly the kind of thing that rots.
+
+## 3. Build the static site
+
+```bash
+npm run build-storybook   # or: yarn build-storybook
+# → outputs the site to ./storybook-static
+npx serve storybook-static  # optional: preview it locally first
+```
+
+Preview it locally before you deploy. If it looks wrong when served from `serve` (a plain static server), it will look wrong on the host too — better to find out now.
+
+## 4. Deploy the `storybook-static` folder
+
+Point any static host at that folder:
+
+-   **Vercel:** import the repo, set **Build command** to `npm run build-storybook` and **Output directory** to `storybook-static`.
+-   **Netlify:** same build command, **Publish directory** `storybook-static`.
+-   **GitHub Pages:** publish `storybook-static/` from a GitHub Action (the official `upload-pages-artifact` + `deploy-pages`).
+
+To rebuild on every push, the shape of the CI job is short:
+
+```yaml storybook.yml
+- uses: actions/setup-node@v4
+  with:
+      node-version: 22
+- run: npm ci
+- run: npm run build-storybook
+# then upload/deploy ./storybook-static with your host's action
+```
+
+That is exactly how the example below is built and served from a subdomain.
+
+## Gotchas that waste an afternoon
+
+- **Blank page or missing styles**: a base-path mismatch. Host at the domain root (a subdomain works well) or set the base path; the browser console will show 404s on the bundles.
+- **Peer-dependency install failures**: Storybook majors lag behind the newest React. On React 19 you may need `--legacy-peer-deps` to install, and some addons will not have caught up — check the addon's support matrix before you upgrade, not after.
+- **Stale build**: hosts cache aggressively. If your changes do not show, confirm the deploy actually rebuilt `storybook-static` and bust the CDN cache.
+
+> Here is mine deployed on a subdomain: [https://storybook.xabierlameiro.com](https://storybook.xabierlameiro.com 'Link to my storybook')
+
+---
+
+# Filter for positions, survey to check compatibility
+
+- URL: https://xabierlameiro.com/blog/react/filter-for-positions
+- Author: Xabier Lameiro
+- Category: React · Tags: node
+- Summary: Survey for recruiters to find out if I am compatible with a specific job position
+
+# Filter for positions, survey to check compatibility
+
+Published: 03-07-2023
+
+<GoogleAdsense slot="6618374506" horizontal />
+
+## Motivation
+
+Believe it or not, due to the high demand for developers of all kinds in the market by companies, many recruiters and headhunters have become copy paste machines. I don't know the number or the daily amount of messages they send to all the profiles in their network that match the new position they have available, but I would bet they are not few. And it's not that I don't like them sending me messages, but I would like them to send me messages that really interest me and make me think that they have seen my profile, my code or some of my work and that they really want to hire me for my skills.
+
+This is not usually the case, many people use programs to automate the process of searching for profiles such as [Hiretual](https://hiretual.com/ 'Hiretual') or [Jobvite](https://www.jobvite.com/ 'Jobvite'), they send messages to all users "that match" and sometimes this does not work very well. Since your profile clearly says Frontend Developer, your experience says the same... but, they have a Java position with awesome microservices for you.
+
+Other times they screw up and send you a message with the name of your teammate:
+
+## The idea
+
+How many times have you had a call with questions like:
+
+-   Why are you looking for a change?
+-   Do you know the SOLID principles?
+-   How many years would you say you've been working with React ? How about Typescript ?
+-   Do you know what continuous integration is?
+
+> To be offered a lower salary than you have, or to be asked for your CV and never be told anything again.
+
+How many times bro ?
+
+**_The idea is to screen you before you get screened._**
+
+## Solution
+
+10 simple questions about points that you consider important, requirements, values... or basically whatever you want and if they are fulfilled, the recruiter will get contact information to be able to go into detail about the whole process.
+
+It's a win win, we both save time, don't we?
+
+## Code
+
+With a container or page component, a couple of buttons, radiobuttons and an array of objects you have more than enough, in my case:
+
+I have my page:
+
+```tsx survey.tsx
+import Dialog from '@/components/Dialog';
+import styles from '@/styles/survey.module.css';
+import ControlButtons from '@/components/ControlButtons';
+import Confetti from 'react-confetti';
+import SEO from '@/components/SEO';
+import useWindowResize from '@/hooks/useWindowResize';
+import useSurvey from '@/hooks/useSurvey';
+import NavigationArrows from '@/components/NavigationArrows';
+import QuestionBlock from '@/components/QuestionBlock';
+
+const Survey = () => {
+    const { width, height } = useWindowResize();
+    const {
+        questions,
+        answers,
+        surveySuccess,
+        totalQuestions,
+        currentQuestionNum,
+        questionsDoneNum,
+        handleNextQuestion,
+        handlePreviousQuestion,
+        handleAnswerOptionClick,
+    } = useSurvey();
+
+    return (
+        <>
+            <Confetti width={width} height={height} numberOfPieces={100} run={surveySuccess} />
+            <SEO
+                noimage={false}
+                meta={{
+                    title: 'Find out if I match the position in 1 minute',
+                    description: 'Click to continue',
+                    noindex: true,
+                }}
+            />
+            <Dialog
+                open
+                modalMode
+                withPadding
+                header={
+                    <div className={styles.header}>
+                        <ControlButtons />
+                        <span>
+                            {currentQuestionNum > 0 && currentQuestionNum < 11 && (
+                                <span>
+                                    {currentQuestionNum} / {totalQuestions - 2}
+                                </span>
+                            )}
+                        </span>
+                    </div>
+                }
+                body={
+                    <div className={styles.container}>
+                        {questions.map((question: any, index: number) => (
+                            <QuestionBlock
+                                key={index}
+                                question={question}
+                                index={index}
+                                currentQuestionNum={currentQuestionNum}
+                                answers={answers}
+                                handleAnswerOptionClick={handleAnswerOptionClick}
+                            />
+                        ))}
+                    </div>
+                }
+                footer={
+                    <div className={styles.buttons}>
+                        <NavigationArrows
+                            hidden={currentQuestionNum < 1 || currentQuestionNum > 10}
+                            disabledLeft={currentQuestionNum < 2}
+                            disabledRight={questionsDoneNum < currentQuestionNum}
+                            onClickLeft={handlePreviousQuestion}
+                            onClickRight={handleNextQuestion}
+                        />
+                    </div>
+                }
+            />
+        </>
+    );
+};
+
+export default Survey;
+```
+
+My hook with logic
+
+```ts useSurvey.ts
+import { useRouter } from 'next/router';
+import { useReducer, useEffect, useRef } from 'react';
+
+const initialState = {
+    currentQuestion: 0,
+    questionsDone: 0,
+    success: false,
+    answers: [],
+};
+
+const reducer = (state: any, action: any) => {
+    ...ya sabes como funciona un switch no?
+};
+
+const useSurvey = () => {
+    const { query } = useRouter();
+    const { name = '&#128075;' } = query;
+    const emailRef = useRef<boolean>(false);
+
+    const [state, dispatch] = useReducer(reducer, initialState);
+
+    // Prepotency here!
+    const questions = [
+        {
+            questionText: 'Which came first, the chicken or the egg?
+            questionHtml: `<h2>Which came first the chicken or the egg?</h2>`,
+            answerOptions: [{ answerText: 'Egg', isCorrect: true, }, { answerText: 'Chicken', isCorrect: false }],
+        },
+    ];
+
+    useEffect(() => {
+        if (state.currentQuestion === questions.length - 1 && !emailRef.current) {
+            (async () => {
+                try {
+                    await fetch('/api/email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            subject: `Job survey from ${name} - ${new Date().toLocaleString()}`,
+                            message: `
+                                    <h1> ${name} </h1>
+                                    <code> ${navigator.userAgent} </code>
+                                    <ol>
+                                        ${state.answers.map(
+                                            (answer: any) =>
+                                                `<li> ${answer.question} : ${answer.answer} - ${
+                                                    answer.isCorrect ? '✅' : '🚫'
+                                                } </li>`
+                                        )}
+                                    </ol>
+                                    `.replace(/,/g, ''),
+                        }),
+                    });
+                    emailRef.current = true;
+                } catch (e) {
+                    console.log(e);
+                }
+            })();
+        }
+    }, [state, name, questions.length]);
+
+    const handlePreviousQuestion = () => {
+        if (state.currentQuestion > 1) dispatch({ type: 'PREVIOUS_QUESTION' });
+    };
+
+    const handleNextQuestion = () => {
+        if (state.currentQuestion != 0 && state.questionsDone >= state.currentQuestion)
+            dispatch({ type: 'NEXT_QUESTION' });
+    };
+
+    const handleAnswerOptionClick = (payload: {
+        question: string;
+        answer: string;
+        isCorrect: boolean;
+        questionNum: number;
+    }) => dispatch({ type: 'ADD_ANSWER', payload });
+
+    return {
+        questions,
+        answers: state.answers,
+        surveySuccess: state.success,
+        currentQuestionNum: state.currentQuestion,
+        questionsDoneNum: state.questionsDone,
+        totalQuestions: questions.length,
+        handleAnswerOptionClick,
+        handleNextQuestion,
+        handlePreviousQuestion,
+    };
+};
+
+export default useSurvey;
+```
+
+My endpoint
+
+```ts email.ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nodemailer from 'nodemailer';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+    const transporter = nodemailer.createTransport({
+        service: process.env.EMAIL_HOST,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.EMAIL_PASSWORD,
+        },
+    });
+
+    const { subject, message } = req.body;
+
+    const mailOptions = {
+        from: process.env.EMAIL,
+        to: process.env.EMAIL,
+        subject: subject,
+        html: message,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: error });
+    }
+}
+```
+
+## Result
+
+Try it yourself: [Link to result](https://xabierlameiro.com/survey?name=Lector/a 'Link to survey')
+
+---
+
+# How to document React components with JSDoc
+
+- URL: https://xabierlameiro.com/blog/react/how-document-my-react-components-with-jsdoc
+- Author: Xabier Lameiro
+- Category: React · Tags: node
+- Summary: Generate documentation for your React components automatically with JSDoc and publish it as a static site — the setup, the annotations that matter, and how to deploy it.
+
+# How to document React components with JSDoc
+
+Published: 01-16-2023
+
+## Introduction
+
+It is necessary to have a good documentation about our components, so that other developers can understand how it works and how to use it. In this article we are going to see how we can document our react components with JSDoc and how to publish the documentation in our static site.
+
+With a few simple steps, the jsdoc library and the use of good programming practices when working with react, we will be able to have a documentation of our components automatically. There are different plugins to upgrade our jsdoc and support react, but as React is still javascript and the components functions the default lib is more than enough.
+
+The report we are going to generate is still an html file, so you can deploy it in any static site.
+
+> If you use typescript you will need to install jsdoc-babel
+
+## 1. Installation
+
+```bash
+
+yarn add jsdoc-babel -D
+
+```
+
+## 2. Configuration
+
+```json jsdoc.json
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc", "closure"]
+    },
+    "source": {
+        "include": ["src/components/"],
+        "includePattern": ".+\\.tsx$",
+        "excludePattern": "(node_modules/|docs)"
+    },
+    "plugins": ["plugins/markdown", "node_modules/jsdoc-babel"],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false
+    },
+    "babel": {
+        "extensions": ["tsx"],
+        "ignore": ["**/*.(test|spec).ts"],
+        "babelrc": false,
+        "presets": [["@babel/preset-env", { "targets": { "node": true } }], "@babel/preset-typescript"],
+        "plugins": ["@babel/proposal-class-properties", "@babel/proposal-object-rest-spread"]
+    },
+    "opts": {
+        "encoding": "utf8",
+        "destination": "./public/docs/",
+        "recurse": true,
+        "verbose": true
+    }
+}
+```
+
+## 3. Customise your report
+
+```javascript custom-docs.js mark=13
+
+import { readFile, writeFile } from 'fs';
+import glob from 'glob';
+
+glob('public/docs/**/*.?(html|css)', function (err, files) {
+    if (err) {
+        console.log('err', err);
+        return;
+    }
+
+    files.forEach((path) => {
+        readFile(path, 'utf8', (err, data) => {
+            ...code
+        });
+    });
+});
+
+```
+
+> There you should find the code you need to modify your report and overwrite it.
+
+## 4. Generate your report
+
+```bash
+
+yarn jsdoc -c jsdoc.json
+
+```
+
+To see an example of the output you can click above where it says Docs or via this [link](https://docs.xabierlameiro.com 'Link to my docs')
+
+---
+
+# How to publish the test coverage report in your React application
+
+- URL: https://xabierlameiro.com/blog/react/publish-report-testing-react
+- Author: Xabier Lameiro
+- Category: React · Tags: jest, testing, react, ci
+- Summary: I show you how to publish the testing coverage report with jest in your React or Nextjs application, so you or people can see the testing coverage of your project.
+
+# How to publish the test coverage report in your React application
+
+Published: 01-01-2023
+
+You run `jest --coverage`, get a nice HTML report in `coverage/`, and then it dies on your machine. This post turns that report into a page anyone can open — useful for an open-source project where contributors want to see how well things are tested, or just to show your work. The stack is minimal:
+
+-   [Jest](https://jestjs.io/ 'Link to jestjs website')
+
+> A perfect "alternative" to SonarQube for small projects.
+
+Publishing a test report is not something everyone does, and some consider it imprudent because you can leak internal detail. The honest use case is an open-source repo where the report helps people contribute, or a teaching post. If you want it gated, a path protected by user and password is enough.
+
+PD: this example is a **Next.js** app, but it works for any web app that uses **jest**.
+
+## 1. Path for the report
+
+First, point the jest `coverageDirectory` at a public folder:
+
+```javascript jest.config.js mark=4
+const customJestConfig = {
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    coveragePathIgnorePatterns: ['^.*\\.stories\\.[jt]sx?$'],
+    coverageDirectory: 'public/coverage',
+    testEnvironment: 'jest-environment-jsdom',
+    coverageReporters: ['html'],
+    collectCoverageFrom: ['src/components/**/*.tsx'],
+    moduleNameMapper: {
+        '^@/helpers(.*)$': '<rootDir>src/helpers/index.ts$1',
+        '^@/layout(.*)$': '<rootDir>src/components/Layout/index.tsx$1',
+        '^@/test$': '<rootDir>/jest.setup.js',
+        '^@/components(.*)$': '<rootDir>src/components/$1',
+        '^@/context(.*)$': '<rootDir>src/context/$1',
+        '^@/hooks(.*)$': '<rootDir>src/hooks/$1',
+        '^@/constants(.*)$': '<rootDir>src/constants/$1',
+    },
+};
+```
+
+`collectCoverageFrom` matters more than people think: without it, coverage is computed only over files a test happened to import, which flatters your numbers. Point it at the real source globs so untested files count as 0, not as absent.
+
+## 2. Script to modify the report
+
+The report references its CSS/JS/images with relative paths that break once it is served from a sub-path. This script rewrites those paths and customises a couple of texts:
+
+> If you prefer a class, use a Jest [CustomReporter](https://jestjs.io/docs/configuration 'Jest configuration') and implement `onRunComplete`.
+
+```javascript custom-reporter.js
+import { readFile, writeFile } from 'fs';
+import glob from 'glob';
+
+glob('public/coverage/**/*.?(html|css)', function (err, files) {
+    if (err) {
+        console.log('err', err);
+        return;
+    }
+
+    files.forEach((path) => {
+        readFile(path, 'utf8', (err, data) => {
+            if (err) {
+                console.log('err', err);
+                return;
+            }
+            let replaced = data.replace(
+                /Code coverage generated by\n\s*<a href="https:\/\/istanbul\.js\.org\/"/g,
+                `Code coverage automatically generated by Xabier Lameiro on ${new Date().toLocaleDateString()}`
+            );
+
+            if (path === 'public/coverage/index.html') {
+                replaced = replaced.replace(/src="/g, 'src="coverage/');
+                replaced = replaced.replace(/href="/g, 'href="coverage/');
+            }
+
+            writeFile(path, replaced, 'utf-8', function (err, a) {
+                if (err) {
+                    console.log('err', err);
+                    return;
+                }
+            });
+        });
+    });
+});
+```
+
+## 3. Generate the report on build
+
+Add a `postbuild` step so the report lands in the public folder every time you build:
+
+```json package.json mark=5,9
+{
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "postbuild": "npm run coverage",
+        "start": "next start",
+        "lint": "next lint",
+        "test": "NODE_ENV=test jest",
+        "coverage": "rm -rf public/coverage && NODE_ENV=test jest --coverage && node custom-reporter.js",
+        "watch": "jest --watchAll",
+        "test:clear": "jest --clearCache",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build"
+    }
+}
+```
+
+## 4. Create a redirect on the host
+
+So a clean URL serves the folder's `index.html`:
+
+```javascript next.config.js mark=4,5
+ rewrites: async () => {
+        return [
+            {
+                source: '/:coverage',
+                destination: '/:coverage/index.html',
+            },
+        ];
+    },
+```
+
+## One thing I got wrong: keep it out of Google
+
+Here is the part no tutorial warns you about, and it bit this very site. Once the coverage report was public, Google indexed every one of those generated HTML pages — dozens of near-identical, text-thin files. That is textbook _low value content_, and it dilutes the ranking signals of your real pages; it was part of what got this domain flagged by AdSense. Publishing the report is fine, but tell search engines to ignore it:
+
+- Inject `<meta name="robots" content="noindex">` into the generated HTML (the same reporter script that fixes the paths can add it), or
+- Serve an `X-Robots-Tag: noindex` header for the report path or subdomain.
+
+A coverage report is for humans who go looking for it, not for search results. Ship it, then hide it from crawlers.
+
+> Here is an example of what the report of this blog looks like: [coverage.xabierlameiro.com](https://coverage.xabierlameiro.com/ 'Coverage section')
+

@@ -127,6 +127,9 @@ const toPost = ({ content, data }: ParsedPost) => ({
         readTime: readingTime(content),
         numberOfWords: countWords(content),
         date: extractPostDate(content),
+        // Optional frontmatter field marking a substantive content update (freshness
+        // signal for search + LLM engines; feeds dateModified and sitemap lastmod)
+        updated: data.updated ?? null,
         slug: data.slug,
         title: data.title,
         locale: data.locale,

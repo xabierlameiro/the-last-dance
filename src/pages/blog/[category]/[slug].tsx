@@ -195,6 +195,7 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
             slug: string;
             locale: string;
             date: string | null;
+            updated: string | null;
         };
     };
     const posts = getAllPosts();
@@ -218,7 +219,8 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
                 slug: post.meta.slug,
             },
             locale: post.meta.locale,
-            date: post.meta.date,
+            // lastmod: prefer the substantive-update date over the original publish date
+            date: post.meta.updated ?? post.meta.date,
         })),
         locales
     );
