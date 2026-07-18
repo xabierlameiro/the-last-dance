@@ -47,6 +47,7 @@
         "react-dom": "^19.1.0",
         "react-icons": "^4.7.1",
         "react-intl": "^6.8.9",
+        "remark-gfm": "^4.0.1",
         "shiki": "^0.10.1",
         "swr": "^2.0.2"
     },
