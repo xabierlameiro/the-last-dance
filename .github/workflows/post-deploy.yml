@@ -7,6 +7,21 @@ permissions:
   contents: read
 
 jobs:
+    indexnow:
+        # SDD-013: push all URLs to IndexNow (Bing & partners) right after deploy.
+        # ChatGPT Search retrieves from Bing's index, so this shortens the path from
+        # "deployed" to "citable by LLM search". Best-effort — never fails the pipeline.
+        name: IndexNow ping
+        runs-on: ubuntu-22.04
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+            - name: Wait for deployment to be live
+              run: sleep 120
+            - name: Submit URLs to IndexNow
+              run: node scripts/indexnow-ping.mjs || true
     lighthouse:
         name: Lighthouse
         runs-on: ubuntu-22.04

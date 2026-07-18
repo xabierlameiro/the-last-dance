@@ -1,0 +1,43 @@
+# Xabier Lameiro
+
+> Personal site and technical blog of Xabier Lameiro, a software architect from Galicia (Spain)
+> specialised in web development with React, Next.js and TypeScript. Posts are practical,
+> first-hand guides about errors, testing, CI/CD and web tooling, available in English,
+> Spanish (/es) and Galician (/gl). English URLs below are canonical.
+
+## Pages
+
+- [About](https://xabierlameiro.com/about): Who Xabier Lameiro is — bio, experience and stack
+- [Contact](https://xabierlameiro.com/contact): Email and profiles
+- [Blog index](https://xabierlameiro.com/blog): All posts with categories
+
+## Blog: Error
+
+- [Fix "Failed to replace env in config: $\{NPM_TOKEN}" in npm and yarn](https://xabierlameiro.com/blog/error/npm-token-solution-error): How to fix the npm/yarn error "Failed to replace env in config: ${NPM_TOKEN}" in one minute: define the missing environment variable that your .npmrc expects, or remove the stale entry.
+- [EADDRINUSE: address already in use — how to free the port](https://xabierlameiro.com/blog/error/solve-address-in-use-error): Fix the Node.js error "listen EADDRINUSE: address already in use": find and kill the process holding the port on macOS, Linux and Windows, free it with one command, or just run on another port.
+- [How to fix Minified React error #425 (hydration mismatch)](https://xabierlameiro.com/blog/error/uncaught-error-minified-react-error): Fix Minified React error #425 ("Text content does not match server-rendered HTML"): every common cause of a hydration mismatch — dates, random values, locale formatting, browser-only APIs, invalid HTML — and the right fix for each, with Next.js examples.
+
+## Blog: Javascript
+
+- [Lighthouse report automation](https://xabierlameiro.com/blog/javascript/lighthouse-reporting-automation): Automation of Lighthouse reporting using playwright and the lightouse api on a deployed website in a real example
+
+## Blog: Nextjs
+
+- [Continuous Integration with Github Actions workflow](https://xabierlameiro.com/blog/nextjs/continuous-integration-with-github-actions-workflow): Set up CI/CD for a Next.js project with GitHub Actions: lint, test and build on every push, then deploy to Vercel. The workflow YAML explained step by step.
+- [Counter for github stars repository](https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository): Build a GitHub stars counter for your site with a Next.js API route and Octokit — cache the GitHub API to dodge rate limits and render a live star count. Full code included.
+- [Dark theme with Nextjs](https://xabierlameiro.com/blog/nextjs/dark-theme): Build a dark theme in Next.js with CSS variables and a theme-toggle event — no flash of the wrong theme and no heavy library. A step-by-step guide with the full code.
+- [Make a views counter with google analytics](https://xabierlameiro.com/blog/nextjs/make-a-views-counter-with-google-analytics): Add a page-views counter to your Next.js blog using the Google Analytics Data API (BetaAnalyticsDataClient) behind an API route — auth, the report query and caching explained.
+- [How to translate URL slugs in a Next.js site](https://xabierlameiro.com/blog/nextjs/translate-slugs-web-pages): Translate your URLs per language for a fully internationalized Next.js site using static MDX pages — map localized slugs, keep canonicals clean, and link locales with hreflang.
+
+## Blog: React
+
+- [Deploying my storybook is very simple](https://xabierlameiro.com/blog/react/deploying-my-storybook-is-very-simple): Deploy your Storybook as a static site so anyone can browse your React components online — the build command, where to host it, and how to wire it into CI. Step by step.
+- [Filter for positions, survey to check compatibility](https://xabierlameiro.com/blog/react/filter-for-positions): Survey for recruiters to find out if I am compatible with a specific job position
+- [How to document React components with JSDoc](https://xabierlameiro.com/blog/react/how-document-my-react-components-with-jsdoc): Generate documentation for your React components automatically with JSDoc and publish it as a static site — the setup, the annotations that matter, and how to deploy it.
+- [How to publish the test coverage report in your React application](https://xabierlameiro.com/blog/react/publish-report-testing-react): I show you how to publish the testing coverage report with jest in your React or Nextjs application, so you or people can see the testing coverage of your project.
+
+## Optional
+
+- [Full content](https://xabierlameiro.com/llms-full.txt): Every post inlined as plain markdown
+- [Sitemap](https://xabierlameiro.com/sitemap.xml): All URLs including /es and /gl locales
+

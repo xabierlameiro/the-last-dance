@@ -2,5 +2,49 @@
 User-agent: *
 Allow: /
 
+# AI / LLM crawlers — explicitly welcome (SDD-013). Training + search + on-demand
+# fetchers. The default * rule already allows them; these sections document intent
+# and survive any future tightening of the default.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# LLM-friendly site map (llmstxt.org): /llms.txt and /llms-full.txt
+
 # Sitemaps
 Sitemap: https://xabierlameiro.com/sitemap.xml

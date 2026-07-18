@@ -46,7 +46,26 @@ here, and their drafting prompt embeds it.
   statement, cut it rather than inventing one.
 - Cite external sources; keep quotes short and attributed.
 
-## 5. Cadence (unchanged from SDD-006)
+## 5. GEO — write so LLM engines can cite you (SDD-013)
+
+AI answer engines (ChatGPT Search, Perplexity, Gemini, Claude) now answer a meaningful share of
+the exact error/how-to queries this blog targets. They extract and cite **self-contained
+passages**, so structure for extraction (research-measured lifts: quotations ≈ +41%, statistics
+≈ +32%, citations ≈ +30% visibility in generative engines):
+
+- Open with a **"Quick answer" / TL;DR block** that fully answers the query in 2–4 sentences —
+  extractable without the rest of the page.
+- Each H2 section should stand alone: state the claim, then the evidence. Declarative sentences;
+  avoid "I think / we believe" filler around factual statements (keep first-person for the
+  *experience* parts, which is what differentiates us).
+- Include **concrete numbers, versions and dates**, and cite external sources by name/link —
+  cited passages get picked.
+- Keep the `faq:` block — Q&A pairs map 1:1 to how these engines retrieve.
+- On substantive updates, set **`updated: 'YYYY-MM-DD'`** in the frontmatter — it feeds
+  `dateModified`, `article:modified_time` and the sitemap `lastmod` (freshness matters,
+  especially for Perplexity).
+
+## 6. Cadence (unchanged from SDD-006)
 
 - ~2 substantive posts per month — **not** one per radar signal. Depth over volume is what removes
   the low-value signal.
