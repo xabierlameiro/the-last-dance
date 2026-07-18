@@ -101,9 +101,20 @@ const findPostBySlug = (slug: string | { params: { slug: string } }): ParsedPost
 const extractPostDate = (content: string): string | null => {
     const match = content.match(/<Date\s+date="([^"]+)"/);
     if (!match) return null;
-    const parsed = new Date(match[1]);
-    if (isNaN(parsed.getTime())) return null;
-    return parsed.toISOString().split('T')[0];
+    // Build the ISO string from the MM-DD-YYYY components directly: V8 parses non-ISO
+    // date strings as LOCAL midnight, so round-tripping through `new Date(...)` +
+    // `toISOString()` shifted every post one day early in timezones ahead of UTC
+    // (e.g. Europe/Madrid: "07-18-2026" → "2026-07-17").
+    const componentsMatch = match[1].match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    if (!componentsMatch) return null;
+    const [, month, day, year] = componentsMatch;
+    // Date.UTC normalizes overflow ("13-40-2023" would roll over), so a round-trip
+    // mismatch means the components were not a real calendar date.
+    const utcDate = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+    if (utcDate.getUTCMonth() !== Number(month) - 1 || utcDate.getUTCDate() !== Number(day)) {
+        return null;
+    }
+    return `${year}-${month}-${day}`;
 };
 
 /**
