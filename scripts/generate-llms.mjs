@@ -12,19 +12,25 @@ const DOMAIN = 'https://xabierlameiro.com';
 const BLOG_DIR = 'data/blog';
 const OUT_DIR = 'public';
 
-const readPosts = () => {
-    const posts = [];
-    for (const dir of fs.readdirSync(BLOG_DIR)) {
-        const full = path.join(BLOG_DIR, dir);
-        if (!fs.statSync(full).isDirectory()) continue;
-        for (const file of fs.readdirSync(full)) {
-            if (!file.endsWith('.en.mdx')) continue;
-            const { data, content } = matter(fs.readFileSync(path.join(full, file), 'utf8'));
-            posts.push({ data, content });
-        }
-    }
-    return posts.sort((a, b) => (a.data.category + a.data.slug).localeCompare(b.data.category + b.data.slug));
-};
+// Only the English posts feed llms.txt; the translations would just duplicate each entry.
+const readEnglishPostsIn = (dir) =>
+    fs
+        .readdirSync(dir)
+        .filter((file) => file.endsWith('.en.mdx'))
+        .map((file) => {
+            const { data, content } = matter(fs.readFileSync(path.join(dir, file), 'utf8'));
+            return { data, content };
+        });
+
+const sortKey = ({ data }) => `${data.category}${data.slug}`;
+
+const readPosts = () =>
+    fs
+        .readdirSync(BLOG_DIR)
+        .map((entry) => path.join(BLOG_DIR, entry))
+        .filter((full) => fs.statSync(full).isDirectory())
+        .flatMap(readEnglishPostsIn)
+        .sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
 
 const postUrl = ({ category, slug }) => `${DOMAIN}/blog/${String(category).toLowerCase()}/${slug}`;
 
@@ -58,9 +64,9 @@ const llms = [
     '',
     '## Pages',
     '',
-    `- [About](${DOMAIN}/about): Who Xabier Lameiro is — bio, experience and stack`,
-    `- [Contact](${DOMAIN}/contact): Email and profiles`,
-    `- [Blog index](${DOMAIN}/blog): All posts with categories`,
+    // /about and /contact were folded into the home desktop in #137. The generated file was
+    // hand-corrected there but this list was not, so prebuild kept regenerating dead URLs.
+    `- [Home](${DOMAIN}): Who Xabier Lameiro is — bio, experience, stack and contact details`,
     '',
     ...[...byCategory.entries()].flatMap(([category, categoryPosts]) => [
         `## Blog: ${category}`,

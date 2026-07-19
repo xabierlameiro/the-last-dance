@@ -1,19 +1,17 @@
 import React from 'react';
-import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote';
 import { useDialog } from '@/context/dialog';
 import Dialog from '@/components/Dialog';
 import ControlButtons from '@/components/ControlButtons';
 import SidesShift from '@/components/SidesShift';
 import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCategory } from '@/helpers/fileReader';
-import { components } from '@/helpers/mdxjs';
 import { serialize } from '@/helpers/mdx';
 import { createSiteMap } from '@/helpers/fileWritter';
-import { author } from '@/constants/site';
 import { useRouter } from 'next/router';
 import useSideShift from '@/hooks/useSideShift';
 import { useIntl } from 'react-intl';
 import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
+import usePostComponents from '@/components/Blog/PostByline';
 import Loading from '@/components/RenderManager/Loading';
 import styles from '@/styles/blog.module.css';
 import { clx } from '@/helpers';
@@ -65,8 +63,15 @@ type Props = {
     }[];
 };
 
+/** @description Which side panel the swipe gesture has opened, if any. */
+const resolveSideClass = (left: boolean, right: boolean) => {
+    if (right) return styles.openCategories;
+    if (left) return styles.openPosts;
+    return '';
+};
+
 const PostPage = ({ post, tags, categories, posts }: Props) => {
-    const { formatMessage: f, formatDate } = useIntl();
+    const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
     const { isMobile } = useWindowResize();
     const { left, onSideShiftLeft, right, onSideShiftRight } = useSideShift();
@@ -74,52 +79,8 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
         query: { category, slug },
     } = useRouter();
     const close = () => dispatch({ type: 'close' });
-
-    // Every MDX body opens with `# Title` immediately followed by <Date />, so a page-level
-    // byline rendered above <MDXRemote> produced: author → title → date. Injecting it through
-    // the h1 override lands it under the heading, where a byline belongs, without editing the
-    // 42 MDX files. It stays server-rendered (the <Date /> component is ssr: false, so its
-    // output never reaches a crawler) which is the point of the E-E-A-T byline in SDD-003.
-    // UTC pins the calendar day: meta.date is a date-only ISO string, which parses as UTC
-    // midnight and would format one day early in timezones behind UTC (same bug as #135).
-    const postComponents = React.useMemo(() => {
-        const byline = (
-            <p className={styles.byline}>
-                {/* The entity page is the home: its editor window holds the bio and contact tabs */}
-                <Link href="/">{post.meta.author ?? author}</Link>
-                {post.meta.date ? (
-                    <>
-                        {' · '}
-                        <time dateTime={post.meta.date}>
-                            {formatDate(post.meta.date, {
-                                timeZone: 'UTC',
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric',
-                            })}
-                        </time>
-                    </>
-                ) : null}
-            </p>
-        );
-
-        return {
-            ...components,
-            h1: (props: React.ComponentPropsWithoutRef<'h1'>) => (
-                <>
-                    <h1 {...props} />
-                    {byline}
-                </>
-            ),
-            // The byline carries the date now. The <Date /> tag stays in the MDX source because
-            // extractPostDate parses it for datePublished and the sitemap lastmod.
-            Date: () => null,
-        };
-    }, [formatDate, post.meta.author, post.meta.date]);
-
-    let sideClass = '';
-    if (left && !right) sideClass = styles.openPosts;
-    else if (right) sideClass = styles.openCategories;
+    const postComponents = usePostComponents(post.meta);
+    const sideClass = resolveSideClass(left, right);
 
     return (
         <>

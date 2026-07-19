@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import jsdom from 'jsdom';
 import allowCors from '../../helpers/cors';
+import { isValidCityName } from '../../helpers/city';
 
 interface NewsItem {
     title: string;
@@ -90,8 +91,7 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
         return res.status(400).json({ error: 'City parameter is required and must be a string' });
     }
 
-    // Validate city format — '+' is allowed because the UI sends "city+region" pairs
-    if (city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s+-]+$/.test(city)) {
+    if (!isValidCityName(city)) {
         return res.status(400).json({ error: 'Invalid city name format' });
     }
 

@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
+import { isValidCityName } from '../../helpers/city';
 
 interface WeatherData {
     city: string;
@@ -181,10 +182,7 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
         return res.status(400).json({ error: 'Maximum 5 cities allowed' });
     }
 
-    // Validate each city name (basic validation)
-    const invalidCities = citiesArray.filter(
-        (city) => !city || city.length < 2 || city.length > 50 || !/^[a-zA-ZÀ-ÿ\s+-]+$/.test(city)
-    );
+    const invalidCities = citiesArray.filter((city) => !isValidCityName(city));
 
     if (invalidCities.length > 0) {
         return res.status(400).json({ error: `Invalid city names: ${invalidCities.join(', ')}` });

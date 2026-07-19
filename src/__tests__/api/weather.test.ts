@@ -1,22 +1,7 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
 import fetchMock from 'jest-fetch-mock';
 import handler from '../../pages/api/weather';
+import { createMockResponse } from '../../__test__/apiMocks';
 
-type MockResponse = NextApiResponse & {
-    status: jest.Mock;
-    json: jest.Mock;
-    setHeader: jest.Mock;
-    end: jest.Mock;
-};
-
-const createMockResponse = (): MockResponse => {
-    const res = {} as MockResponse;
-    res.status = jest.fn().mockReturnValue(res);
-    res.json = jest.fn().mockReturnValue(res);
-    res.setHeader = jest.fn().mockReturnValue(res);
-    res.end = jest.fn().mockReturnValue(res);
-    return res;
-};
 
 const GEO_FIXTURE = JSON.stringify({
     results: [{ latitude: 52.66, longitude: -8.63, name: 'Limerick', country: 'Ireland' }],

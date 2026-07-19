@@ -12,7 +12,9 @@
         "playwright.config.ts",
         "e2e/**/*.ts",
         ".storybook/**/*.{js,ts,tsx}",
-        "custom-*.js"
+        "custom-*.js",
+        "scripts/generate-post-posters.mjs",
+        "src/__test__/**/*.ts"
     ],
     "ignorePatterns": [
         "lighthouse/assets/**",
@@ -23,5 +25,8 @@
         ".next/**"
     ],
     "ignoreDependencies": ["@mdx-js/loader", "@mdx-js/react", "@storybook/addons", "@storybook/theming"],
-    "ignoreExportsUsedInFile": true
+    "ignoreExportsUsedInFile": true,
+    "health": {
+        "coverage": "public/coverage/coverage-final.json"
+    }
 }

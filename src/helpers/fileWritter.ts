@@ -15,6 +15,21 @@ type SitemapRoute = {
     };
 };
 
+// Pages that must never reach the sitemap: framework internals, route directories
+// handled by their own entries above, error pages, and utility pages with no search value.
+const NON_SITEMAP_PAGES = new Set([
+    '_app.tsx',
+    '_document.tsx',
+    'blog',
+    'api',
+    'legal',
+    '404.tsx',
+    '500.tsx',
+    'survey.tsx',
+    'settings.tsx',
+    'comments.tsx',
+]);
+
 const urlEntry = (loc: string, lastmod?: string | null) => `
     <url>
         <loc>${loc}</loc>
@@ -57,20 +72,7 @@ export const createSiteMap = (routes: SitemapRoute[], locales: string[]) => {
     // No <lastmod> for evergreen pages: stamping the build date on every URL misleads crawlers
     const pages = fs
         .readdirSync(path.join(process.cwd(), '/src/pages'))
-        .filter(
-            (page) =>
-                page !== '_app.tsx' &&
-                page !== '_document.tsx' &&
-                page !== 'blog' &&
-                page !== 'api' &&
-                page !== 'legal' &&
-                page !== '404.tsx' &&
-                page !== '500.tsx' &&
-                page !== 'survey.tsx' &&
-                // Utility pages with no search value
-                page !== 'settings.tsx' &&
-                page !== 'comments.tsx'
-        )
+        .filter((page) => !NON_SITEMAP_PAGES.has(page))
         .map((page) => {
             page = page.replace('.tsx', '');
             return page === 'index' ? '' : page;

@@ -1,25 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
 import fetchMock from 'jest-fetch-mock';
 import handler from '../../pages/api/news';
+import { createMockResponse, createRequest } from '../../__test__/apiMocks';
 
-type MockResponse = NextApiResponse & {
-    status: jest.Mock;
-    json: jest.Mock;
-    setHeader: jest.Mock;
-    end: jest.Mock;
-};
-
-const createMockResponse = (): MockResponse => {
-    const res = {} as MockResponse;
-    res.status = jest.fn().mockReturnValue(res);
-    res.json = jest.fn().mockReturnValue(res);
-    res.setHeader = jest.fn().mockReturnValue(res);
-    res.end = jest.fn().mockReturnValue(res);
-    return res;
-};
-
-const createGetRequest = (city: string) =>
-    ({ method: 'GET', query: { city }, headers: {} } as unknown as NextApiRequest);
+const createGetRequest = (city: string) => createRequest({ city });
 
 const RSS_FIXTURE = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel><title>Search</title>

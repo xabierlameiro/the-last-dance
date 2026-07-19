@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import allowCors from '../../helpers/cors';
+import { isSafePagePath } from '../../helpers/slug';
 
 /**
  * @description This function is used to get the total number of page views for a given page. It uses the Google
@@ -23,21 +24,40 @@ interface AnalyticsData {
 
 type AnalyticsResponse = AnalyticsData | { error: string };
 
-export default allowCors(async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<AnalyticsResponse>
-) {
+const GA_PROPERTY = 'properties/348472560';
+const GA_DATE_RANGES = [{ startDate: '2023-01-01', endDate: 'today' }];
+const GA_METRICS = [{ name: 'screenPageViews' }, { name: 'newUsers' }];
+
+const EMPTY_ANALYTICS: AnalyticsData = { pageViews: 0, newUsers: 0 };
+
+/**
+ * @description Build the runReport request. Without a slug the report covers the whole
+ * property; with one it is filtered down to that exact page path.
+ */
+const buildReportRequest = (slug?: string) => ({
+    property: GA_PROPERTY,
+    dateRanges: GA_DATE_RANGES,
+    metrics: GA_METRICS,
+    ...(slug && {
+        dimensionFilter: {
+            filter: {
+                fieldName: 'pagePath',
+                stringFilter: { matchType: 'EXACT' as const, value: slug },
+            },
+        },
+    }),
+});
+
+export default allowCors(async function handler(req: NextApiRequest, res: NextApiResponse<AnalyticsResponse>) {
     // Only allow GET requests
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { query } = req;
-    const { slug } = query;
-    let data: AnalyticsData | null = null;
+    const { slug } = req.query;
 
     // Validate slug parameter if provided
-    if (slug && (typeof slug !== 'string' || slug.includes('..') || slug.includes('\\'))) {
+    if (slug && !isSafePagePath(slug)) {
         return res.status(400).json({ error: 'Invalid slug parameter' });
     }
 
@@ -55,86 +75,26 @@ export default allowCors(async function handler(
             },
             projectId: process.env.ANALYTICS_PROJECT_ID,
         });
-        if (!slug) {
-            const [response] = await analyticsDataClient.runReport({
-                property: 'properties/348472560',
-                dateRanges: [
-                    {
-                        startDate: '2023-01-01',
-                        endDate: 'today',
-                    },
-                ],
-                metrics: [
-                    {
-                        name: 'screenPageViews',
-                    },
-                    {
-                        name: 'newUsers',
-                    },
-                ],
-            });
 
-            if (!response || !response.rows) {
-                res.status(500).json({ error: 'No data' });
-                return;
+        const [response] = await analyticsDataClient.runReport(buildReportRequest(slug as string | undefined));
+        const [row] = response?.rows ?? [];
+
+        if (!row) {
+            // A page nobody has visited yet is a normal result, not a failure — GA simply
+            // returns no rows for it. Only the unfiltered site-wide report having no rows
+            // means something is actually wrong.
+            if (slug) {
+                return res.status(200).json(EMPTY_ANALYTICS);
             }
-            data = {
-                pageViews: response?.rows?.[0].metricValues?.[0].value || '0',
-                newUsers: response?.rows?.[0].metricValues?.[1].value || '0',
-            };
-        } else {
-            const [response] = await analyticsDataClient.runReport({
-                property: 'properties/348472560',
-                dateRanges: [
-                    {
-                        startDate: '2023-01-01',
-                        endDate: 'today',
-                    },
-                ],
-
-                metrics: [
-                    {
-                        name: 'screenPageViews',
-                    },
-                    {
-                        name: 'newUsers',
-                    },
-                ],
-                dimensionFilter: {
-                    filter: {
-                        fieldName: 'pagePath',
-                        stringFilter: {
-                            matchType: 'EXACT',
-                            value: slug.toString(),
-                        },
-                    },
-                },
-            });
-
-            if (!response || !response.rows || typeof response.rowCount !== 'number') {
-                res.status(500).json({ error: 'Error while parsing analytics data' });
-                return;
-            }
-
-            if (response.rowCount > 0) {
-                data = {
-                    pageViews: response?.rows?.[0].metricValues?.[0].value || '0',
-                    newUsers: response?.rows?.[0].metricValues?.[1].value || '0',
-                };
-            } else {
-                data = {
-                    pageViews: 0,
-                    newUsers: 0,
-                };
-            }
+            return res.status(500).json({ error: 'No data' });
         }
 
-        res.status(200).json({
-            pageViews: data?.pageViews || '0',
-            newUsers: data?.newUsers || '0',
+        return res.status(200).json({
+            pageViews: row.metricValues?.[0]?.value || '0',
+            newUsers: row.metricValues?.[1]?.value || '0',
         });
     } catch (err: unknown) {
         console.error('Analytics API Error:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
     }
 });
