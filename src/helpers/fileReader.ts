@@ -279,14 +279,22 @@ const getPostsByCategory = (category: string, locale: string) => {
 const getAllTags = (locale: string) => {
     const posts = getPostsByLocale(locale);
     const tags = posts.map((post) => post.meta.tags);
-    return [...new Set(tags.flat())].map((tag) => {
-        const postsBytag = getPostsByTag(tag, locale);
-        return {
-            tag,
-            total: tags.flat().filter((t) => t === tag).length,
-            href: `/blog/${tag.toLowerCase()}/${postsBytag[0].meta.slug}`,
-        };
-    });
+    // Categories and tags share the /blog/[category]/ URL namespace, so a tag that spells a
+    // category name ('nextjs' vs category 'Nextjs') resolves to the SAME URL and shows up
+    // twice in the sidebar — once under Topics, once under Tags — with different counts.
+    // The SEO content pass (PR #131) introduced several of these. Frontmatter is cleaned, and
+    // this guard keeps the taxonomies disjoint if a colliding tag is ever added back.
+    const categoryNames = new Set(posts.map((post) => post.meta.category.toLowerCase()));
+    return [...new Set(tags.flat())]
+        .filter((tag) => !categoryNames.has(tag.toLowerCase()))
+        .map((tag) => {
+            const postsBytag = getPostsByTag(tag, locale);
+            return {
+                tag,
+                total: tags.flat().filter((t) => t === tag).length,
+                href: `/blog/${tag.toLowerCase()}/${postsBytag[0].meta.slug}`,
+            };
+        });
 };
 
 /**

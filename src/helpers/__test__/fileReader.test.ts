@@ -1,4 +1,4 @@
-import { getPostBySlug } from '../fileReader';
+import { getAllCategories, getPostBySlug } from '../fileReader';
 
 // The post date comes from the `<Date date="MM-DD-YYYY" />` tag in the MDX body and feeds
 // datePublished in the Article JSON-LD. The old implementation parsed the tag with
@@ -25,5 +25,17 @@ describe('getPostBySlug', () => {
         process.env.TZ = 'America/New_York';
         const post = getPostBySlug('uncaught-error-minified-react-error');
         expect(post.meta.date).toBe('2023-01-05');
+    });
+});
+
+// Both taxonomies render as sidebar sections ("Topics" and "Tags") that link into the same
+// /blog/[category]/ namespace, so an overlapping name is the same URL listed twice.
+describe('getAllCategories', () => {
+    it.each(['en', 'es', 'gl'])('Should keep tags disjoint from categories in %s', (locale) => {
+        const { categories, tags } = getAllCategories(locale);
+        const categoryNames = new Set(categories.map(({ category }) => category.toLowerCase()));
+        const colliding = tags.filter(({ tag }) => categoryNames.has(tag.toLowerCase()));
+
+        expect(colliding).toEqual([]);
     });
 });
