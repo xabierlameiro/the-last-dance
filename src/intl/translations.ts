@@ -12,19 +12,6 @@ export const messages = {
         'blog.category.seo.title': '{category} articles | Xabier Lameiro',
         'blog.category.seo.description': 'All the articles about {category} published by Xabier Lameiro.',
         'about.title': 'About me',
-        'about.seo.title': 'About Xabier Lameiro | Software Architect',
-        'about.seo.description':
-            'Who is Xabier Lameiro: a software architect from Galicia (Spain) specialised in web development with React, Next.js and TypeScript.',
-        'about.p1':
-            "Hi, I'm Xabier Lameiro — a software architect from Galicia, Spain. I have spent my career building web products in the banking and retail sectors, working for companies like CaixaBank, Openbank and Inditex.",
-        'about.p2':
-            'These days I focus on React, Next.js and TypeScript, with a strong interest in testing, automation and the IoT. I also hold a higher technician degree in microcomputing and networks.',
-        'about.p3':
-            'This site is my playground: a macOS-style desktop built with Next.js where I publish what I learn, in English, Spanish and Galician.',
-        'contact.title': 'Contact',
-        'contact.seo.title': 'Contact | Xabier Lameiro',
-        'contact.seo.description': 'How to contact Xabier Lameiro: email, LinkedIn, GitHub and X.',
-        'contact.intro': 'The quickest ways to reach me:',
         'blog.readtime': `{readTime} minutes of reading time`,
         'blog.breadcrumb': 'Notes',
         'blog.readHits': `{hits} hits`,
@@ -113,19 +100,6 @@ export const messages = {
         'blog.category.seo.title': 'Artículos de {category} | Xabier Lameiro',
         'blog.category.seo.description': 'Todos los artículos sobre {category} publicados por Xabier Lameiro.',
         'about.title': 'Sobre mí',
-        'about.seo.title': 'Sobre Xabier Lameiro | Arquitecto de software',
-        'about.seo.description':
-            'Quién es Xabier Lameiro: arquitecto de software gallego especializado en desarrollo web con React, Next.js y TypeScript.',
-        'about.p1':
-            'Hola, soy Xabier Lameiro, arquitecto de software gallego. He construido productos web en banca y retail, trabajando para compañías como CaixaBank, Openbank e Inditex.',
-        'about.p2':
-            'Actualmente me centro en React, Next.js y TypeScript, con especial interés en el testing, la automatización y el IoT. Además soy técnico superior en microinformática y redes.',
-        'about.p3':
-            'Este sitio es mi laboratorio: un escritorio estilo macOS construido con Next.js donde publico lo que aprendo, en inglés, español y gallego.',
-        'contact.title': 'Contacto',
-        'contact.seo.title': 'Contacto | Xabier Lameiro',
-        'contact.seo.description': 'Cómo contactar con Xabier Lameiro: email, LinkedIn, GitHub y X.',
-        'contact.intro': 'Las formas más rápidas de localizarme:',
         'blog.tags': 'Etiquetas',
         'blog.readtime': '{readTime} minutos de tiempo de lectura',
         'blog.readHits': '{hits} visitas',
@@ -215,19 +189,6 @@ export const messages = {
         'blog.category.seo.title': 'Artigos de {category} | Xabier Lameiro',
         'blog.category.seo.description': 'Todos os artigos sobre {category} publicados por Xabier Lameiro.',
         'about.title': 'Sobre min',
-        'about.seo.title': 'Sobre Xabier Lameiro | Arquitecto de software',
-        'about.seo.description':
-            'Quen é Xabier Lameiro: arquitecto de software galego especializado en desenvolvemento web con React, Next.js e TypeScript.',
-        'about.p1':
-            'Ola, son Xabier Lameiro, arquitecto de software galego. Construín produtos web en banca e retail, traballando para compañías como CaixaBank, Openbank e Inditex.',
-        'about.p2':
-            'Actualmente céntrome en React, Next.js e TypeScript, con especial interese no testing, na automatización e no IoT. Ademais son técnico superior en microinformática e redes.',
-        'about.p3':
-            'Este sitio é o meu laboratorio: un escritorio estilo macOS construído con Next.js onde publico o que aprendo, en inglés, español e galego.',
-        'contact.title': 'Contacto',
-        'contact.seo.title': 'Contacto | Xabier Lameiro',
-        'contact.seo.description': 'Como contactar con Xabier Lameiro: email, LinkedIn, GitHub e X.',
-        'contact.intro': 'As formas máis rápidas de localizarme:',
         'blog.tags': 'Etiquetas',
         'blog.readtime': '{readTime} minutos de tempo de lectura',
         'blog.readHits': '{hits} visitas',
