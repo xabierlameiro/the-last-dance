@@ -1,0 +1,6 @@
+{
+    "comment": "Landing post of the Notes app, per locale. Single source of truth for two consumers that cannot share TypeScript: the Dock (src/constants/navMenu.ts) and the /blog redirects in next.config.js. The slug is translated per locale, so a redirect cannot rely on Next's automatic locale prefixing — it would send /es/blog to the English slug, which does not exist.",
+    "en": "/blog/nextjs/continuous-integration-with-github-actions-workflow",
+    "es": "/blog/nextjs/integracion-continua-con-github-actions-workflow",
+    "gl": "/blog/nextjs/integracion-continua-con-github-actions-workflow"
+}

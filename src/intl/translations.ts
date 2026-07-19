@@ -2,16 +2,6 @@ export const messages = {
     en: {
         'blog.title': 'This is the blog page',
         'blog.categories': 'Topics',
-        'blog.index.title': 'Blog',
-        'blog.index.intro':
-            'Notes and tutorials about web development — React, Next.js, testing, automation and the occasional hard-won error fix — written from my day-to-day work as a software architect.',
-        'blog.index.seo.title': 'Blog | Xabier Lameiro',
-        'blog.index.seo.description':
-            'Articles about web development, React, Next.js, testing and automation by Xabier Lameiro, available in English, Spanish and Galician.',
-        'blog.category.intro': 'All the articles filed under {category}.',
-        'blog.category.seo.title': '{category} articles | Xabier Lameiro',
-        'blog.category.seo.description': 'All the articles about {category} published by Xabier Lameiro.',
-        'about.title': 'About me',
         'blog.readtime': `{readTime} minutes of reading time`,
         'blog.breadcrumb': 'Notes',
         'blog.readHits': `{hits} hits`,
@@ -90,16 +80,6 @@ export const messages = {
     es: {
         'blog.title': 'Esta es la página de blog',
         'blog.categories': 'Temas',
-        'blog.index.title': 'Blog',
-        'blog.index.intro':
-            'Notas y tutoriales sobre desarrollo web — React, Next.js, testing, automatización y algún error sufrido en primera persona — escritos desde mi día a día como arquitecto de software.',
-        'blog.index.seo.title': 'Blog | Xabier Lameiro',
-        'blog.index.seo.description':
-            'Artículos sobre desarrollo web, React, Next.js, testing y automatización de Xabier Lameiro, disponibles en inglés, español y gallego.',
-        'blog.category.intro': 'Todos los artículos de la categoría {category}.',
-        'blog.category.seo.title': 'Artículos de {category} | Xabier Lameiro',
-        'blog.category.seo.description': 'Todos los artículos sobre {category} publicados por Xabier Lameiro.',
-        'about.title': 'Sobre mí',
         'blog.tags': 'Etiquetas',
         'blog.readtime': '{readTime} minutos de tiempo de lectura',
         'blog.readHits': '{hits} visitas',
@@ -179,16 +159,6 @@ export const messages = {
     gl: {
         'blog.title': 'Esta é a páxina de blog',
         'blog.categories': 'Temas',
-        'blog.index.title': 'Blog',
-        'blog.index.intro':
-            'Notas e titoriais sobre desenvolvemento web — React, Next.js, testing, automatización e algún erro sufrido en primeira persoa — escritos desde o meu día a día como arquitecto de software.',
-        'blog.index.seo.title': 'Blog | Xabier Lameiro',
-        'blog.index.seo.description':
-            'Artigos sobre desenvolvemento web, React, Next.js, testing e automatización de Xabier Lameiro, dispoñibles en inglés, español e galego.',
-        'blog.category.intro': 'Todos os artigos da categoría {category}.',
-        'blog.category.seo.title': 'Artigos de {category} | Xabier Lameiro',
-        'blog.category.seo.description': 'Todos os artigos sobre {category} publicados por Xabier Lameiro.',
-        'about.title': 'Sobre min',
         'blog.tags': 'Etiquetas',
         'blog.readtime': '{readTime} minutos de tempo de lectura',
         'blog.readHits': '{hits} visitas',

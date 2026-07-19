@@ -8,7 +8,6 @@
 ## Pages
 
 - [Home](https://xabierlameiro.com): Who Xabier Lameiro is — bio, experience, stack and contact details
-- [Blog index](https://xabierlameiro.com/blog): All posts with categories
 
 ## Blog: Error
 

@@ -25,6 +25,11 @@ export default withMDX({
     // and `destination` are prefixed for every locale automatically, so these two entries cover
     // /about, /es/about and /gl/about and pass the locale through. `permanent: true` emits 308,
     // which Google consolidates exactly like a 301.
+    // The /blog and /blog/<category> hubs redirect from getStaticProps instead of here, even
+    // though the docs prefer config for build-time redirects: their destination is a per-locale
+    // slug, and a locale-varying destination needs `locale: false`, whose matcher runs against
+    // the raw path. That works for /es and /gl but cannot express the default locale — neither
+    // `/blog` nor `/en/blog` as source ever matches an incoming `/blog`, which then 404s.
     redirects: async () => {
         return [
             { source: '/about', destination: '/', permanent: true },

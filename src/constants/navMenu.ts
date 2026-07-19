@@ -1,3 +1,5 @@
+import blogLanding from './blogLanding.json' with { type: 'json' };
+
 type Item = {
     img: string;
     alt: string;
@@ -16,9 +18,9 @@ export const menu: Array<Item> = [
         img: '/menu/notes.png',
         alt: 'Go to blog',
         link: {
-            en: '/blog/nextjs/continuous-integration-with-github-actions-workflow',
-            es: '/blog/nextjs/integracion-continua-con-github-actions-workflow',
-            gl: '/blog/nextjs/integracion-continua-con-github-actions-workflow',
+            en: blogLanding.en,
+            es: blogLanding.es,
+            gl: blogLanding.gl,
         },
         testId: 'blog',
     },

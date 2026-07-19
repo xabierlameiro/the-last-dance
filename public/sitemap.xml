@@ -13,66 +13,6 @@
   </url>
 
   <url>
-    <loc>https://xabierlameiro.com/blog</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/blog/error</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/blog/javascript</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/blog/nextjs</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/blog/react</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/es/blog</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/es/blog/error</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/es/blog/javascript</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/es/blog/nextjs</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/es/blog/react</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/gl/blog</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/gl/blog/error</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/gl/blog/javascript</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/gl/blog/nextjs</loc>
-  </url>
-
-  <url>
-    <loc>https://xabierlameiro.com/gl/blog/react</loc>
-  </url>
-
-  <url>
     <loc>https://xabierlameiro.com/blog/error/solve-address-in-use-error</loc>
     <lastmod>2026-07-17</lastmod>
   </url>

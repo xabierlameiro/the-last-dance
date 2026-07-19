@@ -1,95 +1,36 @@
-import React from 'react';
-import Link from 'next/link';
-import { useIntl } from 'react-intl';
-import Dialog from '@/components/Dialog';
-import ControlButtons from '@/components/ControlButtons';
-import SEO from '@/components/SEO';
-import { useDialog } from '@/context/dialog';
-import { getPostsByLocale } from '@/helpers/fileReader';
-import PostSummaryList, { type PostSummary } from '@/components/Blog/PostSummaryList';
-import styles from '@/styles/blogIndex.module.css';
-
-type CategorySummary = {
-    category: string;
-    total: number;
-};
-
-type Props = {
-    posts: PostSummary[];
-    categories: CategorySummary[];
-};
+import blogLanding from '@/constants/blogLanding.json';
+import { defaultLocale } from '@/constants/site';
+import { getLang } from '@/helpers';
 
 /**
- * @description Blog hub page (SDD-002 D3): crawlable index of every post and
- * category with internal links — /blog used to redirect to the home page.
+ * @description /blog used to be a hub page listing every post inside a plain white panel — an
+ * app the desktop does not have. The blog is the full-screen Notes window, so this URL only
+ * survives to redirect the links and search results that already point at it.
+ *
+ * The redirect lives here rather than in next.config.js (which the docs otherwise prefer for
+ * build-time redirects) because the landing slug is translated per locale. A locale-varying
+ * destination forces `locale: false`, and that matcher never matches the default locale's
+ * unprefixed `/blog`. Here the locale arrives from Next directly, so every language works.
+ *
+ * getServerSideProps, not getStaticProps: a static page is prerendered at build time, and Next
+ * rejects a redirect returned during prerendering ("`redirect` can not be returned from
+ * getStaticProps during prerendering"). Serving these two URLs from a function is a fair price
+ * for redirect-only routes that carry no content.
  */
-const BlogIndex = ({ posts, categories }: Props) => {
-    const { formatMessage: f } = useIntl();
-    const { open, dispatch } = useDialog();
-    const close = () => dispatch({ type: 'close' });
+const BlogIndexRedirect = () => null;
 
-    return (
-        <>
-            <SEO
-                meta={{
-                    title: f({ id: 'blog.index.seo.title' }),
-                    description: f({ id: 'blog.index.seo.description' }),
-                }}
-            />
-            <Dialog
-                large
-                modalMode
-                open={open}
-                body={
-                    <div className={styles.container} data-testid="blog-index">
-                        <ControlButtons onClickClose={close} onClickMinimise={close} />
-                        <h1>{f({ id: 'blog.index.title' })}</h1>
-                        <p className={styles.intro}>{f({ id: 'blog.index.intro' })}</p>
-                        <nav className={styles.categories} aria-label={f({ id: 'blog.categories' })}>
-                            {categories.map(({ category, total }) => (
-                                <Link
-                                    key={category}
-                                    href={`/blog/${category.toLowerCase()}`}
-                                    className={styles.category}
-                                >
-                                    {`${category} (${total})`}
-                                </Link>
-                            ))}
-                        </nav>
-                        <PostSummaryList posts={posts} />
-                        <p className={styles.links}>
-                            {/* /about and /contact are gone — the home is the entity page */}
-                            <Link href="/">{f({ id: 'about.title' })}</Link>
-                        </p>
-                    </div>
-                }
-            />
-        </>
-    );
-};
-
-export const getStaticProps = async ({ locale }: { locale: string }) => {
-    const posts = getPostsByLocale(locale)
-        .map(({ meta }) => ({
-            title: meta.title,
-            excerpt: meta.excerpt ?? '',
-            slug: meta.slug,
-            category: meta.category,
-            date: meta.date,
-        }))
-        .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
-
-    const categories = [...new Set(posts.map((post) => post.category))].map((category) => ({
-        category,
-        total: posts.filter((post) => post.category === category).length,
-    }));
+export const getServerSideProps = async ({ locale }: { locale: string }) => {
+    const slug = blogLanding[locale as keyof typeof blogLanding] ?? blogLanding[defaultLocale];
 
     return {
-        props: {
-            posts,
-            categories,
+        redirect: {
+            // The locale prefix has to be added by hand: unlike a next.config.js redirect, a
+            // redirect returned from getServerSideProps is used verbatim. Without it /es/blog
+            // would land on the English URL tree carrying a Spanish slug, which 404s.
+            destination: `${getLang(locale)}${slug}`,
+            permanent: true,
         },
     };
 };
 
-export default BlogIndex;
+export default BlogIndexRedirect;
