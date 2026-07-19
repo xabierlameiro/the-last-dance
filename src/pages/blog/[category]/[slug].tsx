@@ -21,6 +21,8 @@ import dynamic from 'next/dynamic';
 import useWindowResize from '@/hooks/useWindowResize';
 import SEO from '@/components/SEO';
 
+import { ADSENSE_ENABLED } from '@/components/GoogleAdsense';
+
 const GoogleAdsense = dynamic(() => import('@/components/GoogleAdsense'), {
     loading: () => <Loading />,
     ssr: false,
@@ -139,9 +141,11 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 />
                                 <NavList title={f({ id: 'blog.tags' })} list={tags} category={category} />
                             </div>
-                            <aside className={styles.navAd}>
-                                <GoogleAdsense slot="2616692922" />
-                            </aside>
+                            {ADSENSE_ENABLED && (
+                                <aside className={styles.navAd}>
+                                    <GoogleAdsense slot="2616692922" />
+                                </aside>
+                            )}
                         </nav>
                         <nav className={styles.secondNav} onTouchStart={onSideShiftRight}>
                             <AsidePanel />
@@ -153,7 +157,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                         </nav>
                         <article className={styles.article}>
                             <ArticlePanel readTime={post.meta.readTime} />
-                            <div className={styles.body}>
+                            <div className={clx(styles.body, ADSENSE_ENABLED ? styles.withAd : '')}>
                                 <div className={styles.mdx}>
                                     <MDXRemote
                                         frontmatter={undefined}
@@ -162,9 +166,11 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                         scope={{}}
                                     />
                                 </div>
-                                <aside className={styles.verticalAd}>
-                                    <GoogleAdsense slot="2425121235" />
-                                </aside>
+                                {ADSENSE_ENABLED && (
+                                    <aside className={styles.verticalAd}>
+                                        <GoogleAdsense slot="2425121235" />
+                                    </aside>
+                                )}
                             </div>
                         </article>
                     </div>

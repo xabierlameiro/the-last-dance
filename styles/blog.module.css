@@ -101,16 +101,19 @@
     display: grid;
 }
 
+/* The 250px vertical ad column is only carved out when ads actually serve (withAd is set
+   from ADSENSE_ENABLED). While they are hidden, the post keeps the full width instead of
+   leaving a quarter of the viewport empty. */
 @media screen and (min-width: 1400px) {
-    .body {
+    .body.withAd {
         grid-template-columns: 1fr 250px;
     }
-    .mdx {
+    .body.withAd .mdx {
         display: block;
         padding: 0 30px 0 0;
         width: calc(100vw - 710px);
     }
-    .verticalAd {
+    .body.withAd .verticalAd {
         z-index: 1;
     }
 }
