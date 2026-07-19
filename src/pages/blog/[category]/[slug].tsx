@@ -64,7 +64,7 @@ type Props = {
 };
 
 const PostPage = ({ post, tags, categories, posts }: Props) => {
-    const { formatMessage: f } = useIntl();
+    const { formatMessage: f, formatDate } = useIntl();
     const { open, dispatch } = useDialog();
     const { isMobile } = useWindowResize();
     const { left, onSideShiftLeft, right, onSideShiftRight } = useSideShift();
@@ -72,6 +72,47 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
         query: { category, slug },
     } = useRouter();
     const close = () => dispatch({ type: 'close' });
+
+    // Every MDX body opens with `# Title` immediately followed by <Date />, so a page-level
+    // byline rendered above <MDXRemote> produced: author → title → date. Injecting it through
+    // the h1 override lands it under the heading, where a byline belongs, without editing the
+    // 42 MDX files. It stays server-rendered (the <Date /> component is ssr: false, so its
+    // output never reaches a crawler) which is the point of the E-E-A-T byline in SDD-003.
+    // UTC pins the calendar day: meta.date is a date-only ISO string, which parses as UTC
+    // midnight and would format one day early in timezones behind UTC (same bug as #135).
+    const postComponents = React.useMemo(() => {
+        const byline = (
+            <p className={styles.byline}>
+                <Link href="/about">{post.meta.author ?? author}</Link>
+                {post.meta.date ? (
+                    <>
+                        {' · '}
+                        <time dateTime={post.meta.date}>
+                            {formatDate(post.meta.date, {
+                                timeZone: 'UTC',
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                            })}
+                        </time>
+                    </>
+                ) : null}
+            </p>
+        );
+
+        return {
+            ...components,
+            h1: (props: React.ComponentPropsWithoutRef<'h1'>) => (
+                <>
+                    <h1 {...props} />
+                    {byline}
+                </>
+            ),
+            // The byline carries the date now. The <Date /> tag stays in the MDX source because
+            // extractPostDate parses it for datePublished and the sitemap lastmod.
+            Date: () => null,
+        };
+    }, [formatDate, post.meta.author, post.meta.date]);
 
     let sideClass = '';
     if (left && !right) sideClass = styles.openPosts;
@@ -114,15 +155,10 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                             <ArticlePanel readTime={post.meta.readTime} />
                             <div className={styles.body}>
                                 <div className={styles.mdx}>
-                                    {/* E-E-A-T byline (SDD-003): author linked to the entity page */}
-                                    <p className={styles.byline}>
-                                        <Link href="/about">{post.meta.author ?? author}</Link>
-                                        {post.meta.date ? ` · ${post.meta.date}` : ''}
-                                    </p>
                                     <MDXRemote
                                         frontmatter={undefined}
                                         {...post.content}
-                                        components={components}
+                                        components={postComponents}
                                         scope={{}}
                                     />
                                 </div>

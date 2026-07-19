@@ -155,8 +155,10 @@
     display: grid;
 }
 
+/* Sits directly under the centered post h1, so it follows the heading's alignment */
 .byline {
     font-size: 13px;
-    margin: 0 0 12px;
+    margin: -10px 0 24px;
     opacity: 0.75;
+    text-align: center;
 }
