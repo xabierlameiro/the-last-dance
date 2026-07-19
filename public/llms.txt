@@ -7,8 +7,7 @@
 
 ## Pages
 
-- [About](https://xabierlameiro.com/about): Who Xabier Lameiro is — bio, experience and stack
-- [Contact](https://xabierlameiro.com/contact): Email and profiles
+- [Home](https://xabierlameiro.com): Who Xabier Lameiro is — bio, experience, stack and contact details
 - [Blog index](https://xabierlameiro.com/blog): All posts with categories
 
 ## Blog: Error

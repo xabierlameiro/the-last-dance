@@ -58,9 +58,8 @@ const BlogIndex = ({ posts, categories }: Props) => {
                         </nav>
                         <PostSummaryList posts={posts} />
                         <p className={styles.links}>
-                            <Link href="/about">{f({ id: 'about.title' })}</Link>
-                            {' · '}
-                            <Link href="/contact">{f({ id: 'contact.title' })}</Link>
+                            {/* /about and /contact are gone — the home is the entity page */}
+                            <Link href="/">{f({ id: 'about.title' })}</Link>
                         </p>
                     </div>
                 }

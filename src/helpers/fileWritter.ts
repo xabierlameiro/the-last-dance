@@ -59,7 +59,8 @@ export const createSiteMap = (routes: SitemapRoute[], locales: string[]) => {
         legalSlugs.map((slug) => urlEntry(`${domain}${localePrefix(locale)}/legal/${slug}`))
     );
 
-    // Top-level pages (home, about, contact, …); utility pages stay excluded.
+    // Top-level pages, read from the pages directory; utility pages stay excluded. /about and
+    // /contact dropped out here on their own when the files were deleted and folded into the home.
     // No <lastmod> for evergreen pages: stamping the build date on every URL misleads crawlers
     const pages = fs
         .readdirSync(path.join(process.cwd(), '/src/pages'))

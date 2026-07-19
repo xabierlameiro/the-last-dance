@@ -46,6 +46,12 @@ const Document = (props: Props) => {
                             name: author,
                             alternateName: authorAlternateName,
                             url: process.env.NEXT_PUBLIC_DOMAIN,
+                            // The home page presents the bio as source code inside the editor
+                            // window, which crawlers read as <code>, not as prose. Carrying the
+                            // same facts here keeps them machine-readable now that /about is gone.
+                            description:
+                                'Software architect from Galicia, Spain. Builds web products for the banking and retail sectors — CaixaBank, Openbank and Inditex — working mainly with React, Next.js and TypeScript, with a strong interest in testing, automation and the IoT.',
+                            mainEntityOfPage: { '@id': `${process.env.NEXT_PUBLIC_DOMAIN}/#profilepage` },
                             sameAs: socialNetworks,
                             email: 'mailto:xabier.lameiro@gmail.com',
                             image: {

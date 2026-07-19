@@ -85,7 +85,8 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     const postComponents = React.useMemo(() => {
         const byline = (
             <p className={styles.byline}>
-                <Link href="/about">{post.meta.author ?? author}</Link>
+                {/* The entity page is the home: its editor window holds the bio and contact tabs */}
+                <Link href="/">{post.meta.author ?? author}</Link>
                 {post.meta.date ? (
                     <>
                         {' · '}
