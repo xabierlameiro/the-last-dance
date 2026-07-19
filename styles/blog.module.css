@@ -62,6 +62,30 @@
     width: calc(100vw - 460px);
 }
 
+/* GFM tables (remark-gfm) — block + overflow so wide tables scroll instead of
+   breaking the constrained .mdx column on small screens */
+.mdx table {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.9rem;
+}
+
+.mdx th,
+.mdx td {
+    /* --blog-border/--blog-nav store raw RGB components; wrap in rgba() like the rest of this file */
+    border: 1px solid rgba(var(--blog-border));
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.mdx th {
+    background-color: rgba(var(--blog-nav), 0.35);
+}
+
 @media screen and (max-width: 900px) {
     .mdx {
         width: calc(100vw - 70px);
