@@ -8,7 +8,9 @@ type AdComponent = FC<{
 }>;
 
 // Temporarily hidden: AdSense ads are not serving. Flip to true to restore.
-const ADSENSE_ENABLED = false;
+// Exported because the blog layout reserves a 250px column for the vertical slot; that
+// reservation has to disappear with the ads, or the post column is narrowed for nothing.
+export const ADSENSE_ENABLED = false;
 
 /**
  * @description - The adsense will be rendered only in production mode and horizontal only on mobile

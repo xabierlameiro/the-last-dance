@@ -17,6 +17,25 @@ const withMDX = nextMDX({
 });
 
 export default withMDX({
+    // /about and /contact were standalone pages rendering a plain white panel, which broke the
+    // macOS-desktop premise: the only "apps" this site has are the Dock items. Both were already
+    // duplicating the home page, where the VS Code window shows the bio (index.tsx), the
+    // experience (knowledge.module.css) and the contact details (contact.json) as its three tabs.
+    // The home is the entity page, so the two URLs fold into it. With i18n configured, `source`
+    // and `destination` are prefixed for every locale automatically, so these two entries cover
+    // /about, /es/about and /gl/about and pass the locale through. `permanent: true` emits 308,
+    // which Google consolidates exactly like a 301.
+    // The /blog and /blog/<category> hubs redirect from getStaticProps instead of here, even
+    // though the docs prefer config for build-time redirects: their destination is a per-locale
+    // slug, and a locale-varying destination needs `locale: false`, whose matcher runs against
+    // the raw path. That works for /es and /gl but cannot express the default locale — neither
+    // `/blog` nor `/en/blog` as source ever matches an incoming `/blog`, which then 404s.
+    redirects: async () => {
+        return [
+            { source: '/about', destination: '/', permanent: true },
+            { source: '/contact', destination: '/', permanent: true },
+        ];
+    },
     rewrites: async () => {
         return [
             {

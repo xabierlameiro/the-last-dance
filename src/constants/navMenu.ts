@@ -15,11 +15,9 @@ export const menu: Array<Item> = [
     {
         img: '/menu/notes.png',
         alt: 'Go to blog',
-        link: {
-            en: '/blog/nextjs/continuous-integration-with-github-actions-workflow',
-            es: '/blog/nextjs/integracion-continua-con-github-actions-workflow',
-            gl: '/blog/nextjs/integracion-continua-con-github-actions-workflow',
-        },
+        // /blog redirects to the newest post in the active locale, so the Dock never points at a
+        // slug that ages out (or 404s once that post is renamed). Link carries the current locale.
+        link: '/blog',
         testId: 'blog',
     },
     {

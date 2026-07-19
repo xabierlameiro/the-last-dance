@@ -205,6 +205,14 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
                 )}
                 <meta property="og:url" content={url} />
                 <meta property="og:locale" content={OG_LOCALES[l ?? 'en'] ?? 'en_US'} />
+                {/* og:locale alone tells a scraper which language THIS page is; the alternates
+                    declare that the other translations exist. hreflang covers this for search
+                    engines, but Open Graph consumers (LinkedIn, Facebook, Slack) do not read it. */}
+                {Object.entries(OG_LOCALES)
+                    .filter(([lang]) => lang !== (l ?? 'en'))
+                    .map(([lang, ogLocale]) => (
+                        <meta key={lang} property="og:locale:alternate" content={ogLocale} />
+                    ))}
                 <link rel="canonical" href={url} title="Canonical url" />
                 {meta?.alternate?.map(({ lang, url }, index) => (
                     <link

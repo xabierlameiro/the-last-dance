@@ -1,96 +1,35 @@
-import React from 'react';
-import Link from 'next/link';
-import { useIntl } from 'react-intl';
-import Dialog from '@/components/Dialog';
-import ControlButtons from '@/components/ControlButtons';
-import SEO from '@/components/SEO';
-import { useDialog } from '@/context/dialog';
-import { getPostsByLocale } from '@/helpers/fileReader';
-import PostSummaryList, { type PostSummary } from '@/components/Blog/PostSummaryList';
-import styles from '@/styles/blogIndex.module.css';
-
-type CategorySummary = {
-    category: string;
-    total: number;
-};
-
-type Props = {
-    posts: PostSummary[];
-    categories: CategorySummary[];
-};
+import { getLatestPostPath } from '@/helpers/fileReader';
+import { getLang } from '@/helpers';
 
 /**
- * @description Blog hub page (SDD-002 D3): crawlable index of every post and
- * category with internal links — /blog used to redirect to the home page.
+ * @description /blog used to be a hub page listing every post inside a plain white panel — an
+ * app the desktop does not have. The blog is the full-screen Notes window, so this URL survives
+ * only as the blog's entry point: it redirects to the newest post in the active locale.
+ *
+ * That is also what the Dock links to. Pointing the Dock here instead of at a post means the
+ * entry point follows publishing on its own, and `<Link href="/blog">` already carries the
+ * current locale, so the visitor stays in their language.
+ *
+ * getServerSideProps, not getStaticProps: a static page is prerendered at build time, and Next
+ * rejects a redirect returned during prerendering ("`redirect` can not be returned from
+ * getStaticProps during prerendering"). It also keeps the target correct between deploys.
  */
-const BlogIndex = ({ posts, categories }: Props) => {
-    const { formatMessage: f } = useIntl();
-    const { open, dispatch } = useDialog();
-    const close = () => dispatch({ type: 'close' });
+const BlogIndexRedirect = () => null;
 
-    return (
-        <>
-            <SEO
-                meta={{
-                    title: f({ id: 'blog.index.seo.title' }),
-                    description: f({ id: 'blog.index.seo.description' }),
-                }}
-            />
-            <Dialog
-                large
-                modalMode
-                open={open}
-                body={
-                    <div className={styles.container} data-testid="blog-index">
-                        <ControlButtons onClickClose={close} onClickMinimise={close} />
-                        <h1>{f({ id: 'blog.index.title' })}</h1>
-                        <p className={styles.intro}>{f({ id: 'blog.index.intro' })}</p>
-                        <nav className={styles.categories} aria-label={f({ id: 'blog.categories' })}>
-                            {categories.map(({ category, total }) => (
-                                <Link
-                                    key={category}
-                                    href={`/blog/${category.toLowerCase()}`}
-                                    className={styles.category}
-                                >
-                                    {`${category} (${total})`}
-                                </Link>
-                            ))}
-                        </nav>
-                        <PostSummaryList posts={posts} />
-                        <p className={styles.links}>
-                            <Link href="/about">{f({ id: 'about.title' })}</Link>
-                            {' · '}
-                            <Link href="/contact">{f({ id: 'contact.title' })}</Link>
-                        </p>
-                    </div>
-                }
-            />
-        </>
-    );
-};
+export const getServerSideProps = async ({ locale }: { locale: string }) => {
+    const path = getLatestPostPath(locale);
 
-export const getStaticProps = async ({ locale }: { locale: string }) => {
-    const posts = getPostsByLocale(locale)
-        .map(({ meta }) => ({
-            title: meta.title,
-            excerpt: meta.excerpt ?? '',
-            slug: meta.slug,
-            category: meta.category,
-            date: meta.date,
-        }))
-        .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
-
-    const categories = [...new Set(posts.map((post) => post.category))].map((category) => ({
-        category,
-        total: posts.filter((post) => post.category === category).length,
-    }));
+    if (!path) return { notFound: true as const };
 
     return {
-        props: {
-            posts,
-            categories,
+        redirect: {
+            // The locale prefix has to be added by hand: unlike a next.config.js redirect, a
+            // redirect returned from getServerSideProps is used verbatim. Without it /es/blog
+            // would land on the English URL tree carrying a Spanish slug, which 404s.
+            destination: `${getLang(locale)}${path}`,
+            permanent: false,
         },
     };
 };
 
-export default BlogIndex;
+export default BlogIndexRedirect;

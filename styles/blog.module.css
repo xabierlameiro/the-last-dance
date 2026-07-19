@@ -101,16 +101,19 @@
     display: grid;
 }
 
+/* The 250px vertical ad column is only carved out when ads actually serve (withAd is set
+   from ADSENSE_ENABLED). While they are hidden, the post keeps the full width instead of
+   leaving a quarter of the viewport empty. */
 @media screen and (min-width: 1400px) {
-    .body {
+    .body.withAd {
         grid-template-columns: 1fr 250px;
     }
-    .mdx {
+    .body.withAd .mdx {
         display: block;
         padding: 0 30px 0 0;
         width: calc(100vw - 710px);
     }
-    .verticalAd {
+    .body.withAd .verticalAd {
         z-index: 1;
     }
 }
@@ -123,6 +126,14 @@
     .navListContainer {
         padding-right: 12px;
     }
+}
+
+/* Markdown images arrive as raw <img> at their natural size (the hydration diagram is
+   1520px wide), which overflowed the column on any viewport narrower than ~1980px. Code
+   blocks never did, because CodeHike sizes its own frame. */
+.body img {
+    height: auto;
+    max-width: 100%;
 }
 
 .body blockquote {
@@ -155,8 +166,10 @@
     display: grid;
 }
 
+/* Sits directly under the centered post h1, so it follows the heading's alignment */
 .byline {
     font-size: 13px;
-    margin: 0 0 12px;
+    margin: -10px 0 24px;
     opacity: 0.75;
+    text-align: center;
 }

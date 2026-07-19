@@ -1,96 +1,34 @@
-import React from 'react';
-import Link from 'next/link';
-import { useIntl } from 'react-intl';
-import Dialog from '@/components/Dialog';
-import ControlButtons from '@/components/ControlButtons';
-import SEO from '@/components/SEO';
-import { useDialog } from '@/context/dialog';
-import { getAllPosts, getPostsByLocaleAndCategory } from '@/helpers/fileReader';
-import PostSummaryList, { type PostSummary } from '@/components/Blog/PostSummaryList';
-import styles from '@/styles/blogIndex.module.css';
-
-type Props = {
-    posts: PostSummary[];
-    categoryName: string;
-    categorySlug: string;
-};
+import { getLatestPostPath } from '@/helpers/fileReader';
+import { getLang } from '@/helpers';
 
 /**
- * @description Category hub page (SDD-002 D3): lists every post in a category
- * with crawlable internal links and locale-aware SEO metadata.
+ * @description Category hubs (/blog/nextjs, /blog/error, …) were the same white panel as /blog
+ * and are gone for the same reason: the blog window's own sidebar is how you browse a category.
+ * The URL stays as an entry point, landing on the newest post of that category in the active
+ * locale — or on the newest post overall when the category holds none, so a stale inbound link
+ * still arrives somewhere useful instead of 404ing. See src/pages/blog/index.tsx for the rest.
  */
-const CategoryIndex = ({ posts, categoryName, categorySlug }: Props) => {
-    const { formatMessage: f } = useIntl();
-    const { open, dispatch } = useDialog();
-    const close = () => dispatch({ type: 'close' });
+const CategoryIndexRedirect = () => null;
 
-    return (
-        <>
-            <SEO
-                meta={{
-                    title: f({ id: 'blog.category.seo.title' }, { category: categoryName }) as string,
-                    description: f({ id: 'blog.category.seo.description' }, { category: categoryName }) as string,
-                    url: `/blog/${categorySlug}`,
-                }}
-            />
-            <Dialog
-                large
-                modalMode
-                open={open}
-                body={
-                    <div className={styles.container} data-testid="category-index">
-                        <ControlButtons onClickClose={close} onClickMinimise={close} />
-                        <h1>{categoryName}</h1>
-                        <p className={styles.intro}>{f({ id: 'blog.category.intro' }, { category: categoryName })}</p>
-                        <PostSummaryList posts={posts} />
-                        <p className={styles.links}>
-                            <Link href="/blog">{f({ id: 'blog.index.title' })}</Link>
-                        </p>
-                    </div>
-                }
-            />
-        </>
-    );
-};
+export const getServerSideProps = async ({
+    locale,
+    params,
+}: {
+    locale: string;
+    params: { category: string };
+}) => {
+    const path = getLatestPostPath(locale, params.category);
 
-export const getStaticProps = async ({ params, locale }: { params: { category: string }; locale: string }) => {
-    const { category } = params;
-    const posts = getPostsByLocaleAndCategory(locale, category).map(({ meta }) => ({
-        title: meta.title,
-        excerpt: meta.excerpt ?? '',
-        slug: meta.slug,
-        category: meta.category,
-        date: meta.date,
-    }));
-
-    if (posts.length === 0) {
-        return {
-            notFound: true as const,
-        };
-    }
+    if (!path) return { notFound: true as const };
 
     return {
-        props: {
-            posts: [...posts].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? '')),
-            categoryName: posts[0].category,
-            categorySlug: category.toLowerCase(),
+        redirect: {
+            // See src/pages/blog/index.tsx: the locale prefix is not added for us here, and the
+            // redirect is temporary because the newest post changes with every publication.
+            destination: `${getLang(locale)}${path}`,
+            permanent: false,
         },
     };
 };
 
-export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
-    const posts = getAllPosts();
-    const categories = [...new Set(posts.map((post) => post.meta.category.toLowerCase()))];
-
-    return {
-        paths: locales.flatMap((locale) =>
-            categories.map((category) => ({
-                params: { category },
-                locale,
-            }))
-        ),
-        fallback: 'blocking',
-    };
-};
-
-export default CategoryIndex;
+export default CategoryIndexRedirect;

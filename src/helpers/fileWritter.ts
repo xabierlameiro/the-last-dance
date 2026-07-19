@@ -43,13 +43,6 @@ export const createSiteMap = (routes: SitemapRoute[], locales: string[]) => {
         urlEntry(`${domain}${localePrefix(locale)}/blog/${category}/${slug}`, date)
     );
 
-    // Blog hub + category hub pages (SDD-002 D3)
-    const categories = [...new Set(routes.map(({ params }) => params.category))];
-    const hubEntries = locales.flatMap((locale) => [
-        urlEntry(`${domain}${localePrefix(locale)}/blog`),
-        ...categories.map((category) => urlEntry(`${domain}${localePrefix(locale)}/blog/${category}`)),
-    ]);
-
     // Legal pages — previously missing from the sitemap
     const legalSlugs = fs
         .readdirSync(path.join(process.cwd(), 'data/legal'))
@@ -59,7 +52,8 @@ export const createSiteMap = (routes: SitemapRoute[], locales: string[]) => {
         legalSlugs.map((slug) => urlEntry(`${domain}${localePrefix(locale)}/legal/${slug}`))
     );
 
-    // Top-level pages (home, about, contact, …); utility pages stay excluded.
+    // Top-level pages, read from the pages directory; utility pages stay excluded. /about and
+    // /contact dropped out here on their own when the files were deleted and folded into the home.
     // No <lastmod> for evergreen pages: stamping the build date on every URL misleads crawlers
     const pages = fs
         .readdirSync(path.join(process.cwd(), '/src/pages'))
@@ -87,7 +81,7 @@ export const createSiteMap = (routes: SitemapRoute[], locales: string[]) => {
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
         <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${[...pageEntries, ...hubEntries, ...postEntries, ...legalEntries].join('')}
+        ${[...pageEntries, ...postEntries, ...legalEntries].join('')}
         </urlset>
     `;
 

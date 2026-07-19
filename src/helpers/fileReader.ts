@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import matter from 'gray-matter';
+import { defaultLocale } from '@/constants/site';
 
 // Path to posts directory
 const POST_PATH = path.join(process.cwd(), 'data/blog');
@@ -196,6 +197,38 @@ export const getPostsByLocale = (locale: string) => {
 };
 
 /**
+ * @description Path of the newest post, used as the blog's landing URL: the Dock links to
+ * /blog and that route redirects here, so the entry point follows publishing instead of being
+ * pinned to a slug that goes stale (and 404s outright if the post is ever renamed or removed).
+ *
+ * Dates are the ISO strings extracted from the post body, so comparing them as text orders them
+ * chronologically. Scoping to a category serves /blog/<category>, which should land on that
+ * category's newest post rather than the blog's; an empty category falls back to the newest
+ * post overall, and a locale with no posts at all falls back to the default locale.
+ *
+ * @example
+ *     getLatestPostPath('es');
+ *     returns '/blog/nextjs/integracion-continua-con-github-actions-workflow'
+ *
+ * @param {string} locale - Locale of the posts.
+ * @param {string} [category] - Optional category to scope the search to.
+ * @returns {string | null} - Post path without locale prefix, or null when the corpus is empty.
+ */
+export const getLatestPostPath = (locale: string, category?: string): string | null => {
+    const localePosts = getPostsByLocale(locale);
+    const posts = localePosts.length ? localePosts : getPostsByLocale(defaultLocale);
+
+    const inCategory = category
+        ? posts.filter((post) => post.meta.category.toLowerCase() === category.toLowerCase())
+        : [];
+    const pool = inCategory.length ? inCategory : posts;
+
+    const latest = [...pool].sort((a, b) => (b.meta.date ?? '').localeCompare(a.meta.date ?? ''))[0];
+
+    return latest ? `/blog/${latest.meta.category.toLowerCase()}/${latest.meta.slug}` : null;
+};
+
+/**
  * @description Get all posts by category and locale.
  *
  * @example
@@ -279,14 +312,22 @@ const getPostsByCategory = (category: string, locale: string) => {
 const getAllTags = (locale: string) => {
     const posts = getPostsByLocale(locale);
     const tags = posts.map((post) => post.meta.tags);
-    return [...new Set(tags.flat())].map((tag) => {
-        const postsBytag = getPostsByTag(tag, locale);
-        return {
-            tag,
-            total: tags.flat().filter((t) => t === tag).length,
-            href: `/blog/${tag.toLowerCase()}/${postsBytag[0].meta.slug}`,
-        };
-    });
+    // Categories and tags share the /blog/[category]/ URL namespace, so a tag that spells a
+    // category name ('nextjs' vs category 'Nextjs') resolves to the SAME URL and shows up
+    // twice in the sidebar — once under Topics, once under Tags — with different counts.
+    // The SEO content pass (PR #131) introduced several of these. Frontmatter is cleaned, and
+    // this guard keeps the taxonomies disjoint if a colliding tag is ever added back.
+    const categoryNames = new Set(posts.map((post) => post.meta.category.toLowerCase()));
+    return [...new Set(tags.flat())]
+        .filter((tag) => !categoryNames.has(tag.toLowerCase()))
+        .map((tag) => {
+            const postsBytag = getPostsByTag(tag, locale);
+            return {
+                tag,
+                total: tags.flat().filter((t) => t === tag).length,
+                href: `/blog/${tag.toLowerCase()}/${postsBytag[0].meta.slug}`,
+            };
+        });
 };
 
 /**
