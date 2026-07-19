@@ -4,6 +4,7 @@ import Dialog from '@/components/Dialog';
 import ControlButtons from '@/components/ControlButtons';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from '@/helpers/mdx';
+import { isSafeSlug } from '@/helpers/slug';
 import styles from '@/styles/legal.module.css';
 import path from 'path';
 import fs from 'fs';
@@ -105,6 +106,23 @@ const Legal = ({ source, meta }: Props) => {
     );
 };
 
+/**
+ * @description Resolve a legal document path, or null when the slug is unsafe,
+ * escapes the legal directory, or names a file that does not exist.
+ * @param {string} slug - Route slug.
+ * @returns {string | null} Absolute path to the .mdx file, or null.
+ */
+const resolveLegalDocPath = (slug: string): string | null => {
+    if (!isSafeSlug(slug)) return null;
+
+    const fullPath = path.join(LEGAL_PATH, `${slug}.mdx`);
+
+    // Belt and braces: isSafeSlug already rejects traversal, this catches path.join surprises
+    if (!fullPath.startsWith(LEGAL_PATH) || !fs.existsSync(fullPath)) return null;
+
+    return fullPath;
+};
+
 export const getStaticProps = async ({
     params,
 }: {
@@ -113,28 +131,10 @@ export const getStaticProps = async ({
     };
 }) => {
     const { slug } = params;
+    const fullPath = resolveLegalDocPath(slug);
 
-    // Validate slug to prevent directory traversal
-    if (!slug || typeof slug !== 'string' || slug.includes('..') || slug.includes('/') || slug.includes('\\')) {
-        return {
-            notFound: true,
-        };
-    }
-
-    const fullPath = path.join(LEGAL_PATH, `${slug}.mdx`);
-
-    // Ensure the resolved path is within the legal directory
-    if (!fullPath.startsWith(LEGAL_PATH)) {
-        return {
-            notFound: true,
-        };
-    }
-
-    // Check if file exists
-    if (!fs.existsSync(fullPath)) {
-        return {
-            notFound: true,
-        };
+    if (!fullPath) {
+        return { notFound: true };
     }
 
     const mdx = fs.readFileSync(fullPath, 'utf8');

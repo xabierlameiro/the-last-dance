@@ -19,7 +19,7 @@ jobs:
         name: Linting
         runs-on: ubuntu-22.04
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v5
             - uses: actions/setup-node@v3
               with:
                   node-version: 22
@@ -44,7 +44,7 @@ jobs:
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
             NEXT_PUBLIC_ENV: 'preview'
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v5
             - uses: actions/setup-node@v3
               with:
                   node-version: 22
@@ -57,7 +57,7 @@ jobs:
             - name: Run unit tests
               run: npm run coverage
             - name: Checkout unit-report repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v5
               with:
                   repository: xabierlameiro/unit-report
                   token: ${{ secrets.TOKEN_GITHUB }}
@@ -85,7 +85,7 @@ jobs:
               run: |
                   npm run test:e2e:report
             - name: Checkout e2e-report repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v5
               with:
                   repository: xabierlameiro/e2e-report
                   token: ${{ secrets.TOKEN_GITHUB }}
@@ -109,7 +109,7 @@ jobs:
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v5
             - uses: actions/setup-node@v3
               with:
                   node-version: 22
@@ -122,7 +122,7 @@ jobs:
             - name: Generate documentation
               run: npm run jsdoc
             - name: Checkout doc repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v5
               with:
                   repository: xabierlameiro/doc-report
                   token: ${{ secrets.TOKEN_GITHUB }}
@@ -139,7 +139,7 @@ jobs:
                   git commit -m "Update doc-report"
                   git push origin main
             - name: Checkout stb-report repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v5
               with:
                   repository: xabierlameiro/stb-report
                   token: ${{ secrets.TOKEN_GITHUB }}
@@ -162,7 +162,7 @@ jobs:
         needs: [code_checking, testing, documentation]
         steps:
             - name: Checkout version repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v5
               with:
                   fetch-depth: 0
                   token: ${{ secrets.TOKEN_GITHUB }}

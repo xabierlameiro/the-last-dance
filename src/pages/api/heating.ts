@@ -19,9 +19,11 @@ export default allowCors(async function handler(
     _req: NextApiRequest,
     res: NextApiResponse<HeatingResponse>
 ) {
-    // HEATING_CREDENTIALS must NOT use the NEXT_PUBLIC_ prefix: it holds the
-    // Ariston account login payload and would be inlined into the client bundle.
-    const credentials = process.env.HEATING_CREDENTIALS || process.env.NEXT_PUBLIC_HEATING;
+    // HEATING_CREDENTIALS must NOT use the NEXT_PUBLIC_ prefix: it holds the Ariston
+    // account login payload and Next inlines every NEXT_PUBLIC_* value into the client
+    // bundle. A NEXT_PUBLIC_HEATING fallback used to sit here, which would have published
+    // those credentials the moment anyone set it — read the server-only name and nothing else.
+    const credentials = process.env.HEATING_CREDENTIALS;
     if (!credentials) {
         console.error('Missing HEATING_CREDENTIALS environment variable');
         return res.status(500).json({ error: 'Configuration error' });

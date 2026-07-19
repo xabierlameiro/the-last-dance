@@ -14,7 +14,7 @@ jobs:
         name: IndexNow ping
         runs-on: ubuntu-22.04
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
             - uses: actions/setup-node@v4
               with:
                   node-version: 22
@@ -26,7 +26,7 @@ jobs:
         name: Lighthouse
         runs-on: ubuntu-22.04
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v5
             - uses: actions/setup-node@v3
               with:
                   node-version: 22
@@ -41,7 +41,7 @@ jobs:
                   sleep 10m
                   npm run lighthouse-report
             - name: Checkout performance-report repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v5
               with:
                   repository: xabierlameiro/performance-report
                   token: ${{ secrets.TOKEN_GITHUB }}

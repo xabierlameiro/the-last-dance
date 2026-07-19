@@ -20,8 +20,20 @@ const customJestConfig = {
     testPathIgnorePatterns: ['e2e', 'migration'],
     coverageDirectory: 'public/coverage',
     testEnvironment: 'jest-environment-jsdom',
-    coverageReporters: ['html'],
-    collectCoverageFrom: ['src/components/**/*.tsx', 'src/hooks/**/*.ts'],
+    // html powers the published report; lcovonly feeds Sonar and json feeds fallow health --coverage
+    coverageReporters: ['html', 'lcovonly', 'json'],
+    // helpers and API routes hold unit-testable logic and belong in the coverage picture;
+    // leaving them out reported 84% while a third of the codebase was simply unmeasured.
+    // src/pages/**/*.tsx stays out on purpose: those are integration-level, covered by e2e.
+    collectCoverageFrom: [
+        'src/components/**/*.tsx',
+        'src/hooks/**/*.ts',
+        'src/helpers/**/*.ts',
+        'src/pages/api/**/*.ts',
+        'src/constants/**/*.ts',
+        'src/context/**/*.tsx',
+        'scripts/trending/lib.js',
+    ],
     moduleNameMapper: {
         '^@/helpers(.*)$': '<rootDir>src/helpers/$1',
         '^@/layout(.*)$': '<rootDir>src/components/Layout/index.tsx$1',

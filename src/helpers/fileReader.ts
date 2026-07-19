@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import matter from 'gray-matter';
 import { defaultLocale } from '@/constants/site';
+import { isSafeSlug } from './slug';
 
 // Path to posts directory
 const POST_PATH = path.join(process.cwd(), 'data/blog');
@@ -62,22 +63,31 @@ const loadCorpus = (): ParsedPost[] => {
 };
 
 /**
- * @description Find a parsed post by slug in the cached corpus.
+ * @description Reduce a slug or route params object to the bare, comparable slug.
  * @param {string | { params: { slug: string } }} slug - Slug or route params.
- * @returns {ParsedPost}
+ * @returns {string} NFC-normalized slug.
+ * @throws {Error} When the slug looks like a directory traversal attempt.
  */
-const findPostBySlug = (slug: string | { params: { slug: string } }): ParsedPost => {
-    let raw = typeof slug === 'object' ? slug.params.slug : slug;
-    raw = raw.split('/').pop() ?? raw;
+const normalizeSlug = (slug: string | { params: { slug: string } }): string => {
+    const input = typeof slug === 'object' ? slug.params.slug : slug;
+    const bare = input.split('/').pop() ?? input;
 
-    // Validate slug to prevent directory traversal
-    if (!raw || raw.includes('..') || raw.includes('/') || raw.includes('\\')) {
+    if (!isSafeSlug(bare)) {
         throw new Error('Invalid slug parameter');
     }
 
     // Slugs with non-ASCII characters (e.g. "compoñentes") may arrive NFD-decomposed from some
     // clients/crawlers while the frontmatter stores them NFC-composed.
-    const normalizedSlug = raw.normalize('NFC');
+    return bare.normalize('NFC');
+};
+
+/**
+ * @description Find a parsed post by slug in the cached corpus.
+ * @param {string | { params: { slug: string } }} slug - Slug or route params.
+ * @returns {ParsedPost}
+ */
+const findPostBySlug = (slug: string | { params: { slug: string } }): ParsedPost => {
+    const normalizedSlug = normalizeSlug(slug);
 
     const post = loadCorpus().find(
         ({ data, fileName }) =>

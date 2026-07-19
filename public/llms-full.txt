@@ -101,7 +101,7 @@ One last thing, because it is a mistake I see often. The `.npmrc` that reference
 
 - URL: https://xabierlameiro.com/blog/error/solve-address-in-use-error
 - Author: Xabier Lameiro
-- Category: Error · Tags: node, error, cli
+- Category: Error · Tags: node, cli
 - Summary: Fix the Node.js error "listen EADDRINUSE: address already in use": find and kill the process holding the port on macOS, Linux and Windows, free it with one command, or just run on another port.
 
 # EADDRINUSE: address already in use — how to free the port
@@ -191,7 +191,7 @@ If the server runs in a container, the host port is held by the port mapping, no
 
 - URL: https://xabierlameiro.com/blog/error/uncaught-error-minified-react-error
 - Author: Xabier Lameiro
-- Category: Error · Tags: react, nextjs, hydration, ssr
+- Category: Error · Tags: hydration, ssr
 - Summary: Fix Minified React error #425 ("Text content does not match server-rendered HTML"): every common cause of a hydration mismatch — dates, random values, locale formatting, browser-only APIs, invalid HTML — and the right fix for each, with Next.js examples.
 
 # How to fix Minified React error #425 (hydration mismatch)
@@ -468,7 +468,7 @@ If you want to see the results just click on "Lightouse" in the top navigation b
 
 - URL: https://xabierlameiro.com/blog/nextjs/continuous-integration-with-github-actions-workflow
 - Author: Xabier Lameiro
-- Category: Nextjs · Tags: github-actions, ci, nextjs, devops
+- Category: Nextjs · Tags: github-actions, ci, devops
 - Summary: Set up CI/CD for a Next.js project with GitHub Actions: lint, test and build on every push, then deploy to Vercel. The workflow YAML explained step by step.
 
 # Continuous Integration with Github Actions workflow
@@ -933,7 +933,7 @@ You can see the complete code in my repository if you need it, and if you find i
 
 - URL: https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production
 - Author: Xabier Lameiro
-- Category: Nextjs · Tags: nextjs, memory-leak, node, performance
+- Category: Nextjs · Tags: memory-leak, node, performance
 - Summary: Three open memory leaks in Next.js 15.5–16.3, how to tell which one you have from heap snapshots, and why on serverless a leak shows up as a 504 timeout.
 
 # How to find a Next.js memory leak in production
@@ -1254,7 +1254,7 @@ You can see the result by looking at the url of this post and changing the langu
 
 - URL: https://xabierlameiro.com/blog/react/deploying-my-storybook-is-very-simple
 - Author: Xabier Lameiro
-- Category: React · Tags: storybook, react, ci
+- Category: React · Tags: storybook, ci
 - Summary: Deploy your Storybook as a static site so anyone can browse your React components online — the build command, where to host it, and how to wire it into CI. Step by step.
 
 # Deploying my storybook is very simple
@@ -1746,7 +1746,7 @@ To see an example of the output you can click above where it says Docs or via th
 
 - URL: https://xabierlameiro.com/blog/react/publish-report-testing-react
 - Author: Xabier Lameiro
-- Category: React · Tags: jest, testing, react, ci
+- Category: React · Tags: jest, testing, ci
 - Summary: I show you how to publish the testing coverage report with jest in your React or Nextjs application, so you or people can see the testing coverage of your project.
 
 # How to publish the test coverage report in your React application
