@@ -217,6 +217,8 @@ export const messages = {
         'news.error': 'Erro ao obter as novas',
         'news.empty': 'Non hai novas recentes',
         'news.loading': 'Cargando... novas',
+        'weather.error': 'Erro ao obter o tempo',
+        'weather.loading': 'Cargando... tempo',
         'weather.precipitation': 'Precipitación {precipitation}',
         'weather.humidity': 'Humedade {humidity}',
         'weather.windSpeed': 'Vento {windSpeed}',
