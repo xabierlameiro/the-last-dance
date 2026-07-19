@@ -1,5 +1,3 @@
-import blogLanding from './blogLanding.json' with { type: 'json' };
-
 type Item = {
     img: string;
     alt: string;
@@ -17,11 +15,9 @@ export const menu: Array<Item> = [
     {
         img: '/menu/notes.png',
         alt: 'Go to blog',
-        link: {
-            en: blogLanding.en,
-            es: blogLanding.es,
-            gl: blogLanding.gl,
-        },
+        // /blog redirects to the newest post in the active locale, so the Dock never points at a
+        // slug that ages out (or 404s once that post is renamed). Link carries the current locale.
+        link: '/blog',
         testId: 'blog',
     },
     {

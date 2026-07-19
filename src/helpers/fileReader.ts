@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import matter from 'gray-matter';
+import { defaultLocale } from '@/constants/site';
 
 // Path to posts directory
 const POST_PATH = path.join(process.cwd(), 'data/blog');
@@ -193,6 +194,38 @@ export const getAllPosts = () => loadCorpus().map(toPost);
 export const getPostsByLocale = (locale: string) => {
     const posts = getAllPosts();
     return posts.filter((post) => post.meta.locale === locale);
+};
+
+/**
+ * @description Path of the newest post, used as the blog's landing URL: the Dock links to
+ * /blog and that route redirects here, so the entry point follows publishing instead of being
+ * pinned to a slug that goes stale (and 404s outright if the post is ever renamed or removed).
+ *
+ * Dates are the ISO strings extracted from the post body, so comparing them as text orders them
+ * chronologically. Scoping to a category serves /blog/<category>, which should land on that
+ * category's newest post rather than the blog's; an empty category falls back to the newest
+ * post overall, and a locale with no posts at all falls back to the default locale.
+ *
+ * @example
+ *     getLatestPostPath('es');
+ *     returns '/blog/nextjs/integracion-continua-con-github-actions-workflow'
+ *
+ * @param {string} locale - Locale of the posts.
+ * @param {string} [category] - Optional category to scope the search to.
+ * @returns {string | null} - Post path without locale prefix, or null when the corpus is empty.
+ */
+export const getLatestPostPath = (locale: string, category?: string): string | null => {
+    const localePosts = getPostsByLocale(locale);
+    const posts = localePosts.length ? localePosts : getPostsByLocale(defaultLocale);
+
+    const inCategory = category
+        ? posts.filter((post) => post.meta.category.toLowerCase() === category.toLowerCase())
+        : [];
+    const pool = inCategory.length ? inCategory : posts;
+
+    const latest = [...pool].sort((a, b) => (b.meta.date ?? '').localeCompare(a.meta.date ?? ''))[0];
+
+    return latest ? `/blog/${latest.meta.category.toLowerCase()}/${latest.meta.slug}` : null;
 };
 
 /**
