@@ -1,5 +1,5 @@
 import { Html, Head, Main, NextScript } from 'next/document';
-import { author, authorAlternateName, socialNetworks } from '@/constants/site';
+import { author, authorAlternateName, defaultLocale, personDescription, socialNetworks } from '@/constants/site';
 
 type Props = {
     __NEXT_DATA__: {
@@ -7,8 +7,10 @@ type Props = {
     };
 };
 const Document = (props: Props) => {
+    const locale = props.__NEXT_DATA__.locale ?? defaultLocale;
+
     return (
-        <Html lang={props.__NEXT_DATA__.locale} data-theme="light">
+        <Html lang={locale} data-theme="light">
             <Head>
                 <meta charSet="utf-8" />
                 <meta name="theme-color" content="#FFF" />
@@ -48,9 +50,9 @@ const Document = (props: Props) => {
                             url: process.env.NEXT_PUBLIC_DOMAIN,
                             // The home page presents the bio as source code inside the editor
                             // window, which crawlers read as <code>, not as prose. Carrying the
-                            // same facts here keeps them machine-readable now that /about is gone.
-                            description:
-                                'Software architect from Galicia, Spain. Builds web products for the banking and retail sectors — CaixaBank, Openbank and Inditex — working mainly with React, Next.js and TypeScript, with a strong interest in testing, automation and the IoT.',
+                            // same facts here keeps them machine-readable now that /about is gone,
+                            // in the language of the page being described.
+                            description: personDescription[locale] ?? personDescription[defaultLocale],
                             mainEntityOfPage: { '@id': `${process.env.NEXT_PUBLIC_DOMAIN}/#profilepage` },
                             sameAs: socialNetworks,
                             email: 'mailto:xabier.lameiro@gmail.com',
