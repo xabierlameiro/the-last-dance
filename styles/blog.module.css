@@ -125,6 +125,14 @@
     }
 }
 
+/* Markdown images arrive as raw <img> at their natural size (the hydration diagram is
+   1520px wide), which overflowed the column on any viewport narrower than ~1980px. Code
+   blocks never did, because CodeHike sizes its own frame. */
+.body img {
+    height: auto;
+    max-width: 100%;
+}
+
 .body blockquote {
     border-left: 5px solid rgba(var(--blue-color));
     padding: 10px;
