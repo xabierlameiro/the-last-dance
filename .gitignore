@@ -49,3 +49,6 @@ migration/node_modules
 migration/.next
 # lean-ctx tool artifacts
 .lean-ctx/
+
+# local dev-server config (Claude Code Browser pane), machine-specific
+.claude/launch.json
