@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['memory-leak', 'node', 'performance']
 locale: 'gl'
-updated: '2026-07-18'
+updated: '2026-07-21'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
 description: 'Tres fugas de memoria abertas en Next.js 15.5–16.3, como identificar a túa con heap snapshots e por que en serverless a fuga se disfraza dun 504.'
 image: '/posts/nextjs-memory-leak.png'
@@ -23,6 +23,8 @@ faq:
       answer: 'Non. Subir o límite do heap só dá marxe: convén dimensionar o heap ao contedor para evitar OOM prematuros, pero un crecemento monótono acabará chocando igual contra o novo límite. É un paliativo mentres localizas a retención real con snapshots.'
     - question: 'Afectan estas fugas a Vercel ou a outro serverless?'
       answer: 'Poucas veces como OOM: as instancias recíclanse antes de acumular días de heap. En serverless o mesmo malgasto aparece como latencia, custo e erros 504 FUNCTION_INVOCATION_TIMEOUT. No meu blog, un loader O(N²) tardaba 32 segundos en renderizar unha páxina fronte ao límite duns 10 da función; o arranxo foi cachear o corpus a nivel de módulo.'
+    - question: 'Como comprobo se a miña app Next.js ten unha fuga de memoria?'
+      answer: 'Compila con output standalone e executa npx next-leak sobre o directorio da app. Mide cada ruta nun proceso limpo con GC forzado antes de cada mostra, clasifica a curva post-GC como leak, stable ou inconclusive e nomea os obxectos que reteñen memoria — cos snapshots crus e un run.json para verificar o veredicto en Chrome DevTools.'
 ---
 
 # Como atopar unha fuga de memoria de Next.js en produción
@@ -137,6 +139,27 @@ Os números medidos antes e despois, neste repo:
 | Render baixo demanda dunha faceta | 504 (timeout) | ~134 ms   |
 
 A moralexa que conecta coas tres fugas de arriba: **serverless non te libra dos problemas de memoria — transfórmaos**. O reciclado de instancias esconde a retención acumulativa, pero calquera malgasto por request reaparece como latencia, custo e timeouts. E unha caché a nivel de módulo é memoria por instancia que escolles gastar: acoutada e estática por deploy é un arranxo; sen límite e medrando co tráfico sería a fuga 4.
+
+## Como o medín (en vez de fiarme das miñas intuicións)
+
+Todo o anterior saíu de comparar snapshots á man. Á terceira vez de repetir ese ritual — warm-up, GC forzado, snapshot base, carga, repouso, GC outra vez, mostra, diff — automaticeino nun CLI: [next-leak](https://github.com/xabierlameiro/next-leak).
+
+```bash
+npx next-leak . --quick
+```
+
+Arrinca o teu build standalone ruta a ruta nun proceso limpo, xera carga real (incluídos clientes que colgan a metade do stream), forza GC antes de cada mostra e xulga a **forma** da curva post-GC, non os tamaños absolutos. Contra a reprodución de #95094 atopou a fuga e nomeou o retedor pola súa conta:
+
+```
+✖ /api/heap  leak  (+4.70 MB/1000 req)
+  heap 28.7 → 40.3 → 59.0 → 75.8 → 75.9 → 101.2 → 101.2 → 139.0 → 139.0 MB
+    ↳ grown [object] Array 112.5 MB — TimeoutsManager#object[.resources]
+      <- system / Context#object[.timeoutsManager] <- …
+```
+
+Iso é o crecemento en chanzos da fuga 3 co `TimeoutsManager` do sandbox nomeado na cadea de retención — o mesmo diagnóstico de arriba, nuns tres minutos.
+
+Dous datos honestos de medir as tres: #94890 reproduciu cunha décima parte da carga orixinal; #94919 **non** reproduciu nun build standalone nin con 4.000 desconexións reais a metade de stream por ciclo — as páxinas do repro responden en ~6 ms, así que non queda stream que abandonar. Encaixa coa nota do propio reporter de que a magnitude escala co payload RSC: se sospeitas da fuga 2, mide as túas páxinas reais máis pesadas, non un repro mínimo. Cada veredicto vén cos snapshots crus e un `run.json` lexible por máquina, para que verifiques cada afirmación en DevTools.
 
 ## É Next.js ou é o teu código?
 
