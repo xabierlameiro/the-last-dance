@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['memory-leak', 'node', 'performance']
 locale: 'en'
-updated: '2026-07-18'
+updated: '2026-07-21'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
 description: 'Three open memory leaks in Next.js 15.5–16.3, how to tell which one you have from heap snapshots, and why on serverless a leak shows up as a 504 timeout.'
 image: '/posts/nextjs-memory-leak.png'
@@ -23,6 +23,8 @@ faq:
       answer: 'No. Raising the heap limit only buys headroom: sizing the heap to your container avoids premature OOM kills, but a monotonic climb will eventually hit any new limit. Treat it as a stopgap while you locate the real retention with snapshots.'
     - question: 'Do these leaks affect Vercel or other serverless platforms?'
       answer: 'Rarely as OOM: instances are recycled before days of heap can accumulate. On serverless the same waste shows up as latency, cost and 504 FUNCTION_INVOCATION_TIMEOUT errors. On my blog, an O(N^2) post loader took 32 seconds to render a page against a roughly 10 second function limit; the fix was caching the corpus at module level.'
+    - question: 'How can I check if my Next.js app leaks memory?'
+      answer: 'Build with output standalone and run npx next-leak against the app directory. It measures every route in a fresh process with forced GC before each sample, classifies the post-GC curve as leak, stable or inconclusive, and names the retaining objects — with raw heap snapshots and a run.json so you can verify the verdict in Chrome DevTools.'
 ---
 
 # How to find a Next.js memory leak in production
@@ -137,6 +139,27 @@ The numbers measured before and after, in this repo:
 | On-demand render of a tag facet | 504 (timeout) | ~134 ms   |
 
 The takeaway that connects back to the three leaks above: **serverless doesn't free you from memory problems — it transforms them**. Instance recycling hides cumulative retention, but any per-request waste comes back as latency, cost and timeouts. And a module-level cache is per-instance memory you choose to spend: bounded and static per deploy, it's a fix; unbounded and growing with traffic, it would be leak number 4.
+
+## How I measured this (instead of trusting my hunches)
+
+Everything above came from manual snapshot diffing. After the third time I ran that ritual by hand — warm-up, forced GC, baseline snapshot, load, idle, GC again, sample, diff — I automated it into a CLI: [next-leak](https://github.com/xabierlameiro/next-leak).
+
+```bash
+npx next-leak . --quick
+```
+
+It boots your standalone build route by route in a fresh process, drives real load (including clients that hang up mid-stream), forces GC before every sample, and judges the **shape** of the post-GC curve instead of absolute sizes. Against the reproduction for #95094 it found the leak and named the retainer on its own:
+
+```
+✖ /api/heap  leak  (+4.70 MB/1000 req)
+  heap 28.7 → 40.3 → 59.0 → 75.8 → 75.9 → 101.2 → 101.2 → 139.0 → 139.0 MB
+    ↳ grown [object] Array 112.5 MB — TimeoutsManager#object[.resources]
+      <- system / Context#object[.timeoutsManager] <- …
+```
+
+That is the stepwise growth of leak 3 with the sandbox `TimeoutsManager` named in the retainer chain — the same diagnosis as above, in about three minutes.
+
+Two honest data points from measuring all three: #94890 reproduced with a tenth of the original load; #94919 did **not** reproduce on a standalone build even with 4,000 real mid-stream disconnections per cycle — the repro's pages answer in ~6 ms, so there is no stream left to abandon. That matches the reporter's own note that the magnitude scales with the RSC payload: if you suspect leak 2, measure your heaviest real pages, not a minimal repro. Every verdict ships with the raw snapshots and a machine-readable `run.json`, so you can verify every claim yourself in DevTools.
 
 ## Is it Next.js or is it your code?
 

@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['memory-leak', 'node', 'performance']
 locale: 'es'
-updated: '2026-07-18'
+updated: '2026-07-21'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
 description: 'Tres fugas de memoria abiertas en Next.js 15.5–16.3, cómo identificar la tuya con heap snapshots y por qué en serverless la fuga se disfraza de un 504.'
 image: '/posts/nextjs-memory-leak.png'
@@ -23,6 +23,8 @@ faq:
       answer: 'No. Subir el límite del heap solo da margen: conviene dimensionar el heap al contenedor para evitar OOM prematuros, pero un crecimiento monótono acabará chocando igual contra el nuevo límite. Es un paliativo mientras localizas la retención real con snapshots.'
     - question: '¿Afectan estas fugas a Vercel o a otro serverless?'
       answer: 'Rara vez como OOM: las instancias se reciclan antes de acumular días de heap. En serverless el mismo despilfarro aparece como latencia, coste y errores 504 FUNCTION_INVOCATION_TIMEOUT. En mi blog, un loader O(N²) tardaba 32 segundos en renderizar una página frente al límite de unos 10 de la función; el arreglo fue cachear el corpus a nivel de módulo.'
+    - question: '¿Cómo compruebo si mi app Next.js tiene una fuga de memoria?'
+      answer: 'Compila con output standalone y ejecuta npx next-leak sobre el directorio de la app. Mide cada ruta en un proceso limpio con GC forzado antes de cada muestra, clasifica la curva post-GC como leak, stable o inconclusive y nombra los objetos que retienen memoria — con los snapshots crudos y un run.json para verificar el veredicto en Chrome DevTools.'
 ---
 
 # Cómo encontrar una fuga de memoria de Next.js en producción
@@ -137,6 +139,27 @@ Los números medidos antes y después, en este repo:
 | Render bajo demanda de una faceta | 504 (timeout) | ~134 ms   |
 
 La moraleja que conecta con las tres fugas de arriba: **serverless no te libra de los problemas de memoria — los transforma**. El reciclado de instancias esconde la retención acumulativa, pero cualquier despilfarro por request reaparece como latencia, coste y timeouts. Y una caché a nivel de módulo es memoria por instancia que eliges gastar: acotada y estática por deploy es un arreglo; sin límite y creciendo con el tráfico sería la fuga 4.
+
+## Cómo lo medí (en vez de fiarme de mis corazonadas)
+
+Todo lo anterior salió de comparar snapshots a mano. A la tercera vez de repetir ese ritual — warm-up, GC forzado, snapshot base, carga, reposo, GC otra vez, muestra, diff — lo automaticé en un CLI: [next-leak](https://github.com/xabierlameiro/next-leak).
+
+```bash
+npx next-leak . --quick
+```
+
+Arranca tu build standalone ruta a ruta en un proceso limpio, genera carga real (incluidos clientes que cuelgan a mitad de stream), fuerza GC antes de cada muestra y juzga la **forma** de la curva post-GC, no los tamaños absolutos. Contra la reproducción de #95094 encontró la fuga y nombró el retenedor por su cuenta:
+
+```
+✖ /api/heap  leak  (+4.70 MB/1000 req)
+  heap 28.7 → 40.3 → 59.0 → 75.8 → 75.9 → 101.2 → 101.2 → 139.0 → 139.0 MB
+    ↳ grown [object] Array 112.5 MB — TimeoutsManager#object[.resources]
+      <- system / Context#object[.timeoutsManager] <- …
+```
+
+Eso es el crecimiento escalonado de la fuga 3 con el `TimeoutsManager` del sandbox nombrado en la cadena de retención — el mismo diagnóstico de arriba, en unos tres minutos.
+
+Dos datos honestos de medir las tres: #94890 reprodujo con una décima parte de la carga original; #94919 **no** reprodujo en un build standalone ni con 4.000 desconexiones reales a mitad de stream por ciclo — las páginas del repro responden en ~6 ms, así que no queda stream que abandonar. Encaja con la nota del propio reporter de que la magnitud escala con el payload RSC: si sospechas de la fuga 2, mide tus páginas reales más pesadas, no un repro mínimo. Cada veredicto viene con los snapshots crudos y un `run.json` legible por máquina, para que verifiques cada afirmación en DevTools.
 
 ## ¿Es Next.js o es tu código?
 
