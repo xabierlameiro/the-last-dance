@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['memory-leak', 'node', 'performance']
 locale: 'gl'
-updated: '2026-07-21'
+updated: '2026-07-22'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
 description: 'Tres fugas de memoria abertas en Next.js 15.5–16.3, como identificar a túa con heap snapshots e por que en serverless a fuga se disfraza dun 504.'
 image: '/posts/nextjs-memory-leak.png'
@@ -158,6 +158,8 @@ Arrinca o teu build standalone ruta a ruta nun proceso limpo, xera carga real (i
 ```
 
 Iso é o crecemento en chanzos da fuga 3 co `TimeoutsManager` do sandbox nomeado na cadea de retención — o mesmo diagnóstico de arriba, nuns tres minutos.
+
+O protocolo completo, por que existe cada paso e o par antes/despois que demostra que o diagnóstico era correcto están en [como medir unha fuga de memoria en Next.js e demostrar o diagnóstico](https://xabierlameiro.com/gl/blog/nextjs/medir-fuga-de-memoria-en-nextjs).
 
 Dous datos honestos de medir as tres: #94890 reproduciu cunha décima parte da carga orixinal; #94919 **non** reproduciu nun build standalone nin con 4.000 desconexións reais a metade de stream por ciclo — as páxinas do repro responden en ~6 ms, así que non queda stream que abandonar. Encaixa coa nota do propio reporter de que a magnitude escala co payload RSC: se sospeitas da fuga 2, mide as túas páxinas reais máis pesadas, non un repro mínimo. Cada veredicto vén cos snapshots crus e un `run.json` lexible por máquina, para que verifiques cada afirmación en DevTools.
 

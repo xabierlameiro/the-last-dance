@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['memory-leak', 'node', 'performance']
 locale: 'en'
-updated: '2026-07-21'
+updated: '2026-07-22'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
 description: 'Three open memory leaks in Next.js 15.5–16.3, how to tell which one you have from heap snapshots, and why on serverless a leak shows up as a 504 timeout.'
 image: '/posts/nextjs-memory-leak.png'
@@ -158,6 +158,8 @@ It boots your standalone build route by route in a fresh process, drives real lo
 ```
 
 That is the stepwise growth of leak 3 with the sandbox `TimeoutsManager` named in the retainer chain — the same diagnosis as above, in about three minutes.
+
+The full protocol, why each step exists, and the before/after pair that proves the diagnosis was right are in [how to measure a Next.js memory leak and prove the diagnosis](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak).
 
 Two honest data points from measuring all three: #94890 reproduced with a tenth of the original load; #94919 did **not** reproduce on a standalone build even with 4,000 real mid-stream disconnections per cycle — the repro's pages answer in ~6 ms, so there is no stream left to abandon. That matches the reporter's own note that the magnitude scales with the RSC payload: if you suspect leak 2, measure your heaviest real pages, not a minimal repro. Every verdict ships with the raw snapshots and a machine-readable `run.json`, so you can verify every claim yourself in DevTools.
 
