@@ -1,0 +1,132 @@
+---
+title: 'Cómo medir una fuga de memoria en Next.js y demostrar el diagnóstico'
+slug: 'medir-fuga-de-memoria-nextjs'
+author: 'Xabier Lameiro'
+category: 'Nextjs'
+tags: ['memory-leak', 'heap-snapshot', 'node', 'debugging', 'performance']
+locale: 'es'
+updated: '2026-07-22'
+excerpt: 'Heap 28,7 → 138,9 MB en 8 ciclos · el objeto que retiene, con nombre · la misma app plana al quitar la causa'
+description: 'El protocolo de medición detrás de una fuga de memoria confirmada en Next.js: GC forzado con --expose-gc, diffs de heap snapshots y cadenas de retención, y el par antes/después que demuestra el diagnóstico. Automatizado en next-leak.'
+image: '/posts/measure-nextjs-memory-leak.png'
+alternate: [{ lang: 'en', url: 'measure-nextjs-memory-leak' }, { lang: 'gl', url: 'medir-fuga-de-memoria-en-nextjs' }]
+faq:
+    - question: '¿Cómo demuestro que una fuga de memoria es real y no calentamiento?'
+      answer: 'Mide en ciclos y juzga la forma de la curva después de un GC forzado, no un número suelto. El crecimiento de calentamiento (JIT, cachés perezosas) se aplana tras uno o dos ciclos y devuelve un 20-30% bajo presión de GC; una fuga real sigue subiendo y no devuelve nada. Excluye el primer ciclo del veredicto y fuerza el GC antes de cada muestra para no estar midiendo basura que el recolector habría liberado igual.'
+    - question: '¿Cuántas peticiones necesito para confirmar una fuga de memoria en Next.js?'
+      answer: 'Menos de las que usa la mayoría de reportes, si el protocolo es correcto. El issue 95094 reprodujo con 8 ciclos de 3000 peticiones y 20 conexiones. El issue 94890, cuyo reporte original necesitaba 1,2 millones de peticiones y un script propio, reprodujo con 120000 peticiones con URLs únicas. Importa menos el volumen de carga que forzar el GC en el momento correcto y excluir el calentamiento.'
+    - question: '¿Qué te dice un diff de heap snapshots que no te diga una gráfica de memoria?'
+      answer: 'Una gráfica te dice que la memoria crece. El diff entre dos snapshots nombra el objeto que creció y la cadena de referencias que lo retiene. En el issue 95094 el diff señaló un array de 112,47 MB en TimeoutsManager.resources, retenido a través del contexto del sandbox y del closure del polyfill de setTimeout, que es exactamente el mecanismo que describe el issue.'
+    - question: '¿Cómo sé que mi diagnóstico es correcto y no una casualidad?'
+      answer: 'Quita la causa y vuelve a medir con parámetros idénticos. En el issue 95094 la fuga fue de 28,7 a 138,9 MB; añadiendo clearTimeout(id) dentro del callback, la misma app midió de 27,8 a 25,6 MB, plana, a +0,02 MB por cada 1000 peticiones. Si quitar la causa sospechosa no elimina el efecto, el diagnóstico está mal.'
+    - question: '¿Puedo hacer esta medición en mi propia app de Next.js?'
+      answer: 'Sí. Compila con output standalone y ejecuta npx next-leak sobre el directorio de la app. Mide cada ruta en un proceso nuevo, con calentamiento antes de la línea base y GC forzado antes de cada muestra, clasifica la curva post-GC como leak, stable o inconclusive y nombra los objetos que retienen, dejando los heap snapshots crudos y un run.json para que verifiques el veredicto tú mismo en Chrome DevTools.'
+---
+
+# Cómo medir una fuga de memoria en Next.js y demostrar el diagnóstico
+
+<Date date="07-22-2026" />
+
+<GoogleAdsense />
+
+## Respuesta rápida
+
+Casi todos los reportes de fugas de memoria mueren en el mismo sitio. Alguien publica una gráfica que sube, un maintainer pide heap snapshots tomados tras un GC forzado, y nadie vuelve. No creo que sea pereza — tomar esos snapshots _correctamente_ es más difícil de lo que el hilo da a entender, y hacerlo mal te deja números que parecen convincentes y no significan nada.
+
+Así que cogí un issue abierto y lo hice bien: [vercel/next.js#95094](https://github.com/vercel/next.js/issues/95094), _"Memory leak from retained sandbox timeouts causes stepwise heap growth"_. La afirmación es que `setTimeout` dentro del middleware fuga, porque el sandbox guarda cada id de timeout y no lo suelta nunca.
+
+Esa afirmación es fácil de creer y fácil de equivocar. El crecimiento escalonado es también lo que parecen el calentamiento del JIT y las cachés perezosas. Distinguir una cosa de la otra es todo el trabajo.
+
+Este post va del _método_: cómo medir y cómo demostrar el diagnóstico. Si lo que necesitas es averiguar cuál de las fugas abiertas te está afectando en producción, lee antes [cómo encontrar una fuga de memoria de Next.js en producción](https://xabierlameiro.com/blog/nextjs/fuga-de-memoria-nextjs-en-produccion) y vuelve aquí a confirmarlo.
+
+## El protocolo importa más que la herramienta
+
+Cada paso existe para matar una forma concreta de engañarte a ti mismo:
+
+-   **Un proceso nuevo por ruta.** No se arrastra nada de lo que ejecutaste antes.
+-   **Calentamiento antes de la línea base.** Las primeras peticiones disparan el JIT y las cachés perezosas. Si haces el snapshot en frío, le imputas todo eso a la fuga.
+-   **GC forzado — tres pasadas — antes de cada muestra.** El heap que el GC puede liberar no está fugado. Si muestreas sin forzarlo, estás midiendo basura. Esto exige arrancar el proceso con `--expose-gc` para poder llamar a `global.gc()`, y escribir el snapshot con `v8.writeHeapSnapshot()` justo después.
+-   **Ciclos, no una sola lectura.** Un número no dice nada. Una serie tiene forma, y la forma es lo que sobrevive al ruido.
+-   **Una auditoría de la propia carga.** Una ejecución que en silencio no envió su tráfico se parece exactamente a una ruta sana.
+
+Lo último no es teórico. Dos veces mi propio generador de carga no envió casi nada — una porque el timeout iba en segundos enteros, otra porque el 86% de las peticiones no llegaba a conectar. Las dos habrían impreso un `stable` muy convencido. Solo las cacé porque la ejecución registra lo que hizo de verdad.
+
+## Los números
+
+Contra el repositorio de reproducción del propio issue — next `16.3.0-canary.50`, Node 24.15, darwin arm64, 8 ciclos de 3000 peticiones, 20 conexiones:
+
+```
+heap tras GC forzado, por ciclo (MB):
+28,7 → 40,2 → 59,0 → 75,8 → 75,8 → 101,0 → 101,1 → 138,9 → 138,9
+```
+
+Es la forma escalonada del título, unos **4,7 MB por cada 1000 peticiones**, y no vuelve nunca. El calentamiento se aplana tras uno o dos ciclos. Esto no devuelve nada.
+
+## El diff de snapshots nombra el mecanismo
+
+Un heap que sube te dice que tienes un problema. No te dice qué está reteniendo la memoria. El diff entre la línea base y el snapshot final sí:
+
+```
+grown [object] Array  112.47 MB
+  — TimeoutsManager#object[.resources]
+  <- system / Context#object[.timeoutsManager]
+  <- webSetTimeoutPolyfill#closure[.context]
+```
+
+Se lee de abajo arriba: el polyfill de `setTimeout` del sandbox retiene un contexto, el contexto retiene un `TimeoutsManager`, y su array `resources` ha crecido hasta 112 MB de entradas de timeout. Es exactamente el mecanismo que describe el issue — y no tuve que saber dónde mirar para encontrarlo.
+
+Esto es lo mismo que leerías a mano en Chrome DevTools: carga los dos snapshots en la pestaña Memory, cambia a la vista **Comparison** y abre los _retainers_ de lo que haya crecido. Los snapshots se conservan precisamente para que puedas comprobarlo tú: un veredicto que no puedes auditar es solo una opinión con números.
+
+## Quitar la causa elimina el efecto
+
+Este es el paso que la gente se salta, y el único que convierte una medición en una confirmación.
+
+El hilo propone un workaround: llamar a `clearTimeout(id)` dentro del callback para que el sandbox libere la entrada. Si mi diagnóstico es correcto, eso debería borrar la curva. Misma app, mismos parámetros:
+
+```
+27,8 → 25,2 → 25,3 → 25,4 → 25,4 → 25,5 → 25,5 → 25,5 → 25,6
+```
+
+Plana. **+0,02 MB por cada 1000 peticiones.** No cambió nada salvo la causa, y el efecto se fue con ella. Es el estándar que yo querría de cualquiera que me enseñe una fuga.
+
+Una cosa que no esperaba: con 100 conexiones concurrentes, la versión _arreglada_ dio timeout en cerca del 9% de las peticiones. Llevar la cuenta de 500 timeouts por petición cuesta CPU además de memoria, así que en un middleware caliente esto importa más allá del heap.
+
+El detalle completo con los parámetros de reproducción está [en el propio issue](https://github.com/vercel/next.js/issues/95094#issuecomment-5035131691).
+
+## El mismo método dice "no" igual de a menudo
+
+Lo apliqué a seis issues abiertos. Dos más reprodujeron:
+
+-   **[#94890](https://github.com/vercel/next.js/issues/94890)** — la caché LRU del router no cuenta sus claves. Heap 26,7 → 71,9 MB, con la cadena apuntando al comprobador de rutas del sistema de ficheros. El reporte original necesitaba 1,2M de peticiones y un script propio; esto llevó 120000 y un comando.
+-   **[#84884](https://github.com/vercel/next.js/issues/84884)** — axios con `AbortSignal` en el middleware. Cuatro rutas casi idénticas en el repro, y solo `/middleware/axios` fuga: 32,8 → 369,9 MB mientras las otras tres quedan planas. Eso es aislamiento por comparación, no una correlación de la que fiarse.
+
+Tres no reprodujeron — y las razones llevaban todo el tiempo en los hilos. Una se arregló aguas arriba en la 16.0.3. Otra es un bug de Node que el reporter confirma que ya no existe en Node 26. La tercera es un problema del servidor de desarrollo, que este método no puede ver por diseño.
+
+Un resultado negativo con evidencia detrás vale tanto como una confirmación. Es la diferencia entre "no consigo reproducirlo" y "esto es lo que ejecuté, esto es lo que vi, y esto es lo que descarté".
+
+En ~25 rutas sanas de aplicaciones reales en producción — PPR, MDX, Auth.js, Sentry, i18n — no dio ni un falso positivo. Ese número me importa más que las confirmaciones. Un detector de fugas que grita "lobo" es peor que no tener ninguno.
+
+## Por qué no usar simplemente Chrome DevTools o memlab
+
+Porque ninguno ejecuta el experimento por ti, y el experimento es la parte difícil:
+
+| Herramienta                                              | Qué te da                                                                  | Dónde se queda                                                                                                                                                                                        |
+| -------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Chrome DevTools**                                      | La verdad de referencia: dos snapshots y una vista Comparison              | La carga la reproduces tú, el GC lo fuerzas tú, los momentos los eliges tú y los retainers los lees tú. Hacerlo _bien_ es toda la dificultad                                                          |
+| **[memlab](https://github.com/facebook/memlab)**         | Un motor excelente de análisis de heap — lo uso para parsear los snapshots | Está construido alrededor de escenarios de navegador que programas tú. No genera carga HTTP contra tus rutas, y no sabe nada de los manifiestos de rutas de Next.js ni de los source maps de tu build |
+| **[clinic.js](https://github.com/clinicjs/node-clinic)** | Profiling amplio de rendimiento en Node                                    | Su propio README dice que ya no se mantiene activamente                                                                                                                                               |
+| **`--inspect` + snapshots manuales**                     | Control total                                                              | Lo mismo que DevTools, más mantener a mano el proceso, la carga y los snapshots sincronizados                                                                                                         |
+
+Lo que le falta a todos no es el análisis — es el experimento controlado que lo rodea: un proceso nuevo por ruta, calentamiento antes de la línea base, GC forzado y un reposo adaptativo antes de cada muestra, y una auditoría de si la carga que crees haber enviado llegó de verdad.
+
+## Medir tu propia app
+
+Automaticé el protocolo de arriba en una CLI, [next-leak](https://github.com/xabierlameiro/next-leak):
+
+```bash
+npx next-leak .
+```
+
+Necesita App Router, `output: "standalone"` y Node ≥ 22. Es un alcance estrecho a propósito — es la razón de que el número de falsos positivos sea el que es. Te da una de tres respuestas, y las tres sirven: no tienes una fuga (el caso común, y el informe lo demuestra), la fuga es tuya o de una dependencia (con el fichero nombrado cuando los source maps lo permiten), o parece de las tripas del framework, con un borrador de issue y los snapshots para respaldarlo.
+
+Si vienes por el otro lado — una gráfica subiendo en producción y ni idea de por qué — empieza aquí: [cómo encontrar una fuga de memoria de Next.js en producción](https://xabierlameiro.com/blog/nextjs/fuga-de-memoria-nextjs-en-produccion).
