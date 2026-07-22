@@ -162,6 +162,17 @@ const posts = [
         subhead: 'Heap growth, OOM and 504s — a Next.js 16 field map',
         ghost: 'OOM',
     },
+    {
+        // Pairs with nextjs-memory-leak.png above: that post is about finding
+        // the leak, this one about proving it. Hence Find → Prove, OOM → GC.
+        file: 'measure-nextjs-memory-leak.png',
+        eyebrow: 'NEXT.JS · DIAGNOSTICS',
+        line1: 'Prove the',
+        line2: 'memory ',
+        accentWord: 'leak',
+        subhead: 'Force GC, diff the heap, then remove the cause',
+        ghost: 'GC',
+    },
 ];
 
 let done = 0;
