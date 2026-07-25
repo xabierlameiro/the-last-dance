@@ -25,10 +25,20 @@ interface AnalyticsData {
 type AnalyticsResponse = AnalyticsData | { error: string };
 
 const GA_PROPERTY = 'properties/348472560';
+// Since the property started collecting, so the counters read as all-time totals.
 const GA_DATE_RANGES = [{ startDate: '2023-01-01', endDate: 'today' }];
 const GA_METRICS = [{ name: 'screenPageViews' }, { name: 'newUsers' }];
 
 const EMPTY_ANALYTICS: AnalyticsData = { pageViews: 0, newUsers: 0 };
+
+/**
+ * The GA4 Data API bills every call against a per-property daily token quota, and
+ * without this header each visitor rendering a view counter spent one. A total
+ * that is five minutes stale is indistinguishable from a fresh one to a reader,
+ * so the edge answers instead — and `stale-while-revalidate` means a quota
+ * exhaustion or an API outage shows the last known figure rather than an error.
+ */
+const CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=86400';
 
 /**
  * @description Build the runReport request. Without a slug the report covers the whole
@@ -62,7 +72,11 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
     }
 
     // Validate required environment variables
-    if (!process.env.ANALYTICS_CLIENT_EMAIL || !process.env.ANALYTICS_PRIVATE_KEY || !process.env.ANALYTICS_PROJECT_ID) {
+    if (
+        !process.env.ANALYTICS_CLIENT_EMAIL ||
+        !process.env.ANALYTICS_PRIVATE_KEY ||
+        !process.env.ANALYTICS_PROJECT_ID
+    ) {
         console.error('Missing required environment variables for Google Analytics API');
         return res.status(500).json({ error: 'Configuration error' });
     }
@@ -84,11 +98,15 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
             // returns no rows for it. Only the unfiltered site-wide report having no rows
             // means something is actually wrong.
             if (slug) {
+                res.setHeader('Cache-Control', CACHE_CONTROL);
                 return res.status(200).json(EMPTY_ANALYTICS);
             }
+            // Errors stay uncached: caching one would keep serving it for five minutes
+            // after the cause is gone.
             return res.status(500).json({ error: 'No data' });
         }
 
+        res.setHeader('Cache-Control', CACHE_CONTROL);
         return res.status(200).json({
             pageViews: row.metricValues?.[0]?.value || '0',
             newUsers: row.metricValues?.[1]?.value || '0',
