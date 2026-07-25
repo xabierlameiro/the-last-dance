@@ -1,7 +1,8 @@
 // Usage: `node lighthouse/assets/lighthouse.js`
 import fs from 'fs';
 import lighthouse from 'lighthouse';
-import chromeLauncher from 'chrome-launcher';
+// chrome-launcher is native ESM and exposes no default export, only named ones.
+import * as chromeLauncher from 'chrome-launcher';
 import { chart, nodeStructure, options, DOMAIN, translations } from './constants.js';
 
 try {
