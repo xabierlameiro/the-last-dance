@@ -5,7 +5,7 @@ jest.mock('@google-analytics/data', () => ({
 }));
 
 import handler from '../../pages/api/analytics';
-import { createMockResponse, createRequest } from '../../__test__/apiMocks';
+import { createMockResponse, createRequest, type MockResponse } from '../../__test__/apiMocks';
 
 const rowsWith = (pageViews: string, newUsers: string) => [
     { rows: [{ metricValues: [{ value: pageViews }, { value: newUsers }] }] },
@@ -95,5 +95,38 @@ describe('/api/analytics', () => {
 
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({ error: 'Internal server error' });
+    });
+
+    const cacheControlOf = (res: MockResponse) =>
+        res.setHeader.mock.calls.find(([header]) => header === 'Cache-Control')?.[1];
+
+    // Every uncached call spends a token from the GA4 Data API's daily per-property
+    // quota, and one is spent per visitor rendering a counter.
+    it('lets the edge cache a successful report', async () => {
+        runReport.mockResolvedValue(rowsWith('120', '45'));
+        const res = createMockResponse();
+
+        await handler(createRequest(), res);
+
+        expect(cacheControlOf(res)).toBe('public, s-maxage=300, stale-while-revalidate=86400');
+    });
+
+    it('caches the zeroed counters of a page with no views', async () => {
+        runReport.mockResolvedValue([{ rows: [] }]);
+        const res = createMockResponse();
+
+        await handler(createRequest({ slug: '/blog/react/brand-new-post' }), res);
+
+        expect(cacheControlOf(res)).toBe('public, s-maxage=300, stale-while-revalidate=86400');
+    });
+
+    // Caching a failure would keep serving it for five minutes after the cause is gone.
+    it('never caches a failure', async () => {
+        runReport.mockRejectedValue(new Error('quota exceeded'));
+        const res = createMockResponse();
+
+        await handler(createRequest(), res);
+
+        expect(cacheControlOf(res)).toBeUndefined();
     });
 });
