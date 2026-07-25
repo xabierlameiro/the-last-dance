@@ -107,8 +107,11 @@
             "uuid": "^11.1.1"
         },
         "next": {
-            "postcss": "^8.5.16"
-        }
+            "postcss": "^8.5.18"
+        },
+        "brace-expansion@1": "1.1.16",
+        "brace-expansion@2": "2.1.2",
+        "brace-expansion@5": "5.0.8"
     },
     "resolutions": {
         "protobufjs": "^7.2.5",
