@@ -35,8 +35,8 @@ jobs:
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
             NEXT_PUBLIC_ENV: 'preview'
         steps:
-            - uses: actions/checkout@v5
-            - uses: actions/setup-node@v4
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
               with:
                   node-version: 22
                   cache: npm
@@ -48,7 +48,7 @@ jobs:
             - name: Run unit tests with coverage
               run: npm run coverage
             - name: Checkout unit-report repository
-              uses: actions/checkout@v5
+              uses: actions/checkout@v7
               with:
                   repository: xabierlameiro/unit-report
                   token: ${{ secrets.TOKEN_GITHUB }}
@@ -71,7 +71,7 @@ jobs:
             - name: Run end-to-end tests
               run: npm run test:e2e:report
             - name: Checkout e2e-report repository
-              uses: actions/checkout@v5
+              uses: actions/checkout@v7
               with:
                   repository: xabierlameiro/e2e-report
                   token: ${{ secrets.TOKEN_GITHUB }}
@@ -96,8 +96,8 @@ jobs:
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
-            - uses: actions/checkout@v5
-            - uses: actions/setup-node@v4
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
               with:
                   node-version: 22
                   cache: npm
@@ -109,7 +109,7 @@ jobs:
             - name: Generate documentation
               run: npm run jsdoc
             - name: Checkout doc repository
-              uses: actions/checkout@v5
+              uses: actions/checkout@v7
               with:
                   repository: xabierlameiro/doc-report
                   token: ${{ secrets.TOKEN_GITHUB }}
@@ -126,7 +126,7 @@ jobs:
                   git diff --staged --quiet || git commit -m "Update doc-report"
                   git push origin main
             - name: Checkout stb-report repository
-              uses: actions/checkout@v5
+              uses: actions/checkout@v7
               with:
                   repository: xabierlameiro/stb-report
                   token: ${{ secrets.TOKEN_GITHUB }}
@@ -148,8 +148,8 @@ jobs:
         name: Lighthouse
         runs-on: ubuntu-22.04
         steps:
-            - uses: actions/checkout@v5
-            - uses: actions/setup-node@v4
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
               with:
                   node-version: 22
                   cache: npm
@@ -164,7 +164,7 @@ jobs:
             - name: Execute Lighthouse
               run: npm run lighthouse-report
             - name: Checkout performance-report repository
-              uses: actions/checkout@v5
+              uses: actions/checkout@v7
               with:
                   repository: xabierlameiro/performance-report
                   token: ${{ secrets.TOKEN_GITHUB }}
