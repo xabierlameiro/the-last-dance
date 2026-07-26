@@ -174,7 +174,15 @@ export const getStaticProps = async (data: {
     // here used to bounce tag clicks out of the blog, which broke tag navigation (SDD-009).
     const mdxSource = await serialize(post.content);
     const { categories, tags } = getAllCategories(locale);
-    const posts = getPostsByLocaleAndCategory(locale, category);
+
+    // SDD-L03. `getPostsByLocaleAndCategory` returns whole parsed posts, raw `content` included, and
+    // the sidebar list renders three fields. Measured on the built page for this route, 23,971 of the
+    // 29,180 characters `posts` occupied were `content` nobody reads — 82%, shipped to every visitor
+    // and growing linearly with the number of posts in a category. The `Props` type above already
+    // declared only these three, so the type was honest and the payload was not.
+    const posts = getPostsByLocaleAndCategory(locale, category).map(({ meta }) => ({
+        meta: { title: meta.title, excerpt: meta.excerpt, slug: meta.slug },
+    }));
 
     return {
         props: {

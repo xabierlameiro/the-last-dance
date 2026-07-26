@@ -18,7 +18,13 @@ const ViewCounter = ({ all }: { all?: boolean }) => {
     const { formatMessage: f } = useIntl();
 
     return (
-        <div className={styles.views} data-testid="view-counter">
+        /**
+         * SDD-L03: the outer wrapper used `styles.views` too, the same class as the value slot below.
+         * That made a width reservation on `.views` apply at two nesting levels at once and inflate
+         * the row. It is now `styles.counters`, which holds the two independent counters, while
+         * `.views` and `.users` each reserve their own settled width.
+         */
+        <div className={styles.counters} data-testid="view-counter">
             <Tooltip>
                 <Tooltip.Trigger>
                     <span className={styles.views} data-testid="views">

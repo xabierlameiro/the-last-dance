@@ -1,3 +1,16 @@
+/**
+ * SDD-L03. `.views` used to style both the outer wrapper and the inner value slot, so reserving a
+ * width on it applied at two nesting levels at once and inflated the header row from 87px to 141px.
+ * The wrapper is now `.counters`; `.views` and `.users` are the two independent value slots, and each
+ * reserves the wider of its spinner and its settled value so neither shifts its siblings on resolve.
+ */
+.counters {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    gap: 8px;
+}
+
 .views {
     display: flex;
     align-items: center;
@@ -6,16 +19,21 @@
     user-select: none;
     gap: 8px;
     color: rgba(var(--blog-icons));
+    /* 79px measured with a 6-digit count; 82 leaves a little headroom without widening the row. */
+    min-width: 82px;
 }
 
 .views svg {
     width: 19px;
 }
 
+/* Only rendered by `<ViewCounter all />`, so it is absent on post pages. */
 .users {
     padding-left: 12px;
     display: flex;
     font-size: 14px;
     user-select: none;
     gap: 8px;
+    /* 66px measured with a 4-digit count. */
+    min-width: 70px;
 }

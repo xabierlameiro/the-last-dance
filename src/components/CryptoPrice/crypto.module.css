@@ -1,4 +1,8 @@
 .container {
+    /* SDD-L03: reserve the settled width so the header does not reflow when this resolves.
+       Measured on the built site: spinner 41px -> value 64px, +23px shift. `min-width` covers the wider of the
+       spinner and the value, so neither state moves its siblings. */
+    min-width: 80px;
     display: flex;
     align-items: center;
     gap: 5px;
