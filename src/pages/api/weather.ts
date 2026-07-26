@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
+import { CACHE, fetchWithTimeout } from '@/helpers/http';
 import { isValidCityName } from '../../helpers/city';
 
 interface WeatherData {
@@ -104,7 +105,7 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
     geoUrl.searchParams.set('language', 'en');
     geoUrl.searchParams.set('format', 'json');
 
-    const geoRes = await fetch(geoUrl.toString());
+    const geoRes = await fetchWithTimeout(geoUrl.toString());
     if (!geoRes.ok) {
         throw new Error(`Geocoding HTTP error! status: ${geoRes.status}`);
     }
@@ -123,7 +124,7 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
         'temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code'
     );
 
-    const forecastRes = await fetch(forecastUrl.toString());
+    const forecastRes = await fetchWithTimeout(forecastUrl.toString());
     if (!forecastRes.ok) {
         throw new Error(`Forecast HTTP error! status: ${forecastRes.status}`);
     }
@@ -194,6 +195,7 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
                 const results = raw
                     .filter((r): r is PromiseFulfilledResult<WeatherData> => r.status === 'fulfilled')
                     .map((result) => result.value);
+                res.setHeader('Cache-Control', CACHE.weather);
                 res.status(200).json(results);
             })
             .catch((err) => res.status(500).json({ error: err.message }));

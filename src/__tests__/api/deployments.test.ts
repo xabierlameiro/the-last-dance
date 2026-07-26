@@ -58,14 +58,18 @@ describe('/api/deployments', () => {
         expect(fetchMock).not.toHaveBeenCalled();
     });
 
-    it('errors when Vercel returns an empty deployment list', async () => {
+    // SDD-L02: the internal reason ("No deployment found") is logged, not returned. This was the only
+    // route of eight echoing raw Error.message to an anonymous caller — on the error path a non-JSON
+    // Vercel response surfaces a SyntaxError carrying a fragment of the upstream body.
+    it('errors generically when Vercel returns an empty deployment list', async () => {
         fetchMock.mockResponseOnce(JSON.stringify({ deployments: [] }));
         const res = createMockResponse();
 
         await handler(createRequest(), res);
 
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ error: 'No deployment found' });
+        expect(res.json).toHaveBeenCalledWith({ error: 'Internal server error' });
+        expect(JSON.stringify(res.json.mock.calls)).not.toContain('No deployment found');
     });
 
     // The deployment may not carry a creator, so username must degrade rather than throw

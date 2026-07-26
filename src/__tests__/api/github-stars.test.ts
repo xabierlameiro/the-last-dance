@@ -27,24 +27,40 @@ describe('/api/github-stars', () => {
         expect(res.json).toHaveBeenCalledWith(42);
     });
 
-    it('forwards the status and message of a GitHub API error', async () => {
-        reposGet.mockRejectedValue({ status: 404, message: 'Not Found' });
+    it('sets a long cache header, so a visitor does not spend a token-quota request', async () => {
+        reposGet.mockResolvedValue({ data: { stargazers_count: 42 } });
+        const res = createMockResponse();
+
+        await handler(createRequest(), res);
+
+        expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', expect.stringContaining('s-maxage='));
+    });
+
+    // SDD-L02 regression test. This route used to forward Octokit's raw message, which under rate
+    // limiting reads "API rate limit exceeded for user ID 12345" — the owner's numeric account id —
+    // and on a revoked token reads "Bad credentials", a live oracle for when the PAT broke. The
+    // upstream detail must never reach the client.
+    it('does not leak the upstream GitHub error message', async () => {
+        reposGet.mockRejectedValue({ status: 403, message: 'API rate limit exceeded for user ID 12345.' });
         const res = createMockResponse();
 
         await handler(createRequest(), res);
 
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ statusCode: 404, message: 'Not Found' });
+        expect(res.json).toHaveBeenCalledWith({ statusCode: 500, message: 'Internal server error' });
+
+        const body = JSON.stringify(res.json.mock.calls);
+        expect(body).not.toContain('12345');
+        expect(body).not.toContain('rate limit');
     });
 
-    // A thrown string or a plain Error has no status/message pair to forward
-    it('falls back to a generic payload for a non-GitHub error shape', async () => {
+    it('returns the same generic payload for a non-GitHub error shape', async () => {
         reposGet.mockRejectedValue('network down');
         const res = createMockResponse();
 
         await handler(createRequest(), res);
 
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ statusCode: 500, message: 'Unknown error' });
+        expect(res.json).toHaveBeenCalledWith({ statusCode: 500, message: 'Internal server error' });
     });
 });

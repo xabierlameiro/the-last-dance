@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Octokit } from 'octokit';
 import allowCors from '../../helpers/cors';
+import { CACHE } from '@/helpers/http';
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
@@ -22,21 +23,20 @@ const REPOSITORY = {
  */
 type GitHubStarsResponse = number | { statusCode: number; message: string };
 
-export default allowCors(async function handler(
-    _req: NextApiRequest,
-    res: NextApiResponse<GitHubStarsResponse>
-) {
+export default allowCors(async function handler(_req: NextApiRequest, res: NextApiResponse<GitHubStarsResponse>) {
     try {
         const {
             data: { stargazers_count },
         } = await octokit.rest.repos.get(REPOSITORY);
+        res.setHeader('Cache-Control', CACHE.slow);
         res.status(200).json(stargazers_count);
     } catch (err: unknown) {
-        if (err && typeof err === 'object' && 'status' in err && 'message' in err) {
-            const { status, message } = err as { status: number; message: string };
-            res.status(500).json({ statusCode: status, message });
-        } else {
-            res.status(500).json({ statusCode: 500, message: 'Unknown error' });
-        }
+        // Was forwarding Octokit's raw message. Under rate limiting GitHub answers "API rate limit
+        // exceeded for user ID 12345", disclosing the owner's numeric account id; on a revoked token
+        // it answers "Bad credentials", which is a live oracle for when the PAT was rotated or broke.
+        // Log the detail, return a flat message like the other seven routes.
+        console.error('GitHub stars API Error:', err);
+        res.setHeader('Cache-Control', CACHE.error);
+        res.status(500).json({ statusCode: 500, message: 'Internal server error' });
     }
 });

@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import allowCors from '../../helpers/cors';
 import { isSafePagePath } from '../../helpers/slug';
+import { CACHE } from '@/helpers/http';
 
 /**
  * @description This function is used to get the total number of page views for a given page. It uses the Google
@@ -37,8 +38,12 @@ const EMPTY_ANALYTICS: AnalyticsData = { pageViews: 0, newUsers: 0 };
  * that is five minutes stale is indistinguishable from a fresh one to a reader,
  * so the edge answers instead — and `stale-while-revalidate` means a quota
  * exhaustion or an API outage shows the last known figure rather than an error.
+ *
+ * SDD-L02 moved the value itself into helpers/http.ts. This route was the only one that had a cache
+ * header; the other seven now share that module, and a local copy here would be the start of the
+ * next drift.
  */
-const CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=86400';
+const CACHE_CONTROL = CACHE.analytics;
 
 /**
  * @description Build the runReport request. Without a slug the report covers the whole
@@ -68,6 +73,7 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
 
     // Validate slug parameter if provided
     if (slug && !isSafePagePath(slug)) {
+        res.setHeader('Cache-Control', CACHE.error);
         return res.status(400).json({ error: 'Invalid slug parameter' });
     }
 
@@ -78,6 +84,7 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
         !process.env.ANALYTICS_PROJECT_ID
     ) {
         console.error('Missing required environment variables for Google Analytics API');
+        res.setHeader('Cache-Control', CACHE.error);
         return res.status(500).json({ error: 'Configuration error' });
     }
 
@@ -103,6 +110,7 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
             }
             // Errors stay uncached: caching one would keep serving it for five minutes
             // after the cause is gone.
+            res.setHeader('Cache-Control', CACHE.error);
             return res.status(500).json({ error: 'No data' });
         }
 
@@ -113,6 +121,7 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
         });
     } catch (err: unknown) {
         console.error('Analytics API Error:', err);
+        res.setHeader('Cache-Control', CACHE.error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
