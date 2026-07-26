@@ -34,7 +34,7 @@ jobs:
         runs-on: ubuntu-22.04
         steps:
             - uses: actions/checkout@v5
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: 22
                   cache: npm
@@ -62,7 +62,7 @@ jobs:
             NEXT_PUBLIC_ENV: 'preview'
         steps:
             - uses: actions/checkout@v5
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: 22
                   cache: npm
@@ -134,7 +134,7 @@ jobs:
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
             - uses: actions/checkout@v5
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: 22
                   cache: npm
