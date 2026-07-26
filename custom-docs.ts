@@ -27,13 +27,12 @@ const brandDocsPage = (data: string): string => {
 
     replaced = replaced.replace(/href="index.html">Home/g, 'href="/">Home');
 
+    // The version is matched as a pattern, not as the literal `JSDoc 3.6.11` these two replacements
+    // used to carry: jsdoc has been on 4.x here since the dependency was bumped, so both had matched
+    // nothing for as long as that, leaving the generator's own credit in the footer of every page.
+    // Pinning a third party's version string inside a regex makes the replacement expire in silence.
     replaced = replaced.replace(
-        /<a href="docs\/https:\/\/github.com\/jsdoc\/jsdoc">JSDoc 3.6.11<\/a>/g,
-        '<a href="https://xabierlameiro.com">Xabier Lameiro</a>',
-    );
-
-    replaced = replaced.replace(
-        /<a href="https:\/\/github.com\/jsdoc\/jsdoc">JSDoc 3.6.11<\/a>/g,
+        /<a href="(?:docs\/)?https:\/\/github\.com\/jsdoc\/jsdoc">JSDoc [\d.]+<\/a>/g,
         '<a href="https://xabierlameiro.com">Xabier Lameiro</a>',
     );
 
