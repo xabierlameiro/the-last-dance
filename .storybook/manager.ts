@@ -1,5 +1,11 @@
 import { addons } from '@storybook/manager-api';
-import { create } from '@storybook/theming/create';
+// `storybook/internal/…` rather than `@storybook/theming/create`, and the reason is not style:
+// the installed `@storybook/theming` is **6.5.16**, whose `create.js` ships no declarations, so
+// that import resolved to `any` — and it paired a v6 theme with the v8 `addons` above. This path
+// is Storybook 8's own, typed, and matches the manager it configures. It is marked internal, so
+// the real fix is bumping `@storybook/theming` to 8.x once an install is possible here; see the
+// note below on why the v6 packages cannot simply be dropped.
+import { create } from 'storybook/internal/theming/create';
 
 /**
  * SDD-L11-T7. `YourTheme.js` folded in — a nine-line theme literal in its own file, imported once.

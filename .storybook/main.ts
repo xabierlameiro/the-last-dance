@@ -36,9 +36,10 @@ const config: StorybookConfig = {
         name: '@storybook/nextjs',
         options: {},
     },
-    docs: {
-        docsPage: false,
-    },
+    // `docs: { docsPage: false }` was here and is gone: `docsPage` is a Storybook 6 key that does
+    // not exist on 8.6's `DocsOptions`, so it had been configuring nothing. T7 kept it believing it
+    // typechecked — it did not, because `.storybook/` was outside the compiler's scope until T10
+    // put it in. Dead config that reads as live is worse than no config.
     staticDirs: ['../public'],
 };
 

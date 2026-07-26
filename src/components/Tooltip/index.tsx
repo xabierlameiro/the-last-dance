@@ -70,7 +70,7 @@ function useTooltip({
             ...interactions,
             ...data,
         }),
-        [open, setOpen, interactions, data]
+        [open, setOpen, interactions, data],
     );
 }
 
@@ -98,8 +98,18 @@ function Tooltip({ children, ...options }: { children: React.ReactNode } & Toolt
 const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement> & { asChild?: boolean }>(
     function TooltipTrigger({ children, asChild = false, ...props }, propRef) {
         const context = useTooltipContext();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const childrenRef = (children as any)?.ref;
+        // SDD-L11-T10. This line used to cast `children` to bypass the type system and read
+        // `.ref` off it — the last such cast in src/ — and it was hiding a real deprecation rather
+        // than merely a missing type. React 19 removed `element.ref` and logs "Accessing
+        // element.ref was removed in React 19. ref is now a regular prop" every time this runs;
+        // `@types/react@19` dropped `ref` from `ReactElement` for the same reason, which is what
+        // made the cast necessary. Verified under react@19.1.0 that the element and the prop hold
+        // the same ref today, so reading it where it now lives keeps the merge below working and
+        // stops the warning. `null` rather than `undefined`: `useMergeRefs` takes `React.Ref`,
+        // which includes the first and not the second.
+        const childrenRef = React.isValidElement<{ ref?: React.Ref<HTMLElement> }>(children)
+            ? (children.props.ref ?? null)
+            : null;
         const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);
 
         // `asChild` allows the user to pass any element as the anchor
@@ -111,7 +121,7 @@ const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement
                     ...props,
                     ...(children.props || {}),
                     'data-state': context.open ? 'open' : 'closed',
-                } as React.HTMLProps<Element>)
+                } as React.HTMLProps<Element>),
             );
         }
 
@@ -125,35 +135,34 @@ const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement
                 {children}
             </span>
         );
-    }
+    },
 );
 
-const TooltipContent = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(function TooltipContent(
-    props,
-    propRef
-) {
-    const context = useTooltipContext();
-    const ref = useMergeRefs([context.refs.setFloating, propRef]);
+const TooltipContent = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
+    function TooltipContent(props, propRef) {
+        const context = useTooltipContext();
+        const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
-    return (
-        <FloatingPortal>
-            {context.open && (
-                <div
-                    className={styles.tooltip}
-                    ref={ref}
-                    style={{
-                        position: context.strategy,
-                        top: context.y ?? 0,
-                        left: context.x ?? 0,
-                        visibility: context.x === null ? 'hidden' : 'visible',
-                        ...props.style,
-                    }}
-                    {...context.getFloatingProps(props)}
-                />
-            )}
-        </FloatingPortal>
-    );
-});
+        return (
+            <FloatingPortal>
+                {context.open && (
+                    <div
+                        className={styles.tooltip}
+                        ref={ref}
+                        style={{
+                            position: context.strategy,
+                            top: context.y ?? 0,
+                            left: context.x ?? 0,
+                            visibility: context.x === null ? 'hidden' : 'visible',
+                            ...props.style,
+                        }}
+                        {...context.getFloatingProps(props)}
+                    />
+                )}
+            </FloatingPortal>
+        );
+    },
+);
 
 Tooltip.Trigger = TooltipTrigger;
 Tooltip.Content = TooltipContent;
