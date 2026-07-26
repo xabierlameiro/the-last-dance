@@ -101,4 +101,34 @@ describe('createSiteMap', () => {
 
         expect(String(writeFileSync.mock.calls.at(-1)?.[0])).toMatch(/public\/sitemap\.xml$/);
     });
+
+    /*
+     * SDD-L10-T13. The production sitemap advertised `/error.module.css` in all three locales, each
+     * returning 404, because the top-level page scan excluded by *name* — anything absent from
+     * `NON_SITEMAP_PAGES` was treated as a route. `src/pages/error.module.css` is a CSS module
+     * colocated with a page, and `.replace('.tsx', '')` left its filename untouched on the way out.
+     *
+     * Submitting a 404 as a page is the same class of damage as SDD-L04's noindex legal pages: it
+     * spends crawl budget and reports back as an error in Search Console, which is what erodes trust
+     * in the file as a whole. Found by an external crawl, not by this suite.
+     *
+     * These assertions read the real `src/pages`, so a future colocated asset of any extension is
+     * caught here rather than in production.
+     */
+    it('should never advertise a colocated stylesheet as a page', async () => {
+        await createSiteMap([], ['en', 'es', 'gl']);
+
+        expect(written()).not.toContain('error.module.css');
+    });
+
+    it('should only advertise entries that could be pages', async () => {
+        await createSiteMap([], ['en']);
+
+        const locs = [...written().matchAll(/<loc>([^<]*)<\/loc>/g)].map((match) => match[1] ?? '');
+        // The extension is checked on the path, not the whole URL: a bare origin ends in the TLD
+        // and would otherwise read as a file.
+        const withFileExtension = locs.filter((loc) => /\.[a-z0-9]+$/i.test(new URL(loc).pathname));
+
+        expect(withFileExtension).toEqual([]);
+    });
 });
