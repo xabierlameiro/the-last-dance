@@ -24,7 +24,7 @@
         "build-storybook": "cross-env NEXT_PRIVATE_LOCAL_WEBPACK=1 storybook build",
         "prettier": "prettier --write .",
         "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json && node custom-docs.ts",
-        "lighthouse-report": "node lighthouse/assets/lighthouse.js",
+        "lighthouse-report": "node lighthouse/assets/lighthouse.ts",
         "posters": "node scripts/generate-post-posters.mjs",
         "test:e2e": "playwright test",
         "test:e2e:report": "playwright test && node custom-report.ts",
