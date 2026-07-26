@@ -3,7 +3,18 @@
 // (AI image models garble exact strings like "#425" or "${NPM_TOKEN}"), files are
 // light (~60 KB vs 1-2 MB), consistent, and reproducible. See SDD-010.
 //
-// Usage: node scripts/generate-post-posters.mjs
+// Usage: npm run posters
+//
+// SDD-L10-T21 asked whether to wire this into `prebuild` alongside generate-llms.mjs, or delete it.
+// Neither. Its output is not dead code — public/posts/*.png is committed and referenced as
+// `image:` in the frontmatter of every post, so it feeds the og:image of all 45 of them. But posters
+// change only when a post is added, so regenerating fifteen PNGs on every build would churn the repo
+// for nothing and add sharp to the critical path.
+//
+// It is a generator run on demand, like `npm run jsdoc`. What it was missing was a name: it existed
+// only as a path someone had to remember, which is why it needed an entry in .fallowrc.json to stop
+// the dead-code detector flagging it. That entry stays — a CLI script genuinely is an entry point —
+// but the script is now discoverable in `npm run`.
 import sharp from 'sharp';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';

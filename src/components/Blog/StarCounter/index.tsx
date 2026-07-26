@@ -18,13 +18,20 @@ const StarCounter = () => {
     return (
         <Tooltip>
             <Tooltip.Trigger>
+                {/*
+                  * SDD-L10-T7: this link had no accessible name — its contents are a decorative
+                  * star icon and a bare number, and while the count is loading it is a spinner and
+                  * nothing else. A screen reader announced "link" with no destination. Found by the
+                  * axe gate added in this phase, on the first run, which is what that gate is for.
+                  */}
                 <a
                     className={styles.stars}
                     href="https://github.com/xabierlameiro/the-last-dance"
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label={f({ id: 'starCounter.label' })}
                 >
-                    <AiOutlineStar />
+                    <AiOutlineStar aria-hidden="true" />
                     <RenderManager
                         loading={loading}
                         error={error}

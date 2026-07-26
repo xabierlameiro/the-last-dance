@@ -4,7 +4,7 @@ import { useDialog } from '@/context/dialog';
 import Dialog from '@/components/Dialog';
 import ControlButtons from '@/components/ControlButtons';
 import SidesShift from '@/components/SidesShift';
-import { getPostBySlug, getAllPosts, getAllCategories, getPostsByLocaleAndCategory } from '@/helpers/fileReader';
+import { getPostBySlug, getAllPosts, getAllCategories, findPostsByCategoryOrTag } from '@/helpers/fileReader';
 import { serialize } from '@/helpers/mdx';
 import { createSiteMap } from '@/helpers/fileWritter';
 import { useRouter } from 'next/router';
@@ -213,12 +213,12 @@ export const getStaticProps = async (data: {
     const mdxSource = await serialize(post.content);
     const { categories, tags } = getAllCategories(locale);
 
-    // SDD-L03. `getPostsByLocaleAndCategory` returns whole parsed posts, raw `content` included, and
+    // SDD-L03. `findPostsByCategoryOrTag` returns whole parsed posts, raw `content` included, and
     // the sidebar list renders three fields. Measured on the built page for this route, 23,971 of the
     // 29,180 characters `posts` occupied were `content` nobody reads — 82%, shipped to every visitor
     // and growing linearly with the number of posts in a category. The `Props` type above already
     // declared only these three, so the type was honest and the payload was not.
-    const posts = getPostsByLocaleAndCategory(locale, category).map(({ meta }) => ({
+    const posts = findPostsByCategoryOrTag(locale, category).map(({ meta }) => ({
         meta: { title: meta.title, excerpt: meta.excerpt, slug: meta.slug },
     }));
 
@@ -262,7 +262,7 @@ export const getStaticPaths = async ({ locales }: { locales: string[] }) => {
     // Tag-based URLs resolve on demand via fallback: 'blocking' and rely on the
     // SEO rel=canonical to consolidate the duplicate content.
     // The date travels separately from `paths` — Next.js rejects extra keys there.
-    createSiteMap(
+    await createSiteMap(
         posts.map((post: PathPost) => ({
             params: {
                 category: post.meta.category.toLowerCase(),

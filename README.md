@@ -94,6 +94,7 @@ same way.
 | `npm run test:e2e`          | Playwright end-to-end tests                      |
 | `npm run storybook`         | Start Storybook dev server on port 6006          |
 | `npm run jsdoc`             | Generate API docs into `public/docs`             |
+| `npm run posters`           | Regenerate the blog og:image posters             |
 | `npm run lighthouse-report` | Lighthouse report for every sitemap URL          |
 | `npm run trending`          | Trending-content radar                           |
 | `npm run prettier`          | Format the repository                            |

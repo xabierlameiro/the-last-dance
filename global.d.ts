@@ -1,10 +1,16 @@
-declare module 'glob' {
-    export function sync(pattern: string): string[];
-}
-
-declare module 'prettier' {
-    export function format(content: string, options?: object): string;
-}
+/*
+ * SDD-L10-T10. Two hand-rolled `declare module` blocks used to sit here, for `glob` and `prettier`.
+ * Both shadowed the packages' real, shipped types with a guess.
+ *
+ * The prettier one was a live trap rather than merely redundant. It declared
+ * `format(): string`; in Prettier 3 it returns `Promise<string>`. With the declaration in place an
+ * upgrade would have typechecked cleanly while `fileWritter.ts` wrote the literal string
+ * `[object Promise]` into `public/sitemap.xml` — and that surfaces three layers away as a wrong
+ * count in the indexed-pages widget, not as an error anywhere near the cause.
+ *
+ * Both packages ship their own types. Deleting these is what let the compiler point at the exact
+ * line needing an `await` when prettier went to 3.
+ */
 
 // Jest globals
 declare global {

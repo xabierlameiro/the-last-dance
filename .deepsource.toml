@@ -1,5 +1,29 @@
 version = 1
 
+# SDD-L10-T20. DeepSource and Sonar disagreed about what this codebase is.
+#
+# The 61 test files were analysed as production code — so every `expect` chain and fixture was held
+# to production rules — while `lighthouse/assets/**`, which Sonar excludes as vendored Raphael and
+# Treant ("not our code to analyze"), was analysed in full. Two tools, two definitions of the
+# project, and neither one matching jest.config.js. These mirror Sonar's exclusions.
+
+test_patterns = [
+  "**/*.test.ts",
+  "**/*.test.tsx",
+  "**/__test__/**",
+  "**/__tests__/**",
+  "e2e/**"
+]
+
+exclude_patterns = [
+  "lighthouse/assets/**",
+  "public/**",
+  "data/**",
+  ".next/**",
+  "storybook-static/**",
+  "**/*.stories.tsx"
+]
+
 [[analyzers]]
 name = "javascript"
 

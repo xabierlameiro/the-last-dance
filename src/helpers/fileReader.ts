@@ -323,10 +323,18 @@ export const getLatestPostPath = (locale: string, category?: string): string | n
 };
 
 /**
- * @description Get all posts by category and locale.
+ * @description Every post in a locale whose **category or tag** matches, compared case-insensitively
+ * on the category.
+ *
+ * SDD-L10-T25 renamed this from `getPostsByLocaleAndCategory`. It sat forty lines from
+ * `getPostsByCategory` — now `findPostsByExactCategory` — and the two differ in two ways that
+ * neither name hinted at: this one also matches tags, and it lowercases. They are the reason a tag
+ * URL and a category URL can resolve to the same listing, which is deliberate (SDD-012 leaves tag
+ * URLs on `fallback: 'blocking'` with a canonical pointing at the category), but "ByLocaleAndCategory"
+ * versus "ByCategory" reads like an argument-order difference.
  *
  * @example
- *     getPostsByLocaleAndCategory('en', 'JavaScript');
+ *     findPostsByCategoryOrTag('en', 'JavaScript');
  *     returns[
  *         {
  *             content: '...',
@@ -338,7 +346,7 @@ export const getLatestPostPath = (locale: string, category?: string): string | n
  * @param {string} category - Category of the posts.
  * @returns {Object} - Object with posts.
  */
-export const getPostsByLocaleAndCategory = (locale: string, category: string) => {
+export const findPostsByCategoryOrTag = (locale: string, category: string) => {
     const posts = getPostsByLocale(locale);
     return posts.filter(
         (post) => post.meta.category.toLowerCase() === category?.toLowerCase() || post.meta.tags.includes(category)
@@ -370,7 +378,7 @@ const getPostsByTag = (tag: string, locale: string) => {
  * @description Get all posts by category and locale.
  *
  * @example
- *     getPostsByCategory('JavaScript', 'en');
+ *     findPostsByExactCategory('JavaScript', 'en');
  *     returns[
  *         {
  *             content: '...',
@@ -382,7 +390,12 @@ const getPostsByTag = (tag: string, locale: string) => {
  * @param {string} locale - Locale of the posts.
  * @returns {Object} - Object with posts.
  */
-const getPostsByCategory = (category: string, locale: string) => {
+/*
+ * Exact and case-sensitive, unlike `findPostsByCategoryOrTag` above, and tags are not consulted.
+ * Used to resolve the first post of a category for the sidebar link, where matching a tag would
+ * point the link at a listing the reader did not ask for.
+ */
+const findPostsByExactCategory = (category: string, locale: string) => {
     const posts = getPostsByLocale(locale);
     return posts.filter((post) => post.meta.category === category);
 };
@@ -451,7 +464,7 @@ export const getAllCategories = (locale: string) => {
     return {
         // Same guard as getAllTags: the link needs a post to point at.
         categories: [...new Set(categories)].flatMap((category) => {
-            const [firstPost] = getPostsByCategory(category, locale);
+            const [firstPost] = findPostsByExactCategory(category, locale);
             if (!firstPost) return [];
             return [
                 {

@@ -12,6 +12,13 @@ jest.mock('next/head', () => {
     };
 });
 
+// SDD-L10-T17: the router mock is overridable per test now, so its default has to be restored
+// between tests or the first override silently becomes every later test's router.
+const { useRouter, __defaultRouter } = require('next/router');
+beforeEach(() => {
+    useRouter.mockImplementation(__defaultRouter);
+});
+
 const AllTheProviders = ({ children }) => {
     return React.createElement(React.Fragment, null, children);
 };
