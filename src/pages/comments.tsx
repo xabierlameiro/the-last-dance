@@ -34,6 +34,10 @@ const Comments = () => {
                 }}
             />
 
+            {/* SDD-L05: this page rendered with no heading at all, so heading navigation found
+                nothing and the document had no programmatic title. The window chrome is the visual
+                title in this design, so the <h1> is visually hidden rather than bolted on. */}
+            <h1 className="visuallyHidden">{f({ id: 'comments.seo.title' })}</h1>
             <Dialog
                 open
                 modalMode

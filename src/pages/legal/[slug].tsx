@@ -78,19 +78,18 @@ const Legal = ({ source, meta }: Props) => {
                 open={open}
                 body={
                     <div className={clx(styles.container, left ? styles.open : '')} onTouchStart={onSideShiftLeft}>
-                        <nav className={styles.nav}>
+                        <nav className={styles.nav} aria-label={f({ id: 'nav.legal' })}>
                             <ControlButtons onClickClose={close} onClickMinimise={close} />
                             <SidesShift className={styles.shift} />
                             <SearchInput placeHolderText={f({ id: 'legal.search-placeholder' })} />
                             <span className={styles.title}>{f({ id: 'legal.title' })}</span>
                             <ul>
                                 {links.map((link, index) => (
-                                    <li
-                                        key={index}
-                                        onClick={() => handleLinkClick(index)}
-                                        className={selected === index ? styles.selected : ''}
-                                    >
-                                        <Link href={link.href}>
+                                    /* SDD-L05: handler moved from the <li> to the <Link>, as in the Dock —
+                                       a list item is not an interaction target, and on the <li> it fired
+                                       for clicks in the row's padding where no link exists. */
+                                    <li key={index} className={selected === index ? styles.selected : ''}>
+                                        <Link href={link.href} onClick={() => handleLinkClick(index)}>
                                             {link.icon}
                                             <span>{link.title}</span>
                                         </Link>

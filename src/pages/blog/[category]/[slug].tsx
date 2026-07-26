@@ -74,7 +74,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     const { formatMessage: f } = useIntl();
     const { open, dispatch } = useDialog();
     const { isMobile } = useWindowResize();
-    const { left, onSideShiftLeft, right, onSideShiftRight } = useSideShift();
+    const { left, onSideShiftLeft, right, onSideShiftRight, toggleLeft, toggleRight } = useSideShift();
     const {
         query: { category, slug },
     } = useRouter();
@@ -92,7 +92,11 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                 open={open}
                 body={
                     <div className={clx(styles.container, sideClass)} onTouchStart={onSideShiftLeft}>
-                        <nav className={styles.nav} onTouchStart={onSideShiftRight}>
+                        <nav
+                            className={styles.nav}
+                            onTouchStart={onSideShiftRight}
+                            aria-label={f({ id: 'nav.taxonomy' })}
+                        >
                             <ControlButtons onClickClose={close} onClickMinimise={close} />
                             <div className={styles.navListContainer}>
                                 <NavList
@@ -109,13 +113,29 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                                 </aside>
                             )}
                         </nav>
-                        <nav className={styles.secondNav} onTouchStart={onSideShiftRight}>
+                        <nav
+                            className={styles.secondNav}
+                            onTouchStart={onSideShiftRight}
+                            aria-label={f({ id: 'nav.posts' })}
+                        >
                             <AsidePanel />
                             <div className={styles.postLinks}>
                                 <PostList posts={posts} slug={slug} category={category} />
                             </div>
-                            <SidesShift leftPosition />
-                            <SidesShift />
+                            {/* SDD-L05: these two rendered with no handleClick, so the only visible
+                                affordance for the side panels did nothing and the real gesture was
+                                touch-only. */}
+                            <SidesShift
+                                leftPosition
+                                handleClick={toggleRight}
+                                label={f({ id: 'blog.toggleCategories' })}
+                                expanded={right}
+                            />
+                            <SidesShift
+                                handleClick={toggleLeft}
+                                label={f({ id: 'blog.togglePosts' })}
+                                expanded={left}
+                            />
                         </nav>
                         <article className={styles.article}>
                             <ArticlePanel readTime={post.meta.readTime} />

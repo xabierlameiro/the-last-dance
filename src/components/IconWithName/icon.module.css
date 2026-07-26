@@ -1,12 +1,18 @@
+/* SDD-L05: `outline: none` removed; focus is marked by the global :focus-visible token. */
+/* Also applied to a <button> now (SDD-L05), so the UA's background, border and font are reset. */
 .option {
     width: 60px;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 5px;
     cursor: pointer;
-    outline: none;
 }
 
 .optionText {

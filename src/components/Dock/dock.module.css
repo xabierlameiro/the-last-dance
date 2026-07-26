@@ -1,3 +1,4 @@
+/* SDD-L05: `outline: none` removed; focus is marked by the global :focus-visible token. */
 .dock {
     background-color: rgba(var(--grey-color), 0.2);
     box-shadow: 0 8px 32px 0 rgb(var(--grey-color) / 37%);
@@ -22,7 +23,6 @@
     display: flex;
     list-style: none;
     cursor: pointer;
-    outline: none;
     user-select: none;
 }
 
@@ -30,7 +30,6 @@
     display: flex;
     align-items: center;
     position: relative;
-    outline: none;
     user-select: none;
 }
 

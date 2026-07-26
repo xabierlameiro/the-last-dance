@@ -65,9 +65,13 @@ const Dialog = (props: Props) => {
             )}
         >
             <header data-testid="dialog-header">{header}</header>
-            <main className={styles.body} data-testid="dialog-body">
+            {/* SDD-L05: was <main>. Layout already wraps children in one, so every page shipped
+                two landmarks — invalid, and it breaks the "skip to main content" idiom because a
+                screen-reader user gets two ambiguous "main" regions. On the blog the real article
+                sat inside the inner one. */}
+            <div className={styles.body} data-testid="dialog-body">
                 {body}
-            </main>
+            </div>
             <footer data-testid="dialog-footer">{footer}</footer>
         </div>
     );

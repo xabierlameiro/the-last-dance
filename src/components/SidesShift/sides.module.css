@@ -11,8 +11,45 @@
     left: 0;
 }
 
-@media screen and (min-width: 768px) {
-    .swap {
+/**
+ * SDD-L05: was `min-width: 768px`, while blog.module.css and legal.module.css collapsed the panels to
+ * 10px rails up to 900px. So between 768 and 900 the panels were collapsed AND the grabber was hidden,
+ * and the only way to open them was a touch gesture — an outright dead end for a mouse or keyboard.
+ *
+ * Both now key off the same threshold, taken from src/constants/devices.ts: the panels are collapsed
+ * up to `tabletMax` (1023) and the grabber is visible for exactly that range, hiding from
+ * `desktopMin` (1024) where the panels are laid out in full.
+ */
+@media screen and (min-width: 1024px) {
+    .swap,
+    .grabber {
         display: none;
     }
+}
+
+/**
+ * The button wrapper added in SDD-L05. A 44x44 hit area rather than the icon's 10px, which is the
+ * WCAG 2.2 target-size minimum and simply easier to hit; the visual remains the thin grabber line.
+ */
+.grabber {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    z-index: 2;
+}
+
+.grabber .swap {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
 }

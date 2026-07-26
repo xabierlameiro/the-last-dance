@@ -3,6 +3,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import sonarjs from 'eslint-plugin-sonarjs';
 import nextPlugin from '@next/eslint-plugin-next';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 export default tseslint.config(
     {
@@ -26,6 +27,22 @@ export default tseslint.config(
     js.configs.recommended,
     ...tseslint.configs.recommended,
     sonarjs.configs.recommended,
+    /**
+     * SDD-L05. Absent from package.json, the lockfile and node_modules before this — which is why
+     * the audit's accessibility findings existed at all: roughly two thirds of them map to rules in
+     * this set (click-events-have-key-events, no-static-element-interactions, alt-text,
+     * label-has-associated-control, anchor-is-valid).
+     *
+     * `flatConfigs.recommended` defaults every rule to `error`, and it is left there: this change
+     * fixes everything it reported, so it starts clean and any regression fails the PR gate.
+     *
+     * Honest correction to the plan: it predicted this would catch "roughly two thirds" of the
+     * audit's Critical and High accessibility findings. It reported **13 problems across 4 rules**.
+     * The rest of that dimension — contrast ratios, missing ARIA, duplicate landmarks, heading
+     * order, focus management — is not statically detectable and had to be found and fixed by hand.
+     * Useful, and nowhere near sufficient.
+     */
+    jsxA11y.flatConfigs.recommended,
     {
         plugins: {
             '@next/next': nextPlugin,

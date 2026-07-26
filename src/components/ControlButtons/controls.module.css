@@ -2,20 +2,22 @@
     display: flex;
     cursor: pointer;
     gap: 6px;
-    outline: none;
     user-select: none;
 }
 
+/* SDD-L05: these are <button> now, so the UA's own padding, font and background are reset here.
+   `outline: none` is gone — the global :focus-visible token in globals.css is what marks focus. */
 .ch_frame_button {
     width: 12.8px;
     height: 12.8px;
+    padding: 0;
+    font: inherit;
     border: 0.08em solid;
     border-radius: 50%;
-    display: inline-block;
     box-sizing: border-box;
     display: grid;
     place-content: center;
-    outline: none;
+    cursor: pointer;
     user-select: none;
 }
 
@@ -49,15 +51,18 @@
     stroke-width: 2px;
 }
 
+/* Keyed off the real attribute as well as the class. `pointer-events: none` alone only stopped the
+   mouse: the handler stayed live for keyboard and programmatic activation. */
+.ch_frame_button:disabled,
 .ch_frame_button_disabled {
     background-color: rgba(var(--disable-color));
     border-color: rgba(var(--disable-color));
-    pointer-events: none;
     user-select: none;
     cursor: default;
     opacity: 0.4;
 }
 
+.ch_frame_buttons:hover .ch_frame_button:disabled svg,
 .ch_frame_buttons:hover .ch_frame_button_disabled svg {
     opacity: 0;
 }
