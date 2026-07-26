@@ -93,17 +93,20 @@ jobs:
                   git add .
                   git commit -m "Update unit-report"
                   git push origin main
+            # chromium-headless-shell is named explicitly: dropping `channel: 'chrome'` from
+            # playwright.config.ts means the headless runs use the bundled shell, which is a separate
+            # download from `chromium` and produced "Executable doesn't exist" locally when assumed.
             - name: Install Playwright Browsers
-              run: npx playwright install --with-deps chromium
+              run: npx playwright install --with-deps chromium chromium-headless-shell
               env:
                   DEBIAN_FRONTEND: noninteractive
-            - name: Run dev server
-              run: npm run dev &
-            - name: Wait for dev server to be ready
-              run: npx wait-on http://localhost:3000
+            # `npm run dev &` + `npx wait-on` used to live here. It hung indefinitely on 2026-07-26
+            # (the wait step takes ~22s when it works; it sat for over 20 minutes), and `wait-on` was
+            # never a declared dependency, so npx fetched it from the network mid-run. The
+            # `webServer` block in playwright.config.ts now owns startup, with its own readiness
+            # probe and timeout — and it builds, so e2e runs against production output.
             - name: Run end-to-end tests
-              run: |
-                  npm run test:e2e:report
+              run: npm run test:e2e:report
             - name: Checkout e2e-report repository
               if: github.event_name == 'push'
               uses: actions/checkout@v5
