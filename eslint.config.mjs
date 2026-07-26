@@ -16,6 +16,11 @@ export default tseslint.config(
             'data/**',
             'next-env.d.ts',
             '**/*.stories.tsx',
+            // Playwright's generated HTML report and traces. Gitignoring them is not enough: flat
+            // config does not read .gitignore, so `eslint .` linted the bundled report JS and
+            // produced ~9,000 errors as soon as the suite had been run locally.
+            'playwright-report/**',
+            'test-results/**',
         ],
     },
     js.configs.recommended,
