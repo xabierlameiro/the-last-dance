@@ -27,9 +27,13 @@
     color: rgba(var(--blue-color));
 }
 
+/* SDD-L06: was `var(--blog-color)`, which is defined nowhere in the codebase — the declaration was
+   dropped by the browser, so the selected state fell back to the inherited colour and had never
+   actually been verified. --blog-font-selected is the token that pairs with the selected row's
+   --blue-color background (7.20:1). */
 .selected .number,
 .postList .selected svg {
-    color: rgba(var(--blog-color));
+    color: rgba(var(--blog-font-selected));
 }
 
 .selected {

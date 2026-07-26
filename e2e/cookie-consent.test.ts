@@ -43,7 +43,9 @@ test.describe('Cookie consent', () => {
     test('should not overlap the Dock', async ({ page }) => {
         await expect(page.getByTestId('consent-accept')).toBeVisible();
 
-        const card = await page.getByRole('dialog').boundingBox();
+        // Scoped by name: SDD-L06 gave the page's own window a real `role="dialog"` too, so a bare
+        // role query now matches both and Playwright's strict mode rejects it.
+        const card = await page.getByRole('dialog', { name: 'Cookies' }).boundingBox();
         const dock = await page.getByTestId('home').boundingBox();
         expect(card).not.toBeNull();
         expect(dock).not.toBeNull();

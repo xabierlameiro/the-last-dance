@@ -51,7 +51,23 @@ const DeploymentStatus = () => {
         <RenderManager error={isError} loading={isLoading}>
             <Tooltip>
                 <Tooltip.Trigger>
-                    <div className={`${styles.status} ${status ? styles[status.toLowerCase()] : ''}`} />
+                    {/*
+                     * SDD-L06: was an empty <div> — no text, no label, no role. A screen reader
+                     * announced nothing, and sighted users had only hue to go on: every one of the six
+                     * states computes between 1.01:1 and 2.93:1 against the LIGHT header gradient, so
+                     * low-vision users could not see it at all and colour-blind users could not tell
+                     * ready from error. `role="img"` plus a name carries the state to assistive tech,
+                     * and the glyph gives it a second, non-colour channel (WCAG 1.4.1).
+                     */}
+                    <span
+                        role="img"
+                        aria-label={f(
+                            { id: 'deploymentstatus.tooltip' },
+                            { status, username, environment, createdAt: '' }
+                        )}
+                        data-status={status ? status.toLowerCase() : 'unknown'}
+                        className={`${styles.status} ${status ? styles[status.toLowerCase()] : ''}`}
+                    />
                 </Tooltip.Trigger>
                 <Tooltip.Content>
                     {f(
