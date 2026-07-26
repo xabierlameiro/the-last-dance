@@ -62,7 +62,10 @@ const reducer = (state: SurveyState, action: SurveyAction): SurveyState => {
 
 const useSurvey = () => {
     const { query } = useRouter();
-    const rawName = Array.isArray(query.name) ? query.name[0] : query.name ?? DEFAULT_SURVEY_NAME;
+    // SDD-L07: the default only covered the non-array branch. `?name=` repeated in the query string
+    // gives Next an array, and an empty one gives `undefined` — which then reached
+    // `sanitizeSurveyName` as a string it was not typed to receive.
+    const rawName = (Array.isArray(query.name) ? query.name[0] : query.name) ?? DEFAULT_SURVEY_NAME;
     const name = sanitizeSurveyName(rawName);
 
     const [state, dispatch] = useReducer(reducer, initialState);

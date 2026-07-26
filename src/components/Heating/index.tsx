@@ -24,7 +24,12 @@ const Heating = () => {
                         errorTitle={f({ id: 'heating.error' })}
                         loadingTitle={f({ id: 'heating.loading' })}
                     >
-                        <div>{data.outsideTemp ?? 0}</div>|<div>{data.zoneMeasuredTemp ?? 0}</div>
+                        {/*
+                         * SDD-L07: both `?? 0` defaults are dead. `data` is non-optional, both
+                         * fields are non-optional numbers, and `useHeating` already substitutes
+                         * `initialValues` when there is nothing — three guards for one case.
+                         */}
+                        <div>{data.outsideTemp}</div>|<div>{data.zoneMeasuredTemp}</div>
                     </RenderManager>
                 </div>
             </Tooltip.Trigger>

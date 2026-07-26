@@ -4,31 +4,30 @@ import styles from './deploymentstatus.module.css';
 import Tooltip from '@/components/Tooltip';
 import { useIntl } from 'react-intl';
 import RenderManager from '@/components/RenderManager';
+import createFetcher from '@/helpers/createFetcher';
+import { deploymentSchema } from '../../types/schemas';
 import type { DeploymentData } from '../../types/api';
 
 const url = `${process.env.NEXT_PUBLIC_DOMAIN}/api/deployments`;
 
-const fetchDeployment = async (url: string): Promise<DeploymentData> => {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch deployment data: ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data as DeploymentData;
-};
+const fetchDeployment = createFetcher(deploymentSchema, '/api/deployments');
 
 /**
  *
- * @returns { {data: DeploymentData | undefined, isLoading: boolean, isError: boolean} } - The deployment status
+ * @returns { {data: DeploymentData | undefined, isLoading: boolean, error: Error | undefined} }
  * @description - Fetches the deployment status
- * @example - const { data, isLoading, isError } = useDeploymentStatus();
+ * @example - const { data, isLoading, error } = useDeploymentStatus();
  */
-const useDeploymentStatus = () => {
-    const { data, error } = useSWR<DeploymentData>(url, fetchDeployment);
+const useDeploymentStatus = (): {
+    data: DeploymentData | undefined;
+    isLoading: boolean;
+    error: Error | undefined;
+} => {
+    const { data, error } = useSWR<DeploymentData, Error>(url, fetchDeployment);
     return {
         data,
         isLoading: !error && !data,
-        isError: error,
+        error,
     };
 };
 
@@ -39,7 +38,7 @@ const useDeploymentStatus = () => {
  * @example - <DeploymentStatus />
  */
 const DeploymentStatus = () => {
-    const { data, isLoading, isError } = useDeploymentStatus();
+    const { data, isLoading, error } = useDeploymentStatus();
     const { formatMessage: f } = useIntl();
 
     const status = data?.status;
@@ -48,7 +47,7 @@ const DeploymentStatus = () => {
     const createdAt = data?.createdAt;
 
     return (
-        <RenderManager error={isError} loading={isLoading}>
+        <RenderManager error={error} loading={isLoading}>
             <Tooltip>
                 <Tooltip.Trigger>
                     {/*

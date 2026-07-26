@@ -1,4 +1,6 @@
 import useSWR from 'swr';
+import createFetcher from '@/helpers/createFetcher';
+import { heatingSchema } from '../types/schemas';
 import type { HeatingData } from '../types/api';
 
 const url = `${process.env.NEXT_PUBLIC_DOMAIN}/api/heating`;
@@ -8,21 +10,14 @@ const initialValues: HeatingData = {
     zoneMeasuredTemp: 0,
 };
 
-const fetchHeating = async (url: string): Promise<HeatingData> => {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch heating data: ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data as HeatingData;
-};
+const fetchHeating = createFetcher(heatingSchema, '/api/heating');
 
 const useHeating = (): {
     data: HeatingData;
-    error: boolean;
+    error: Error | undefined;
     loading: boolean;
 } => {
-    const { data, error, isLoading } = useSWR<HeatingData>(url, fetchHeating, {
+    const { data, error, isLoading } = useSWR<HeatingData, Error>(url, fetchHeating, {
         keepPreviousData: true,
         fallback: initialValues,
         fallbackData: initialValues,

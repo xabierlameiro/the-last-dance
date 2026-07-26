@@ -1,6 +1,8 @@
 import React from 'react';
 import useSWR from 'swr';
 import { useRouter } from 'next/router';
+import createFetcher from '@/helpers/createFetcher';
+import { analyticsSchema } from '../types/schemas';
 import type { AnalyticsData } from '../types/api';
 
 const initialValues: AnalyticsData = {
@@ -8,20 +10,20 @@ const initialValues: AnalyticsData = {
     newUsers: 0,
 };
 
+/**
+ * SDD-L07: `error` was declared `boolean` here and in every sibling hook. SWR types its response as
+ * `SWRResponse<Data, Error>` with `Error` defaulting to `any` when only the first generic is given,
+ * and `any` assigns to `boolean` without complaint. So the declaration said boolean, an `Error`
+ * object flowed, and every widget could show only one undifferentiated error icon — a boolean cannot
+ * express anything else.
+ */
 type ReturnType = {
     data: AnalyticsData;
-    error: boolean;
+    error: Error | undefined;
     loading: boolean;
 };
 
-const fetchAnalytics = async (url: string): Promise<AnalyticsData> => {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch analytics data: ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data as AnalyticsData;
-};
+const fetchAnalytics = createFetcher(analyticsSchema, '/api/analytics');
 
 const useAnalytics = (all?: boolean): ReturnType => {
     const { asPath, locale } = useRouter();
@@ -33,7 +35,7 @@ const useAnalytics = (all?: boolean): ReturnType => {
         return url.toString();
     }, [all, slug]);
 
-    const { data, error, isLoading } = useSWR<AnalyticsData>(memoUrl, fetchAnalytics, {
+    const { data, error, isLoading } = useSWR<AnalyticsData, Error>(memoUrl, fetchAnalytics, {
         keepPreviousData: all ? true : false,
         fallback: initialValues,
         fallbackData: initialValues,

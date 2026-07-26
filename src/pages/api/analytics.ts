@@ -4,6 +4,7 @@ import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import allowCors from '../../helpers/cors';
 import { isSafePagePath } from '../../helpers/slug';
 import { CACHE } from '@/helpers/http';
+import type { AnalyticsData } from '../../types/api';
 
 /**
  * @description This function is used to get the total number of page views for a given page. It uses the Google
@@ -17,12 +18,17 @@ import { CACHE } from '@/helpers/http';
  * }>}
  * @throws {Error: Error while parsing analytics data}
  * @see https://developers.google.com/analytics/devguides/reporting/data/v1/api-schema
+ *
+ * SDD-L07: this route declared `pageViews: string | number` and returned
+ * `row.metricValues?.[0]?.value || '0'` — a **string**, because that is what the GA4 Data API emits
+ * for every metric. `types/api.ts` declared the same field `number`, and `useAnalytics` cast the
+ * response with `as AnalyticsData`, which erases at compile time and checks nothing. So a string
+ * travelled all the way to `ViewCounter`, which rendered `12345` unseparated while `CryptoPrice`
+ * beside it went through `formatNumber`. The two counters disagreed for exactly this reason.
+ *
+ * The union is gone and the coercion happens here, at the boundary that knows GA4 sends strings,
+ * rather than being carried through the app as an ambiguity. `types/api.ts` is the single contract.
  */
-interface AnalyticsData {
-    pageViews: string | number;
-    newUsers: string | number;
-}
-
 type AnalyticsResponse = AnalyticsData | { error: string };
 
 const GA_PROPERTY = 'properties/348472560';
@@ -31,6 +37,18 @@ const GA_DATE_RANGES = [{ startDate: '2023-01-01', endDate: 'today' }];
 const GA_METRICS = [{ name: 'screenPageViews' }, { name: 'newUsers' }];
 
 const EMPTY_ANALYTICS: AnalyticsData = { pageViews: 0, newUsers: 0 };
+
+/**
+ * @description Turn a GA4 metric value into the number the contract promises.
+ *
+ * Deliberately not `z.coerce.number()`: coercion there runs `Number()`, which maps `null` and `''`
+ * to `0` and an unparseable string to `NaN` — and `NaN` serialises to JSON `null`, so a bad metric
+ * would arrive at the client as a missing field rather than a rejected one. Explicit is better here.
+ */
+const toCount = (value: string | null | undefined): number => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+};
 
 /**
  * The GA4 Data API bills every call against a per-property daily token quota, and
@@ -116,8 +134,8 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
 
         res.setHeader('Cache-Control', CACHE_CONTROL);
         return res.status(200).json({
-            pageViews: row.metricValues?.[0]?.value || '0',
-            newUsers: row.metricValues?.[1]?.value || '0',
+            pageViews: toCount(row.metricValues?.[0]?.value),
+            newUsers: toCount(row.metricValues?.[1]?.value),
         });
     } catch (err: unknown) {
         console.error('Analytics API Error:', err);

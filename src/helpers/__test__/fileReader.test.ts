@@ -1,4 +1,6 @@
 import { getAllCategories, getLatestPostPath, getPostBySlug, getPostsByLocale } from '../fileReader';
+import { describeIssues } from '../../types/schemas';
+import { postFrontmatterSchema } from '../../types/upstream';
 
 // The post date comes from the `<Date date="MM-DD-YYYY" />` tag in the MDX body and feeds
 // datePublished in the Article JSON-LD. The old implementation parsed the tag with
@@ -99,5 +101,32 @@ describe('getAllCategories', () => {
         const colliding = tags.filter(({ tag }) => categoryNames.has(tag.toLowerCase()));
 
         expect(colliding).toEqual([]);
+    });
+});
+
+/**
+ * SDD-L07. `buildPost` typed gray-matter's output as `Record<string, any>` and `getAllPosts`
+ * annotated its map callback as `PathPost` — a cast the compiler accepted only because the source
+ * was `any`. All 45 posts carry every required field today, which is exactly why this is worth
+ * pinning: it is the one place the `as` pattern can break a **deploy**, since `getStaticPaths` runs
+ * over the whole corpus during `next build` and a post missing `category` throws with no filename
+ * anywhere in the message.
+ */
+describe('frontmatter validation', () => {
+    it.each(['en', 'es', 'gl'])('Should accept every published post in %s', (locale) => {
+        const posts = getPostsByLocale(locale);
+
+        expect(posts.length).toBeGreaterThan(0);
+        for (const post of posts) {
+            expect(typeof post.meta.title).toBe('string');
+            expect(typeof post.meta.category).toBe('string');
+        }
+    });
+
+    it('Should name the file and the field when a post is missing one', () => {
+        const parsed = postFrontmatterSchema.safeParse({ title: 'A post with no category' });
+
+        expect(parsed.success).toBe(false);
+        expect(describeIssues(parsed.error!.issues)).toContain('category');
     });
 });
