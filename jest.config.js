@@ -1,3 +1,4 @@
+// @ts-check
 // jest.config.js
 import nextJest from 'next/jest.js';
 
