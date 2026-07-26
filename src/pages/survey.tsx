@@ -8,9 +8,13 @@ import useSurvey, { type Question } from '@/hooks/useSurvey';
 import NavigationArrows from '@/components/NavigationArrows';
 import QuestionBlock from '@/components/QuestionBlock';
 import usePrefersReducedMotion from '@/hooks/usePrefersReducedMotion';
+import surveyCopy from '../intl/survey';
+import { useRouter } from 'next/router';
 
 const Survey = () => {
     const { width, height } = useWindowResize();
+    const router = useRouter();
+    const copy = surveyCopy(router.locale);
     const {
         questions,
         answers,
@@ -41,9 +45,11 @@ const Survey = () => {
             />
             <SEO
                 noimage={false}
+                /* SDD-L08: title and description were Spanish literals on a trilingual site,
+                   hardcoded here rather than in any catalogue. */
                 meta={{
-                    title: 'Averigua si hago match con la posición en 1 minuto',
-                    description: 'Click para continuar',
+                    title: copy.seo.title,
+                    description: copy.seo.description,
                     noindex: true,
                 }}
             />
@@ -53,7 +59,13 @@ const Survey = () => {
                 withPadding
                 header={
                     <div className={styles.header}>
-                        <ControlButtons />
+                        {/*
+                          * SDD-L08: the window controls did nothing at all — no handler was passed,
+                          * so the close button on a modal that covers the whole viewport was inert.
+                          * `router.back()` returns to wherever the visitor came from, which for this
+                          * page is almost always the blog post that linked here.
+                          */}
+                        <ControlButtons onClickClose={() => router.back()} onClickMinimise={() => router.back()} />
                         <span>
                             {currentQuestionNum > 0 && currentQuestionNum < 11 && (
                                 <span>

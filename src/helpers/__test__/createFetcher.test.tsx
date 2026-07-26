@@ -77,7 +77,7 @@ describe('createFetcher', () => {
         ['/api/heating', heatingSchema, { outsideTemp: '12.5', zoneMeasuredTemp: 21 }],
         ['/api/indexed-pages', counterSchema, { num: null }],
         ['/api/news', newsSchema, { news: [{ link: 'x', title: 'y', published: 3, description: 'z' }] }],
-        ['/api/xrp', xrpSchema, { price: '0.51', todaySummary: 'Up', todayPorcentage: '+1%' }],
+        ['/api/xrp', xrpSchema, { price: '0.51', todaySummary: 'Up', todayPercentage: '+1%' }],
         ['/api/weather', weatherSchema, [{ city: 'moraña' }]],
         ['/api/github-stars', githubStarsSchema, '42'],
         ['/api/deployments', deploymentSchema, { status: 'HIBERNATING' }],

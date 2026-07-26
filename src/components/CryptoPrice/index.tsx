@@ -39,7 +39,7 @@ const CryptoPrice = () => {
                 {f(
                     { id: 'cryptoPrice.tooltip' },
                     {
-                        todayPorcentage: data?.todayPorcentage ?? '0%',
+                        todayPercentage: data?.todayPercentage ?? '0%',
                     }
                 )}
             </Tooltip.Content>

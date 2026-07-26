@@ -19,7 +19,7 @@ describe('/api/xrp', () => {
         expect(res.json).toHaveBeenCalledWith({
             price: 2.1235,
             todaySummary: 'Up',
-            todayPorcentage: '+3.46%',
+            todayPercentage: '+3.46%',
         });
     });
 
@@ -33,7 +33,7 @@ describe('/api/xrp', () => {
         expect(res.json).toHaveBeenCalledWith({
             price: 1.5,
             todaySummary: 'Down',
-            todayPorcentage: '-2.50%',
+            todayPercentage: '-2.50%',
         });
     });
 

@@ -150,9 +150,34 @@ export const blogTags = ({ meta, locale, author, urls }: BlogTagsInput) => {
     return tags;
 };
 
+/**
+ * Paths whose content is identical in every locale, so no `es`/`gl` alternate may be claimed.
+ *
+ * SDD-L08. `data/legal/` holds three files with no locale suffix and `legal/[slug].tsx` never
+ * receives the locale, so the same English document is served at `/legal/*`, `/es/legal/*` and
+ * `/gl/legal/*` — while these tags told Google three translations existed. hreflang is a
+ * reciprocal claim about *translated* content; pointing it at the same English text is telling
+ * search engines something untrue, and it invites them to serve a Spanish-speaking reader an
+ * English page they cannot use.
+ *
+ * This is a stopgap, not the fix. The fix is L08-T2 — actual `es`/`gl` legal documents — which is
+ * owner work: these texts invoke Spanish law (Ley 34/2002, LOPD-GDD, RD 1720/2007) and make
+ * representations to users about data handling. A machine translation is not adequate. Until then,
+ * claiming nothing beats claiming falsely.
+ */
+const UNTRANSLATED_PATH_PREFIXES = ['/legal/'];
+
 /** @description hreflang links for the static, non-blog pages. */
 export const staticHreflangTags = (domain: string | undefined, pagePath: string) => {
     const path = cleanTrailingSlash(pagePath);
+
+    if (UNTRANSLATED_PATH_PREFIXES.some((prefix) => path.startsWith(prefix))) {
+        return [
+            <link hrefLang="en" rel="alternate" href={`${domain}${path}`} key="hreflang-en" />,
+            <link hrefLang="x-default" rel="alternate" href={`${domain}${path}`} key="hreflang-default" />,
+        ];
+    }
+
     return [
         <link hrefLang="en" rel="alternate" href={`${domain}${path}`} key="hreflang-en" />,
         <link hrefLang="es" rel="alternate" href={`${domain}/es${path}`} key="hreflang-es" />,
@@ -236,6 +261,6 @@ export const alternateLinks = (meta: SeoMeta | undefined, domain: string | undef
             rel="alternate"
             href={`${domain}${getLang(lang)}/blog/${category}/${url}`}
             hrefLang={lang}
-            title={`Alternate url for langueage ${lang}`}
+            title={`Alternate url for language ${lang}`}
         />
     ));

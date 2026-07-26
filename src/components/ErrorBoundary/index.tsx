@@ -1,8 +1,11 @@
 import React from 'react';
+import Link from 'next/link';
+import { FormattedMessage } from 'react-intl';
 import ControlButtons from '@/components/ControlButtons';
 import SEO from '@/components/SEO';
 import Dialog from '@/components/Dialog';
 import Layout from '@/components/Layout';
+import styles from '../../pages/error.module.css';
 
 class ErrorBoundary extends React.Component<React.PropsWithChildren<unknown>, { hasError: boolean; error?: Error }> {
     constructor(props: React.PropsWithChildren<unknown>) {
@@ -16,6 +19,19 @@ class ErrorBoundary extends React.Component<React.PropsWithChildren<unknown>, { 
         return { hasError: true, error };
     }
 
+    /**
+     * SDD-L08. The boundary used to render `this.state.error?.message` straight to the visitor.
+     *
+     * That is a React error object from a production bundle: at best it reads "Minified React error
+     * #418", at worst it carries a fragment of internal state, a URL, or a property name from
+     * whatever threw. It tells a reader nothing they can act on and tells anyone else more than they
+     * should see. The detail belongs in the console, where a developer can read it; the page gets a
+     * sentence in the visitor's own language.
+     */
+    componentDidCatch(error: Error, info: React.ErrorInfo) {
+        console.error('Unhandled render error:', error, info.componentStack);
+    }
+
     render() {
         if (this.state.hasError) {
             return (
@@ -23,8 +39,8 @@ class ErrorBoundary extends React.Component<React.PropsWithChildren<unknown>, { 
                     <>
                         <SEO
                             meta={{
-                                title: 'Error | Oh! sorry, an error has occurred',
-                                description: 'Oh! sorry, an error has occurred',
+                                title: 'Error',
+                                description: '',
                                 noindex: true,
                             }}
                         />
@@ -34,8 +50,15 @@ class ErrorBoundary extends React.Component<React.PropsWithChildren<unknown>, { 
                             withPadding
                             header={<ControlButtons disabled />}
                             body={
-                                <div style={{ display: 'grid', placeContent: 'center', height: 'inherit' }}>
-                                    {this.state.error?.message || 'An unknown error occurred'}
+                                // A class component cannot call useIntl. FormattedMessage reads the
+                                // same context, and _app mounts IntlProvider outside this boundary.
+                                <div className={styles.body}>
+                                    <p>
+                                        <FormattedMessage id="error.boundary.message" />
+                                    </p>
+                                    <Link href="/" className={styles.home}>
+                                        <FormattedMessage id="error.home" />
+                                    </Link>
                                 </div>
                             }
                         />

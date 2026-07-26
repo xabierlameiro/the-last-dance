@@ -93,10 +93,17 @@ export const newsSchema = z.object({
     news: z.array(newsItemSchema),
 });
 
+/**
+ * SDD-L08-T20: `todayPorcentage` — not a word in English, Spanish (`porcentaje`) or Galician
+ * (`porcentaxe`). It was the API field name, the contract field name, and the ICU placeholder in all
+ * three catalogues, so the misspelling had propagated from the route to the rendered tooltip.
+ *
+ * The only consumer of `/api/xrp` is this site's own widget, so renaming the response field is safe.
+ */
 export const xrpSchema = z.object({
     price: z.number(),
     todaySummary: z.string(),
-    todayPorcentage: z.string(),
+    todayPercentage: z.string(),
 });
 
 /**

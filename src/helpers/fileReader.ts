@@ -72,12 +72,45 @@ const buildPost = (filePath: string): ParsedPost => {
 // function, which blew past Vercel's timeout (FUNCTION_INVOCATION_TIMEOUT). Cache only in
 // production so `next dev` still hot-reloads content edits.
 let corpusCache: ParsedPost[] | null = null;
+let corpusStamp = '';
+
+/**
+ * SDD-L09-T13. The cache used to be production-only, so `next dev` re-read and gray-matter-parsed
+ * all 45 posts on **every** call — and `getAllTags` calls `loadCorpus` once per tag, `getPostsByTag`
+ * once more per tag after that. Rendering one blog page in development was hundreds of full-corpus
+ * parses.
+ *
+ * The intent behind that guard was right and is preserved: an author editing an `.mdx` file must see
+ * the change without restarting the server. The implementation just paid more than it had to.
+ * Stat-ing the files is cheap next to parsing them, so development keys the cache on the newest
+ * mtime and the file count — an edit, an addition or a deletion all change that, and nothing else
+ * has to.
+ */
+const corpusFingerprint = (files: string[]): string => {
+    let newest = 0;
+    for (const file of files) {
+        const { mtimeMs } = fs.statSync(file);
+        if (mtimeMs > newest) newest = mtimeMs;
+    }
+    return `${files.length}:${newest}`;
+};
 
 const loadCorpus = (): ParsedPost[] => {
     if (corpusCache && process.env.NODE_ENV === 'production') {
         return corpusCache;
     }
-    corpusCache = findMdxFiles(POST_PATH).map(buildPost);
+
+    const files = findMdxFiles(POST_PATH);
+
+    if (corpusCache) {
+        const stamp = corpusFingerprint(files);
+        if (stamp === corpusStamp) return corpusCache;
+        corpusStamp = stamp;
+    } else {
+        corpusStamp = corpusFingerprint(files);
+    }
+
+    corpusCache = files.map(buildPost);
     return corpusCache;
 };
 
@@ -184,29 +217,38 @@ const extractPostDate = (content: string): string | null => {
  * @param {ParsedPost} parsed - Raw parsed post from the corpus.
  * @returns {Object} - Object with post content and derived meta.
  */
-const toPost = ({ content, data }: ParsedPost) => ({
-    content,
-    meta: {
-        readTime: readingTime(content),
-        numberOfWords: countWords(content),
-        date: extractPostDate(content),
-        // Optional frontmatter field marking a substantive content update (freshness
-        // signal for search + LLM engines; feeds dateModified and sitemap lastmod)
-        updated: data.updated ?? null,
-        slug: data.slug,
-        title: data.title,
-        locale: data.locale,
-        category: data.category,
-        author: data.author,
-        tags: data.tags,
-        excerpt: data.excerpt,
-        image: data.image,
-        description: data.description,
-        alternate: data.alternate,
-        // null (not undefined) so the meta object survives getStaticProps serialization
-        faq: data.faq ?? null,
-    },
-});
+const toPost = ({ content, data }: ParsedPost) => {
+    /*
+     * SDD-L09-T14: `readingTime(content)` calls `countWords(content)` internally, so this used to
+     * split the whole body on ``` and then on whitespace **twice** for every post — and `toPost`
+     * runs across the entire corpus for every listing, category and tag page.
+     */
+    const numberOfWords = countWords(content);
+
+    return {
+        content,
+        meta: {
+            readTime: minutesToRead(numberOfWords),
+            numberOfWords,
+            date: extractPostDate(content),
+            // Optional frontmatter field marking a substantive content update (freshness
+            // signal for search + LLM engines; feeds dateModified and sitemap lastmod)
+            updated: data.updated ?? null,
+            slug: data.slug,
+            title: data.title,
+            locale: data.locale,
+            category: data.category,
+            author: data.author,
+            tags: data.tags,
+            excerpt: data.excerpt,
+            image: data.image,
+            description: data.description,
+            alternate: data.alternate,
+            // null (not undefined) so the meta object survives getStaticProps serialization
+            faq: data.faq ?? null,
+        },
+    };
+};
 
 export const getPostBySlug = (slug: string | { params: { slug: string } }, locale?: string) =>
     toPost(findPostBySlug(slug, locale));
@@ -433,6 +475,8 @@ export const getAllCategories = (locale: string) => {
  * @param {string} content - String to count words.
  * @returns {number} - Number of words.
  */
+const WORDS_PER_MINUTE = 200;
+
 export const countWords = (content: string) => {
     // Fixed: Use a more secure approach to avoid regex DoS
     // Split by triple backticks and count words only in non-code sections
@@ -458,8 +502,7 @@ export const countWords = (content: string) => {
  * @param {string} content - String to calculate reading time.
  * @returns {number} - Reading time in minutes.
  */
-export const readingTime = (content: string) => {
-    const wordsPerMinute = 200;
-    const numberOfWords = countWords(content);
-    return Math.ceil(numberOfWords / wordsPerMinute);
-};
+export const minutesToRead = (numberOfWords: number) => Math.ceil(numberOfWords / WORDS_PER_MINUTE);
+
+/** Kept for callers that only have the text; `toPost` uses `minutesToRead` to avoid a second walk. */
+export const readingTime = (content: string) => minutesToRead(countWords(content));

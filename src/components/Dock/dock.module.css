@@ -38,7 +38,38 @@
     transition: all 0.2s ease;
 }
 
+/*
+ * SDD-L08. The Dock's five icons carry no text. Their only cue was a `title` tooltip — which a touch
+ * device never shows — plus the magnify-on-hover below, behind `@media (hover: hover)`, which never
+ * matches on touch either. So the site's primary navigation was five unlabelled pictures on exactly
+ * the devices with the least context.
+ *
+ * The label is always in the DOM (that is what gives each link its accessible name) and revealed on
+ * hover and focus where a pointer exists. Where there is no hover, it is simply always visible.
+ */
+.label {
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    line-height: 1;
+    white-space: nowrap;
+    color: rgba(var(--blog-font));
+    pointer-events: none;
+}
+
 @media (hover: hover) {
+    .label {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .dock li:hover .label,
+    .dock a:focus-visible .label {
+        opacity: 1;
+    }
+
     .dock li:hover img {
         width: 100px;
         height: 100px;

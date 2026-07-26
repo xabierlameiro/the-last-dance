@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import styles from './backgroundImage.module.css';
 import backgroundImage from '../../../public/background-image.jpeg';
-import { useIntl } from 'react-intl';
 
 /**
  * @example
@@ -10,7 +9,6 @@ import { useIntl } from 'react-intl';
  * @returns {JSX.Element}
  */
 const BackgroundImage = () => {
-    const { formatMessage: f } = useIntl();
     return (
         <div className={styles.bgWrap}>
             <Image
@@ -31,7 +29,13 @@ const BackgroundImage = () => {
                 sizes="100vw"
                 placeholder="blur"
                 src={backgroundImage}
-                alt={f({ id: 'background.image.alt' })}
+                /*
+                 * SDD-L08: this carried a translated sentence — "This is the background image" — so
+                 * a screen reader announced it as the first content of every page on the site,
+                 * before any of the real content. The wallpaper conveys nothing; an empty alt is
+                 * what marks it decorative and skips it. The catalogue key is deleted with it.
+                 */
+                alt=""
                 style={{
                     objectFit: 'cover',
                 }}

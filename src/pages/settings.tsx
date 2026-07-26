@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from '@/styles/settings.module.css';
 import { useIntl } from 'react-intl';
+import { useRouter } from 'next/router';
 import SEO from '@/components/SEO';
 import Avatar from '@/components/Avatar';
 import Dialog from '@/components/Dialog';
@@ -16,9 +17,15 @@ const toggleHandler = (toggleLang: () => void) => () => toggleLang();
 
 const Header = ({ lang, toggleLang }: { lang: boolean; toggleLang: () => void }) => {
     const { formatMessage: f } = useIntl();
+    const router = useRouter();
     const close = () => {
-        // For a standalone page, we can't really "close", so we'll go back to home
-        window.location.href = '/';
+        /*
+         * SDD-L08: was `window.location.href = '/'`. Two problems in one line. It is a full document
+         * reload, throwing away the SPA and re-downloading everything to go one route away; and `/`
+         * is the *English* home, so closing Settings from `/es/settings` or `/gl/settings` silently
+         * dropped the visitor's language. `router.push` with an explicit locale keeps both.
+         */
+        router.push('/', '/', { locale: router.locale });
     };
     return (
         <header className={styles.header}>

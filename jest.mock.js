@@ -7,6 +7,10 @@ jest.mock('react-intl', () => ({
         formatDate: (date) => date,
         formatNumber: (number) => number,
     }),
+    // SDD-L08: `ErrorBoundary` is a class component, so it cannot call `useIntl` and reads the same
+    // context through `FormattedMessage` instead. Returning the id matches what `formatMessage`
+    // does above, so assertions read the same way whichever API a component uses.
+    FormattedMessage: ({ id }) => id,
 }));
 
 jest.mock('next/router', () => ({

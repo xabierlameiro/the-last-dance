@@ -1,6 +1,15 @@
+/**
+ * SDD-L08: `alt` was five hardcoded English strings — including the typo 'Got to configuration
+ * page' — on a site that ships in three languages. They are message ids now, resolved by `Dock`.
+ *
+ * The label is not only for assistive tech. These icons carry no text, and their only visible cue
+ * was a `title` tooltip plus a CSS hover state behind `@media (hover: hover)` — which never matches
+ * on a touch device. So on a phone the Dock is five unlabelled pictures and nothing else, which is
+ * why `Dock` now renders the label as text under each icon.
+ */
 type Item = {
     img: string;
-    alt: string;
+    labelId: string;
     link: { en: string; es: string; gl: string } | string;
     testId: string;
 };
@@ -8,13 +17,13 @@ type Item = {
 export const menu: Array<Item> = [
     {
         img: '/menu/vscode.png',
-        alt: 'Go to home page',
+        labelId: 'dock.home',
         link: '/',
         testId: 'home',
     },
     {
         img: '/menu/notes.png',
-        alt: 'Go to blog',
+        labelId: 'dock.blog',
         // /blog redirects to the newest post in the active locale, so the Dock never points at a
         // slug that ages out (or 404s once that post is renamed). Link carries the current locale.
         link: '/blog',
@@ -22,19 +31,19 @@ export const menu: Array<Item> = [
     },
     {
         img: '/menu/terminal.png',
-        alt: 'Go to terminal',
+        labelId: 'dock.terminal',
         link: '/comments',
         testId: 'terminal',
     },
     {
         img: '/menu/books.png',
-        alt: 'Legal documents',
+        labelId: 'dock.legal',
         link: '/legal/cookies-policy',
         testId: 'legal',
     },
     {
         img: '/menu/settings.png',
-        alt: 'Got to configuration page',
+        labelId: 'dock.settings',
         link: '/settings',
         testId: 'settings',
     },
