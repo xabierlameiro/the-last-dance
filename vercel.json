@@ -8,5 +8,6 @@
         }
     },
     "buildCommand": "npm run build",
-    "installCommand": "npm ci --legacy-peer-deps --include=optional"
+    "installCommand": "npm ci --legacy-peer-deps --include=optional",
+    "ignoreCommand": "sh scripts/vercel-ignore-build.sh"
 }

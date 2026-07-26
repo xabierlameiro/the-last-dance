@@ -8,14 +8,44 @@ updates:
     # SDD-L01: package-ecosystem was left as the template's empty string, which is invalid — so
     # scheduled version updates never ran. The Dependabot PRs that did arrive came from security
     # alerts, which fire independently of this file, giving the false impression it worked.
+    #
+    # SDD-L01b: grouped, after that fix produced EIGHT separate PRs in one morning. Each one is a
+    # branch, each branch was building a Vercel preview, and Dependabot rebases its branches — so
+    # `globals`, `eslint` and `cross-env` each cost two preview deployments on 2026-07-26 before
+    # anyone looked at them. Grouping means one branch and one review instead of eight.
+    #
+    # scripts/vercel-ignore-build.sh now skips preview builds on dependabot branches regardless, so
+    # this is the second of two independent brakes rather than the only one.
     - package-ecosystem: 'npm'
       directory: '/'
       schedule:
           interval: 'weekly'
-      open-pull-requests-limit: 5
+      open-pull-requests-limit: 3
+      groups:
+          # Patch and minor bumps are the ones that are usually safe to take together and rarely
+          # worth reading individually.
+          safe-updates:
+              patterns:
+                  - '*'
+              update-types:
+                  - 'minor'
+                  - 'patch'
+          # Majors stay grouped too, but separately: they need reading, and mixing them with the
+          # routine bumps would mean one red PR blocking a batch of green ones. Note the current
+          # crop includes eslint 9 -> 10 and globals 14 -> 17, which touch the flat config directly.
+          major-updates:
+              patterns:
+                  - '*'
+              update-types:
+                  - 'major'
     # Keeps the SHA-pinned third-party action in pre-deploy.yml current, since a pinned SHA does not
     # receive upstream fixes on its own.
     - package-ecosystem: 'github-actions'
       directory: '/'
       schedule:
           interval: 'weekly'
+      open-pull-requests-limit: 2
+      groups:
+          actions:
+              patterns:
+                  - '*'

@@ -1,3 +1,10 @@
+# SDD-L01b: the Lighthouse job moved to reports.yml (weekly + manual). It pushed to
+# performance-report on every merge, and that repo has its own Vercel git integration, so each merge
+# cost an extra production deployment there — 6 of them on 2026-07-26 alone. It also burned ~10
+# minutes of runner time per merge sleeping, waiting for a deploy it was racing.
+#
+# IndexNow stays on push: telling search engines a URL changed is the one thing here that is
+# genuinely time-sensitive (SDD-013 — ChatGPT Search retrieves from Bing's index).
 name: Workflow Post-Deploy
 on:
     push:
@@ -22,38 +29,3 @@ jobs:
               run: sleep 120
             - name: Submit URLs to IndexNow
               run: node scripts/indexnow-ping.mjs || true
-    lighthouse:
-        name: Lighthouse
-        runs-on: ubuntu-22.04
-        steps:
-            - uses: actions/checkout@v5
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: 22
-                  cache: npm
-            - name: Install dependencies
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm ci --legacy-peer-deps --include=optional
-            - name: Execute Lighthouse
-              run: |
-                  sleep 10m
-                  npm run lighthouse-report
-            - name: Checkout performance-report repository
-              uses: actions/checkout@v5
-              with:
-                  repository: xabierlameiro/performance-report
-                  token: ${{ secrets.TOKEN_GITHUB }}
-                  path: performance-report
-            - name: Copy output folder and publish
-              run: |
-                  cd performance-report
-                  cp -r ../lighthouse .
-                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
-                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
-                  git config --global user.email "action@github.com"
-                  git config --global user.name "GitHub Action"
-                  git add .
-                  git commit -m "Update performance-report"
-                  git push origin main
