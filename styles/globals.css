@@ -59,12 +59,55 @@
     --termianl-header-font: 73, 71, 74;
 }
 
+/**
+ * SDD-L05: `outline: none` and `-webkit-tap-highlight-color: transparent` removed from here.
+ *
+ * Between them they erased every focus indicator on the site — plus the touch affordance — and the
+ * whole codebase contained exactly one `:focus-visible` rule, which itself computed 1.00:1 in the
+ * light theme. A sighted keyboard-only user had no way to know where focus was on any page: the dock,
+ * the header links, the blog post list, the language select. Tabbing was a blind walk.
+ */
 * {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
-    outline: none;
-    -webkit-tap-highlight-color: transparent;
+}
+
+/**
+ * The single focus token for the whole site. `:focus-visible` rather than `:focus`, so it appears for
+ * keyboard and assistive-tech users without adding a ring to every mouse click.
+ *
+ * `--link-on-surface` and not `--blue-color`: the latter is theme-independent and computes 2.31:1 on
+ * the dark background, so a ring built from it would be invisible in exactly the theme where it is
+ * hardest to see anyway. This token is theme-scoped — 7.20:1 light, 7.84:1 dark.
+ */
+/**
+ * SDD-L05. Content for assistive tech and heading navigation that the visual design has no room for.
+ *
+ * The home page, /comments, 404 and 500 rendered with **no heading at all**, so a screen-reader user
+ * pressing H found nothing and the documents had no programmatic title. The macOS-window premise has
+ * no natural place for an <h1> — the window chrome is the title — so it is provided here instead of
+ * bolting visible text onto the design.
+ *
+ * The clip-rect technique rather than `display: none` or `visibility: hidden`, both of which remove
+ * the element from the accessibility tree and would defeat the point.
+ */
+.visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+:focus-visible {
+    outline: 2px solid rgba(var(--link-on-surface));
+    outline-offset: 2px;
+    border-radius: 2px;
 }
 
 ::-webkit-scrollbar {

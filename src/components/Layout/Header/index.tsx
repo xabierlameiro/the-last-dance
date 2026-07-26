@@ -83,8 +83,12 @@ const Route = () => {
  * @returns {JSX.Element}
  */
 const NavLinks = () => {
+    const { formatMessage: f } = useIntl();
+
     return (
-        <nav className={styles.navLinks}>
+        // SDD-L05: landmark navigation listed "navigation, navigation" (four of them on a post page)
+        // with nothing to tell the social links from the Dock from the category sidebar.
+        <nav className={styles.navLinks} aria-label={f({ id: 'nav.social' })}>
             {socialLinks.map((item) => (
                 <a
                     key={item.href}

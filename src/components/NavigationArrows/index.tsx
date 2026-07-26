@@ -24,10 +24,12 @@ const NavigationArrows = ({ hidden, disabledLeft, onClickLeft, disabledRight, on
     if (hidden) return null;
 
     return (
-        <nav className={styles.nav}>
+        // SDD-L05: was <nav>. A two-button prev/next pager inside a survey is not site navigation,
+        // and as a landmark it added a bare "navigation" region for two controls.
+        <div className={styles.nav}>
             <SlArrowLeft className={disabledLeft ? styles.disabled : ''} data-testid="left" onClick={onClickLeft} />
             <SlArrowRight className={disabledRight ? styles.disabled : ''} data-testid="right" onClick={onClickRight} />
-        </nav>
+        </div>
     );
 };
 

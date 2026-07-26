@@ -32,7 +32,12 @@ const NavList = ({ title, list, category, isCategory }: Props) => {
 
     return (
         <>
-            <h2 className={styles.navTitle}>{title}</h2>
+            {/* SDD-L05: was <h2>. These two sidebar titles precede the article in DOM order, so
+                every post outline read h2, h2, h1 — the post title reported as subordinate to the
+                sidebar, and heading navigation landing here first. The surrounding <nav> carries an
+                aria-label now, so the region is still reachable by landmark without these claiming
+                to be document structure. */}
+            <p className={styles.navTitle}>{title}</p>
             <ul className={styles.postList} data-testid="nav-list">
                 {list.map(
                     (

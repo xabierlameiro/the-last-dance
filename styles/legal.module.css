@@ -6,7 +6,7 @@
     background: rgba(var(--blog-background));
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1023px) {
     .container {
         grid-template-columns: 10px 1fr;
     }
@@ -73,7 +73,7 @@
     color: rgba(var(--blog-font));
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1023px) {
     .content {
         margin-top: 0;
     }

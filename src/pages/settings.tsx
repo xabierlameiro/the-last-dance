@@ -77,9 +77,14 @@ const Content = ({ lang, toggleLang }: { lang: boolean; toggleLang: () => void }
                 />
                 <IconWithName
                     icon="/settings/theme.png"
-                    alt={f({ id: 'settings.langAlt' })}
+                    // SDD-L05: this used to be `settings.langAlt` — the *language* setting's alt text on
+                    // the theme icon. Empty is correct anyway: the adjacent `name` already labels the
+                    // control, so a described icon would just repeat it.
+                    alt=""
                     name={f({ id: theme === dark ? 'settings.dark' : 'settings.light' })}
                     onClick={toggleTheme}
+                    // Announces on/off rather than leaving a screen-reader user to infer it from the label.
+                    pressed={theme === dark}
                 />
             </section>
             <section className={styles.confg}></section>

@@ -1,3 +1,4 @@
+/* SDD-L05: `outline: none` removed; focus is marked by the global :focus-visible token. */
 .lang_container {
     background-color: rgba(var(--blog-background));
     color: rgba(var(--blog-font));
@@ -19,13 +20,11 @@
     height: auto; /* Cambiar de 100% a auto para evitar problemas de altura */
     overflow: visible; /* Cambiar de auto a visible para asegurar que el contenido se muestre correctamente */
     font-size: 13px;
-    outline: none;
     background-color: rgba(var(--blog-background));
     color: rgba(var(--blog-font));
 }
 
 .lang_select option {
-    outline: none;
     padding: 10px;
 }
 

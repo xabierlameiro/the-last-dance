@@ -53,6 +53,11 @@ const usePostComponents = (meta: BylineMeta) => {
             ...components,
             h1: (props: React.ComponentPropsWithoutRef<'h1'>) => (
                 <>
+                    {/* jsx-a11y/heading-has-content cannot see through the spread and reads this as an
+                        empty heading. The content is real: MDX passes the `# Title` text as children,
+                        which is why every built post page has a populated <h1>. Suppressed rather than
+                        restructured, because the alternative is to stop forwarding props. */}
+                    {/* eslint-disable-next-line jsx-a11y/heading-has-content */}
                     <h1 {...props} />
                     {byline}
                 </>

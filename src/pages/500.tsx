@@ -16,6 +16,12 @@ const Custom500 = () => {
                     noindex: true,
                 }}
             />
+            {/* SDD-L05: this page rendered with no heading at all, so heading navigation found
+                nothing and the document had no programmatic title. The window chrome is the visual
+                title in this design, so the <h1> is visually hidden rather than bolted on. */}
+            {/* Plain English for now: this whole page is hardcoded English, and translating
+                only the heading would be inconsistent. SDD-L08 localises these pages. */}
+            <h1 className="visuallyHidden">Server error</h1>
             <Dialog
                 modalMode
                 withPadding

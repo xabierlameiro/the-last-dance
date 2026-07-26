@@ -5,7 +5,7 @@
     transition: all 0.5s ease-in-out;
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1023px) {
     .container {
         grid-template-columns: 10px 10px 1fr;
     }
@@ -28,7 +28,7 @@
     color: rgba(var(--blog-font-description));
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1023px) {
     .nav {
         padding: 20px 0 20px 12px;
     }
@@ -86,7 +86,7 @@
     background-color: rgba(var(--blog-nav), 0.35);
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1023px) {
     .mdx {
         width: calc(100vw - 70px);
     }
@@ -118,7 +118,7 @@
     }
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1023px) {
     .body {
         padding: 0px 15px 60px 10px;
         width: calc(100vw - 15px);

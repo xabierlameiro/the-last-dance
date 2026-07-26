@@ -1,3 +1,4 @@
+/* SDD-L05: `outline: none` removed; focus is marked by the global :focus-visible token. */
 .userInfo {
     display: grid;
     grid-auto-flow: column;
@@ -8,7 +9,6 @@
 .avatar {
     clip-path: circle(32px at center);
     cursor: pointer;
-    outline: none;
 }
 
 .userDetails {
