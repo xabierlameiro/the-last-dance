@@ -1,0 +1,17 @@
+# SDD-L11-T8. Third-party libraries vendored into the repo, marked so GitHub Linguist stops
+# counting them as this project's code.
+#
+# They are 265,737 of the 279,602 bytes of JavaScript left after the L11 migration — 95% of it —
+# so without this the language bar reports ~21% JavaScript for a codebase whose own remaining
+# JavaScript is 13,865 bytes (eslint.config.mjs and four jest config files, the documented D2
+# exception). Marking them is not cosmetic bookkeeping: the alternative is a headline number that
+# describes Raphaël's authors rather than this repository.
+#
+# This matches how the project already treats them everywhere else — `sonar-project.properties`
+# and `.deepsource.toml` both exclude `lighthouse/assets/**` as "vendored Raphael and Treant, not
+# our code to analyze". Neither file is ours to maintain or migrate.
+#
+# Raphaël 2.1.4 — © 2008-2012 Dmitry Baranovskiy / Sencha Labs, MIT.
+# Treant-js — © Fran Peručić, MIT.
+lighthouse/assets/raphael.js linguist-vendored
+lighthouse/assets/Treant.js linguist-vendored
