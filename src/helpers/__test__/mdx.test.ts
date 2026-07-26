@@ -29,7 +29,7 @@ import path from 'path';
  * The same technique, and the same reasoning, as the DeploymentStatus stylesheet test in SDD-L07.
  */
 const source = fs.readFileSync(path.join(__dirname, '..', 'mdx.ts'), 'utf8');
-const plugins = fs.readFileSync(path.join(__dirname, '..', '..', '..', 'mdx.plugins.mjs'), 'utf8');
+const plugins = fs.readFileSync(path.join(__dirname, '..', '..', '..', 'mdx.plugins.ts'), 'utf8');
 
 describe('MDX serialize options', () => {
     it('should keep the dangerous-globals guard on', () => {
@@ -52,8 +52,10 @@ describe('MDX serialize options', () => {
     });
 
     it('should build both pipelines from one plugin factory', () => {
-        expect(source).toContain("from '../../mdx.plugins.mjs'");
-        expect(plugins).toMatch(/export const remarkPlugins = \(\{ autoImport \}\)/);
+        expect(source).toContain("from '../../mdx.plugins.ts'");
+        // The parameter carries a type annotation since SDD-L11-T6 moved this module to
+        // TypeScript, so the destructuring is matched without pinning what follows it.
+        expect(plugins).toMatch(/export const remarkPlugins = \(\{ autoImport \}/);
     });
 
     // "~1M requests" in prose must never pair up into strikethrough.

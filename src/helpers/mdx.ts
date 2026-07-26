@@ -1,4 +1,4 @@
-import { remarkPlugins } from '../../mdx.plugins.mjs';
+import { remarkPlugins } from '../../mdx.plugins.ts';
 import { serialize as sz } from 'next-mdx-remote/serialize';
 import path from 'path';
 import fs from 'fs';

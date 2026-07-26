@@ -4,7 +4,7 @@
     "entry": [
         "src/pages/**/*.{ts,tsx}",
         "src/pages/api/**/*.ts",
-        "next.config.js",
+        "next.config.ts",
         "jest.config.js",
         "jest.setup.js",
         "jest.mock.js",
@@ -12,7 +12,7 @@
         "playwright.config.ts",
         "e2e/**/*.ts",
         ".storybook/**/*.{js,ts,tsx}",
-        "custom-*.js",
+        "custom-*.ts",
         "scripts/generate-post-posters.mjs",
         "src/__test__/**/*.ts"
     ],
