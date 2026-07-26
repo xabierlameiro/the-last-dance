@@ -11,12 +11,13 @@ let page: Page;
 
 test.beforeAll(async ({ browser }) => {
     page = await browser.newPage({});
-    // Answer the consent banner before the first navigation. It is `position: fixed; bottom: 0;
-    // left: 0; right: 0; z-index: 10000` — the full width of the viewport directly over the Dock,
-    // which is this site's only navigation — so while it is unanswered it intercepts every click
-    // there. That is what timed these tests out on `getByTestId('home')`: the banner was swallowing
-    // the click, not the dock being broken.
-    // 'denied' rather than 'granted' so the suite does not opt itself into analytics.
+    // Answer the consent notification before the first navigation, so these tests exercise the page
+    // rather than the notification. 'denied' so the suite does not opt itself into analytics.
+    //
+    // It used to be a full-width bar at `bottom: 0` with `z-index: 10000`, directly over the Dock —
+    // this site's only navigation — and it intercepted every click there until answered, which is what
+    // timed these tests out on `getByTestId('home')`. It is now a macOS-style notification in the
+    // top-right; the dedicated suite below guards that it stays out of the Dock's way.
     await page.addInitScript(
         ([key, choice]) => window.localStorage.setItem(key, choice),
         [CONSENT_STORAGE_KEY, CONSENT_DENIED]

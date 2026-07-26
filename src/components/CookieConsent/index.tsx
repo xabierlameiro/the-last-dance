@@ -1,6 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import Link from 'next/link';
+import { BsCookie } from 'react-icons/bs';
 import { clx } from '@/helpers';
 import styles from './cookieConsent.module.css';
 
@@ -65,18 +66,42 @@ const CookieConsent = () => {
     const handleAccept = React.useCallback(() => answer('granted'), [answer]);
     const handleReject = React.useCallback(() => answer('denied'), [answer]);
 
+    // Escape answers "no". The default state is already denied, so dismissing without choosing must
+    // not be read as acceptance — and a notification the keyboard cannot dismiss is a trap.
+    React.useEffect(() => {
+        if (!needsAnswer) return undefined;
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') handleReject();
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [needsAnswer, handleReject]);
+
     if (!needsAnswer) return null;
 
     return (
-        <div className={styles.banner} role="dialog" aria-live="polite" aria-labelledby="cookie-consent-title">
-            <div className={styles.copy}>
+        /**
+         * `role="dialog"` without `aria-modal`, and no focus trap: this is a macOS-style notification
+         * sitting beside the page, not a modal over it, so trapping focus would misdescribe it and
+         * strand a keyboard user. The previous markup paired `role="dialog"` with `aria-live`, which is
+         * invalid — a dialog is a window, not a live region — and made some screen readers announce the
+         * whole subtree as an atomic update while also reporting a dialog.
+         */
+        <section
+            className={styles.notification}
+            role="dialog"
+            aria-labelledby="cookie-consent-title"
+            aria-describedby="cookie-consent-message"
+        >
+            <div className={styles.header}>
+                <BsCookie className={styles.icon} aria-hidden="true" />
                 <div className={styles.title} id="cookie-consent-title">
                     {formatMessage({ id: 'consent.title' })}
                 </div>
-                <div className={styles.message}>
-                    {formatMessage({ id: 'consent.message' })}{' '}
-                    <Link href="/legal/cookies-policy">{formatMessage({ id: 'legal.cookies-policy' })}</Link>
-                </div>
+            </div>
+            <div className={styles.message} id="cookie-consent-message">
+                {formatMessage({ id: 'consent.message' })}{' '}
+                <Link href="/legal/cookies-policy">{formatMessage({ id: 'legal.cookies-policy' })}</Link>
             </div>
             <div className={styles.actions}>
                 <button type="button" className={styles.button} onClick={handleReject} data-testid="consent-reject">
@@ -91,7 +116,7 @@ const CookieConsent = () => {
                     {formatMessage({ id: 'consent.accept' })}
                 </button>
             </div>
-        </div>
+        </section>
     );
 };
 

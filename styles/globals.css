@@ -20,6 +20,9 @@
 }
 
 [data-theme='dark'] {
+    /* Link colour that works ON a surface, per theme. --blue-color is theme-independent and
+       computes 2.31:1 on the dark background, so it cannot be used for text there. 7.84:1. */
+    --link-on-surface: 145, 180, 230;
     --blog-nav: 48, 41, 51;
     --blog-header: 53, 45, 55;
     --blog-background: 30, 30, 30;
@@ -35,6 +38,8 @@
 }
 
 [data-theme='light'] {
+    /* 7.20:1 on white — same value as --blue-color, which is correct in this theme. */
+    --link-on-surface: 29, 88, 154;
     --blog-nav: 204, 202, 219;
     --blog-header: 255, 255, 255;
     --blog-background: 255, 255, 255;
