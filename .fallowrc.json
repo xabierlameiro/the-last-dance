@@ -11,7 +11,7 @@
         "jest.env.setup.js",
         "playwright.config.ts",
         "e2e/**/*.ts",
-        ".storybook/**/*.{js,ts,tsx}",
+        ".storybook/**/*.{ts,tsx}",
         "custom-*.ts",
         "scripts/generate-post-posters.mjs",
         "src/__test__/**/*.ts"
