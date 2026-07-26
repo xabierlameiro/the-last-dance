@@ -14,7 +14,7 @@
         "start:debugg": "cross-env NODE_OPTIONS='--inspect' next start",
         "start": "next start",
         "lint": "eslint .",
-        "audit:prod": "node scripts/audit-gate.mjs",
+        "audit:prod": "node scripts/audit-gate.ts",
         "typecheck": "tsc --noEmit",
         "test": "jest --silent",
         "coverage": "rm -rf public/coverage && jest --coverage --silent && node custom-reporter.js",
