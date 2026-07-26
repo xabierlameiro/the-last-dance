@@ -139,6 +139,11 @@ const llmsFull = [
 
 fs.writeFileSync(path.join(OUT_DIR, 'llms.txt'), `${llms}\n`);
 fs.writeFileSync(path.join(OUT_DIR, 'llms-full.txt'), `${llmsFull}\n`);
+// The Node version is logged because this file is the project's canary for type stripping: it is
+// the only TypeScript script on the deploy path, and it only runs at all on Node >= 22.18, where
+// stripping is on by default. If it fails to parse, this line never prints — which is itself the
+// signal. Vercel resolves `engines: "22.x"` to the latest 22.x and its docs recommend exactly this
+// for confirming the version a deployment used.
 console.log(
-    `[llms] wrote llms.txt (${posts.length} posts) and llms-full.txt (${(llmsFull.length / 1024).toFixed(0)} KB)`,
+    `[llms] wrote llms.txt (${posts.length} posts) and llms-full.txt (${(llmsFull.length / 1024).toFixed(0)} KB) on Node ${process.version}`,
 );
