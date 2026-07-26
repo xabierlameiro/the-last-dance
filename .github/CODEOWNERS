@@ -1,1 +1,9 @@
 * @xabierlameiro
+
+# MDX content is executable code, not just prose. src/helpers/mdx.ts sets `blockJS: false` — required
+# by the Code Hike highlighting pipeline — so anything merged under these paths ships client-side
+# JavaScript to every visitor. `blockDangerousJS: true` blocks the obvious globals but is not a
+# sandbox. These entries exist to make that review requirement explicit; see SECURITY.md.
+/data/blog/ @xabierlameiro
+/data/home/ @xabierlameiro
+/data/legal/ @xabierlameiro
