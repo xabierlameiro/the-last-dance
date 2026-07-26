@@ -198,7 +198,7 @@ jobs:
               # Pinned to the v5.0.2 commit rather than the mutable tag: this step runs in a checkout
               # where TOKEN_GITHUB is persisted, so a retargeted tag would inherit that access.
               id: version
-              uses: paulhatch/semantic-version@ea50fff3e41d24bb283f22b7343c4b3a314282fb
+              uses: paulhatch/semantic-version@502226b17e3e242e4befd0a45690fcbb27dd1373
               with:
                   version_format: '${major}.${minor}.${patch}'
                   major_pattern: 'MAJOR -'
