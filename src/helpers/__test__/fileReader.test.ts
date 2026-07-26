@@ -15,16 +15,39 @@ describe('getPostBySlug', () => {
         }
     });
 
+    // Asserted as a prefix, not an exact string: what these tests exist to pin is that the calendar
+    // day never shifts with the host timezone. SDD-L04 later added an explicit +00:00 offset to the
+    // value (Google's structured-data guidance asks for one), and coupling these to the exact format
+    // would have made a deliberate change look like the regression they guard against.
     it('Should keep the calendar day of the Date tag in a timezone ahead of UTC', () => {
         process.env.TZ = 'Europe/Madrid';
         const post = getPostBySlug('uncaught-error-minified-react-error');
-        expect(post.meta.date).toBe('2023-01-05');
+        expect(post.meta.date).toMatch(/^2023-01-05T/);
     });
 
     it('Should keep the calendar day of the Date tag in a timezone behind UTC', () => {
         process.env.TZ = 'America/New_York';
         const post = getPostBySlug('uncaught-error-minified-react-error');
-        expect(post.meta.date).toBe('2023-01-05');
+        expect(post.meta.date).toMatch(/^2023-01-05T/);
+    });
+
+    // The offset itself, asserted once and independently of the day.
+    it('Should emit an explicit UTC offset, so freshness is unambiguous to a crawler', () => {
+        const post = getPostBySlug('uncaught-error-minified-react-error');
+        expect(post.meta.date).toBe('2023-01-05T00:00:00+00:00');
+    });
+
+    // SDD-L04: two posts legitimately share a slug across locales (github-workflows es/gl), so the
+    // lookup filters by locale first. Without it, /gl/... served the Spanish post.
+    it('Should resolve a slug shared across locales to the requested locale', () => {
+        const shared = 'integracion-continua-con-github-actions-workflow';
+
+        expect(getPostBySlug(shared, 'es').meta.locale).toBe('es');
+        expect(getPostBySlug(shared, 'gl').meta.locale).toBe('gl');
+    });
+
+    it('Should not find a slug that exists only in another locale', () => {
+        expect(() => getPostBySlug('fuga-de-memoria-nextjs-en-produccion', 'en')).toThrow('Post not found');
     });
 });
 

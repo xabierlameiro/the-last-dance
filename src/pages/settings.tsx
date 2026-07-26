@@ -101,6 +101,11 @@ const Settings = () => {
                 meta={{
                     title: f({ id: 'settings.seo.title' }),
                     description: f({ id: 'settings.seo.description' }),
+                    // SDD-L04: both this page and /settings were indexed by Google while being
+                    // excluded from the sitemap — content-free UI demos ranking under the brand and
+                    // diluting site-quality signals. /survey already did this correctly, so the
+                    // pattern existed and these two just never got it.
+                    noindex: true,
                 }}
             />
             <Dialog

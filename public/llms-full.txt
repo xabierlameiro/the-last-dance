@@ -929,6 +929,121 @@ You can see the complete code in my repository if you need it, and if you find i
 
 ---
 
+# How to measure a Next.js memory leak and prove the diagnosis
+
+- URL: https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak
+- Author: Xabier Lameiro
+- Category: Nextjs · Tags: memory-leak, heap-snapshot, node, debugging, performance
+- Summary: The measurement protocol behind a confirmed Next.js memory leak: forced GC with --expose-gc, heap snapshot diffs and retainer chains, and the before/after pair that proves the diagnosis. Automated in next-leak.
+
+# How to measure a Next.js memory leak and prove the diagnosis
+
+Published: 07-22-2026
+
+## Quick answer
+
+Most memory leak reports die in the same place. Someone posts a graph that climbs, a maintainer asks for heap snapshots taken after a forced GC, and nobody comes back. I don't think that's laziness — taking those snapshots _correctly_ is harder than the thread makes it sound, and getting it wrong gives you numbers that look convincing and mean nothing.
+
+So I took one open issue and did it properly: [vercel/next.js#95094](https://github.com/vercel/next.js/issues/95094), _"Memory leak from retained sandbox timeouts causes stepwise heap growth"_. The claim is that `setTimeout` inside middleware leaks, because the sandbox keeps every timeout id and never lets go.
+
+That claim is easy to believe and easy to get wrong. Stepwise growth is also what JIT warm-up and lazy caches look like. Telling those two apart is the whole job.
+
+This post is about the _method_ — how to measure, and how to prove the diagnosis. If what you actually need is to work out which of the open leaks you're hitting in production, read [how to find a Next.js memory leak in production](https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production) first and come back here to confirm it.
+
+## The protocol matters more than the tool
+
+Every step here exists to kill one specific way of fooling yourself:
+
+-   **A fresh process per route.** Nothing carries over from the last thing you ran.
+-   **Warm-up before the baseline.** The first requests trigger JIT and lazy caches. Snapshot cold and you bill all of that to the leak.
+-   **Forced GC — three passes — before every sample.** Heap the GC can reclaim isn't leaked. Sample without forcing it and you're measuring garbage. This needs the process started with `--expose-gc` so `global.gc()` is callable, and the snapshot written with `v8.writeHeapSnapshot()` right after.
+-   **Cycles, not a single reading.** One number tells you nothing. A series has a shape, and the shape is what survives noise.
+-   **An audit of the load itself.** A run that quietly failed to send its traffic looks exactly like a healthy route.
+
+That last one isn't theoretical. Twice, my own load generator sent almost nothing — once because the timeout was expressed in whole seconds, once because 86% of the requests never finished connecting. Both would have printed a confident `stable`. I only caught them because the run records what it actually did.
+
+## The numbers
+
+Against the issue's own reproduction repo — next `16.3.0-canary.50`, Node 24.15, darwin arm64, 8 cycles of 3000 requests, 20 connections:
+
+```
+heap after forced GC, per cycle (MB):
+28.7 → 40.2 → 59.0 → 75.8 → 75.8 → 101.0 → 101.1 → 138.9 → 138.9
+```
+
+That's the stepwise shape from the title, about **4.7 MB per 1000 requests**, and it never comes back. Warm-up flattens after a cycle or two. This gives back nothing.
+
+## The snapshot diff names the mechanism
+
+A climbing heap tells you that you have a problem. It doesn't tell you what's holding the memory. The diff between the baseline and the final snapshot does:
+
+```
+grown [object] Array  112.47 MB
+  — TimeoutsManager#object[.resources]
+  <- system / Context#object[.timeoutsManager]
+  <- webSetTimeoutPolyfill#closure[.context]
+```
+
+Read it upwards: the sandbox's `setTimeout` polyfill holds a context, the context holds a `TimeoutsManager`, and its `resources` array has grown to 112 MB of timeout entries. That's exactly the mechanism the issue describes — and I didn't have to know where to look to find it.
+
+This is the same thing you'd read by hand in Chrome DevTools: load both snapshots in the Memory tab, switch to the **Comparison** view, and open the _retainers_ of whatever grew. The snapshots are kept precisely so you can go and check it yourself — a verdict you can't audit is just an opinion with numbers attached.
+
+## Removing the cause removes the effect
+
+This is the step people skip, and it's the only one that turns a measurement into a confirmation.
+
+The thread suggests a workaround: call `clearTimeout(id)` inside the callback so the sandbox releases the entry. If my diagnosis is right, that should erase the curve. Same app, same parameters:
+
+```
+27.8 → 25.2 → 25.3 → 25.4 → 25.4 → 25.5 → 25.5 → 25.5 → 25.6
+```
+
+Flat. **+0.02 MB per 1000 requests.** Nothing changed except the cause, and the effect went with it. That's the standard I'd want from anyone showing me a leak.
+
+One thing I didn't expect: at 100 concurrent connections, the _fixed_ version timed out on about 9% of requests. Tracking 500 timeouts per request costs CPU as well as memory, so on hot middleware this matters beyond the heap.
+
+The full write-up with the reproduction parameters is [on the issue itself](https://github.com/vercel/next.js/issues/95094#issuecomment-5035131691).
+
+## The same method says "no" just as often
+
+I ran this against six open issues. Two more reproduced:
+
+-   **[#94890](https://github.com/vercel/next.js/issues/94890)** — the router LRU cache doesn't count its keys. Heap 26.7 → 71.9 MB, with the chain pointing into the route filesystem checker. The original report needed 1.2M requests and a custom script; this took 120000 and one command.
+-   **[#84884](https://github.com/vercel/next.js/issues/84884)** — axios with `AbortSignal` in middleware. Four nearly identical routes in the repro, and only `/middleware/axios` leaks: 32.8 → 369.9 MB while the other three stay flat. That's isolation by comparison, not a correlation you have to trust.
+
+Three didn't reproduce — and the reasons were in the threads all along. One was fixed upstream in 16.0.3. One is a Node bug the reporter confirmed is gone in Node 26. One is a dev-server problem, which this method can't see by design.
+
+A negative result with evidence behind it is worth as much as a confirmation. It's the difference between "I couldn't reproduce it" and "here is what I ran, here is what I saw, here is what I ruled out."
+
+Across ~25 healthy routes on real production apps — PPR, MDX, Auth.js, Sentry, i18n — it reported no false positives. That number matters more to me than the confirmations. A leak detector that cries wolf is worse than not having one.
+
+## Why not just use Chrome DevTools or memlab?
+
+Because none of them run the experiment for you, and the experiment is the hard part:
+
+| Tool                                                     | What it gives you                                                   | Where it stops                                                                                                                                                                 |
+| -------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Chrome DevTools**                                      | The ground truth: two snapshots and a Comparison view               | You reproduce the load, force the GC, pick the moments and read the retainers yourself. Doing that _correctly_ is the whole difficulty                                         |
+| **[memlab](https://github.com/facebook/memlab)**         | An excellent heap-analysis engine — I use it to parse the snapshots | It's built around browser scenarios you script. It doesn't drive HTTP load against your routes, and it knows nothing about Next.js route manifests or your build's source maps |
+| **[clinic.js](https://github.com/clinicjs/node-clinic)** | Broad Node performance profiling                                    | Its own README says it is no longer actively maintained                                                                                                                        |
+| **`--inspect` + manual snapshots**                       | Full control                                                        | Same as DevTools, plus keeping the process, the load and the snapshots in sync by hand                                                                                         |
+
+What's missing from all of them isn't the analysis — it's the controlled experiment around it: a fresh process per route, warm-up before the baseline, forced GC and an adaptive idle before every sample, and an audit of whether the load you think you sent actually landed.
+
+## Measuring your own app
+
+I automated the protocol above into a CLI, [next-leak](https://github.com/xabierlameiro/next-leak):
+
+```bash
+npx next-leak .
+```
+
+It needs App Router, `output: "standalone"` and Node ≥ 22. That's a narrow scope on purpose — it's why the false positive count is what it is. You get one of three answers, and all of them are useful: you don't have a leak (the common case, and the report proves it), the leak is yours or a dependency's (named down to the file when the sourcemaps allow it), or it's framework internals, with a draft issue and the snapshots to back it.
+
+If you're coming at this from the other end — a graph climbing in production and no idea why — start here instead: [How to find a Next.js memory leak in production](https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production).
+
+---
+
 # How to find a Next.js memory leak in production
 
 - URL: https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production
@@ -1065,6 +1180,8 @@ It boots your standalone build route by route in a fresh process, drives real lo
 ```
 
 That is the stepwise growth of leak 3 with the sandbox `TimeoutsManager` named in the retainer chain — the same diagnosis as above, in about three minutes.
+
+The full protocol, why each step exists, and the before/after pair that proves the diagnosis was right are in [how to measure a Next.js memory leak and prove the diagnosis](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak).
 
 Two honest data points from measuring all three: #94890 reproduced with a tenth of the original load; #94919 did **not** reproduce on a standalone build even with 4,000 real mid-stream disconnections per cycle — the repro's pages answer in ~6 ms, so there is no stream left to abandon. That matches the reporter's own note that the magnitude scales with the RSC payload: if you suspect leak 2, measure your heaviest real pages, not a minimal repro. Every verdict ships with the raw snapshots and a machine-readable `run.json`, so you can verify every claim yourself in DevTools.
 

@@ -82,17 +82,34 @@ const normalizeSlug = (slug: string | { params: { slug: string } }): string => {
 };
 
 /**
- * @description Find a parsed post by slug in the cached corpus.
+ * @description Find a parsed post by slug in the cached corpus, preferring the requested locale.
+ *
+ * SDD-L04. This used to match on slug alone, which had two consequences. The visible one was that
+ * every post answered under every locale prefix, and combined with a router-derived canonical it let
+ * Google index the same Spanish article twice. The subtler one: **two posts can legitimately share a
+ * slug across locales** — `github-workflows.es.mdx` and `.gl.mdx` both use
+ * `integracion-continua-con-github-actions-workflow`, because the phrase is spelled the same in
+ * Spanish and Galician — and a slug-only lookup returned whichever came first in the corpus, so
+ * `/gl/blog/nextjs/<slug>` served the *Spanish* post under a Galician prefix.
+ *
+ * Filtering by locale first fixes both. A slug that exists in no locale, or only in another, throws
+ * and the page 404s.
+ *
  * @param {string | { params: { slug: string } }} slug - Slug or route params.
+ * @param {string} [locale] - Locale to resolve within. Omitted only by callers that genuinely want
+ *   any match, of which there are none today.
  * @returns {ParsedPost}
  */
-const findPostBySlug = (slug: string | { params: { slug: string } }): ParsedPost => {
+const findPostBySlug = (slug: string | { params: { slug: string } }, locale?: string): ParsedPost => {
     const normalizedSlug = normalizeSlug(slug);
 
-    const post = loadCorpus().find(
-        ({ data, fileName }) =>
-            data.slug?.normalize('NFC') === normalizedSlug || fileName.normalize('NFC') === `${normalizedSlug}.mdx`
-    );
+    const matchesSlug = ({ data, fileName }: ParsedPost) =>
+        data.slug?.normalize('NFC') === normalizedSlug || fileName.normalize('NFC') === `${normalizedSlug}.mdx`;
+
+    const corpus = loadCorpus();
+    const post = locale
+        ? corpus.find((entry) => entry.data.locale === locale && matchesSlug(entry))
+        : corpus.find(matchesSlug);
 
     if (!post) {
         throw new Error('Post not found');
@@ -125,7 +142,12 @@ const extractPostDate = (content: string): string | null => {
     if (utcDate.getUTCMonth() !== Number(month) - 1 || utcDate.getUTCDate() !== Number(day)) {
         return null;
     }
-    return `${year}-${month}-${day}`;
+    // SDD-L04: return a full ISO instant, not a bare date. `2026-07-22` is valid ISO 8601 and Google
+    // accepts it, but its own structured-data guidance asks for a timezone so freshness is
+    // unambiguous rather than interpreted against the crawler's clock. `PostByline` already pins
+    // display formatting to `timeZone: 'UTC'` and the sitemap's <lastmod> accepts the full form, so
+    // nothing downstream has to change.
+    return `${year}-${month}-${day}T00:00:00+00:00`;
 };
 
 /**
@@ -167,7 +189,8 @@ const toPost = ({ content, data }: ParsedPost) => ({
     },
 });
 
-export const getPostBySlug = (slug: string | { params: { slug: string } }) => toPost(findPostBySlug(slug));
+export const getPostBySlug = (slug: string | { params: { slug: string } }, locale?: string) =>
+    toPost(findPostBySlug(slug, locale));
 
 /**
  * @description Get all posts (read + parsed once, cached per deploy in production).

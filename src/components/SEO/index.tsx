@@ -37,9 +37,7 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
 
     return (
         <Head>
-            {isBlog
-                ? blogTags({ meta, locale, author, urls })
-                : staticHreflangTags(urls.domain, urls.pagePath)}
+            {isBlog ? blogTags({ meta, locale, author, urls }) : staticHreflangTags(urls.domain, urls.pagePath)}
 
             <title>{meta?.title}</title>
             {robotsTags(meta?.noindex)}
@@ -51,7 +49,7 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
             <meta name="twitter:title" content={meta?.title} />
             <meta property="og:type" content={isBlog ? 'article' : 'website'} />
             {articleTags(isBlog, meta)}
-            {imageTags(noimage, urls.imageUrl)}
+            {imageTags(noimage, urls.imageUrl, meta?.title)}
             <meta property="og:url" content={urls.url} />
             {ogLocaleTags(locale)}
             <link rel="canonical" href={urls.url} title="Canonical url" />

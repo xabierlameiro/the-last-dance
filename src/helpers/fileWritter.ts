@@ -1,6 +1,7 @@
 import { defaultLocale } from '@/constants/site';
 import { removeTrailingSlash } from '@/helpers';
 import fs from 'fs';
+import matter from 'gray-matter';
 import path from 'path';
 import prettier from 'prettier';
 
@@ -58,10 +59,23 @@ export const createSiteMap = (routes: SitemapRoute[], locales: string[]) => {
         urlEntry(`${domain}${localePrefix(locale)}/blog/${category}/${slug}`, date)
     );
 
-    // Legal pages — previously missing from the sitemap
+    /**
+     * Legal pages, minus the ones that tell crawlers not to index them.
+     *
+     * SDD-L04: this used to submit every legal slug for every locale unconditionally, and all three
+     * documents carry `noindex: true` in their frontmatter. That put 9 guaranteed-uncrawlable URLs
+     * into the sitemap — Search Console duly reported them as "Discovered – currently not indexed" —
+     * which is the signal that erodes trust in the whole file. Submitting a URL is a request to index
+     * it, so it has to agree with the page's own robots directive.
+     *
+     * The filter stays rather than the block being deleted, so a future indexable legal document is
+     * picked up automatically.
+     */
+    const legalDir = path.join(process.cwd(), 'data/legal');
     const legalSlugs = fs
-        .readdirSync(path.join(process.cwd(), 'data/legal'))
+        .readdirSync(legalDir)
         .filter((file) => file.endsWith('.mdx'))
+        .filter((file) => matter(fs.readFileSync(path.join(legalDir, file), 'utf8')).data?.noindex !== true)
         .map((file) => file.replace('.mdx', ''));
     const legalEntries = locales.flatMap((locale) =>
         legalSlugs.map((slug) => urlEntry(`${domain}${localePrefix(locale)}/legal/${slug}`))

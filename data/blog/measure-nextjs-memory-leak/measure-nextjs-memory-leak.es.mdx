@@ -37,7 +37,7 @@ Así que cogí un issue abierto y lo hice bien: [vercel/next.js#95094](https://g
 
 Esa afirmación es fácil de creer y fácil de equivocar. El crecimiento escalonado es también lo que parecen el calentamiento del JIT y las cachés perezosas. Distinguir una cosa de la otra es todo el trabajo.
 
-Este post va del _método_: cómo medir y cómo demostrar el diagnóstico. Si lo que necesitas es averiguar cuál de las fugas abiertas te está afectando en producción, lee antes [cómo encontrar una fuga de memoria de Next.js en producción](https://xabierlameiro.com/blog/nextjs/fuga-de-memoria-nextjs-en-produccion) y vuelve aquí a confirmarlo.
+Este post va del _método_: cómo medir y cómo demostrar el diagnóstico. Si lo que necesitas es averiguar cuál de las fugas abiertas te está afectando en producción, lee antes [cómo encontrar una fuga de memoria de Next.js en producción](https://xabierlameiro.com/es/blog/nextjs/fuga-de-memoria-nextjs-en-produccion) y vuelve aquí a confirmarlo.
 
 ## El protocolo importa más que la herramienta
 
@@ -129,4 +129,4 @@ npx next-leak .
 
 Necesita App Router, `output: "standalone"` y Node ≥ 22. Es un alcance estrecho a propósito — es la razón de que el número de falsos positivos sea el que es. Te da una de tres respuestas, y las tres sirven: no tienes una fuga (el caso común, y el informe lo demuestra), la fuga es tuya o de una dependencia (con el fichero nombrado cuando los source maps lo permiten), o parece de las tripas del framework, con un borrador de issue y los snapshots para respaldarlo.
 
-Si vienes por el otro lado — una gráfica subiendo en producción y ni idea de por qué — empieza aquí: [cómo encontrar una fuga de memoria de Next.js en producción](https://xabierlameiro.com/blog/nextjs/fuga-de-memoria-nextjs-en-produccion).
+Si vienes por el otro lado — una gráfica subiendo en producción y ni idea de por qué — empieza aquí: [cómo encontrar una fuga de memoria de Next.js en producción](https://xabierlameiro.com/es/blog/nextjs/fuga-de-memoria-nextjs-en-produccion).

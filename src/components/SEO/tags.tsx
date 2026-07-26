@@ -15,6 +15,12 @@ import { articleJsonLd, breadcrumbJsonLd, faqJsonLd } from './jsonLd';
 export type SeoMeta = {
     noindex?: boolean;
     title: string;
+    /**
+     * The locale the content itself is written in, from post frontmatter. Distinct from the router
+     * locale on purpose: `resolveSeoUrls` builds the canonical from this, so a page cannot declare
+     * whatever prefix it happened to be requested under to be canonical (SDD-L04).
+     */
+    locale?: string;
     author?: string;
     description?: string;
     image?: string;
@@ -51,7 +57,19 @@ type UrlInput = { meta?: SeoMeta; isBlog?: boolean; locale?: string; pathname: s
  */
 export const resolveSeoUrls = ({ meta, isBlog, locale, pathname }: UrlInput) => {
     const domain = process.env.NEXT_PUBLIC_DOMAIN;
-    const langPrefix = getLang(locale);
+    /**
+     * SDD-L04: prefer the post's own locale over the router's.
+     *
+     * This used to be `getLang(locale)` unconditionally, so a page served under the wrong locale
+     * prefix declared *that* prefix canonical — it self-canonicalised instead of pointing at the one
+     * true URL. The locale guard in the post's getStaticProps now 404s that case, so this is
+     * belt-and-braces; it is here because a canonical built from where the request happened to land,
+     * rather than from what the content is, is wrong regardless of who else is guarding it.
+     *
+     * Non-blog pages have no `meta.locale`, so they keep using the router locale, which is correct
+     * for them — the same path exists in all three.
+     */
+    const langPrefix = getLang(meta?.locale ?? locale);
     const category = meta?.category?.toLowerCase();
     // meta.url lets dynamic non-blog routes (/legal/[slug], /blog/[category]) provide their
     // real path — router.pathname would leak the bracket placeholder into the canonical URL
@@ -65,9 +83,7 @@ export const resolveSeoUrls = ({ meta, isBlog, locale, pathname }: UrlInput) => 
 
     // For blog posts, the English version is either the current page or listed in the alternates
     const englishAlternate = meta?.alternate?.find(({ lang }) => lang === 'en');
-    const englishAlternateUrl = englishAlternate
-        ? `${domain}/blog/${category}/${englishAlternate.url}`
-        : undefined;
+    const englishAlternateUrl = englishAlternate ? `${domain}/blog/${category}/${englishAlternate.url}` : undefined;
 
     return {
         domain,
@@ -146,7 +162,10 @@ export const staticHreflangTags = (domain: string | undefined, pagePath: string)
 };
 
 export const robotsTags = (noindex?: boolean) => {
-    const content = noindex ? 'noindex' : 'index,follow';
+    // SDD-L04: `max-image-preview:large` opts into large image thumbnails in Search and
+    // Discover. Without it Google defaults to a small preview, which for a blog whose posts all
+    // ship an OG image is leaving the image on the table. Only meaningful on indexable pages.
+    const content = noindex ? 'noindex' : 'index,follow,max-image-preview:large';
     return [
         <meta name="robots" content={content} key="robots" />,
         <meta name="googlebot" content={content} key="googlebot" />,
@@ -170,10 +189,23 @@ export const articleTags = (isBlog: boolean | undefined, meta?: SeoMeta) => {
     return tags;
 };
 
-export const imageTags = (noimage: boolean, imageUrl: string) =>
+/**
+ * SDD-L04: dimensions and alt added alongside the URL. Without `og:image:width`/`height` a scraper
+ * has to fetch the image before it can lay out a card, and some (LinkedIn in particular) fall back to
+ * a small preview or no image rather than wait. Every OG image this site references is 1200x630 —
+ * `og-home.jpg` and all 15 post images in `public/posts/` — so the values are accurate rather than
+ * guessed. `og:image:alt` is the accessible description consumers read out.
+ */
+const OG_IMAGE_WIDTH = '1200';
+const OG_IMAGE_HEIGHT = '630';
+
+export const imageTags = (noimage: boolean, imageUrl: string, title?: string) =>
     noimage
         ? [
               <meta property="og:image" content={imageUrl} key="og-image" />,
+              <meta property="og:image:width" content={OG_IMAGE_WIDTH} key="og-image-width" />,
+              <meta property="og:image:height" content={OG_IMAGE_HEIGHT} key="og-image-height" />,
+              ...(title ? [<meta property="og:image:alt" content={title} key="og-image-alt" />] : []),
               <meta name="twitter:image" content={imageUrl} key="twitter-image" />,
           ]
         : [];

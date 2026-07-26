@@ -36,18 +36,15 @@ export default withMDX({
             { source: '/contact', destination: '/', permanent: true },
         ];
     },
-    rewrites: async () => {
-        return [
-            {
-                source: '/:coverage',
-                destination: '/:coverage/index.html',
-            },
-            {
-                source: '/docs/:path*',
-                destination: '/docs/:path*',
-            },
-        ];
-    },
+    // SDD-L04: two rewrites removed here.
+    //  - `/:coverage -> /:coverage/index.html` read as the literal path /coverage, but `:coverage` is a
+    //    named parameter matching ANY single segment. Harmless today because array rewrites run
+    //    `afterFiles`, so pages and public files resolve first — but it would have silently swallowed
+    //    the first top-level dynamic route anyone added, and the failure would have looked like a
+    //    routing bug rather than a config one.
+    //  - `/docs/:path* -> /docs/:path*` was byte-identical to its source, i.e. a no-op, and targeted
+    //    a public/docs directory that does not exist (it is generated on demand by `npm run jsdoc`
+    //    and excluded by .vercelignore).
     // Append the default value with md extensions
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {
