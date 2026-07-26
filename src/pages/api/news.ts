@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import jsdom from 'jsdom';
 import allowCors from '../../helpers/cors';
+import { CACHE, fetchWithTimeout } from '@/helpers/http';
 import { isValidCityName } from '../../helpers/city';
 
 interface NewsItem {
@@ -19,6 +20,9 @@ interface NewsData {
 type NewsResponse = NewsData | { error: string };
 
 const MAX_NEWS_ITEMS = 10;
+
+/** Google News RSS for one city runs well under 100 KB; 2 MB is a generous ceiling, not a target. */
+const MAX_FEED_BYTES = 2 * 1024 * 1024;
 
 /**
  * @description Get the latest news for a city from the Google News RSS feed.
@@ -38,7 +42,7 @@ const getCityNews = async (city: string): Promise<NewsData> => {
     url.searchParams.set('gl', 'US');
     url.searchParams.set('ceid', 'US:en');
 
-    const response = await fetch(url.toString(), {
+    const response = await fetchWithTimeout(url.toString(), {
         headers: { accept: 'application/rss+xml, application/xml, text/xml' },
         redirect: 'follow',
     });
@@ -46,7 +50,18 @@ const getCityNews = async (city: string): Promise<NewsData> => {
         throw new Error(`News RSS HTTP error! status: ${response.status}`);
     }
 
+    // Cap the body before it reaches JSDOM. `response.text()` was unbounded and fed straight into an
+    // XML parse, so a large or slow feed turned each request into a multi-second CPU-and-memory burn —
+    // a cheap path to function timeouts once someone noticed the endpoint was uncached.
+    const declaredLength = Number(response.headers.get('content-length') ?? 0);
+    if (declaredLength > MAX_FEED_BYTES) {
+        throw new Error(`News RSS response too large: ${declaredLength} bytes`);
+    }
+
     const raw = await response.text();
+    if (raw.length > MAX_FEED_BYTES) {
+        throw new Error(`News RSS response too large: ${raw.length} bytes`);
+    }
     const { JSDOM } = jsdom;
     const document = new JSDOM(raw, { contentType: 'text/xml' }).window.document;
 
@@ -97,9 +112,11 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
 
     try {
         const data = await getCityNews(city);
+        res.setHeader('Cache-Control', CACHE.news);
         res.status(200).json(data);
     } catch (error) {
         console.error('News API Error:', error);
+        res.setHeader('Cache-Control', CACHE.error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

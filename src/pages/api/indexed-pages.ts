@@ -4,6 +4,7 @@ import path from 'path';
 import console from '@/helpers/console';
 import { getSearchConsoleClient, SITE_URL } from '@/helpers/searchConsole';
 import allowCors from '../../helpers/cors';
+import { CACHE } from '@/helpers/http';
 
 /**
  * @description Count the pages Google surfaced for the site in the last 28 days,
@@ -28,7 +29,10 @@ const countFromSearchConsole = async (): Promise<number | null> => {
             startDate: toDay(start),
             endDate: toDay(end),
             dimensions: ['page'],
-            rowLimit: 25000,
+            // Was 25000. The route only needs `rows.length`, and the site publishes ~60 URLs, so the
+            // old limit asked Search Console for four hundred times more data than the widget can
+            // use — an expensive query repeated per visitor before this route was cached.
+            rowLimit: 1000,
         },
     });
 
@@ -57,6 +61,7 @@ export default allowCors(async function handler(_req: NextApiRequest, res: NextA
     try {
         const num = await countFromSearchConsole();
         if (num !== null && num > 0) {
+            res.setHeader('Cache-Control', CACHE.slow);
             return res.status(200).json({ num });
         }
     } catch (err) {
@@ -64,8 +69,10 @@ export default allowCors(async function handler(_req: NextApiRequest, res: NextA
     }
 
     try {
+        res.setHeader('Cache-Control', CACHE.slow);
         return res.status(200).json({ num: countFromSitemap() });
     } catch {
+        res.setHeader('Cache-Control', CACHE.error);
         return res.status(500).json({ error: 'Unable to count indexed pages' });
     }
 });

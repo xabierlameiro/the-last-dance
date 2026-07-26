@@ -26,8 +26,12 @@ export const createMockResponse = (): MockResponse => {
 /**
  * `headers` is always present because the CORS wrapper reads `req.headers.origin`
  * before the handler runs; omitting it throws before the assertion under test.
+ *
+ * The third parameter exists for the CORS tests, which need to drive `origin` directly. Optional and
+ * last so the existing call sites are unaffected.
  */
 export const createRequest = (
     query: Record<string, string> = {},
-    method = 'GET'
-): NextApiRequest => ({ method, query, headers: {} } as unknown as NextApiRequest);
+    method = 'GET',
+    headers: Record<string, string> = {}
+): NextApiRequest => ({ method, query, headers } as unknown as NextApiRequest);

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import allowCors from '../../helpers/cors';
+import { CACHE, fetchWithTimeout } from '@/helpers/http';
 
 export type DeploymentStatus = 'BUILDING' | 'ERROR' | 'INITIALIZING' | 'QUEUED' | 'READY' | 'CANCELED';
 export type DeploymentEnvironment = 'production' | 'preview';
@@ -30,7 +31,7 @@ const fetchLatestDeployment = async (projectId: string, target: string, token: s
     url.searchParams.set('target', target);
     url.searchParams.set('limit', '1');
 
-    const result = await fetch(url.toString(), {
+    const result = await fetchWithTimeout(url.toString(), {
         headers: { Authorization: `Bearer ${token}` },
         method: 'get',
     });
@@ -46,6 +47,7 @@ export default allowCors(async function handler(
     const missingEnv = REQUIRED_ENV.filter((name) => !process.env[name]);
     if (missingEnv.length > 0) {
         console.error(`Missing required environment variables for Vercel API: ${missingEnv.join(', ')}`);
+        res.setHeader('Cache-Control', CACHE.error);
         return res.status(500).json({ error: 'Configuration error' });
     }
 
@@ -60,16 +62,26 @@ export default allowCors(async function handler(
             throw new Error('No deployment found');
         }
 
+        res.setHeader('Cache-Control', CACHE.deployment);
         return res.status(200).json({
             status: deployment.state,
             environment: process.env.NEXT_PUBLIC_ENV as DeploymentEnvironment,
             createdAt: deployment.createdAt,
             buildingAt: deployment.buildingAt,
             ready: deployment.ready,
+            // Kept deliberately. The audit flagged it as reconnaissance, but DeploymentStatus renders
+            // it in the widget tooltip, and the value is the owner's own account name — already public
+            // as the org in this repository's URL. Removing it would break a feature to hide
+            // something that is not hidden.
             username: deployment.creator?.username,
         });
     } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-        return res.status(500).json({ error: errorMessage });
+        // Was `err.message`, the only route of eight that echoed internal error text to the client.
+        // A non-JSON Vercel error page surfaces a SyntaxError carrying a fragment of the upstream
+        // body, and a fetch failure surfaces Node's internal text — an uncontrolled channel from
+        // server internals to an anonymous caller.
+        console.error('Deployments API Error:', err);
+        res.setHeader('Cache-Control', CACHE.error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
 });

@@ -121,12 +121,15 @@ describe('/api/analytics', () => {
     });
 
     // Caching a failure would keep serving it for five minutes after the cause is gone.
+    // SDD-L02 made this explicit: the header used to be absent on the error path, and an absent
+    // Cache-Control lets a CDN apply its own heuristic caching. `no-store` states the intent instead
+    // of relying on the default.
     it('never caches a failure', async () => {
         runReport.mockRejectedValue(new Error('quota exceeded'));
         const res = createMockResponse();
 
         await handler(createRequest(), res);
 
-        expect(cacheControlOf(res)).toBeUndefined();
+        expect(cacheControlOf(res)).toBe('no-store');
     });
 });
