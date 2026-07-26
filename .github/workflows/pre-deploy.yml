@@ -74,28 +74,6 @@ jobs:
             # Coverage thresholds live in jest.config.js and fail this step when breached.
             - name: Run unit tests
               run: npm run coverage
-            - name: Checkout unit-report repository
-              if: github.event_name == 'push'
-              uses: actions/checkout@v5
-              with:
-                  repository: xabierlameiro/unit-report
-                  token: ${{ secrets.TOKEN_GITHUB }}
-                  path: unit-report
-            - name: Copy report coverage folder and publish
-              if: github.event_name == 'push'
-              run: |
-                  cd unit-report
-                  cp -r ../public/coverage/ .
-                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
-                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
-                  git config --global user.email "action@github.com"
-                  git config --global user.name "GitHub Action"
-                  git add .
-                  git commit -m "Update unit-report"
-                  git push origin main
-            # chromium-headless-shell is named explicitly: dropping `channel: 'chrome'` from
-            # playwright.config.ts means the headless runs use the bundled shell, which is a separate
-            # download from `chromium` and produced "Executable doesn't exist" locally when assumed.
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps chromium chromium-headless-shell
               env:
@@ -107,87 +85,11 @@ jobs:
             # probe and timeout — and it builds, so e2e runs against production output.
             - name: Run end-to-end tests
               run: npm run test:e2e:report
-            - name: Checkout e2e-report repository
-              if: github.event_name == 'push'
-              uses: actions/checkout@v5
-              with:
-                  repository: xabierlameiro/e2e-report
-                  token: ${{ secrets.TOKEN_GITHUB }}
-                  path: e2e-report
-            - name: Copy playwright-report/index.html to e2e-report/index.html
-              if: github.event_name == 'push'
-              run: |
-                  cd e2e-report
-                  cp -r ../playwright-report/index.html index.html
-                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
-                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
-                  git config --global user.email "action@github.com"
-                  git config --global user.name "GitHub Action"
-                  git add .
-                  git commit -m "Update e2e-report"
-                  git push origin main
-    documentation:
-        name: Documenting
-        # Pure generate-and-publish to three other repos; nothing to verify on a PR.
-        if: github.event_name == 'push'
-        runs-on: ubuntu-22.04
-        env:
-            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
-            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        steps:
-            - uses: actions/checkout@v5
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: 22
-                  cache: npm
-            - name: Install dependencies
-              run: |
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm ci --legacy-peer-deps --include=optional
-            - name: Generate documentation
-              run: npm run jsdoc
-            - name: Checkout doc repository
-              uses: actions/checkout@v5
-              with:
-                  repository: xabierlameiro/doc-report
-                  token: ${{ secrets.TOKEN_GITHUB }}
-                  path: doc
-            - name: Copy documentation and publish
-              run: |
-                  cd doc
-                  cp -r ../public/docs/ .
-                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
-                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
-                  git config --global user.email "action@github.com"
-                  git config --global user.name "GitHub Action"
-                  git add .
-                  git commit -m "Update doc-report"
-                  git push origin main
-            - name: Checkout stb-report repository
-              uses: actions/checkout@v5
-              with:
-                  repository: xabierlameiro/stb-report
-                  token: ${{ secrets.TOKEN_GITHUB }}
-                  path: stb-report
-            - name: Copy storybook and publish
-              run: |
-                  npm run build-storybook
-                  cd stb-report
-                  cp -r ../storybook-static/ .
-                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
-                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
-                  git config --global user.email "action@github.com"
-                  git config --global user.name "GitHub Action"
-                  git add .
-                  git commit -m "Update stb-report"
-                  git push origin main
     version:
         name: Versioning
         if: github.event_name == 'push'
         runs-on: ubuntu-22.04
-        needs: [code_checking, testing, documentation]
+        needs: [code_checking, testing]
         # The only job that writes to this repository, so the only one that needs the scope.
         permissions:
             contents: write

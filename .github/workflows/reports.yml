@@ -1,0 +1,182 @@
+# Publishes the five report sites: coverage, e2e, JSDoc, Storybook and Lighthouse.
+#
+# SDD-L01b. These jobs used to hang off every push to `master`, inside the quality gate and the
+# post-deploy workflow. Each one pushes to a separate repository that has its own Vercel git
+# integration, so a single merge cost SIX deployments — one for the site and five for the reports.
+# Measured on 2026-07-26: `performance-report` alone took 6 production deployments in a day, every one
+# of them the same "Update performance-report" commit from this action.
+#
+# None of these reports is time-critical. Coverage, docs and a Lighthouse run are things you consult,
+# not things anyone is waiting on within minutes of a merge — so they move to a weekly cadence with a
+# manual trigger for when you do want them fresh. This removes 5 deployments per merge, which is the
+# single largest saving available.
+name: Publish reports
+
+on:
+    schedule:
+        # Mondays 06:00 UTC, an hour before the trending radar so they do not contend for runners.
+        - cron: '0 6 * * 1'
+    workflow_dispatch: {}
+
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    coverage_and_e2e:
+        name: Coverage and e2e reports
+        runs-on: ubuntu-22.04
+        env:
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+            NEXT_PUBLIC_ENV: 'preview'
+        steps:
+            - uses: actions/checkout@v5
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  npm ci --legacy-peer-deps --include=optional
+            - name: Run unit tests with coverage
+              run: npm run coverage
+            - name: Checkout unit-report repository
+              uses: actions/checkout@v5
+              with:
+                  repository: xabierlameiro/unit-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: unit-report
+            - name: Copy report coverage folder and publish
+              run: |
+                  cd unit-report
+                  cp -r ../public/coverage/ .
+                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
+                  git config --global user.email "action@github.com"
+                  git config --global user.name "GitHub Action"
+                  git add .
+                  git diff --staged --quiet || git commit -m "Update unit-report"
+                  git push origin main
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps chromium chromium-headless-shell
+              env:
+                  DEBIAN_FRONTEND: noninteractive
+            - name: Run end-to-end tests
+              run: npm run test:e2e:report
+            - name: Checkout e2e-report repository
+              uses: actions/checkout@v5
+              with:
+                  repository: xabierlameiro/e2e-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: e2e-report
+            - name: Copy playwright-report/index.html to e2e-report/index.html
+              run: |
+                  cd e2e-report
+                  cp -r ../playwright-report/index.html index.html
+                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
+                  git config --global user.email "action@github.com"
+                  git config --global user.name "GitHub Action"
+                  git add .
+                  git diff --staged --quiet || git commit -m "Update e2e-report"
+                  git push origin main
+
+    documentation:
+        name: JSDoc and Storybook
+        runs-on: ubuntu-22.04
+        env:
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        steps:
+            - uses: actions/checkout@v5
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  npm ci --legacy-peer-deps --include=optional
+            - name: Generate documentation
+              run: npm run jsdoc
+            - name: Checkout doc repository
+              uses: actions/checkout@v5
+              with:
+                  repository: xabierlameiro/doc-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: doc
+            - name: Copy documentation and publish
+              run: |
+                  cd doc
+                  cp -r ../public/docs/ .
+                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
+                  git config --global user.email "action@github.com"
+                  git config --global user.name "GitHub Action"
+                  git add .
+                  git diff --staged --quiet || git commit -m "Update doc-report"
+                  git push origin main
+            - name: Checkout stb-report repository
+              uses: actions/checkout@v5
+              with:
+                  repository: xabierlameiro/stb-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: stb-report
+            - name: Copy storybook and publish
+              run: |
+                  npm run build-storybook
+                  cd stb-report
+                  cp -r ../storybook-static/ .
+                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
+                  git config --global user.email "action@github.com"
+                  git config --global user.name "GitHub Action"
+                  git add .
+                  git diff --staged --quiet || git commit -m "Update stb-report"
+                  git push origin main
+
+    lighthouse:
+        name: Lighthouse
+        runs-on: ubuntu-22.04
+        steps:
+            - uses: actions/checkout@v5
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  npm ci --legacy-peer-deps --include=optional
+            # No `sleep 10m` here. That existed because this job used to chase a deployment that had
+            # just started; on a schedule the site is already live, so it measures whatever is in
+            # production right now.
+            - name: Execute Lighthouse
+              run: npm run lighthouse-report
+            - name: Checkout performance-report repository
+              uses: actions/checkout@v5
+              with:
+                  repository: xabierlameiro/performance-report
+                  token: ${{ secrets.TOKEN_GITHUB }}
+                  path: performance-report
+            - name: Copy output folder and publish
+              run: |
+                  cd performance-report
+                  cp -r ../lighthouse .
+                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
+                  git config --global user.email "action@github.com"
+                  git config --global user.name "GitHub Action"
+                  git add .
+                  git diff --staged --quiet || git commit -m "Update performance-report"
+                  git push origin main
