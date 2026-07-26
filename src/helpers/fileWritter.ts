@@ -86,6 +86,12 @@ export const createSiteMap = async (routes: SitemapRoute[], locales: string[]): 
     // No <lastmod> for evergreen pages: stamping the build date on every URL misleads crawlers
     const pages = fs
         .readdirSync(path.join(process.cwd(), '/src/pages'))
+        // SDD-L10-T13: include what is a page, then exclude the ones that must not ship. The filter
+        // used to be exclusion-only, so anything absent from NON_SITEMAP_PAGES became a URL —
+        // `error.module.css` sits in this directory beside the page that imports it, survived a
+        // `.replace('.tsx', '')` that does not match it, and was advertised in all three locales as
+        // a page returning 404. An allowlist by extension cannot be outgrown by a new asset type.
+        .filter((page) => page.endsWith('.tsx'))
         .filter((page) => !NON_SITEMAP_PAGES.has(page))
         .map((page) => {
             page = page.replace('.tsx', '');
