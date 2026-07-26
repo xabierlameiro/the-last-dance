@@ -8,6 +8,7 @@
 import * as z from 'zod/mini';
 import { describeIssues } from '../../src/types/schemas.ts';
 import { normalize, scoreItem, dedupeByUrl, buildReport, PROFILE } from './lib.ts';
+import type { NormalizedItem } from './lib.ts';
 
 const TOP_N = 8;
 const OWNER = 'xabierlameiro';
@@ -15,9 +16,11 @@ const QUERY_KEYWORDS = ['nextjs', 'react', 'claude ai', 'mcp server', 'playwrigh
 const SUBREDDITS = ['reactjs', 'nextjs', 'webdev', 'ClaudeAI'];
 const USER_AGENT = 'trending-radar/1.0 (+https://xabierlameiro.com)';
 // Stack repos to mine for recurring, high-engagement open issues (SDD-011).
+// `react/react` is the current name: the repository moved from `facebook/react`, and the
+// search API answers 422 — not an empty result — for the old one.
 const ISSUE_REPOS = [
     'vercel/next.js',
-    'facebook/react',
+    'react/react',
     'microsoft/TypeScript',
     'nodejs/node',
     'jestjs/jest',
@@ -31,59 +34,75 @@ const fetchJson = async (url: string): Promise<unknown> => {
     return response.json();
 };
 
+/**
+ * @description Run one request per input and keep whatever succeeds.
+ *
+ * Every source used to fan out with `Promise.all`, which rejects on the first failure — so a
+ * single dead input discarded all its siblings. That is not hypothetical: `githubIssues` queried
+ * `facebook/react` after the repository was renamed, the search API answered 422, and the whole
+ * GitHub-issues source (all seven repos) contributed nothing to the radar for as long as the name
+ * stayed stale, behind one line of stderr. One bad input must cost one input.
+ *
+ * Normalization runs inside the per-input task on purpose, so a validation failure is isolated the
+ * same way a network failure is.
+ */
+const collectEach = async <Input>(
+    source: string,
+    inputs: readonly Input[],
+    collectOne: (input: Input) => Promise<NormalizedItem[]>,
+): Promise<NormalizedItem[]> => {
+    const settled = await Promise.allSettled(inputs.map(collectOne));
+    return settled.flatMap((result, index) => {
+        if (result.status === 'fulfilled') return result.value;
+        const reason = result.reason instanceof Error ? result.reason.message : String(result.reason);
+        console.error(`[trending] ${source}:${String(inputs[index])} skipped: ${reason}`);
+        return [];
+    });
+};
+
 const collectors = {
-    hackerNews: async () => {
+    hackerNews: () => {
         const since = Math.floor(Date.now() / 1000) - 7 * 86400;
-        const batches = await Promise.all(
-            QUERY_KEYWORDS.map((keyword) =>
-                fetchJson(
+        return collectEach('hackerNews', QUERY_KEYWORDS, async (keyword) =>
+            normalize.hn(
+                await fetchJson(
                     `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(
                         keyword,
                     )}&tags=story&numericFilters=created_at_i>${since}&hitsPerPage=10`,
                 ),
             ),
         );
-        return batches.flatMap(normalize.hn);
     },
-    devto: async () => {
-        const tags = ['nextjs', 'react', 'typescript', 'ai', 'testing'];
-        const batches = await Promise.all(
-            tags.map((tag) => fetchJson(`https://dev.to/api/articles?tag=${tag}&top=7&per_page=10`)),
-        );
-        return batches.flatMap(normalize.devto);
-    },
-    reddit: async () => {
-        const batches = await Promise.all(
-            SUBREDDITS.map((subreddit) => fetchJson(`https://www.reddit.com/r/${subreddit}/top.json?t=week&limit=15`)),
-        );
-        return batches.flatMap(normalize.reddit);
-    },
-    github: async () => {
+    devto: () =>
+        collectEach('devto', ['nextjs', 'react', 'typescript', 'ai', 'testing'], async (tag) =>
+            normalize.devto(await fetchJson(`https://dev.to/api/articles?tag=${tag}&top=7&per_page=10`)),
+        ),
+    reddit: () =>
+        collectEach('reddit', SUBREDDITS, async (subreddit) =>
+            normalize.reddit(await fetchJson(`https://www.reddit.com/r/${subreddit}/top.json?t=week&limit=15`)),
+        ),
+    github: () => {
         // One request per topic: the search API rejects OR between topic qualifiers (422)
         const since = new Date(Date.now() - 14 * 86_400_000).toISOString().slice(0, 10);
-        const topics = ['nextjs', 'claude', 'mcp'];
-        const batches = await Promise.all(
-            topics.map((topic) =>
-                fetchJson(
+        return collectEach('github', ['nextjs', 'claude', 'mcp'], async (topic) =>
+            normalize.github(
+                await fetchJson(
                     `https://api.github.com/search/repositories?q=created:%3E${since}+topic:${topic}&sort=stars&order=desc&per_page=10`,
                 ),
             ),
         );
-        return batches.flatMap(normalize.github);
     },
-    githubIssues: async () => {
-        // Most-commented open issues per stack repo — recurring, evergreen developer pain.
-        const batches = await Promise.all(
-            ISSUE_REPOS.map((repo) =>
-                fetchJson(
+    // Most-commented open issues per stack repo — recurring, evergreen developer pain.
+    githubIssues: () =>
+        collectEach('githubIssues', ISSUE_REPOS, async (repo) =>
+            normalize.githubIssues(
+                await fetchJson(
                     `https://api.github.com/search/issues?q=${encodeURIComponent(
                         `repo:${repo} type:issue state:open`,
                     )}&sort=comments&order=desc&per_page=8`,
                 ),
             ),
-        );
-        return batches.flatMap(normalize.githubIssues);
-    },
+        ),
 };
 
 // GitHub documents name/html_url as always present; pushed_at may be null on empty repos.
