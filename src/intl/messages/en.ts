@@ -60,6 +60,7 @@ const en = {
     'legal.search-placeholder': 'Search in legals',
     'weather.tooltip': 'Click above for weather and news updates',
     'countdown.caption': 'Important date',
+    'starCounter.label': 'Star this repository on GitHub',
     'starCounter.tooltip': 'Come on, give me a star!',
     'starCounter.error': 'Error getting the number of stars',
     'starCounter.loading': 'Loading... stars',

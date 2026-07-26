@@ -56,6 +56,7 @@ const gl = {
     'legal.search-placeholder': 'Buscar en legales',
     'weather.tooltip': 'Fai clic enriba para obter actualizacións do tempo e as novas',
     'countdown.caption': 'Data importante',
+    'starCounter.label': 'Dálle unha estrela a este repositorio en GitHub',
     'starCounter.tooltip': '¡Vén, dámelle unha estrela!',
     'starCounter.error': 'Erro ao obter o número de estrelas',
     'starCounter.loading': 'Cargando... estrelas',

@@ -13,31 +13,51 @@ jest.mock('react-intl', () => ({
     FormattedMessage: ({ id }) => id,
 }));
 
-jest.mock('next/router', () => ({
-    useRouter() {
-        return {
-            route: '/',
-            pathname: '/',
-            query: '',
-            asPath: '',
-            push: jest.fn(),
-            events: {
-                on: jest.fn(),
-                off: jest.fn(),
-            },
-            beforePopState: jest.fn(() => null),
-            prefetch: jest.fn(() => null),
-        };
+/*
+ * SDD-L10-T17. Two defects in this mock.
+ *
+ * `query` was the empty **string** `''`, not an object. Next always provides an object, so any
+ * component reading `query.name` got `undefined` from a string rather than from a missing key — the
+ * same value by luck, and a different one the moment anything iterated it.
+ *
+ * And there was no `locale`, `locales` or `defaultLocale` at all. On a site that ships in three
+ * languages, every unit test ran as if the router had no locale: `useSurvey` fell through to its
+ * default, `useAnalytics` built an English slug, and nothing in the suite could observe a locale
+ * bug. Combined with the intl mock returning message ids, the unit suite was structurally blind to
+ * i18n — which is why SDD-L10-T6 covers locale switching in e2e instead.
+ */
+const defaultRouter = () => ({
+    route: '/',
+    pathname: '/',
+    query: {},
+    asPath: '/',
+    locale: 'en',
+    locales: ['en', 'es', 'gl'],
+    defaultLocale: 'en',
+    push: jest.fn(),
+    events: {
+        on: jest.fn(),
+        off: jest.fn(),
     },
+    beforePopState: jest.fn(() => null),
+    prefetch: jest.fn(() => null),
+});
+
+// `jest.fn` rather than a plain method: as a bare function no test could override it, so no test
+// could vary the locale or the path — the mock decided the answer for the whole suite. jest.setup.js
+// restores this default before each test so an override cannot leak into the next one.
+jest.mock('next/router', () => ({
+    useRouter: jest.fn(defaultRouter),
+    __defaultRouter: defaultRouter,
 }));
 
-jest.mock(
-    'next/head',
-    () =>
-        function Head(props) {
-            return <>{props.children}</>;
-        }
-);
+/*
+ * SDD-L10-T17: `next/head` was mocked here AND in jest.setup.js, with different implementations —
+ * this one a bare fragment, that one a <div data-testid="next-head">. `setupFiles` runs before
+ * `setupFilesAfterEnv`, so the second silently won and this one never applied. The SEO suite asserts
+ * against `next-head`, so the surviving mock is the one in jest.setup.js; this copy is gone rather
+ * than reconciled, because two mocks of one module is how a suite ends up testing the mock.
+ */
 
 global.fetch = jest.fn(() =>
     Promise.resolve({

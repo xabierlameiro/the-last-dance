@@ -50,7 +50,7 @@ const urlEntry = (loc: string, lastmod?: string | null) => `
  * @param {Array} locales - Array of locales
  * @returns {void}
  */
-export const createSiteMap = (routes: SitemapRoute[], locales: string[]) => {
+export const createSiteMap = async (routes: SitemapRoute[], locales: string[]): Promise<void> => {
     const domain = process.env.NEXT_PUBLIC_DOMAIN;
     const localePrefix = (locale: string) => (locale !== defaultLocale ? `/${locale}` : '');
 
@@ -101,7 +101,10 @@ export const createSiteMap = (routes: SitemapRoute[], locales: string[]) => {
         </urlset>
     `;
 
-    const formattedXml = prettier.format(xml, { parser: 'html', printWidth: 120 });
+    // SDD-L10-T10: awaited. Prettier 3 returns a Promise; the fake `declare module 'prettier'` in
+    // global.d.ts claimed otherwise, so without deleting it this line would have written the literal
+    // text "[object Promise]" into the sitemap with nothing failing.
+    const formattedXml = await prettier.format(xml, { parser: 'html', printWidth: 120 });
     const filePath = path.join(PUBLIC_DIR, 'sitemap.xml');
 
     fs.writeFileSync(filePath, formattedXml);

@@ -1,72 +1,80 @@
-import { Page, test, expect } from '@playwright/test';
 import { socialLinks } from '@/constants/site';
+import { expect, test } from './fixtures';
 
-// Must stay in sync with CONSENT_STORAGE_KEY / ConsentChoice in
-// src/components/CookieConsent/index.tsx. Duplicated rather than imported because that module
-// imports a CSS module, which Playwright's transform cannot resolve.
-const CONSENT_STORAGE_KEY = 'cookie-consent';
-const CONSENT_DENIED = 'denied';
-
-let page: Page;
-
-test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage({});
-    // Answer the consent notification before the first navigation, so these tests exercise the page
-    // rather than the notification. 'denied' so the suite does not opt itself into analytics.
-    //
-    // It used to be a full-width bar at `bottom: 0` with `z-index: 10000`, directly over the Dock —
-    // this site's only navigation — and it intercepted every click there until answered, which is what
-    // timed these tests out on `getByTestId('home')`. It is now a macOS-style notification in the
-    // top-right; the dedicated suite below guards that it stays out of the Dock's way.
-    await page.addInitScript(
-        ([key, choice]) => window.localStorage.setItem(key, choice),
-        [CONSENT_STORAGE_KEY, CONSENT_DENIED]
-    );
-});
-
-test.afterAll(async () => {
-    await page.close();
-});
-
+/**
+ * SDD-L10, T1 + T2. This suite could not fail.
+ *
+ * Of its tests, exactly two contained a real assertion. Three called `.isVisible()` and awaited the
+ * boolean without asserting it — `locator.isVisible()` resolves to true or false and never throws,
+ * so the test passed whether the element was there or not. Three more called `.click()` with no
+ * post-condition: a click that navigated nowhere, or hit the wrong element, was indistinguishable
+ * from one that worked. Two were commented out entirely.
+ *
+ * Writing the assertions found things the old suite could not have. The `<footer>` has **zero
+ * height** — its only child is the Dock, which is `position: fixed` — so a naive `toBeVisible()` on
+ * it fails; the old `.isVisible()` returned `false` there and the result was discarded. And the two
+ * commented-out tests named a `close` control that does not exist on `/`: the home page's `Dialog`
+ * is rendered with no `header`, so it has no `ControlButtons` and that window cannot be closed at
+ * all. They are not restored, because there is nothing there to restore them to.
+ */
 test.describe('Landing page', () => {
-    test('should navigate to landing page', async () => {
+    test.beforeEach(async ({ page }) => {
         await page.goto('/');
+    });
+
+    test('should navigate to landing page', async ({ page }) => {
         await expect(page).toHaveTitle(/Software Architect, microcomputing and networks Technician/);
     });
-    test('should check if the header, main and footer are visible', async () => {
-        await page.getByTestId('header').isVisible();
-        await page.getByTestId('main').isVisible();
-        await page.getByTestId('footer').isVisible();
-    });
-    test('should naviage between tabs', async () => {
-        await page.getByTitle('knowledge.module.css').click();
-        await page.getByTitle('contact.json').click();
-        await page.getByTitle('index.tsx').click();
-    });
-    /*     test('should click and close the modal', async () => {
-        await page.getByTestId('close').click();
-    }); */
-    /*     test('should click and open the modal', async () => {
-        await page.getByTestId('home').click();
-    });
-    test('should click on minimise the modal', async () => {
-        await page.getByTestId('minimise').click();
-    }); */
-    test('should open the modal again', async () => {
-        await page.getByTestId('home').click();
+
+    /**
+     * `expect(locator).toBeVisible()` auto-retries until the timeout and throws on failure;
+     * `locator.isVisible()` returns a boolean immediately. The old version awaited the second and
+     * discarded it, which is the difference between a test and a statement.
+     *
+     * The footer is asserted attached rather than visible: it is a zero-height wrapper around a
+     * fixed-position Dock, so "visible" is the wrong question to ask of it. The Dock is the thing a
+     * reader can actually see and use, so that is what is asserted.
+     */
+    test('should render the three landmarks', async ({ page }) => {
+        await expect(page.getByTestId('header')).toBeVisible();
+        await expect(page.getByTestId('main')).toBeVisible();
+        await expect(page.getByTestId('footer')).toBeAttached();
+        await expect(page.getByTestId('dock')).toBeVisible();
     });
 
-    socialLinks.forEach(async (link) => {
-        test(`should navigate to ${link.name} page`, async () => {
+    test('should switch between the editor tabs', async ({ page }) => {
+        // Code Hike marks the active tab with a class, not aria-current — asserted against what the
+        // markup actually does rather than what it ought to.
+        const knowledge = page.getByTitle('knowledge.module.css');
+        const index = page.getByTitle('index.tsx');
+
+        await knowledge.click();
+        await expect(knowledge).toHaveClass(/ch-editor-tab-active/);
+        await expect(index).not.toHaveClass(/ch-editor-tab-active/);
+
+        await index.click();
+        await expect(index).toHaveClass(/ch-editor-tab-active/);
+        await expect(knowledge).not.toHaveClass(/ch-editor-tab-active/);
+    });
+
+    // Replaces "should open the modal again", which clicked the Dock and asserted nothing.
+    test('should navigate from the Dock', async ({ page }) => {
+        await page.getByTestId('settings').click();
+
+        await expect(page).toHaveURL(/\/settings$/);
+        await expect(page.getByTestId('dialog')).toBeVisible();
+    });
+
+    for (const link of socialLinks) {
+        test(`should navigate to ${link.name} page`, async ({ page }) => {
             const popupPromise = page.waitForEvent('popup');
             await page.getByTestId(link.testId).click();
             const popup = await popupPromise;
-            // Wait for the popup to load.
             await popup.waitForLoadState();
-            // check if the url contains the correct URL.
-            await expect(popup.url()).toContain(link.href);
-            // Close the popup.
+
+            expect(popup.url()).toContain(link.href);
+
             await popup.close();
         });
-    });
+    }
 });

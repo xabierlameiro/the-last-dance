@@ -1,7 +1,22 @@
 import { readFile, writeFile } from 'fs/promises';
-import pkg from 'glob';
-const { glob } = pkg;
+import { glob } from 'glob';
 
+/**
+ * SDD-L10-T8. This script reported success on every run while doing nothing.
+ *
+ * `glob` was never declared as a dependency — it arrived transitively through jest@29, which pinned
+ * 7.2.3. In v7 the awaited call resolves to a `Glob` **instance**, not an array, so
+ * `for (const path of files)` threw `files is not iterable` on the first line of the loop. The
+ * blanket `catch` below turned that into a `console.log` and the process exited 0.
+ *
+ * The consequence is not cosmetic. The replacement at the bottom of the loop injects
+ * `<meta name="robots" content="noindex">` into every generated docs page — a guard whose own
+ * comment calls it mandatory — and it had never once executed. (It is moot today because
+ * `.vercelignore` excludes `public/docs`, but the script is what the guard depends on.)
+ *
+ * Now: `glob` is an explicit devDependency at ^11, whose promise API returns a real array (verified
+ * by running it), and a failure sets a non-zero exit code instead of printing and moving on.
+ */
 async function processFiles() {
     try {
         const files = await glob('public/docs/*.?(html|css|ts.html)');
@@ -35,11 +50,13 @@ async function processFiles() {
 
                 await writeFile(path, replaced, 'utf-8');
             } catch (err) {
-                console.log('Error processing file:', path, err);
+                console.error('Error processing file:', path, err);
+                process.exitCode = 1;
             }
         }
     } catch (err) {
-        console.log('Error finding files:', err);
+        console.error('Error finding files:', err);
+        process.exitCode = 1;
     }
 }
 
@@ -49,11 +66,15 @@ async function processCssFile() {
         const replaced = data.replace(/nav(?:\r\n|\r|\n){/g, 'nav { position:sticky; top:20px;');
         await writeFile('public/docs/styles/jsdoc-default.css', replaced, 'utf-8');
     } catch (err) {
-        console.log('Error processing CSS file:', err);
+        console.error('Error processing CSS file:', err);
+        process.exitCode = 1;
     }
 }
 
 // Run both functions
 Promise.all([processFiles(), processCssFile()])
     .then(() => console.log('Documentation processing completed'))
-    .catch(err => console.error('Error:', err));
+    .catch((err) => {
+        console.error('Error:', err);
+        process.exitCode = 1;
+    });
