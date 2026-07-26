@@ -4,27 +4,59 @@
 // as plain markdown so agents (IDE assistants, MCP retrieval) can ingest the whole
 // blog in one fetch. Honest expectation per 2026 measurements: big AI search crawlers
 // rarely fetch these files — this is a zero-cost bet, not the main GEO lever.
+//
+// SDD-L11-T4. This runs as `prebuild`, so it is on the deploy path: a throw here fails
+// the Vercel build. That is the right trade — a post with broken frontmatter should stop
+// a deploy rather than ship an llms.txt quietly missing an entry — but it is why the
+// frontmatter contract is the app's own rather than a second one invented here.
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import * as z from 'zod/mini';
+import { postFrontmatterSchema } from '../src/types/upstream.ts';
+import { describeIssues } from '../src/types/schemas.ts';
 
 const DOMAIN = 'https://xabierlameiro.com';
 const BLOG_DIR = 'data/blog';
 const OUT_DIR = 'public';
 
+/**
+ * The router's frontmatter contract plus the four fields only this generator reads.
+ *
+ * Sharing `postFrontmatterSchema` is the point: `fileReader.ts` already validates every post at
+ * build time, and a second hand-rolled notion of "a valid post" here would drift from it silently.
+ * The extra fields are optional because they are: `description`/`excerpt` fall back to each other
+ * and then to an empty string, exactly as before.
+ */
+const llmsPostSchema = z.extend(postFrontmatterSchema, {
+    description: z.optional(z.string()),
+    excerpt: z.optional(z.string()),
+    author: z.optional(z.string()),
+    tags: z.optional(z.array(z.string())),
+});
+
+type LlmsPost = {
+    data: z.infer<typeof llmsPostSchema>;
+    content: string;
+};
+
 // Only the English posts feed llms.txt; the translations would just duplicate each entry.
-const readEnglishPostsIn = (dir) =>
+const readEnglishPostsIn = (dir: string): LlmsPost[] =>
     fs
         .readdirSync(dir)
         .filter((file) => file.endsWith('.en.mdx'))
         .map((file) => {
             const { data, content } = matter(fs.readFileSync(path.join(dir, file), 'utf8'));
-            return { data, content };
+            const parsed = llmsPostSchema.safeParse(data);
+            if (!parsed.success) {
+                throw new Error(`Invalid frontmatter in ${file}: ${describeIssues(parsed.error.issues)}`);
+            }
+            return { data: parsed.data, content };
         });
 
-const sortKey = ({ data }) => `${data.category}${data.slug}`;
+const sortKey = ({ data }: LlmsPost): string => `${data.category}${data.slug}`;
 
-const readPosts = () =>
+const readPosts = (): LlmsPost[] =>
     fs
         .readdirSync(BLOG_DIR)
         .map((entry) => path.join(BLOG_DIR, entry))
@@ -32,10 +64,11 @@ const readPosts = () =>
         .flatMap(readEnglishPostsIn)
         .sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
 
-const postUrl = ({ category, slug }) => `${DOMAIN}/blog/${String(category).toLowerCase()}/${slug}`;
+const postUrl = ({ category, slug }: LlmsPost['data']): string =>
+    `${DOMAIN}/blog/${String(category).toLowerCase()}/${slug}`;
 
 // Strip MDX-only syntax so the full-text file is plain, readable markdown.
-const toPlainMarkdown = (mdx) =>
+const toPlainMarkdown = (mdx: string): string =>
     mdx
         .replace(/<CH\.Code[^>]*>/g, '')
         .replace(/<\/CH\.Code>/g, '')
@@ -47,11 +80,12 @@ const toPlainMarkdown = (mdx) =>
 
 const posts = readPosts();
 
-const byCategory = new Map();
+const byCategory = new Map<string, LlmsPost[]>();
 for (const post of posts) {
     const cat = post.data.category;
-    if (!byCategory.has(cat)) byCategory.set(cat, []);
-    byCategory.get(cat).push(post);
+    const bucket = byCategory.get(cat) ?? [];
+    byCategory.set(cat, bucket);
+    bucket.push(post);
 }
 
 const llms = [
@@ -71,7 +105,9 @@ const llms = [
     ...[...byCategory.entries()].flatMap(([category, categoryPosts]) => [
         `## Blog: ${category}`,
         '',
-        ...categoryPosts.map(({ data }) => `- [${data.title}](${postUrl(data)}): ${data.description ?? data.excerpt ?? ''}`),
+        ...categoryPosts.map(
+            ({ data }) => `- [${data.title}](${postUrl(data)}): ${data.description ?? data.excerpt ?? ''}`,
+        ),
         '',
     ]),
     '## Optional',
@@ -103,4 +139,11 @@ const llmsFull = [
 
 fs.writeFileSync(path.join(OUT_DIR, 'llms.txt'), `${llms}\n`);
 fs.writeFileSync(path.join(OUT_DIR, 'llms-full.txt'), `${llmsFull}\n`);
-console.log(`[llms] wrote llms.txt (${posts.length} posts) and llms-full.txt (${(llmsFull.length / 1024).toFixed(0)} KB)`);
+// The Node version is logged because this file is the project's canary for type stripping: it is
+// the only TypeScript script on the deploy path, and it only runs at all on Node >= 22.18, where
+// stripping is on by default. If it fails to parse, this line never prints — which is itself the
+// signal. Vercel resolves `engines: "22.x"` to the latest 22.x and its docs recommend exactly this
+// for confirming the version a deployment used.
+console.log(
+    `[llms] wrote llms.txt (${posts.length} posts) and llms-full.txt (${(llmsFull.length / 1024).toFixed(0)} KB) on Node ${process.version}`,
+);

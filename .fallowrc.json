@@ -4,16 +4,16 @@
     "entry": [
         "src/pages/**/*.{ts,tsx}",
         "src/pages/api/**/*.ts",
-        "next.config.js",
+        "next.config.ts",
         "jest.config.js",
         "jest.setup.js",
         "jest.mock.js",
         "jest.env.setup.js",
         "playwright.config.ts",
         "e2e/**/*.ts",
-        ".storybook/**/*.{js,ts,tsx}",
-        "custom-*.js",
-        "scripts/generate-post-posters.mjs",
+        ".storybook/**/*.{ts,tsx}",
+        "custom-*.ts",
+        "scripts/generate-post-posters.ts",
         "src/__test__/**/*.ts"
     ],
     "ignorePatterns": [

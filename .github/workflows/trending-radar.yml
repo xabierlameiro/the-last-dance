@@ -27,9 +27,15 @@ jobs:
               env:
                   ANALYTICS_CLIENT_EMAIL: ${{ secrets.ANALYTICS_CLIENT_EMAIL }}
                   ANALYTICS_PRIVATE_KEY: ${{ secrets.ANALYTICS_PRIVATE_KEY }}
+              # SDD-L11-T2. The install is no longer optional, so it no longer ends in `|| true`.
+              # The radar validates its sources with zod now, making node_modules a hard
+              # precondition where the old .js files had zero module-scope imports. A swallowed
+              # install failure used to cost only the GSC section (googleapis is imported
+              # dynamically); it would now surface two lines later as ERR_MODULE_NOT_FOUND against
+              # a 0-byte report. Fail at the install, where the message names the cause.
               run: |
-                  npm install --legacy-peer-deps --no-audit --no-fund --omit=dev --ignore-scripts googleapis > /dev/null 2>&1 || true
-                  node scripts/trending/index.js > trending-report.md
+                  npm install --legacy-peer-deps --no-audit --no-fund --omit=dev --ignore-scripts googleapis > /dev/null 2>&1
+                  node scripts/trending/index.ts > trending-report.md
                   tail -5 trending-report.md
 
             - name: Open issue

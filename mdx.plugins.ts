@@ -13,8 +13,11 @@ import fullTheme from 'shiki/themes/one-dark-pro.json' with { type: 'json' };
  * `serialize`/`serializePath` pair had a third and fourth copy of the array between them, each
  * commented "See serializePath": noticed, documented, not removed.
  *
- * Plain `.mjs` rather than TypeScript on purpose — `next.config.js` is loaded by Node directly and
- * is never transpiled, so it cannot import a `.ts` module.
+ * SDD-L11-T6. This was `.mjs`, with a note explaining that `next.config.js` is loaded by Node
+ * directly and therefore could not import a `.ts` module. That constraint died with the config's
+ * own migration: Next loads `next.config.ts` through `next/dist/build/next-config-ts`, which
+ * registers `require.extensions` hooks for `.ts`, `.mts` and `.mjs` and runs every module the
+ * config pulls in through SWC. The transitive import is transpiled the same way the config is.
  *
  * ## The theme, trimmed (T1)
  *
@@ -63,15 +66,17 @@ const CODE_HIKE_UI_COLOUR_KEYS = [
     'tab.inactiveForeground',
 ];
 
+const themeColours: Record<string, string> = fullTheme.colors;
+
 export const theme = {
     name: fullTheme.name,
     type: fullTheme.type,
     tokenColors: fullTheme.tokenColors,
     colors: Object.fromEntries(
-        CODE_HIKE_UI_COLOUR_KEYS.filter((key) => fullTheme.colors[key] !== undefined).map((key) => [
+        CODE_HIKE_UI_COLOUR_KEYS.filter((key) => themeColours[key] !== undefined).map((key) => [
             key,
-            fullTheme.colors[key],
-        ])
+            themeColours[key],
+        ]),
     ),
 };
 
@@ -90,10 +95,19 @@ export const theme = {
  *
  * Everything else — the theme and the GFM rules — is shared, which is the part that was drifting.
  *
- * @param {{ autoImport: boolean }} options
- * @returns {import('unified').PluggableList}
+ * The return type is inferred rather than annotated `PluggableList`, against this repo's habit of
+ * typing exports explicitly, and the two `as` assertions are what make that work. Two copies of
+ * `unified` are installed — the top-level one and `remark-rehype/node_modules/unified` — with
+ * structurally incompatible `Plugin` types, so annotating with either copy breaks the consumer
+ * using the other: `next.config.ts` feeds this to `@next/mdx`, `helpers/mdx.ts` to
+ * `next-mdx-remote`. The assertions only pin each entry as the two-element tuple it already is,
+ * which TypeScript would otherwise widen to a union array that satisfies neither copy. They state
+ * the shape of the value, not a claim about whose `Plugin` type it is.
+ *
+ * This surfaced only on the migration: as `.mjs` the module sat outside the compiler's scope, so
+ * the conflict existed and was simply unseen.
  */
-export const remarkPlugins = ({ autoImport }) => [
-    [remarkGfm, { singleTilde: false }],
-    [remarkCodeHike, { autoImport, theme }],
+export const remarkPlugins = ({ autoImport }: { autoImport: boolean }) => [
+    [remarkGfm, { singleTilde: false }] as [typeof remarkGfm, { singleTilde: boolean }],
+    [remarkCodeHike, { autoImport, theme }] as [typeof remarkCodeHike, { autoImport: boolean; theme: typeof theme }],
 ];

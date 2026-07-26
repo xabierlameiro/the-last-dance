@@ -101,7 +101,11 @@ export default tseslint.config(
     },
     {
         // Node ESM scripts (trending radar, poster generation, etc.)
-        files: ['scripts/**/*.{js,mjs}'],
+        // SDD-L11: `.ts` is listed alongside `.mjs` because these files are migrating to
+        // TypeScript one at a time. The carve-outs below are keyed to what the code is — Node
+        // tooling over trusted local input — not to the extension it currently carries, and a
+        // rename must not silently change which rules apply to the same script.
+        files: ['scripts/**/*.{js,mjs,ts}'],
         languageOptions: {
             sourceType: 'module',
             globals: {
@@ -111,6 +115,16 @@ export default tseslint.config(
         rules: {
             // Utility scripts favour terse expressions; a nested ternary is fine here.
             'sonarjs/no-nested-conditional': 'off',
+        },
+    },
+    {
+        // The custom-* report post-processors (SDD-L11-T5). ESM TypeScript, unlike the CommonJS
+        // block above. They rewrite HTML that istanbul, jsdoc and Playwright generate locally, so
+        // the regexes never see remote input and the ReDoS rule does not apply — the same
+        // exemption the `custom-*.js` block granted them before the rename.
+        files: ['custom-*.ts'],
+        rules: {
+            'sonarjs/slow-regex': 'off',
         },
     }
 );

@@ -19,11 +19,27 @@ import sharp from 'sharp';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
+/**
+ * SDD-L11-T4. Typed, and that is all: unlike the llms generator this script never reads
+ * frontmatter — the poster copy is authored here, deliberately, because it is design text rather
+ * than post metadata. The phase's plan assumed both scripts parsed frontmatter; only one did.
+ */
+type PosterCopy = {
+    eyebrow: string;
+    line1: string;
+    line2: string;
+    accentWord?: string;
+    subhead: string;
+    ghost: string;
+};
+
+type Poster = PosterCopy & { file: string };
+
 const OUT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'posts');
 
-const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const esc = (s: string): string => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-const ghostSize = (t) => (t.length <= 3 ? 300 : t.length <= 4 ? 230 : 170);
+const ghostSize = (t: string): number => (t.length <= 3 ? 300 : t.length <= 4 ? 230 : 170);
 
 const poster = ({
     eyebrow,
@@ -32,7 +48,7 @@ const poster = ({
     accentWord,
     subhead,
     ghost,
-}) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+}: PosterCopy): string => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#111a2e"/></linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#818cf8"/></linearGradient>
@@ -41,24 +57,24 @@ const poster = ({
   <g stroke="#1e293b" stroke-width="1" opacity="0.5"><path d="M0 158 H1200 M0 316 H1200 M0 474 H1200"/><path d="M300 0 V630 M600 0 V630 M900 0 V630"/></g>
   <rect x="0" y="0" width="1200" height="8" fill="url(#accent)"/>
   <text x="1120" y="470" fill="#1e293b" font-family="system-ui, sans-serif" font-size="${ghostSize(
-      ghost
+      ghost,
   )}" font-weight="800" text-anchor="end" opacity="0.55">${esc(ghost)}</text>
   <text x="80" y="150" fill="#38bdf8" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="24" font-weight="700" letter-spacing="3">${esc(
-      eyebrow
+      eyebrow,
   )}</text>
   <text x="78" y="248" fill="#f8fafc" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="82" font-weight="800">${esc(
-      line1
+      line1,
   )}</text>
   <text x="78" y="336" fill="#f8fafc" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="82" font-weight="800">${esc(
-      line2
+      line2,
   )}${accentWord ? ` <tspan fill="#38bdf8">${esc(accentWord)}</tspan>` : ''}</text>
   <text x="80" y="404" fill="#94a3b8" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="30" font-weight="500">${esc(
-      subhead
+      subhead,
   )}</text>
   <text x="80" y="560" fill="#cbd5e1" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="26" font-weight="700">Xabier Lameiro <tspan fill="#64748b" font-weight="500">· xabierlameiro.com</tspan></text>
 </svg>`;
 
-const posts = [
+const posts: Poster[] = [
     {
         file: 'npm-token.png',
         eyebrow: 'ERROR · NPM',
