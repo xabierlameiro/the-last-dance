@@ -157,9 +157,27 @@ export const getStaticProps = async (data: {
     // Unknown slugs must 404, not crash the render with a 500
     let post;
     try {
-        post = getPostBySlug(data);
+        post = getPostBySlug(data, locale);
     } catch {
         // Retry a missing slug within a minute (e.g. a just-added post), without hammering.
+        return {
+            notFound: true as const,
+            revalidate: 60,
+        };
+    }
+
+    /**
+     * SDD-L04. `findPostBySlug` matches on slug or filename only, with no locale filter, and
+     * `fallback: 'blocking'` renders anything unprerendered with a 200. So a Spanish slug answered
+     * under the English prefix — and `resolveSeoUrls` built the canonical from the *router* locale, so
+     * the page self-canonicalised at whatever prefix was asked for. Search Console confirmed the
+     * result: the same Spanish article indexed twice, at /blog/... and /es/blog/..., each claiming
+     * itself canonical. Surface was 45 posts x 3 prefixes.
+     *
+     * Note this is deliberately narrower than it looks. Faceted *category* URLs stay valid (see the
+     * comment below); only a mismatched **locale** 404s.
+     */
+    if (post.meta?.locale && post.meta.locale !== locale) {
         return {
             notFound: true as const,
             revalidate: 60,

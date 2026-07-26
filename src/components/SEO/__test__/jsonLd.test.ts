@@ -13,10 +13,16 @@ describe('articleJsonLd', () => {
         domain: DOMAIN,
     };
 
-    it('builds an Article node pointing back at its own URL', () => {
+    it('builds a BlogPosting node wired into the site graph', () => {
         const node = articleJsonLd({ ...base, date: '2026-07-01' });
 
-        expect(node['@type']).toBe('Article');
+        // SDD-L04: BlogPosting rather than the generic Article, and addressable via @id so
+        // `publisher`/`isPartOf` are real edges to the nodes _document.tsx defines. Search Console
+        // reported only Breadcrumbs as detected structured data while this node floated unlinked.
+        expect(node['@type']).toBe('BlogPosting');
+        expect(node['@id']).toBe(`${base.url}#article`);
+        expect(node.publisher).toEqual({ '@id': `${DOMAIN}/#person` });
+        expect(node.isPartOf).toEqual({ '@id': `${DOMAIN}/#website` });
         expect(node.headline).toBe('A post');
         expect(node.mainEntityOfPage).toEqual({ '@type': 'WebPage', '@id': base.url });
         expect(node.author[0]['@id']).toBe(`${DOMAIN}/#person`);

@@ -18,7 +18,13 @@ const Document = (props: Props) => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@xlameirodev" />
                 <meta name="twitter:creator" content="@xlameirodev" />
-                <meta name="google" content="notranslate" />
+                {/*
+                 * SDD-L04: `<meta name="google" content="notranslate">` used to sit here. It suppresses
+                 * Google's offer to translate the page — on a site that deliberately publishes in three
+                 * languages and declares reciprocal hreflang for them. It also does nothing for the
+                 * locales that are not covered. Removed; the per-locale `lang` attribute and hreflang
+                 * already tell Google what each page is written in.
+                 */}
                 <link rel="icon" href="/favicon.png" title="The favicon" />
                 <link rel="apple-touch-icon" href="/favicon.png" />
                 <script
@@ -53,7 +59,11 @@ const Document = (props: Props) => {
                             // same facts here keeps them machine-readable now that /about is gone,
                             // in the language of the page being described.
                             description: personDescription[locale] ?? personDescription[defaultLocale],
-                            mainEntityOfPage: { '@id': `${process.env.NEXT_PUBLIC_DOMAIN}/#profilepage` },
+                            // SDD-L04: `mainEntityOfPage: '#profilepage'` used to sit here. This node is
+                            // emitted on every page, but #profilepage is only defined on the home page
+                            // (index.tsx), so on the ~54 other URLs it was a dangling @id. The home page's
+                            // ProfilePage node already points the other way with `mainEntity: '#person'`,
+                            // which is the correct direction, so nothing is lost by removing it.
                             sameAs: socialNetworks,
                             email: 'mailto:xabier.lameiro@gmail.com',
                             image: {

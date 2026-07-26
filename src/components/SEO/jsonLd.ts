@@ -41,7 +41,13 @@ export const articleJsonLd = ({
     domain,
 }: ArticleInput) => ({
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    // SDD-L04: BlogPosting rather than the generic Article — these are blog posts, and the more
+    // specific type is what Google's own examples use for them.
+    '@type': 'BlogPosting',
+    // An @id makes the node addressable, so `isPartOf` and `publisher` below are real graph edges
+    // instead of repeated literals. Search Console reported only Breadcrumbs as detected structured
+    // data on an indexed post, with the article node floating unlinked.
+    '@id': `${url}#article`,
     headline: title,
     description,
     url,
@@ -56,6 +62,10 @@ export const articleJsonLd = ({
             url: domain,
         },
     ],
+    // Both point at nodes _document.tsx already defines, so the post joins the site graph rather
+    // than describing itself in isolation.
+    publisher: { '@id': `${domain}/#person` },
+    isPartOf: { '@id': `${domain}/#website` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
 });
 

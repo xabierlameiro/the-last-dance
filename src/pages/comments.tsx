@@ -26,6 +26,11 @@ const Comments = () => {
                 meta={{
                     title: f({ id: 'comments.seo.title' }),
                     description: f({ id: 'comments.seo.description' }),
+                    // SDD-L04: both this page and /settings were indexed by Google while being
+                    // excluded from the sitemap — content-free UI demos ranking under the brand and
+                    // diluting site-quality signals. /survey already did this correctly, so the
+                    // pattern existed and these two just never got it.
+                    noindex: true,
                 }}
             />
 
