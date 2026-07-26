@@ -46,6 +46,36 @@ describe('CookieConsent', () => {
         });
     });
 
+    // Escape must mean "no", never "yes" by omission: the default state is already denied, and a
+    // notification the keyboard cannot dismiss is a trap.
+    it('answers denied on Escape', () => {
+        render(<CookieConsent />);
+        fireEvent.keyDown(window, { key: 'Escape' });
+
+        expect(window.localStorage.getItem(CONSENT_STORAGE_KEY)).toBe('denied');
+        expect(screen.queryByTestId('consent-accept')).not.toBeInTheDocument();
+    });
+
+    // Regression guard. `role="dialog"` + `aria-live` on one node is invalid — a dialog is a window,
+    // not a live region — and made some screen readers announce the subtree as an atomic update while
+    // also reporting a dialog.
+    it('is a named dialog, not a live region', () => {
+        render(<CookieConsent />);
+        const dialog = screen.getByRole('dialog');
+
+        expect(dialog).toHaveAttribute('aria-labelledby', 'cookie-consent-title');
+        expect(dialog).not.toHaveAttribute('aria-live');
+        // Non-modal on purpose: it is a notification beside the page, so focus is not trapped.
+        expect(dialog).not.toHaveAttribute('aria-modal');
+    });
+
+    // It used to be a full-width bar at `bottom: 0`, directly over the Dock — the only navigation
+    // this site has — intercepting clicks on it until answered.
+    it('does not render as a bottom-anchored full-width bar', () => {
+        render(<CookieConsent />);
+        expect(screen.getByRole('dialog').className).not.toMatch(/banner/);
+    });
+
     it('does not ask when there is nowhere to record the answer', () => {
         // Private mode and cookie-blocking extensions make getItem throw. Asking on
         // every page load would be worse than staying on the denied defaults.

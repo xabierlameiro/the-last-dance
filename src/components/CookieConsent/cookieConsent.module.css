@@ -1,80 +1,145 @@
-.banner {
+/**
+ * Styled as a macOS notification, not a web cookie bar.
+ *
+ * It used to be a full-width footer banner at `bottom: 0` with `z-index: 10000`, which sat directly
+ * over the Dock — the only navigation this site has — and swallowed clicks on it until answered.
+ * macOS puts this class of alert in the top-right, under the menu bar, so that is where it goes now:
+ * same geometry as the Notification component (top: 42px, right: 20px, 340px wide), the Dock stays
+ * reachable, and the metaphor holds.
+ */
+.notification {
     position: fixed;
-    z-index: 10000;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    padding: 15px 20px;
-    background-color: rgba(var(--blog-background));
+    top: 42px;
+    right: 20px;
+    z-index: 9999;
+    width: 340px;
+    max-width: calc(100vw - 40px);
+    padding: 14px 16px 16px;
+    border-radius: 14px;
+    /* Vibrancy, matching the Dock. Kept at 0.94 rather than fully translucent on purpose: the
+       contrast of the text below is only predictable if the surface is nearly opaque, and this
+       component's whole defect was unreadable text. */
+    background-color: rgba(var(--blog-background), 0.94);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(var(--blog-border));
+    box-shadow: 0 8px 32px 0 rgb(31 38 135 / 25%);
     color: rgba(var(--blog-font));
-    border-top: 1px solid rgba(var(--blog-border));
-    box-shadow: 0 -8px 32px 0 rgb(31 38 135 / 37%);
-    font-size: 14px;
+    font-family: var(--font-family);
+    font-size: 13px;
+    animation: slide-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both;
 }
 
-.copy {
-    flex: 1 1 420px;
-    max-width: 720px;
+.header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+/* The app "icon" a macOS notification carries. Decorative — the title text is the accessible name. */
+.icon {
+    flex-shrink: 0;
+    height: 16px;
+    width: 16px;
+    color: rgba(var(--link-on-surface));
 }
 
 .title {
-    font-size: 16px;
-    font-weight: 400;
-    margin-bottom: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
 .message {
-    font-size: 14px;
-    line-height: 1.3;
+    font-size: 13px;
+    line-height: 1.4;
+    color: rgba(var(--blog-font));
 }
 
+/* Was --blog-font-selected, which is #FFF in BOTH themes and therefore invisible on the light
+   background: a computed 1.00:1. --link-on-surface is theme-scoped — 7.20:1 light, 7.84:1 dark. */
 .message a {
-    color: rgba(var(--blog-font-selected));
+    color: rgba(var(--link-on-surface));
     text-decoration: underline;
+    text-underline-offset: 2px;
 }
 
 .actions {
     display: flex;
-    gap: 10px;
-    flex-shrink: 0;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
 }
 
+/**
+ * Both buttons are the same size and sit side by side, one click each. Accept is the filled default
+ * the way a macOS dialog marks its primary action, but Reject is a fully legible, equally reachable
+ * button — not a link, not hidden behind a "manage preferences" step. Prominence is allowed; making
+ * refusal harder than acceptance is not.
+ */
 .button {
     cursor: pointer;
-    padding: 8px 18px;
-    font-family: var(--font-family);
-    font-size: 14px;
-    border-radius: 6px;
+    min-width: 88px;
+    padding: 6px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
     border: 1px solid rgba(var(--blog-border));
-    background-color: transparent;
+    background-color: rgba(var(--blog-header));
     color: rgba(var(--blog-font));
-}
-
-.button:hover,
-.button:focus-visible {
-    border-color: rgba(var(--blog-font-selected));
+    transition: filter 0.15s ease;
 }
 
 .accept {
-    background-color: rgba(var(--blog-font-selected));
-    border-color: rgba(var(--blog-font-selected));
-    color: rgba(var(--blog-background));
+    /* #FFF on #1D589A = 7.20:1 in both themes. */
+    background-color: rgba(var(--blue-color));
+    border-color: rgba(var(--blue-color));
+    color: rgba(var(--white-color));
 }
 
+.button:hover {
+    filter: brightness(1.08);
+}
+
+/* The old rule used --blog-font-selected here too, so the only focus style in the whole codebase
+   computed 1.00:1 in the light theme — an invisible focus ring on the consent gate. */
+.button:focus-visible {
+    outline: 2px solid rgba(var(--link-on-surface));
+    outline-offset: 2px;
+}
+
+@keyframes slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(calc(100% + 20px));
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .notification {
+        animation: none;
+    }
+}
+
+/* On a phone the notification spans the width under the menu bar, still nowhere near the Dock. */
 @media screen and (max-width: 768px) {
-    .banner {
+    .notification {
+        top: 32.5px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+        max-width: none;
         font-size: 12px;
-        padding: 12px 15px;
-        gap: 10px;
     }
 
     .actions {
-        width: 100%;
+        margin-top: 12px;
     }
 
     .button {
