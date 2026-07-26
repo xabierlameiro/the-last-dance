@@ -1,10 +1,26 @@
 import { Page, test, expect } from '@playwright/test';
 import { socialLinks } from '@/constants/site';
 
+// Must stay in sync with CONSENT_STORAGE_KEY / ConsentChoice in
+// src/components/CookieConsent/index.tsx. Duplicated rather than imported because that module
+// imports a CSS module, which Playwright's transform cannot resolve.
+const CONSENT_STORAGE_KEY = 'cookie-consent';
+const CONSENT_DENIED = 'denied';
+
 let page: Page;
 
 test.beforeAll(async ({ browser }) => {
     page = await browser.newPage({});
+    // Answer the consent banner before the first navigation. It is `position: fixed; bottom: 0;
+    // left: 0; right: 0; z-index: 10000` — the full width of the viewport directly over the Dock,
+    // which is this site's only navigation — so while it is unanswered it intercepts every click
+    // there. That is what timed these tests out on `getByTestId('home')`: the banner was swallowing
+    // the click, not the dock being broken.
+    // 'denied' rather than 'granted' so the suite does not opt itself into analytics.
+    await page.addInitScript(
+        ([key, choice]) => window.localStorage.setItem(key, choice),
+        [CONSENT_STORAGE_KEY, CONSENT_DENIED]
+    );
 });
 
 test.afterAll(async () => {
