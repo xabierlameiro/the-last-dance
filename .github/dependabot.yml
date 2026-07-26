@@ -5,7 +5,17 @@
 
 version: 2
 updates:
-  - package-ecosystem: "" # See documentation for possible values
-    directory: "/" # Location of package manifests
-    schedule:
-      interval: "weekly"
+    # SDD-L01: package-ecosystem was left as the template's empty string, which is invalid — so
+    # scheduled version updates never ran. The Dependabot PRs that did arrive came from security
+    # alerts, which fire independently of this file, giving the false impression it worked.
+    - package-ecosystem: 'npm'
+      directory: '/'
+      schedule:
+          interval: 'weekly'
+      open-pull-requests-limit: 5
+    # Keeps the SHA-pinned third-party action in pre-deploy.yml current, since a pinned SHA does not
+    # receive upstream fixes on its own.
+    - package-ecosystem: 'github-actions'
+      directory: '/'
+      schedule:
+          interval: 'weekly'

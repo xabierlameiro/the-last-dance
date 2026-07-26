@@ -8,5 +8,5 @@
         }
     },
     "buildCommand": "npm run build",
-    "installCommand": "npm install --legacy-peer-deps --include=optional"
+    "installCommand": "npm ci --legacy-peer-deps --include=optional"
 }

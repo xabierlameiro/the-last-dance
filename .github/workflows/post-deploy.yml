@@ -27,7 +27,7 @@ jobs:
         runs-on: ubuntu-22.04
         steps:
             - uses: actions/checkout@v5
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v4
               with:
                   node-version: 22
                   cache: npm
@@ -35,7 +35,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --legacy-peer-deps
+                  npm ci --legacy-peer-deps --include=optional
             - name: Execute Lighthouse
               run: |
                   sleep 10m

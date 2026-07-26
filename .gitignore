@@ -52,3 +52,7 @@ migration/.next
 
 # local dev-server config (Claude Code Browser pane), machine-specific
 .claude/launch.json
+
+# Playwright artifacts (written into the repo root by `npm run test:e2e`)
+/playwright-report
+/test-results

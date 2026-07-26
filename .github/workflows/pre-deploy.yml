@@ -1,26 +1,40 @@
-name: Workflow Pre-Deploy
+# The quality gate. Runs on every pull request to `master` and again after merge.
+#
+# SDD-L01: this workflow used to trigger on `push: [dev]`. `dev` went stale on 2025-07-23 (its last
+# run failed) while every PR targeted `master`, so lint, typecheck, tests and `npm audit` were
+# configured, working, and never consulted on the path to production. Now `code_checking` and
+# `testing` gate the PR; the report-publishing and versioning jobs only run after merge, guarded on
+# `github.event_name == 'push'`.
+#
+# The `deploy` job was removed rather than moved: it POSTed to a Vercel deploy hook to build a
+# *preview* from `dev`. On `master`, vercel.json already has `deploymentEnabled.master = true`, so
+# the git integration deploys every push — keeping the hook would have produced two deployments per
+# merge.
+name: Quality Gate
 on:
+    pull_request:
+        branches: [master]
     push:
-        branches: [dev]
+        branches: [master]
 
+# Native replacement for styfle/cancel-workflow-action, which was pinned by mutable tag and received
+# secrets.TOKEN_GITHUB — a PAT with write access to five other repositories. `concurrency` needs no
+# token and no third-party code, so the exposure is removed rather than pinned.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+# Least privilege by default. Only `version` writes back to this repo, and it raises its own.
 permissions:
-    contents: write
+    contents: read
 
 jobs:
-    cancel_redundancy:
-        name: Cancel Redundant Workflow Runs
-        runs-on: ubuntu-22.04
-        steps:
-            - name: Cancel previous redundant workflow runs
-              uses: styfle/cancel-workflow-action@0.11.0
-              with:
-                  access_token: ${{ secrets.TOKEN_GITHUB }}
     code_checking:
         name: Linting
         runs-on: ubuntu-22.04
         steps:
             - uses: actions/checkout@v5
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v4
               with:
                   node-version: 22
                   cache: npm
@@ -28,13 +42,16 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --legacy-peer-deps
+                  npm ci --legacy-peer-deps --include=optional
             - name: Linter
               run: npm run lint
             - name: Type check
               run: npx tsc --noEmit
+            # Wraps `npm audit --omit=dev` with a dated allowlist, because one advisory
+            # (GHSA-mh99-v99m-4gvg) has no upstream fix and is unreachable here. A stale or expired
+            # allowlist entry fails the gate, so the exception cannot rot. See scripts/audit-gate.mjs.
             - name: Security audit (production dependencies)
-              run: npm audit --omit=dev --audit-level=high
+              run: npm run audit:prod
     testing:
         name: Testing
         runs-on: ubuntu-22.04
@@ -45,7 +62,7 @@ jobs:
             NEXT_PUBLIC_ENV: 'preview'
         steps:
             - uses: actions/checkout@v5
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v4
               with:
                   node-version: 22
                   cache: npm
@@ -53,16 +70,19 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --legacy-peer-deps
+                  npm ci --legacy-peer-deps --include=optional
+            # Coverage thresholds live in jest.config.js and fail this step when breached.
             - name: Run unit tests
               run: npm run coverage
             - name: Checkout unit-report repository
+              if: github.event_name == 'push'
               uses: actions/checkout@v5
               with:
                   repository: xabierlameiro/unit-report
                   token: ${{ secrets.TOKEN_GITHUB }}
                   path: unit-report
             - name: Copy report coverage folder and publish
+              if: github.event_name == 'push'
               run: |
                   cd unit-report
                   cp -r ../public/coverage/ .
@@ -85,12 +105,14 @@ jobs:
               run: |
                   npm run test:e2e:report
             - name: Checkout e2e-report repository
+              if: github.event_name == 'push'
               uses: actions/checkout@v5
               with:
                   repository: xabierlameiro/e2e-report
                   token: ${{ secrets.TOKEN_GITHUB }}
                   path: e2e-report
             - name: Copy playwright-report/index.html to e2e-report/index.html
+              if: github.event_name == 'push'
               run: |
                   cd e2e-report
                   cp -r ../playwright-report/index.html index.html
@@ -103,6 +125,8 @@ jobs:
                   git push origin main
     documentation:
         name: Documenting
+        # Pure generate-and-publish to three other repos; nothing to verify on a PR.
+        if: github.event_name == 'push'
         runs-on: ubuntu-22.04
         env:
             NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
@@ -110,7 +134,7 @@ jobs:
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         steps:
             - uses: actions/checkout@v5
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v4
               with:
                   node-version: 22
                   cache: npm
@@ -118,7 +142,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --legacy-peer-deps
+                  npm ci --legacy-peer-deps --include=optional
             - name: Generate documentation
               run: npm run jsdoc
             - name: Checkout doc repository
@@ -158,8 +182,12 @@ jobs:
                   git push origin main
     version:
         name: Versioning
+        if: github.event_name == 'push'
         runs-on: ubuntu-22.04
         needs: [code_checking, testing, documentation]
+        # The only job that writes to this repository, so the only one that needs the scope.
+        permissions:
+            contents: write
         steps:
             - name: Checkout version repository
               uses: actions/checkout@v5
@@ -167,24 +195,22 @@ jobs:
                   fetch-depth: 0
                   token: ${{ secrets.TOKEN_GITHUB }}
             - name: Version
+              # Pinned to the v5.0.2 commit rather than the mutable tag: this step runs in a checkout
+              # where TOKEN_GITHUB is persisted, so a retargeted tag would inherit that access.
               id: version
-              uses: paulhatch/semantic-version@v5.0.2
+              uses: paulhatch/semantic-version@ea50fff3e41d24bb283f22b7343c4b3a314282fb
               with:
                   version_format: '${major}.${minor}.${patch}'
                   major_pattern: 'MAJOR -'
                   minor_pattern: 'MINOR -'
             - name: Update version in package.json and add tag
+              # `[skip ci]` stops the version bump from re-triggering this workflow. It was harmless
+              # while the trigger was `push: [dev]` and the bump landed elsewhere; now that the
+              # trigger is `push: [master]` and the bump pushes to master, without it every release
+              # would start another run, which would release again. The marker is honoured for
+              # `push` and `pull_request` events.
               run: |
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"
-                  npm version ${{ steps.version.outputs.version }}
+                  npm version ${{ steps.version.outputs.version }} -m "chore(release): %s [skip ci]"
                   git push --follow-tags
-
-    deploy:
-        name: Trigger deploy on preview environment
-        runs-on: ubuntu-22.04
-        needs: [version]
-        steps:
-            - name: Deploy to Vercel
-              run: |
-                  curl -X POST https://api.vercel.com/v1/integrations/deploy/${{ secrets.PRJ }}
