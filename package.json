@@ -29,7 +29,7 @@
         "test:e2e": "playwright test",
         "test:e2e:report": "playwright test && node custom-report.js",
         "next-info": "npx --no-install next info",
-        "trending": "node scripts/trending/index.js"
+        "trending": "node scripts/trending/index.ts"
     },
     "dependencies": {
         "@code-hike/mdx": "^0.8.3",

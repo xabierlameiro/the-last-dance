@@ -54,7 +54,7 @@ const customJestConfig = {
         'src/pages/api/**/*.ts',
         'src/constants/**/*.{ts,tsx}',
         'src/context/**/*.{ts,tsx}',
-        'scripts/trending/lib.js',
+        'scripts/trending/lib.ts',
     ],
     moduleNameMapper: {
         '^@/helpers(.*)$': '<rootDir>src/helpers/$1',

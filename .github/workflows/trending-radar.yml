@@ -29,7 +29,7 @@ jobs:
                   ANALYTICS_PRIVATE_KEY: ${{ secrets.ANALYTICS_PRIVATE_KEY }}
               run: |
                   npm install --legacy-peer-deps --no-audit --no-fund --omit=dev --ignore-scripts googleapis > /dev/null 2>&1 || true
-                  node scripts/trending/index.js > trending-report.md
+                  node scripts/trending/index.ts > trending-report.md
                   tail -5 trending-report.md
 
             - name: Open issue

@@ -1,7 +1,13 @@
 // Trending content radar runner (SDD-006). Usage: `npm run trending` — prints the
 // markdown report to stdout. Every source is optional: a failed fetch is logged to
 // stderr and skipped, the radar never exits non-zero because one upstream is down.
-import { normalize, scoreItem, dedupeByUrl, buildReport, PROFILE } from './lib.js';
+// SDD-L11-T2: a malformed payload now surfaces here as a loud, named validation
+// error from lib.ts (`[trending] hn skipped: hn payload invalid: hits …`) instead
+// of a silently thinner report. Runs under Node's type stripping — relative imports
+// carry explicit `.ts` extensions and tsconfig paths are unavailable.
+import * as z from 'zod/mini';
+import { describeIssues } from '../../src/types/schemas.ts';
+import { normalize, scoreItem, dedupeByUrl, buildReport, PROFILE } from './lib.ts';
 
 const TOP_N = 8;
 const OWNER = 'xabierlameiro';
@@ -19,7 +25,7 @@ const ISSUE_REPOS = [
     'microsoft/playwright',
 ];
 
-const fetchJson = async (url) => {
+const fetchJson = async (url: string): Promise<unknown> => {
     const response = await fetch(url, { headers: { 'user-agent': USER_AGENT, accept: 'application/json' } });
     if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
     return response.json();
@@ -32,23 +38,23 @@ const collectors = {
             QUERY_KEYWORDS.map((keyword) =>
                 fetchJson(
                     `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(
-                        keyword
-                    )}&tags=story&numericFilters=created_at_i>${since}&hitsPerPage=10`
-                )
-            )
+                        keyword,
+                    )}&tags=story&numericFilters=created_at_i>${since}&hitsPerPage=10`,
+                ),
+            ),
         );
         return batches.flatMap(normalize.hn);
     },
     devto: async () => {
         const tags = ['nextjs', 'react', 'typescript', 'ai', 'testing'];
         const batches = await Promise.all(
-            tags.map((tag) => fetchJson(`https://dev.to/api/articles?tag=${tag}&top=7&per_page=10`))
+            tags.map((tag) => fetchJson(`https://dev.to/api/articles?tag=${tag}&top=7&per_page=10`)),
         );
         return batches.flatMap(normalize.devto);
     },
     reddit: async () => {
         const batches = await Promise.all(
-            SUBREDDITS.map((subreddit) => fetchJson(`https://www.reddit.com/r/${subreddit}/top.json?t=week&limit=15`))
+            SUBREDDITS.map((subreddit) => fetchJson(`https://www.reddit.com/r/${subreddit}/top.json?t=week&limit=15`)),
         );
         return batches.flatMap(normalize.reddit);
     },
@@ -59,9 +65,9 @@ const collectors = {
         const batches = await Promise.all(
             topics.map((topic) =>
                 fetchJson(
-                    `https://api.github.com/search/repositories?q=created:%3E${since}+topic:${topic}&sort=stars&order=desc&per_page=10`
-                )
-            )
+                    `https://api.github.com/search/repositories?q=created:%3E${since}+topic:${topic}&sort=stars&order=desc&per_page=10`,
+                ),
+            ),
         );
         return batches.flatMap(normalize.github);
     },
@@ -71,27 +77,39 @@ const collectors = {
             ISSUE_REPOS.map((repo) =>
                 fetchJson(
                     `https://api.github.com/search/issues?q=${encodeURIComponent(
-                        `repo:${repo} type:issue state:open`
-                    )}&sort=comments&order=desc&per_page=8`
-                )
-            )
+                        `repo:${repo} type:issue state:open`,
+                    )}&sort=comments&order=desc&per_page=8`,
+                ),
+            ),
         );
         return batches.flatMap(normalize.githubIssues);
     },
 };
 
-const collectRecentRepos = async () => {
-    const repos = await fetchJson(`https://api.github.com/users/${OWNER}/repos?sort=pushed&per_page=8`);
-    return (Array.isArray(repos) ? repos : []).map((repo) => ({
+// GitHub documents name/html_url as always present; pushed_at may be null on empty repos.
+const ownerReposSchema = z.array(
+    z.object({
+        name: z.string(),
+        html_url: z.string(),
+        pushed_at: z.optional(z.nullable(z.string())),
+    }),
+);
+
+const collectRecentRepos = async (): Promise<{ name: string; url: string; pushedAt: string | undefined }[]> => {
+    const result = ownerReposSchema.safeParse(
+        await fetchJson(`https://api.github.com/users/${OWNER}/repos?sort=pushed&per_page=8`),
+    );
+    if (!result.success) throw new Error(`recentRepos payload invalid: ${describeIssues(result.error.issues)}`);
+    return result.data.map((repo) => ({
         name: repo.name,
         url: repo.html_url,
-        pushedAt: repo.pushed_at,
+        pushedAt: repo.pushed_at ?? undefined,
     }));
 };
 
 // Rising queries from the owner's own Search Console — optional, needs the same
 // service-account env vars as /api/analytics. Skipped silently when absent.
-const collectRisingQueries = async () => {
+const collectRisingQueries = async (): Promise<{ query: string; impressions: number; delta: number }[]> => {
     if (!process.env.ANALYTICS_CLIENT_EMAIL || !process.env.ANALYTICS_PRIVATE_KEY) return [];
     const { google } = await import('googleapis');
     const auth = new google.auth.GoogleAuth({
@@ -102,13 +120,18 @@ const collectRisingQueries = async () => {
         scopes: 'https://www.googleapis.com/auth/webmasters.readonly',
     });
     const webmasters = google.webmasters({ version: 'v3', auth });
-    const day = (offset) => new Date(Date.now() - offset * 86_400_000).toISOString().slice(0, 10);
-    const query = async (startDate, endDate) => {
+    const day = (offset: number): string => new Date(Date.now() - offset * 86_400_000).toISOString().slice(0, 10);
+    const query = async (startDate: string, endDate: string): Promise<Map<string, number>> => {
         const response = await webmasters.searchanalytics.query({
             siteUrl: 'sc-domain:xabierlameiro.com',
             requestBody: { startDate, endDate, dimensions: ['query'], rowLimit: 250 },
         });
-        return new Map((response.data.rows ?? []).map((row) => [row.keys?.[0], row.impressions ?? 0]));
+        const entries: [string, number][] = [];
+        for (const row of response.data.rows ?? []) {
+            const term = row.keys?.[0];
+            if (term !== undefined) entries.push([term, row.impressions ?? 0]);
+        }
+        return new Map(entries);
     };
     const [current, previous] = await Promise.all([query(day(28), day(0)), query(day(56), day(28))]);
     return [...current.entries()]
@@ -118,16 +141,16 @@ const collectRisingQueries = async () => {
         .slice(0, 10);
 };
 
-const runCollector = async (name, collector) => {
+const runCollector = async <T>(name: string, collector: () => Promise<T[]>): Promise<T[]> => {
     try {
         return await collector();
     } catch (error) {
-        console.error(`[trending] ${name} skipped: ${error.message}`);
+        console.error(`[trending] ${name} skipped: ${error instanceof Error ? error.message : String(error)}`);
         return [];
     }
 };
 
-const main = async () => {
+const main = async (): Promise<void> => {
     const now = Date.now();
     const [hn, devto, reddit, github, githubIssues, recentRepos, risingQueries] = await Promise.all([
         runCollector('hackerNews', collectors.hackerNews),
@@ -142,7 +165,7 @@ const main = async () => {
     const topics = dedupeByUrl(
         [...hn, ...devto, ...reddit, ...github, ...githubIssues]
             .map((item) => ({ ...item, ...scoreItem(item, now) }))
-            .filter(({ score }) => score > 0)
+            .filter(({ score }) => score > 0),
     )
         .sort((a, b) => b.score - a.score)
         .slice(0, TOP_N);
@@ -152,7 +175,7 @@ const main = async () => {
             generatedAt: new Date(now).toISOString().slice(0, 10),
             risingQueries,
             recentRepos,
-        })
+        }),
     );
     console.error(`[trending] done: ${topics.length} topics from ${PROFILE.keywords.length} profile keywords`);
 };

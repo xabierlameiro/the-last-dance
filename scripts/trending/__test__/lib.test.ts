@@ -6,7 +6,7 @@ import {
     dedupeByUrl,
     buildReport,
     isDiscussionWorthy,
-} from '../lib.js';
+} from '../lib.ts';
 
 const NOW = Date.parse('2026-07-17T12:00:00Z');
 
@@ -122,7 +122,32 @@ describe('trending radar lib', () => {
             popularity: 325,
             createdAt: '2026-07-16T00:00:00Z',
         });
-        expect(issues[0].tags).toContain('vercel/next.js');
+        expect(issues[0]?.tags).toContain('vercel/next.js');
+    });
+
+    // SDD-L11-T2. Before validation these payloads produced an empty array and a radar that
+    // looked merely quiet. Each case must now name the source and the offending field.
+    describe('rejects malformed payloads instead of silently thinning the radar', () => {
+        it('throws when the envelope is missing', () => {
+            expect(() => normalize.hn({ results: [] })).toThrow(/hn payload invalid: hits/);
+            expect(() => normalize.github({})).toThrow(/github payload invalid: items/);
+            expect(() => normalize.reddit({ data: {} })).toThrow(/reddit payload invalid: data.children/);
+            expect(() => normalize.devto({ articles: [] })).toThrow(/devto payload invalid/);
+        });
+
+        it('throws naming the field when a scored value has the wrong type', () => {
+            expect(() => normalize.hn({ hits: [{ title: 'A', points: '10' }] })).toThrow(
+                /hits.0.points expected number/,
+            );
+            expect(() => normalize.githubIssues({ items: [{ comments: '176' }] })).toThrow(
+                /items.0.comments expected number/,
+            );
+        });
+
+        it('still accepts payloads whose optional fields are absent', () => {
+            expect(normalize.hn({ hits: [{ objectID: '1' }] })[0]).toMatchObject({ title: '', popularity: 0 });
+            expect(normalize.devto([])).toEqual([]);
+        });
     });
 
     it('dedupes by url keeping the highest score', () => {
@@ -153,7 +178,7 @@ describe('trending radar lib', () => {
                 recentRepos: [
                     { name: 'the-last-dance', url: 'https://github.com/x/y', pushedAt: '2026-07-17T00:00:00Z' },
                 ],
-            }
+            },
         );
         expect(report).toContain('# Trending content radar — 2026-07-17');
         expect(report).toContain('### 1. Next.js 16 released');
