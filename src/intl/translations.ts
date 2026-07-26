@@ -35,6 +35,8 @@ export const messages = {
         'legal.legal-notice': 'Legal Notice',
         'legal.privacy-policy': 'Privacy Policy',
         'consent.title': 'Cookies',
+        // SDD-L06: the search field had no label at all; a placeholder is not one.
+        'search.label': 'Search',
         // Side-panel toggles (SDD-L05): the grabbers had no accessible name.
         'blog.toggleCategories': 'Show categories and tags',
         'blog.togglePosts': 'Show posts in this category',
@@ -133,6 +135,7 @@ export const messages = {
         'legal.legal-notice': 'Aviso Legal',
         'legal.privacy-policy': 'Política de Privacidad',
         'consent.title': 'Cookies',
+        'search.label': 'Buscar',
         'blog.toggleCategories': 'Mostrar categorías y etiquetas',
         'blog.togglePosts': 'Mostrar entradas de esta categoría',
         'nav.social': 'Redes sociales',
@@ -227,6 +230,7 @@ export const messages = {
         'legal.legal-notice': 'Aviso Legal',
         'legal.privacy-policy': 'Política de Privacidade',
         'consent.title': 'Cookies',
+        'search.label': 'Buscar',
         'blog.toggleCategories': 'Amosar categorías e etiquetas',
         'blog.togglePosts': 'Amosar entradas desta categoría',
         'nav.social': 'Redes sociais',

@@ -7,6 +7,7 @@ import useWindowResize from '@/hooks/useWindowResize';
 import useSurvey, { type Question } from '@/hooks/useSurvey';
 import NavigationArrows from '@/components/NavigationArrows';
 import QuestionBlock from '@/components/QuestionBlock';
+import usePrefersReducedMotion from '@/hooks/usePrefersReducedMotion';
 
 const Survey = () => {
     const { width, height } = useWindowResize();
@@ -21,10 +22,23 @@ const Survey = () => {
         handlePreviousQuestion,
         handleAnswerOptionClick,
     } = useSurvey();
+    const prefersReducedMotion = usePrefersReducedMotion();
 
     return (
         <>
-            <Confetti width={width} height={height} numberOfPieces={100} run={surveySuccess} />
+            {/*
+             * SDD-L06: a full-viewport 100-piece burst with no opt-out. Large-area unexpected motion
+             * is the canonical vestibular trigger, and the global prefers-reduced-motion block cannot
+             * help here — this is a canvas painting on a timer, not a CSS animation. So it is gated in
+             * JS, and the canvas is hidden from assistive tech either way.
+             */}
+            <Confetti
+                width={width}
+                height={height}
+                numberOfPieces={100}
+                run={surveySuccess && !prefersReducedMotion}
+                aria-hidden="true"
+            />
             <SEO
                 noimage={false}
                 meta={{

@@ -7,6 +7,19 @@
     max-width: 100vw;
     height: calc(100vh - 50px);
     transform: scale(0);
+    /**
+     * SDD-L06 NOTE, deliberately left as `--white-color`.
+     *
+     * This is theme-independent, so every window stays white even under `[data-theme='dark']` while
+     * the text tokens inside it switch — light-on-white. Changing it to `--blog-background` was tried
+     * and reverted in the same phase: the token resolves correctly on this element (verified as
+     * `30,30,30` in the browser) yet `background-color` still computes white, and the cause was not
+     * isolated. Shipping a half-working dark surface is worse than a consistently light one.
+     *
+     * It has never surfaced in production because the dark theme has effectively never run —
+     * `useDarkMode` is mounted only by /settings, so `data-theme` stays at the "light" hardcoded in
+     * _document.tsx everywhere else. Fixing the theme and fixing this surface have to land together.
+     */
     background: rgba(var(--white-color));
     box-shadow: 0 8px 32px 0 rgb(31 38 135 / 37%);
     transition: all 0.3s ease-in;
