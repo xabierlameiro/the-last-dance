@@ -1,4 +1,5 @@
 import React from 'react';
+import type { SurveyCopy } from '../intl/survey/types';
 
 export type AnswerOption = {
     answerText: string;
@@ -20,28 +21,60 @@ export const DEFAULT_SURVEY_NAME = '👋';
 
 export const sanitizeSurveyName = (raw: string): string => (NAME_PATTERN.test(raw) ? raw : DEFAULT_SURVEY_NAME);
 
-const SCHEDULE: Array<{ day: string; hours: string[] }> = [
-    { day: 'Lunes', hours: ['10:00 - 14:15', '17:45 - 21:00'] },
-    { day: 'Martes', hours: ['10:00 - 14:15', '17:45 - 21:00'] },
-    { day: 'Miércoles', hours: ['10:00 - 14:15', '17:45 - 21:00'] },
-    { day: 'Jueves', hours: ['10:00 - 14:15', '17:45 - 21:00'] },
-    { day: 'Viernes', hours: ['10:00 - 14:15'] },
+/**
+ * SDD-L08-T7. Which answers count as a match, kept here with the logic while the wording moved to
+ * `src/intl/survey/`.
+ *
+ * The split is the point: a translator editing copy cannot change the outcome of the questionnaire,
+ * and reading this array tells you what the survey actually tests without wading through prose. The
+ * order matches `SurveyCopy['questions'][n].options` exactly.
+ */
+const ANSWER_KEY: Array<[boolean, boolean, boolean]> = [
+    [true, false, false], // Frontend / Backend / Fullstack
+    [true, true, false], // remote in Spain / remote worldwide / neither
+    [false, true, true], // ≤59k / 60–69k / ≥70k
+    [true, true, true], // national / international / unknown
+    [false, true, true], // variable pay: yes / no / unknown
+    [true, true, true], // 22-23 / 24-26 / 27+ days
+    [true, true, false], // flexible with caveats / fully flexible / not flexible
+    [true, true, true], // Windows / Mac-Linux / my choice
+    [false, true, true], // <1y / <2y / >2y average tenure
+    [true, true, true], // interviews / + long test / + short test
 ];
 
-const SuccessResult = () => (
+const SCHEDULE_HOURS: string[][] = [
+    ['10:00 - 14:15', '17:45 - 21:00'],
+    ['10:00 - 14:15', '17:45 - 21:00'],
+    ['10:00 - 14:15', '17:45 - 21:00'],
+    ['10:00 - 14:15', '17:45 - 21:00'],
+    ['10:00 - 14:15'],
+];
+
+const CONTACT = {
+    phone: '+34603018268',
+    phoneLabel: '603 018 268',
+    email: 'xabier.lameiro@gmail.com',
+    github: 'https://github.com/xabierlameiro',
+    linkedin: 'https://www.linkedin.com/in/xlameiro/',
+    cv: '/xabierlameiro.com.pdf',
+};
+
+const SuccessResult = ({ copy }: { copy: SurveyCopy }) => (
     <>
-        <h1>¡¡¡ OMG !!! Somos compatibles</h1>
+        <h1>{copy.success.heading}</h1>
         {/* eslint-disable-next-line @next/next/no-img-element -- animated gif, next/image would strip the animation */}
-        <img src="/celebration.gif" alt="celebration" width="100%" />
+        <img src="/celebration.gif" alt={copy.success.celebrationAlt} width="100%" />
         <h2>
-            ¿ Quieres contarme más ? <a href="tel:+34603018268">603018268</a>
+            {copy.success.contact} <a href={`tel:${CONTACT.phone}`}>{CONTACT.phoneLabel}</a>
         </h2>
+        {/* The schedule was a bare grid of cells with no caption saying what the hours were for. */}
         <table>
+            <caption>{copy.success.scheduleCaption}</caption>
             <tbody>
-                {SCHEDULE.map(({ day, hours }) => (
+                {copy.success.days.map((day, index) => (
                     <tr key={day}>
                         <td> {day} </td>
-                        {hours.map((hour) => (
+                        {(SCHEDULE_HOURS[index] ?? []).map((hour) => (
                             <td key={hour}> {hour} </td>
                         ))}
                     </tr>
@@ -50,159 +83,74 @@ const SuccessResult = () => (
         </table>
         <ul>
             <li>
-                Escríbeme a{' '}
-                <a href="mailto:xabier.lameiro@gmail.com" target="_blank" rel="noopener noreferrer">
-                    xabier.lameiro@gmail.com
+                {copy.success.email}{' '}
+                <a href={`mailto:${CONTACT.email}`} target="_blank" rel="noopener noreferrer">
+                    {CONTACT.email}
                 </a>
             </li>
             <li>
-                Enlace a mi{' '}
-                <a href="https://github.com/xabierlameiro" target="_blank" rel="noopener noreferrer">
+                {copy.success.github}{' '}
+                <a href={CONTACT.github} target="_blank" rel="noopener noreferrer">
                     github
                 </a>
             </li>
             <li>
-                Enlace a mi{' '}
-                <a href="https://www.linkedin.com/in/xlameiro/" target="_blank" rel="noopener noreferrer">
+                {copy.success.linkedin}{' '}
+                <a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">
                     linkedin
                 </a>
             </li>
             <li>
-                Descárgate mi{' '}
-                <a href="/xabierlameiro.com.pdf" download>
-                    currículum
+                {copy.success.cv}{' '}
+                <a href={CONTACT.cv} download>
+                    {copy.success.cvLabel}
                 </a>
             </li>
         </ul>
     </>
 );
 
-const FailureResult = ({ name }: { name: string }) => (
+const FailureResult = ({ copy, name }: { copy: SurveyCopy; name: string }) => (
     <>
-        <h1> Lo siento mucho {name} </h1>
+        <h1>{copy.failure.heading.replace('{name}', name)}</h1>
         {/* eslint-disable-next-line @next/next/no-img-element -- animated gif, next/image would strip the animation */}
-        <img src="/disappointed.gif" alt="disappointed" width="100%" />
-        <p> Pero parece que la posición y yo no somos compatibles en estos momentos! </p>
-        <p> Te agradezco mucho tu tiempo y espero que encuentres lo que buscas muy pronto. </p>
-        <p> Un saludo. Xabier! 👋 </p>
+        <img src="/disappointed.gif" alt={copy.failure.disappointedAlt} width="100%" />
+        <p>{copy.failure.body}</p>
+        <p>{copy.failure.thanks}</p>
+        <p>{copy.failure.farewell}</p>
     </>
 );
 
-export const buildSurveyQuestions = (name: string, success: boolean): Question[] => {
+export const buildSurveyQuestions = (name: string, success: boolean, copy: SurveyCopy): Question[] => {
     const displayName = name.charAt(0).toUpperCase() + name.slice(1);
 
     return [
         {
-            questionText: '¿ Continuamos ?',
+            questionText: copy.intro.cta,
             questionContent: (
                 <>
-                    <h1>Hola {displayName}, gracias por ponerte en contacto!</h1>
-                    <p>
-                        Si has llegado hasta aquí, seguro que es porque tienes una posición increíble y me lo quieres
-                        contar!! Pero antes de conocernos y que me hagas muchas preguntas, a mi también me gustaría
-                        verificar algunas cosas primero, para saber si la posición y yo, somos compatibles.
-                    </p>
-                    <p>
-                        Si lo somos... te mostraré mi <strong>número de teléfono</strong>,{' '}
-                        <strong>disponibilidad</strong>, <strong>currículum actualizado</strong> y muchas cosas más.
-                    </p>
-                    <h2>¿ Te apuntas ?</h2>
+                    <h1>{copy.intro.greeting.replace('{name}', displayName)}</h1>
+                    <p>{copy.intro.body}</p>
+                    <p>{copy.intro.reward}</p>
+                    <h2>{copy.intro.cta}</h2>
                 </>
             ),
-            answerOptions: [{ answerText: 'Si', isCorrect: true }],
+            answerOptions: [{ answerText: copy.intro.answer, isCorrect: true }],
         },
+        ...copy.questions.map((question, index) => ({
+            questionText: question.text,
+            questionContent: <h1>{question.heading}</h1>,
+            answerOptions: question.options.map((answerText, optionIndex) => ({
+                answerText,
+                isCorrect: ANSWER_KEY[index]?.[optionIndex] ?? false,
+            })),
+        })),
         {
-            questionText: 'Tipo de posición:',
-            questionContent: <h1>La posición es para un perfil :</h1>,
-            answerOptions: [
-                { answerText: 'Frontend', isCorrect: true },
-                { answerText: 'Backend', isCorrect: false },
-                { answerText: 'Fullstack', isCorrect: false },
-            ],
-        },
-        {
-            questionText: 'Tipo de contrato:',
-            questionContent: <h1>El contrato será :</h1>,
-            answerOptions: [
-                { answerText: 'Remoto 100% pero solo en España', isCorrect: true },
-                { answerText: 'Remoto 100% en todo el mundo', isCorrect: true },
-                { answerText: 'Ninguna de las dos', isCorrect: false },
-            ],
-        },
-        {
-            questionText: 'Rango salarial:',
-            questionContent: <h1>El rango salarial es :</h1>,
-            answerOptions: [
-                { answerText: 'Menor o igual a 59.000€', isCorrect: false },
-                { answerText: 'Entre 60.000€ y 69.000€', isCorrect: true },
-                { answerText: 'Mayor o igual a 70.000€', isCorrect: true },
-            ],
-        },
-        {
-            questionText: 'Tipo de equipo:',
-            questionContent: <h1>El equipo de trabajo será :</h1>,
-            answerOptions: [
-                { answerText: 'Nacional', isCorrect: true },
-                { answerText: 'Internacional', isCorrect: true },
-                { answerText: 'Lo desconozco', isCorrect: true },
-            ],
-        },
-        {
-            questionText: 'Salario variable:',
-            questionContent: <h1>¿ El salario tendrá una parte variable ?</h1>,
-            answerOptions: [
-                { answerText: 'Si', isCorrect: false },
-                { answerText: 'No', isCorrect: true },
-                { answerText: 'Lo desconozco', isCorrect: true },
-            ],
-        },
-        {
-            questionText: 'Días de vacaciones:',
-            questionContent: <h1>Los días de vacaciones son :</h1>,
-            answerOptions: [
-                { answerText: '22 - 23', isCorrect: true },
-                { answerText: '24 - 26', isCorrect: true },
-                { answerText: '27 o más', isCorrect: true },
-            ],
-        },
-        {
-            questionText: 'Horario de trabajo flexible:',
-            questionContent: <h1>¿ El horario de trabajo es flexible ?</h1>,
-            answerOptions: [
-                { answerText: 'Si, pero con peros.', isCorrect: true },
-                { answerText: 'Si, totalmente.', isCorrect: true },
-                { answerText: 'No', isCorrect: false },
-            ],
-        },
-        {
-            questionText: 'Tipo de hardware:',
-            questionContent: <h1>El hardware de trabajo será :</h1>,
-            answerOptions: [
-                { answerText: 'Windows', isCorrect: true },
-                { answerText: 'Mac/Linux', isCorrect: true },
-                { answerText: 'A escoger', isCorrect: true },
-            ],
-        },
-        {
-            questionText: 'Promedio de antigüedad:',
-            questionContent: <h1>La media de antigüedad de los compañeros es de :</h1>,
-            answerOptions: [
-                { answerText: 'Menos de 1 año', isCorrect: false },
-                { answerText: 'Menos de 2 años', isCorrect: true },
-                { answerText: 'Más de 2 años', isCorrect: true },
-            ],
-        },
-        {
-            questionText: 'Proceso de selección:',
-            questionContent: <h1>El proceso de selección consta de :</h1>,
-            answerOptions: [
-                { answerText: 'Entrevistas', isCorrect: true },
-                { answerText: 'Entrevistas y prueba técnica larga', isCorrect: true },
-                { answerText: 'Entrevistas y prueba técnica corta', isCorrect: true },
-            ],
-        },
-        {
-            questionContent: <section>{success ? <SuccessResult /> : <FailureResult name={displayName} />}</section>,
+            questionContent: (
+                <section>
+                    {success ? <SuccessResult copy={copy} /> : <FailureResult copy={copy} name={displayName} />}
+                </section>
+            ),
         },
     ];
 };

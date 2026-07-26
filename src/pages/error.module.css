@@ -1,0 +1,19 @@
+/*
+ * SDD-L08. Shared by 404, 500 and the error boundary — the three of them rendered an identical
+ * inline `style` object with a bare sentence in it and no way out of the page.
+ */
+.body {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 16px;
+    height: inherit;
+    padding: 0 24px;
+    text-align: center;
+}
+
+.home {
+    /* The focus ring and the link colour both come from the global tokens SDD-L06 introduced. */
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}

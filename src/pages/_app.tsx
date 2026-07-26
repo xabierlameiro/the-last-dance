@@ -1,7 +1,7 @@
 import '../../styles/globals.css';
 import '@code-hike/mdx/dist/index.css';
 import Script from 'next/script';
-import { IntlProvider } from 'react-intl';
+import { IntlProvider, type IntlConfig } from 'react-intl';
 import { useRouter } from 'next/router';
 import { messages } from '../intl/translations';
 import type { AppProps, NextWebVitalsMetric } from 'next/app';
@@ -98,11 +98,28 @@ const App = ({ Component, pageProps }: AppProps) => {
     const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
     const measurementId = process.env.NEXT_PUBLIC_GA;
 
-    const handleIntlError = (err: Error) => {
-        // if Missing locale data for locale: "gl" in Intl.NumberFormat ignore it
-        if (err.message.includes('Missing locale data for locale: "gl"')) {
-            // Silently ignore this specific error
-        }
+    /**
+     * SDD-L08. This used to be an `if` with an empty body and nothing outside it:
+     *
+     *     if (err.message.includes('Missing locale data for locale: "gl"')) {
+     *         // Silently ignore this specific error
+     *     }
+     *
+     * Which does not silence one error — it discards **all** of them, `MISSING_TRANSLATION` and
+     * `MISSING_MESSAGE` included. That single line is the mechanism that let every missing string in
+     * this phase's findings accumulate without anyone seeing a warning.
+     *
+     * The justification was also stale. On this Node, `Intl.DateTimeFormat.supportedLocalesOf(['gl'])`
+     * returns `['gl']` and formats as `18 de xul. de 2026`; react-intl v6 uses native `Intl` and loads
+     * no locale data of its own. There is nothing left to suppress.
+     *
+     * Nothing is swallowed now. In production the handler stays quiet on the visitor's console —
+     * a missing string is not something a reader can act on — but a missing translation is still a
+     * defect, so development gets the whole list.
+     */
+    const handleIntlError: IntlConfig['onError'] = (err) => {
+        if (process.env.NODE_ENV === 'production') return;
+        console.error(`[intl:${err.code}] ${err.message}`);
     };
 
     return (

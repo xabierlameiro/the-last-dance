@@ -16,6 +16,7 @@ import { MdOutlinePrivacyTip } from 'react-icons/md';
 import matter from 'gray-matter';
 import { useIntl } from 'react-intl';
 import { useDialog } from '@/context/dialog';
+import { useRouter } from 'next/router';
 import SidesShift from '@/components/SidesShift';
 import useSideShift from '@/hooks/useSideShift';
 import { MDXRemoteSerializeResult } from 'next-mdx-remote';
@@ -41,15 +42,11 @@ type Props = {
 
 const Legal = ({ source, meta }: Props) => {
     const { open, dispatch } = useDialog();
+    const { asPath } = useRouter();
     const { formatMessage: f } = useIntl();
     const { left, onSideShiftLeft } = useSideShift();
 
-    const [selected, setSelected] = React.useState(0);
     const close = () => dispatch({ type: 'close' });
-
-    const handleLinkClick = React.useCallback((index: number) => {
-        setSelected(index);
-    }, []);
 
     const links = [
         {
@@ -84,17 +81,29 @@ const Legal = ({ source, meta }: Props) => {
                             <SearchInput placeHolderText={f({ id: 'legal.search-placeholder' })} />
                             <span className={styles.title}>{f({ id: 'legal.title' })}</span>
                             <ul>
-                                {links.map((link, index) => (
-                                    /* SDD-L05: handler moved from the <li> to the <Link>, as in the Dock —
-                                       a list item is not an interaction target, and on the <li> it fired
-                                       for clicks in the row's padding where no link exists. */
-                                    <li key={index} className={selected === index ? styles.selected : ''}>
-                                        <Link href={link.href} onClick={() => handleLinkClick(index)}>
-                                            {link.icon}
-                                            <span>{link.title}</span>
-                                        </Link>
-                                    </li>
-                                ))}
+                                {links.map((link) => {
+                                    /*
+                                     * SDD-L08: which item is highlighted comes from the URL now.
+                                     * It was `useState(0)`, initialised to the first item and only
+                                     * ever changed by an in-page click — so arriving at
+                                     * /legal/privacy-policy from anywhere else (a link, a bookmark,
+                                     * a search result, a full reload) highlighted "Cookies Policy"
+                                     * while the reader looked at the privacy document. State that
+                                     * mirrors the route belongs to the route.
+                                     */
+                                    const isCurrent = asPath.split('?')[0]?.endsWith(link.href) ?? false;
+                                    return (
+                                        /* SDD-L05: handler moved from the <li> to the <Link>, as in the Dock —
+                                           a list item is not an interaction target, and on the <li> it fired
+                                           for clicks in the row's padding where no link exists. */
+                                        <li key={link.href} className={isCurrent ? styles.selected : ''}>
+                                            <Link href={link.href} aria-current={isCurrent ? 'page' : undefined}>
+                                                {link.icon}
+                                                <span>{link.title}</span>
+                                            </Link>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </nav>
                         <article className={styles.content}>{source && <MDXRemote {...source} />}</article>
@@ -133,7 +142,11 @@ export const getStaticProps = async ({
     const fullPath = resolveLegalDocPath(slug);
 
     if (!fullPath) {
-        return { notFound: true };
+        // SDD-L08: `revalidate` added. `fallback: 'blocking'` means an unknown slug is resolved at
+        // request time, and a bare `notFound: true` is cached for the lifetime of the deployment —
+        // so a legal document added after a deploy 404s until the next one. The blog page already
+        // does `{ notFound: true, revalidate: 60 }`; these two routes had no reason to differ.
+        return { notFound: true, revalidate: 60 };
     }
 
     const mdx = fs.readFileSync(fullPath, 'utf8');

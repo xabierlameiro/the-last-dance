@@ -87,6 +87,34 @@ describe('staticHreflangTags', () => {
 
         for (const href of hrefs) expect(href).toMatch(/^https:\/\//);
     });
+
+    /**
+     * SDD-L08. `data/legal/` holds three files with no locale suffix, and `legal/[slug].tsx` never
+     * receives the locale — so the same English document is served at `/legal/*`, `/es/legal/*` and
+     * `/gl/legal/*` while these tags claimed three translations existed. hreflang is a reciprocal
+     * claim about translated content; pointing it at the same English text tells search engines
+     * something untrue and invites them to serve a Spanish reader a page they cannot use.
+     *
+     * The real fix is `es`/`gl` legal documents (L08-T2), which is owner work: these texts invoke
+     * Spanish law and make representations about data handling. Until then, claiming nothing beats
+     * claiming falsely — and this test fails the moment someone adds the alternates back without
+     * adding the documents.
+     */
+    it('claims no translations for the untranslated legal documents', () => {
+        const langs = staticHreflangTags(process.env.NEXT_PUBLIC_DOMAIN, '/legal/privacy-policy').map(
+            (tag) => tag.props.hrefLang as string
+        );
+
+        expect(langs).toEqual(['en', 'x-default']);
+    });
+
+    it('still declares all three locales for pages that really are translated', () => {
+        const langs = staticHreflangTags(process.env.NEXT_PUBLIC_DOMAIN, '/comments').map(
+            (tag) => tag.props.hrefLang as string
+        );
+
+        expect(langs).toEqual(['en', 'es', 'gl', 'x-default']);
+    });
 });
 
 describe('robotsTags', () => {

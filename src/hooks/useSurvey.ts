@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useMemo, useReducer } from 'react';
 import { buildSurveyQuestions, sanitizeSurveyName, DEFAULT_SURVEY_NAME, type Question } from '@/constants/survey';
+import surveyCopy from '../intl/survey';
 
 interface Answer {
     question: string;
@@ -61,16 +62,19 @@ const reducer = (state: SurveyState, action: SurveyAction): SurveyState => {
 };
 
 const useSurvey = () => {
-    const { query } = useRouter();
+    const { query, locale } = useRouter();
     // SDD-L07: the default only covered the non-array branch. `?name=` repeated in the query string
     // gives Next an array, and an empty one gives `undefined` — which then reached
     // `sanitizeSurveyName` as a string it was not typed to receive.
     const rawName = (Array.isArray(query.name) ? query.name[0] : query.name) ?? DEFAULT_SURVEY_NAME;
     const name = sanitizeSurveyName(rawName);
+    // SDD-L08-T7: the whole questionnaire was Spanish literals. The copy now follows the route's
+    // locale; which answers count as a match does not, and stays in constants/survey.tsx.
+    const copy = surveyCopy(locale);
 
     const [state, dispatch] = useReducer(reducer, initialState);
 
-    const questions = useMemo(() => buildSurveyQuestions(name, state.success), [name, state.success]);
+    const questions = useMemo(() => buildSurveyQuestions(name, state.success, copy), [name, state.success, copy]);
 
     const handlePreviousQuestion = () => {
         if (state.currentQuestion > 1) dispatch({ type: 'PREVIOUS_QUESTION' });

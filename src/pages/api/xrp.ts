@@ -8,7 +8,7 @@ import { coinGeckoXrpSchema } from '../../types/upstream';
 /**
  * @description Get the price of XRP in EUR using CoinGecko API
  *
- * @returns {Promise<{ price: string; todaySummary: string; todayPorcentage: string } | { error: string }>}
+ * @returns {Promise<{ price: string; todaySummary: string; todayPercentage: string } | { error: string }>}
  * @example https://xabierlameiro.com/api/xrp
  */
 export default allowCors(async function handler(_req: NextApiRequest, res: NextApiResponse) {
@@ -41,14 +41,14 @@ export default allowCors(async function handler(_req: NextApiRequest, res: NextA
 
         const price = parseFloat(parsed.data.ripple.eur.toFixed(4));
         const change24h = parsed.data.ripple.eur_24h_change;
-        const todayPorcentage = `${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}%`;
+        const todayPercentage = `${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}%`;
         const todaySummary = change24h > 0 ? 'Up' : 'Down';
 
         res.setHeader('Cache-Control', CACHE.price);
         res.status(200).json({
             price,
             todaySummary,
-            todayPorcentage,
+            todayPercentage,
         });
     } catch (err) {
         if (process.env.NODE_ENV === 'development') {

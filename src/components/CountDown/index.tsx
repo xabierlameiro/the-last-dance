@@ -59,7 +59,7 @@ const calculateTimeLeft = (
  * @returns {JSX.Element}
  */
 const CountDown = ({ date: dateProvided, caption }: Props) => {
-    const { formatMessage: f } = useIntl();
+    const { formatMessage: f, formatDate } = useIntl();
     const [time, setTime] = React.useState<TimeLeft>({
         years: 0,
         months: 0,
@@ -69,18 +69,37 @@ const CountDown = ({ date: dateProvided, caption }: Props) => {
         seconds: 0,
     });
 
+    /**
+     * SDD-L09-T10. This was a `setTimeout` with `time` in its dependency array, and the callback
+     * called `setTime` with a **fresh object every tick**. So each tick changed `time` by identity,
+     * which re-ran the effect, which cleared and re-armed the timeout — a re-render loop that ran on
+     * every page, because the header mounts this site-wide. Each pass also dragged the Floating UI
+     * `Tooltip` wrapping it through a full render.
+     *
+     * One interval keyed on the date does the same job: the tick is what should drive the update,
+     * not the state the tick produced.
+     */
     React.useEffect(() => {
-        const timer = setTimeout(() => {
-            calculateTimeLeft(dateProvided, setTime);
-        }, 1000);
+        calculateTimeLeft(dateProvided, setTime);
+        const timer = setInterval(() => calculateTimeLeft(dateProvided, setTime), 1000);
 
-        return () => clearTimeout(timer);
-    }, [dateProvided, time]);
+        return () => clearInterval(timer);
+    }, [dateProvided]);
+
+    /*
+     * SDD-L08-T18: the countdown was six bare numbers whose only explanation was a tooltip reading
+     * "Important date". This at least says what the number counts towards, in the reader's locale
+     * and calendar. What the date signifies is the owner's copy to write, not something to invent.
+     */
+    const label = f(
+        { id: 'countdown.label' },
+        { date: formatDate(dateProvided, { dateStyle: 'long', timeZone: 'UTC' }) }
+    );
 
     return (
         <Tooltip>
             <Tooltip.Trigger>
-                <div className={styles.countdown} data-testid="countdown">
+                <div className={styles.countdown} data-testid="countdown" role="group" aria-label={label}>
                     <div className={styles.countdown__item}>
                         <div suppressHydrationWarning>{time.years}</div>
                         <div className={styles.countdown__item__text}>{f({ id: 'countdown.years' })}</div>

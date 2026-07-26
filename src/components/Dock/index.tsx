@@ -22,7 +22,8 @@ const Dock = () => {
         <>
             <nav className={styles.dock} data-testid="dock" aria-label={f({ id: 'nav.applications' })}>
                 <ul>
-                    {menu.map(({ link, img, alt, testId }, index) => {
+                    {menu.map(({ link, img, labelId, testId }, index) => {
+                        const label = f({ id: labelId });
                         // `?? ''` for the root path: `'/'.split('/')[1]` is `''` but the compiler
                         // cannot know the string starts with a slash.
                         const path = pathname.split('/')[1] ?? '';
@@ -46,10 +47,18 @@ const Dock = () => {
                             >
                                 <Link
                                     href={link?.[locale as keyof typeof link] ?? link}
-                                    title={alt}
+                                    title={label}
                                     onClick={clickHandler}
                                 >
-                                    <Icon src={img} alt={alt} />
+                                    {/*
+                                     * SDD-L08: the icon's alt is empty and the label below carries
+                                     * the name instead. With both, a screen reader announced the
+                                     * destination twice per item; with only the alt, a touch user
+                                     * saw nothing at all, since the hover cue sits behind
+                                     * `@media (hover: hover)`.
+                                     */}
+                                    <Icon src={img} alt="" />
+                                    <span className={styles.label}>{label}</span>
                                 </Link>
                             </li>
                         );

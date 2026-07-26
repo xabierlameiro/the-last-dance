@@ -39,7 +39,11 @@ const useDeploymentStatus = (): {
  */
 const DeploymentStatus = () => {
     const { data, isLoading, error } = useDeploymentStatus();
-    const { formatMessage: f } = useIntl();
+    // SDD-L08: `formatDate` instead of a bare `toLocaleString()` with no locale argument, which
+    // formatted against the *browser's* locale rather than the site's — so a reader on /es with an
+    // English-configured machine saw an English date inside a Spanish sentence. The other three
+    // components that render dates already did this correctly.
+    const { formatMessage: f, formatDate } = useIntl();
 
     const status = data?.status;
     const username = data?.username;
@@ -77,7 +81,9 @@ const DeploymentStatus = () => {
                             status,
                             username,
                             environment,
-                            createdAt: createdAt ? new Date(createdAt).toLocaleString() : '',
+                            createdAt: createdAt
+                                ? formatDate(createdAt, { dateStyle: 'medium', timeStyle: 'short' })
+                                : '',
                         }
                     )}
                 </Tooltip.Content>

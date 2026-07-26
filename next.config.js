@@ -1,15 +1,17 @@
 /** @type {import('next').NextConfig} */
-import { remarkCodeHike } from '@code-hike/mdx';
-import theme from 'shiki/themes/one-dark-pro.json' with { type: 'json' };
+import { remarkPlugins } from './mdx.plugins.mjs';
 import nextMDX from '@next/mdx';
 
 const withMDX = nextMDX({
     extension: /\.mdx?$/,
     options: {
-        // If you use remark-gfm, you'll need to use next.config.mjs
-        // as the package is ESM only
-        // https://github.com/remarkjs/remark-gfm#install
-        remarkPlugins: [[remarkCodeHike, { theme }]],
+        /*
+         * SDD-L09-T7: this pipeline had its own plugin array, without remark-gfm, while
+         * next-mdx-remote had one with it. Same syntax, two sets of rules, depending only on how a
+         * given .mdx file happened to be loaded. Both import `mdx.plugins.mjs` now.
+         */
+        // @next/mdx compiles a real module, so Code Hike can inject the `CH` import itself.
+        remarkPlugins: remarkPlugins({ autoImport: true }),
         rehypePlugins: [],
         // If you use `MDXProvider`, uncomment the following line.
         // providerImportSource: "@mdx-js/react",
@@ -48,7 +50,22 @@ export default withMDX({
     // Append the default value with md extensions
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {
-        largePageDataBytes: 800 * 1000,
+        /*
+         * SDD-L09-T4, partially. This was 800 KB, which is not a fix for anything — it raises the
+         * threshold at which Next warns that a page's JSON is too large, so it silenced the warning
+         * about the blog payload rather than addressing it.
+         *
+         * The spec's target was 128 KB, and this does not reach it. Trimming the theme (T1) removed
+         * the VS Code UI colour map but that was only ~6 KB of a 460 KB page: the bulk is Code Hike's
+         * tokenised output — one object per token with an inline hex colour, 2,085 of them on the
+         * worst page. Collapsing those needs T2 (CSS-variable theming) or T3 (render highlighted
+         * HTML in getStaticProps), and both are gated on decision D4, which is still open.
+         *
+         * So this is a ratchet, not the destination: 480 KB is just above today's worst page (454 KB),
+         * which means any future change that inflates a payload trips the warning during the build.
+         * Lower it again as T2/T3 land.
+         */
+        largePageDataBytes: 480 * 1000,
     },
     images: {
         remotePatterns: [
