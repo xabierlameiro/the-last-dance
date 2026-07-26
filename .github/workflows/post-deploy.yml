@@ -28,4 +28,4 @@ jobs:
             - name: Wait for deployment to be live
               run: sleep 120
             - name: Submit URLs to IndexNow
-              run: node scripts/indexnow-ping.mjs || true
+              run: node scripts/indexnow-ping.ts || true
