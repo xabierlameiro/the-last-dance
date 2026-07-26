@@ -7,7 +7,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "prebuild": "node scripts/generate-llms.mjs",
+        "prebuild": "node scripts/generate-llms.ts",
         "debugg": "cross-env NODE_OPTIONS='--inspect' next dev",
         "prod": "npm install --legacy-peer-deps --silent",
         "build": "next build",
@@ -25,7 +25,7 @@
         "prettier": "prettier --write .",
         "jsdoc": "rm -rf public/docs && jsdoc -c jsdoc.json && node custom-docs.ts",
         "lighthouse-report": "node lighthouse/assets/lighthouse.ts",
-        "posters": "node scripts/generate-post-posters.mjs",
+        "posters": "node scripts/generate-post-posters.ts",
         "test:e2e": "playwright test",
         "test:e2e:report": "playwright test && node custom-report.ts",
         "next-info": "npx --no-install next info",

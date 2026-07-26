@@ -13,7 +13,7 @@
         "e2e/**/*.ts",
         ".storybook/**/*.{ts,tsx}",
         "custom-*.ts",
-        "scripts/generate-post-posters.mjs",
+        "scripts/generate-post-posters.ts",
         "src/__test__/**/*.ts"
     ],
     "ignorePatterns": [
