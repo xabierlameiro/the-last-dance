@@ -18,8 +18,23 @@
     background-color: var(--status-initializing);
 }
 
-.queue {
+/*
+ * SDD-L07: this class was `.queue` while the component looks it up as
+ * `styles[status.toLowerCase()]` — and the state is `QUEUED`. So the lookup returned undefined and
+ * a queued deployment had never once shown its colour. The glyph rule below already used the right
+ * name (`data-status='queued'`), which is what made the mismatch visible.
+ */
+.queued {
     background-color: var(--status-queue);
+}
+
+/* The two states the six-value union omitted. Vercel documents eight. */
+.blocked {
+    background-color: var(--status-blocked);
+}
+
+.deleted {
+    background-color: var(--status-deleted);
 }
 
 .ready {
@@ -31,7 +46,7 @@
 }
 
 /**
- * SDD-L06. A second channel besides hue, so the six states are distinguishable without colour
+ * SDD-L06. A second channel besides hue, so the states are distinguishable without colour
  * perception (WCAG 1.4.1). The dot keeps its colour; the glyph is what actually differentiates it.
  */
 .status {
@@ -58,4 +73,10 @@
 }
 .status[data-status='canceled']::after {
     content: '×';
+}
+.status[data-status='blocked']::after {
+    content: '⊘';
+}
+.status[data-status='deleted']::after {
+    content: '−';
 }

@@ -59,18 +59,7 @@ describe('other helper utilities', () => {
         expect(getLang('en')).toBe('');
     });
 
-    it('fetcher should resolve json or throw', async () => {
-        const { fetcher } = require('..');
-        (global.fetch as jest.Mock).mockResolvedValueOnce({
-            ok: true,
-            json: () => Promise.resolve({ a: 1 }),
-        });
-        await expect(fetcher('url')).resolves.toEqual({ a: 1 });
-
-        (global.fetch as jest.Mock).mockResolvedValueOnce({
-            ok: false,
-            statusText: 'Bad',
-        });
-        await expect(fetcher('url')).rejects.toThrow('Bad');
-    });
+    // SDD-L07 removed the generic `fetcher` from this barrel. It resolved `unknown`, so both of its
+    // callers cast at the call site, and it competed with six hand-rolled copies in the hooks. Its
+    // replacement is `helpers/createFetcher.ts`, covered by createFetcher.test.tsx.
 });

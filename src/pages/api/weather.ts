@@ -4,32 +4,14 @@ import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
 import { CACHE, fetchWithTimeout } from '@/helpers/http';
 import { isValidCityName } from '../../helpers/city';
+import { describeIssues } from '../../types/schemas';
+import { forecastSchema, geocodingSchema } from '../../types/upstream';
+import type { WeatherData } from '../../types/api';
 
-interface WeatherData {
-    city: string;
-    name?: string | null;
-    precipitation?: string | null;
-    humidity?: string | null;
-    windSpeed?: string | null;
-    grades?: string | null;
-    imageUrl?: string;
-}
-
+// SDD-L07: the response shape was declared here, again in `useWeather`, and a third time nowhere —
+// the client took it via `data as WeatherData[]`. One schema now, in `types/schemas.ts`, and the two
+// upstream shapes are checked rather than asserted with `as`.
 type WeatherResponse = WeatherData[] | { error: string };
-
-type GeocodingResponse = {
-    results?: Array<{ latitude: number; longitude: number; name: string; country?: string }>;
-};
-
-type ForecastResponse = {
-    current?: {
-        temperature_2m: number;
-        relative_humidity_2m: number;
-        precipitation: number;
-        wind_speed_10m: number;
-        weather_code: number;
-    };
-};
 
 // Minimal WMO weather-code → description map, used as the image alt / name.
 const WEATHER_CODE_TEXT: Record<number, string> = {
@@ -97,7 +79,7 @@ const emptyWeather = (city: string): WeatherData => ({
  * then the resulting coordinates feed the forecast endpoint.
  */
 const getWeatherData = async (city: string): Promise<WeatherData> => {
-    const query = city.split('+')[0].trim();
+    const query = (city.split('+')[0] ?? city).trim();
 
     const geoUrl = new URL('https://geocoding-api.open-meteo.com/v1/search');
     geoUrl.searchParams.set('name', query);
@@ -109,8 +91,11 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
     if (!geoRes.ok) {
         throw new Error(`Geocoding HTTP error! status: ${geoRes.status}`);
     }
-    const geo = (await geoRes.json()) as GeocodingResponse;
-    const place = geo?.results?.[0];
+    const geo = geocodingSchema.safeParse(await geoRes.json());
+    if (!geo.success) {
+        throw new Error(`Geocoding response did not match: ${describeIssues(geo.error.issues)}`);
+    }
+    const place = geo.data.results?.[0];
     if (!place) {
         console.warn(`No geocoding result for city: ${city}`);
         return emptyWeather(city);
@@ -128,8 +113,11 @@ const getWeatherData = async (city: string): Promise<WeatherData> => {
     if (!forecastRes.ok) {
         throw new Error(`Forecast HTTP error! status: ${forecastRes.status}`);
     }
-    const forecast = (await forecastRes.json()) as ForecastResponse;
-    const current = forecast?.current;
+    const forecast = forecastSchema.safeParse(await forecastRes.json());
+    if (!forecast.success) {
+        throw new Error(`Forecast response did not match: ${describeIssues(forecast.error.issues)}`);
+    }
+    const current = forecast.data.current;
     if (!current) {
         console.warn(`No forecast data for city: ${city}`);
         return emptyWeather(city);
@@ -189,19 +177,42 @@ export default allowCors(async function handler(req: NextApiRequest, res: NextAp
         return res.status(400).json({ error: `Invalid city names: ${invalidCities.join(', ')}` });
     }
 
+    /*
+     * SDD-L07 rewrote this block. It had three defects stacked on each other:
+     *
+     * 1. `.catch()` on a `Promise.allSettled` chain was unreachable. `allSettled` never rejects —
+     *    that is its whole contract — so the only way into it was the `.then` body itself throwing,
+     *    which would then try to send a second response over one already sent.
+     * 2. When every upstream call failed, `results` was `[]` and the route answered **200 with an
+     *    empty array**. The client saw neither an error nor a loading state, so the widget rendered
+     *    nothing at all and looked like a styling bug. A total failure is a 502.
+     * 3. The outer catch was `if (err instanceof Error)`. Anything else thrown — and a rejected
+     *    fetch in Node can surface as a `DOMException` for a timeout, which is not an `Error`
+     *    subclass in every runtime — sent no response whatsoever, leaving the request hanging until
+     *    the platform's function timeout killed it.
+     *
+     * A partial failure still answers 200 with the cities that did resolve: one unreachable city
+     * should not blank the other four.
+     */
     try {
-        await Promise.allSettled(citiesArray.map((city) => getWeatherData(city)))
-            .then((raw) => {
-                const results = raw
-                    .filter((r): r is PromiseFulfilledResult<WeatherData> => r.status === 'fulfilled')
-                    .map((result) => result.value);
-                res.setHeader('Cache-Control', CACHE.weather);
-                res.status(200).json(results);
-            })
-            .catch((err) => res.status(500).json({ error: err.message }));
-    } catch (err: unknown) {
-        if (err instanceof Error) {
-            res.status(500).json({ error: err.message });
+        const settled = await Promise.allSettled(citiesArray.map((city) => getWeatherData(city)));
+        const results = settled
+            .filter((result): result is PromiseFulfilledResult<WeatherData> => result.status === 'fulfilled')
+            .map((result) => result.value);
+
+        if (results.length === 0) {
+            settled.forEach((result) => {
+                if (result.status === 'rejected') console.error('Weather API upstream failure:', result.reason);
+            });
+            res.setHeader('Cache-Control', CACHE.error);
+            return res.status(502).json({ error: 'Weather service unavailable' });
         }
+
+        res.setHeader('Cache-Control', CACHE.weather);
+        return res.status(200).json(results);
+    } catch (err: unknown) {
+        console.error('Weather API Error:', err);
+        res.setHeader('Cache-Control', CACHE.error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
 });

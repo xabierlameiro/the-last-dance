@@ -30,7 +30,21 @@ describe('/api/analytics', () => {
 
         expect(runReport.mock.calls[0][0]).not.toHaveProperty('dimensionFilter');
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({ pageViews: '120', newUsers: '45' });
+        // SDD-L07: numbers, not strings. GA4 emits `"120"`; this route declared
+        // `pageViews: string | number` and forwarded it, `types/api.ts` declared `number`, and the
+        // hook's `as AnalyticsData` reconciled the two by erasing at compile time. `ViewCounter`
+        // then rendered an unseparated `12345` while `CryptoPrice` beside it was formatted.
+        expect(res.json).toHaveBeenCalledWith({ pageViews: 120, newUsers: 45 });
+    });
+
+    // GA can answer with an absent metric value rather than "0" — the counter must stay a number.
+    it('substitutes zero for a metric value that is missing or unparseable', async () => {
+        runReport.mockResolvedValue([{ rows: [{ metricValues: [{ value: null }, { value: 'n/a' }] }] }]);
+        const res = createMockResponse();
+
+        await handler(createRequest(), res);
+
+        expect(res.json).toHaveBeenCalledWith({ pageViews: 0, newUsers: 0 });
     });
 
     it('filters the report by page path when a slug is given', async () => {
@@ -45,7 +59,7 @@ describe('/api/analytics', () => {
                 stringFilter: { matchType: 'EXACT', value: '/blog/react/hooks' },
             },
         });
-        expect(res.json).toHaveBeenCalledWith({ pageViews: '7', newUsers: '3' });
+        expect(res.json).toHaveBeenCalledWith({ pageViews: 7, newUsers: 3 });
     });
 
     // Regression: a page with no views made GA return no rows, which used to surface

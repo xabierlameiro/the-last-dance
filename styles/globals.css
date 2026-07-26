@@ -16,6 +16,11 @@
     --status-queue: #0000ff;
     --status-ready: #00ff00;
     --status-canceled: #808080;
+    /* SDD-L07: Vercel documents eight deployment states; this codebase declared six. These are the
+       two that had no colour, no glyph and no class — a BLOCKED or DELETED deployment rendered an
+       empty circle indistinguishable from "no data". */
+    --status-blocked: #8b008b;
+    --status-deleted: #4b0082;
 }
 
 [data-theme='dark'] {

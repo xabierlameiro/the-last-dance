@@ -110,17 +110,12 @@ export const setInverval = (ref: React.RefObject<HTMLDivElement | null>) => {
     return interval;
 };
 
-/**
- * @description Utility function to use SWR with fetcher.
- * @example const { data, error } = useSWR('/api/weather', fetcher);
- * @param {string} url
- * @returns {Promise<unknown>}
- * @see https://swr.vercel.app/docs/data-fetching
+/*
+ * SDD-L07: the generic `fetcher` used to live here. It returned `Promise<unknown>`, so both of its
+ * callers cast the result at the call site, and it competed with six hand-rolled copies of the same
+ * function in the hooks. All eight are now `helpers/createFetcher.ts`, which takes the route's schema
+ * and returns a value that has actually been checked against it.
+ *
+ * It is gone rather than deprecated on purpose: leaving an unvalidated fetcher exported from the
+ * barrel is how the next hook would quietly get written the old way.
  */
-export const fetcher = (url: string): Promise<unknown> =>
-    fetch(url).then((res) => {
-        if (res.ok) {
-            return res.json();
-        }
-        throw new Error(res.statusText);
-    });

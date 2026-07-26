@@ -96,6 +96,11 @@ export const messages = {
         'deploymentstatus.tooltip':
             'Status : {status} The user {username} has deployed to {environment} environment at {createdAt}',
         'rendermanager.error': 'An error has occurred, we are working on it',
+        // SDD-L07: three failures used to share one sentence, because the prop carrying them was a
+        // boolean. They are different events and a reader can act on the difference — a bad status
+        // is worth retrying, a response that no longer matches its contract is not.
+        'rendermanager.error.status': 'The service answered with an error. It may work if you try again shortly',
+        'rendermanager.error.shape': 'The service answered something unexpected, so this reading is not shown',
         'rendermanager.loading': 'Getting the data...',
     },
     es: {
@@ -191,6 +196,8 @@ export const messages = {
         'deploymentstatus.tooltip':
             'Estado : {status} El usuario {username} ha desplegado en el entorno de {environment} a fecha {createdAt}',
         'rendermanager.error': 'Ha ocurrido un error, estamos trabajando en ello',
+        'rendermanager.error.status': 'El servicio ha respondido con un error. Puede que funcione si lo intentas en un momento',
+        'rendermanager.error.shape': 'El servicio ha respondido algo inesperado, así que este dato no se muestra',
         'rendermanager.loading': 'Obteniendo los datos...',
     },
     gl: {
@@ -286,6 +293,8 @@ export const messages = {
         'deploymentstatus.tooltip':
             'Estado : {status} O usuario {username} ha desplegado no entorno de {environment} a data {createdAt}',
         'rendermanager.error': 'Ocurriu un erro, estamos traballando niso',
+        'rendermanager.error.status': 'O servizo respondeu cun erro. Pode que funcione se o tentas nun momento',
+        'rendermanager.error.shape': 'O servizo respondeu algo inesperado, así que este dato non se amosa',
         'rendermanager.loading': 'Obtendo os datos...',
     },
 };

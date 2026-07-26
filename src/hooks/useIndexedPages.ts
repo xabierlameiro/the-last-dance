@@ -1,19 +1,18 @@
 import useSWR from 'swr';
+import createFetcher from '@/helpers/createFetcher';
+import { counterSchema } from '../types/schemas';
 import type { CounterData } from '../types/api';
 
 const url = `${process.env.NEXT_PUBLIC_DOMAIN}/api/indexed-pages`;
 
-const fetchCounter = async (url: string): Promise<CounterData> => {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch counter data: ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data as CounterData;
-};
+const fetchCounter = createFetcher(counterSchema, '/api/indexed-pages');
 
-const useIndexedPages = () => {
-    const { data, error, isLoading } = useSWR<CounterData>(url, fetchCounter, {
+const useIndexedPages = (): {
+    data: CounterData | undefined;
+    error: Error | undefined;
+    loading: boolean;
+} => {
+    const { data, error, isLoading } = useSWR<CounterData, Error>(url, fetchCounter, {
         dedupingInterval: 5000,
         fallbackData: {
             num: 0,

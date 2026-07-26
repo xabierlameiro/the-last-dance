@@ -23,7 +23,9 @@ const Dock = () => {
             <nav className={styles.dock} data-testid="dock" aria-label={f({ id: 'nav.applications' })}>
                 <ul>
                     {menu.map(({ link, img, alt, testId }, index) => {
-                        const path = pathname.split('/')[1];
+                        // `?? ''` for the root path: `'/'.split('/')[1]` is `''` but the compiler
+                        // cannot know the string starts with a slash.
+                        const path = pathname.split('/')[1] ?? '';
                         const term =
                             typeof link === 'object'
                                 ? link[locale as keyof typeof link]?.split('/')[1]

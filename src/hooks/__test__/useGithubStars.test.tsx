@@ -12,9 +12,15 @@ const TestComponent = () => {
 describe('useGithubStars hook', () => {
     it('returns stars count', () => {
         (useSWR as jest.Mock).mockReturnValue({ data: 42, error: false, isLoading: false });
-        const expectedUrl = new URL('https://xabierlameiro.com/api/github-stars');
         render(<TestComponent />);
-        expect(useSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function), expect.any(Object));
+        // SDD-L07: the key is a string now, like every sibling hook. It was a `URL` built at module
+        // scope, which threw `Invalid URL` during import whenever NEXT_PUBLIC_DOMAIN was unset —
+        // failing the whole build rather than the one widget.
+        expect(useSWR).toHaveBeenCalledWith(
+            `${process.env.NEXT_PUBLIC_DOMAIN}/api/github-stars`,
+            expect.any(Function),
+            expect.any(Object)
+        );
         expect(screen.getByTestId('stars').textContent).toBe('42');
     });
 });

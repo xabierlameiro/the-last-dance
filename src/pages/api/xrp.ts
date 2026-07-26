@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import console from '@/helpers/console';
 import allowCors from '../../helpers/cors';
 import { CACHE, fetchWithTimeout } from '@/helpers/http';
+import { describeIssues } from '../../types/schemas';
+import { coinGeckoXrpSchema } from '../../types/upstream';
 
 /**
  * @description Get the price of XRP in EUR using CoinGecko API
@@ -27,14 +29,18 @@ export default allowCors(async function handler(_req: NextApiRequest, res: NextA
             throw new Error(`CoinGecko API error: ${response.status}`);
         }
 
-        const data = await response.json();
-
-        if (!data.ripple) {
-            throw new Error('XRP data not found');
+        // SDD-L07: `const data = await response.json()` is an implicit `any`, and the only check was
+        // `if (!data.ripple)`. A response with `ripple` present but `eur` missing — what CoinGecko
+        // returns for a currency it does not support, at status 200 — reached `.toFixed()` on
+        // `undefined` and threw a TypeError that the outer catch reported as a flat 500. The log
+        // said "Internal server error" about someone else's API changing shape.
+        const parsed = coinGeckoXrpSchema.safeParse(await response.json());
+        if (!parsed.success) {
+            throw new Error(`CoinGecko response did not match: ${describeIssues(parsed.error.issues)}`);
         }
 
-        const price = parseFloat(data.ripple.eur.toFixed(4));
-        const change24h = data.ripple.eur_24h_change;
+        const price = parseFloat(parsed.data.ripple.eur.toFixed(4));
+        const change24h = parsed.data.ripple.eur_24h_change;
         const todayPorcentage = `${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}%`;
         const todaySummary = change24h > 0 ? 'Up' : 'Down';
 

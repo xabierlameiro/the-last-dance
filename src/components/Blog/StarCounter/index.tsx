@@ -31,7 +31,13 @@ const StarCounter = () => {
                         errorTitle={f({ id: 'starCounter.error' })}
                         loadingTitle={f({ id: 'starCounter.loading' })}
                     >
-                        <span data-testid="star-counter">{data as string}</span>
+                        {/*
+                         * SDD-L07: was `{data as string}`. The route sends a number and the hook
+                         * falls back to `0`, so the cast was wrong in both directions — it just
+                         * happened not to matter, because React renders numbers and strings the
+                         * same way.
+                         */}
+                        <span data-testid="star-counter">{data}</span>
                     </RenderManager>
                 </a>
             </Tooltip.Trigger>

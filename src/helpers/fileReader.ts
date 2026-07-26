@@ -3,6 +3,8 @@ import fs from 'fs';
 import matter from 'gray-matter';
 import { defaultLocale } from '@/constants/site';
 import { isSafeSlug } from './slug';
+import { describeIssues } from '../types/schemas';
+import { postFrontmatterSchema } from '../types/upstream';
 
 // Path to posts directory
 const POST_PATH = path.join(process.cwd(), 'data/blog');
@@ -42,6 +44,23 @@ type ParsedPost = {
  */
 const buildPost = (filePath: string): ParsedPost => {
     const { data, content } = matter(fs.readFileSync(filePath, 'utf8'));
+
+    /*
+     * SDD-L07. `data` is `Record<string, any>` — gray-matter cannot know the shape — and every
+     * consumer downstream simply trusted it: `getAllPosts` annotates its map callback as `PathPost`,
+     * a cast the compiler accepts only because the source is `any`.
+     *
+     * All 45 posts currently carry every required field, so nothing is broken today. It is checked
+     * anyway because this is the one place the `as` pattern can break a **deploy** rather than a
+     * widget: `getStaticPaths` runs over the whole corpus during `next build`, and one post
+     * published without a `category` throws deep inside the route with no filename anywhere in the
+     * message. Failing here instead names the file and the field.
+     */
+    const parsed = postFrontmatterSchema.safeParse(data);
+    if (!parsed.success) {
+        throw new Error(`Invalid frontmatter in ${path.basename(filePath)}: ${describeIssues(parsed.error.issues)}`);
+    }
+
     return { content, data, fileName: filePath.split('/').pop() ?? '' };
 };
 
@@ -133,7 +152,7 @@ const extractPostDate = (content: string): string | null => {
     // date strings as LOCAL midnight, so round-tripping through `new Date(...)` +
     // `toISOString()` shifted every post one day early in timezones ahead of UTC
     // (e.g. Europe/Madrid: "07-18-2026" → "2026-07-17").
-    const componentsMatch = match[1].match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    const componentsMatch = match[1]?.match(/^(\d{2})-(\d{2})-(\d{4})$/);
     if (!componentsMatch) return null;
     const [, month, day, year] = componentsMatch;
     // Date.UTC normalizes overflow ("13-40-2023" would roll over), so a round-trip
@@ -351,16 +370,25 @@ const getAllTags = (locale: string) => {
     // The SEO content pass (PR #131) introduced several of these. Frontmatter is cleaned, and
     // this guard keeps the taxonomies disjoint if a colliding tag is ever added back.
     const categoryNames = new Set(posts.map((post) => post.meta.category.toLowerCase()));
-    return [...new Set(tags.flat())]
-        .filter((tag) => !categoryNames.has(tag.toLowerCase()))
-        .map((tag) => {
-            const postsBytag = getPostsByTag(tag, locale);
-            return {
-                tag,
-                total: tags.flat().filter((t) => t === tag).length,
-                href: `/blog/${tag.toLowerCase()}/${postsBytag[0].meta.slug}`,
-            };
-        });
+    return (
+        [...new Set(tags.flat())]
+            .filter((tag) => !categoryNames.has(tag.toLowerCase()))
+            // SDD-L07: `postsBytag[0].meta.slug` was unguarded. The list cannot be empty today — the
+            // tags come from these same posts — but the sidebar entry exists only to link at a post,
+            // so if that ever stops holding, dropping the entry is right and a crash in
+            // `getStaticProps` is not.
+            .flatMap((tag) => {
+                const [firstPost] = getPostsByTag(tag, locale);
+                if (!firstPost) return [];
+                return [
+                    {
+                        tag,
+                        total: tags.flat().filter((t) => t === tag).length,
+                        href: `/blog/${tag.toLowerCase()}/${firstPost.meta.slug}`,
+                    },
+                ];
+            })
+    );
 };
 
 /**
@@ -379,13 +407,17 @@ export const getAllCategories = (locale: string) => {
     const categories = posts.map((post) => post.meta.category);
     const tags = getAllTags(locale);
     return {
-        categories: [...new Set(categories)].map((category) => {
-            const postsByCategory = getPostsByCategory(category, locale);
-            return {
-                category,
-                total: categories.filter((c) => c === category).length,
-                href: `/blog/${category.toLowerCase()}/${postsByCategory[0].meta.slug}`,
-            };
+        // Same guard as getAllTags: the link needs a post to point at.
+        categories: [...new Set(categories)].flatMap((category) => {
+            const [firstPost] = getPostsByCategory(category, locale);
+            if (!firstPost) return [];
+            return [
+                {
+                    category,
+                    total: categories.filter((c) => c === category).length,
+                    href: `/blog/${category.toLowerCase()}/${firstPost.meta.slug}`,
+                },
+            ];
         }),
         tags,
     };
