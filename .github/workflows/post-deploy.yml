@@ -29,3 +29,51 @@ jobs:
               run: sleep 120
             - name: Submit URLs to IndexNow
               run: node scripts/indexnow-ping.ts || true
+
+    notify-guard:
+        # Tells the indexability guard that a deploy landed, so it audits within
+        # minutes instead of waiting for its six-hourly schedule.
+        #
+        # This runs here rather than as a Vercel webhook because Vercel webhooks
+        # are a Pro-plan feature. The payload and HMAC-SHA1 signature are the
+        # shape Vercel would have sent, so the receiving endpoint is unchanged and
+        # switching to a native webhook later needs no code change on either side.
+        #
+        # github.sha is a better commit reference than the webhook's: it is
+        # literally the commit this workflow is running for.
+        name: Notify indexability guard
+        runs-on: ubuntu-22.04
+        # Never fail a deploy over the monitoring system's own notification.
+        continue-on-error: true
+        steps:
+            - name: Wait for deployment to be live
+              run: sleep 120
+
+            - name: Sign and send the deploy signal
+              env:
+                  GUARD_URL: ${{ secrets.GUARD_WEBHOOK_URL }}
+                  GUARD_SECRET: ${{ secrets.GUARD_WEBHOOK_SECRET }}
+              run: |
+                  set -euo pipefail
+                  if [ -z "${GUARD_URL:-}" ] || [ -z "${GUARD_SECRET:-}" ]; then
+                      echo "Guard endpoint not configured; nothing to notify."
+                      exit 0
+                  fi
+
+                  # The event id is the run id, which is unique per workflow run —
+                  # the receiver rejects duplicates, so a re-run must not reuse it.
+                  BODY=$(printf '{"id":"gha_%s","createdAt":%s,"deploymentUrl":"https://xabierlameiro.com","projectId":"%s","sha":"%s"}' \
+                      "${{ github.run_id }}" \
+                      "$(date +%s)000" \
+                      "prj_pw4DYzndjCtYls8UHOdx1dfd8ZYZ" \
+                      "${{ github.sha }}")
+
+                  SIG=$(printf '%s' "$BODY" | openssl dgst -sha1 -hmac "$GUARD_SECRET" | awk '{print $2}')
+
+                  # The guard answers 200 to every refusal by design, so the body
+                  # is what says whether a run started.
+                  RESPONSE=$(curl -sS --max-time 30 -X POST "$GUARD_URL" \
+                      -H 'content-type: application/json' \
+                      -H "x-vercel-signature: $SIG" \
+                      -d "$BODY")
+                  echo "guard: $RESPONSE"
