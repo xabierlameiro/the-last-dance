@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Xabier Lameiro — Blog</title>
+        <link>https://xabierlameiro.com/es</link>
+        <description>Apuntes de primera mano sobre React, Next.js y TypeScript: errores en producción, testing, CI/CD y herramientas web.</description>
+        <language>es</language>
+        <lastBuildDate>Wed, 22 Jul 2026 00:00:00 +0000</lastBuildDate>
+        <atom:link href="https://xabierlameiro.com/feed.es.xml" rel="self" type="application/rss+xml" />
+        <item>
+            <title>Cómo medir una fuga de memoria en Next.js y demostrar el diagnóstico</title>
+            <link>https://xabierlameiro.com/es/blog/nextjs/medir-fuga-de-memoria-nextjs</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/medir-fuga-de-memoria-nextjs</guid>
+            <pubDate>Wed, 22 Jul 2026 00:00:00 +0000</pubDate>
+            <description>El protocolo de medición detrás de una fuga de memoria confirmada en Next.js: GC forzado con --expose-gc, diffs de heap snapshots y cadenas de retención, y el par antes/después que demuestra el diagnóstico. Automatizado en next-leak.</description>
+            <category>memory-leak</category>
+            <category>heap-snapshot</category>
+            <category>node</category>
+            <category>debugging</category>
+            <category>performance</category>
+        </item>
+        <item>
+            <title>Cómo encontrar una fuga de memoria de Next.js en producción</title>
+            <link>https://xabierlameiro.com/es/blog/nextjs/fuga-de-memoria-nextjs-en-produccion</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/fuga-de-memoria-nextjs-en-produccion</guid>
+            <pubDate>Sat, 18 Jul 2026 00:00:00 +0000</pubDate>
+            <description>Tres fugas de memoria abiertas en Next.js 15.5–16.3, cómo identificar la tuya con heap snapshots y por qué en serverless la fuga se disfraza de un 504.</description>
+            <category>memory-leak</category>
+            <category>node</category>
+            <category>performance</category>
+        </item>
+        <item>
+            <title>Integración continua con Github Actions workflow</title>
+            <link>https://xabierlameiro.com/es/blog/nextjs/integracion-continua-con-github-actions-workflow</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/integracion-continua-con-github-actions-workflow</guid>
+            <pubDate>Tue, 09 May 2023 00:00:00 +0000</pubDate>
+            <description>Configura CI/CD para un proyecto Next.js con GitHub Actions: lint, tests y build en cada push, y despliegue en Vercel. El YAML del workflow explicado paso a paso.</description>
+            <category>github-actions</category>
+            <category>ci</category>
+            <category>devops</category>
+        </item>
+        <item>
+            <title>Filtro para posiciones, encuesta para comprobar compatibilidad</title>
+            <link>https://xabierlameiro.com/es/blog/react/filtro-para-posiciones</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/react/filtro-para-posiciones</guid>
+            <pubDate>Tue, 07 Mar 2023 00:00:00 +0000</pubDate>
+            <description>Encuesta para que los recruiters puedan saber si soy compatible con una posición de trabajo concreta</description>
+            <category>node</category>
+        </item>
+        <item>
+            <title>Tema oscuro con Nextjs</title>
+            <link>https://xabierlameiro.com/es/blog/nextjs/tema-oscuro</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/tema-oscuro</guid>
+            <pubDate>Fri, 03 Feb 2023 00:00:00 +0000</pubDate>
+            <description>Implementa un tema oscuro en Next.js con variables CSS y un evento de cambio de tema: sin parpadeo del tema equivocado y sin librerías pesadas. Guía paso a paso con el código completo.</description>
+            <category>css</category>
+        </item>
+        <item>
+            <title>Automatización de informes de Lighthouse</title>
+            <link>https://xabierlameiro.com/es/blog/javascript/automatizacion-de-informes-de-lighthouse</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/javascript/automatizacion-de-informes-de-lighthouse</guid>
+            <pubDate>Tue, 24 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Automatización de informes de Lighthouse usando playwright y la api de lightouse en una web desplegada en un ejemplo real</description>
+            <category>node</category>
+        </item>
+        <item>
+            <title>Cómo documentar mis componentes react con JSDoc</title>
+            <link>https://xabierlameiro.com/es/blog/react/documentar-mis-componentes-de-react</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/react/documentar-mis-componentes-de-react</guid>
+            <pubDate>Mon, 16 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Genera documentación de tus componentes React automáticamente con JSDoc y publícala como sitio estático: la configuración, las anotaciones que importan y cómo desplegarla.</description>
+            <category>node</category>
+        </item>
+        <item>
+            <title>Cómo traducir los slugs en mis páginas web</title>
+            <link>https://xabierlameiro.com/es/blog/nextjs/como-traducir-las-urls</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/como-traducir-las-urls</guid>
+            <pubDate>Thu, 12 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Traduce tus URLs por idioma para un sitio Next.js totalmente internacionalizado con páginas MDX estáticas: mapea slugs localizados, mantén los canónicos limpios y enlaza idiomas con hreflang.</description>
+            <category>intl</category>
+        </item>
+        <item>
+            <title>Contador de estrellas de un repositorio de GitHub</title>
+            <link>https://xabierlameiro.com/es/blog/nextjs/contador-de-estrellas-de-github</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/contador-de-estrellas-de-github</guid>
+            <pubDate>Wed, 11 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Crea un contador de estrellas de GitHub para tu sitio con una API route de Next.js y Octokit: cachea la API de GitHub para evitar rate limits y muestra el número de estrellas en vivo. Código incluido.</description>
+            <category>node</category>
+        </item>
+        <item>
+            <title>Haz un contador de visitas con google analytics</title>
+            <link>https://xabierlameiro.com/es/blog/nextjs/hacer-un-contador-de-vistas-con-google-analytics</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/hacer-un-contador-de-vistas-con-google-analytics</guid>
+            <pubDate>Tue, 10 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Añade un contador de visitas a tu blog Next.js con la API de datos de Google Analytics (BetaAnalyticsDataClient) tras una API route: autenticación, la consulta del informe y el cacheo explicados.</description>
+            <category>node</category>
+        </item>
+        <item>
+            <title>Cómo arreglar Minified React error #425 (error de hidratación)</title>
+            <link>https://xabierlameiro.com/es/blog/error/error-no-detectado-react-minificado</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/error/error-no-detectado-react-minificado</guid>
+            <pubDate>Thu, 05 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Arregla el Minified React error #425 (&quot;Text content does not match server-rendered HTML&quot;): todas las causas de un error de hidratación —fechas, valores aleatorios, formato por locale, APIs del navegador, HTML inválido— y el arreglo correcto para cada una, con ejemplos en Next.js.</description>
+            <category>hydration</category>
+            <category>ssr</category>
+        </item>
+        <item>
+            <title>Desplegar mi storybook de componentes es muy sencillo</title>
+            <link>https://xabierlameiro.com/es/blog/react/desplegar-storybook-facilmente</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/react/desplegar-storybook-facilmente</guid>
+            <pubDate>Wed, 04 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Despliega tu Storybook como sitio estático para que cualquiera pueda ver tus componentes React online: el comando de build, dónde alojarlo y cómo integrarlo en CI. Paso a paso.</description>
+            <category>storybook</category>
+            <category>ci</category>
+        </item>
+        <item>
+            <title>Solución al error &quot;Failed to replace env in config: ${NPM_TOKEN}&quot; en npm y yarn</title>
+            <link>https://xabierlameiro.com/es/blog/error/npm-token-solucion-error</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/error/npm-token-solucion-error</guid>
+            <pubDate>Tue, 03 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Cómo arreglar en un minuto el error de npm/yarn &quot;Failed to replace env in config: ${NPM_TOKEN}&quot;: define la variable de entorno que espera tu .npmrc o elimina la entrada obsoleta.</description>
+            <category>npm</category>
+            <category>yarn</category>
+            <category>ci</category>
+        </item>
+        <item>
+            <title>EADDRINUSE: address already in use — cómo liberar el puerto</title>
+            <link>https://xabierlameiro.com/es/blog/error/resolver-direccion-en-uso-error</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/error/resolver-direccion-en-uso-error</guid>
+            <pubDate>Mon, 02 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Arregla el error de Node.js &quot;listen EADDRINUSE: address already in use&quot;: encuentra y mata el proceso que ocupa el puerto en macOS, Linux y Windows, libéralo con un comando, o arranca en otro puerto.</description>
+            <category>node</category>
+            <category>cli</category>
+        </item>
+        <item>
+            <title>Como publicar el reporte de cobertura de testing en tu aplicación de React</title>
+            <link>https://xabierlameiro.com/es/blog/react/publicar-reporte-pruebas-react</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/es/blog/react/publicar-reporte-pruebas-react</guid>
+            <pubDate>Sun, 01 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Muestro como publicar el reporte de cobertura de testing con jest en tu aplicación de React o Nextjs, para que tu mismo o la gente pueda ver la cobertura de testing de tu proyecto.</description>
+            <category>jest</category>
+            <category>testing</category>
+            <category>ci</category>
+        </item>
+    </channel>
+</rss>

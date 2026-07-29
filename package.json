@@ -7,7 +7,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "prebuild": "node scripts/generate-llms.ts",
+        "prebuild": "node scripts/generate-llms.ts && node scripts/generate-feeds.ts",
         "debugg": "cross-env NODE_OPTIONS='--inspect' next dev",
         "prod": "npm install --legacy-peer-deps --silent",
         "build": "next build",

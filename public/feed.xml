@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Xabier Lameiro — Blog</title>
+        <link>https://xabierlameiro.com</link>
+        <description>Practical, first-hand notes on React, Next.js and TypeScript: production errors, testing, CI/CD and web tooling.</description>
+        <language>en</language>
+        <lastBuildDate>Wed, 22 Jul 2026 00:00:00 +0000</lastBuildDate>
+        <atom:link href="https://xabierlameiro.com/feed.xml" rel="self" type="application/rss+xml" />
+        <item>
+            <title>How to measure a Next.js memory leak and prove the diagnosis</title>
+            <link>https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak</guid>
+            <pubDate>Wed, 22 Jul 2026 00:00:00 +0000</pubDate>
+            <description>The measurement protocol behind a confirmed Next.js memory leak: forced GC with --expose-gc, heap snapshot diffs and retainer chains, and the before/after pair that proves the diagnosis. Automated in next-leak.</description>
+            <category>memory-leak</category>
+            <category>heap-snapshot</category>
+            <category>node</category>
+            <category>debugging</category>
+            <category>performance</category>
+        </item>
+        <item>
+            <title>How to find a Next.js memory leak in production</title>
+            <link>https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production</guid>
+            <pubDate>Sat, 18 Jul 2026 00:00:00 +0000</pubDate>
+            <description>Three open memory leaks in Next.js 15.5–16.3, how to tell which one you have from heap snapshots, and why on serverless a leak shows up as a 504 timeout.</description>
+            <category>memory-leak</category>
+            <category>node</category>
+            <category>performance</category>
+        </item>
+        <item>
+            <title>Continuous Integration with Github Actions workflow</title>
+            <link>https://xabierlameiro.com/blog/nextjs/continuous-integration-with-github-actions-workflow</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/continuous-integration-with-github-actions-workflow</guid>
+            <pubDate>Tue, 09 May 2023 00:00:00 +0000</pubDate>
+            <description>Set up CI/CD for a Next.js project with GitHub Actions: lint, test and build on every push, then deploy to Vercel. The workflow YAML explained step by step.</description>
+            <category>github-actions</category>
+            <category>ci</category>
+            <category>devops</category>
+        </item>
+        <item>
+            <title>Filter for positions, survey to check compatibility</title>
+            <link>https://xabierlameiro.com/blog/react/filter-for-positions</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/react/filter-for-positions</guid>
+            <pubDate>Tue, 07 Mar 2023 00:00:00 +0000</pubDate>
+            <description>Survey for recruiters to find out if I am compatible with a specific job position</description>
+            <category>node</category>
+        </item>
+        <item>
+            <title>Dark theme with Nextjs</title>
+            <link>https://xabierlameiro.com/blog/nextjs/dark-theme</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/dark-theme</guid>
+            <pubDate>Fri, 03 Feb 2023 00:00:00 +0000</pubDate>
+            <description>Build a dark theme in Next.js with CSS variables and a theme-toggle event — no flash of the wrong theme and no heavy library. A step-by-step guide with the full code.</description>
+            <category>css</category>
+        </item>
+        <item>
+            <title>Lighthouse report automation</title>
+            <link>https://xabierlameiro.com/blog/javascript/lighthouse-reporting-automation</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/javascript/lighthouse-reporting-automation</guid>
+            <pubDate>Tue, 24 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Automation of Lighthouse reporting using playwright and the lightouse api on a deployed website in a real example</description>
+            <category>node</category>
+        </item>
+        <item>
+            <title>How to document React components with JSDoc</title>
+            <link>https://xabierlameiro.com/blog/react/how-document-my-react-components-with-jsdoc</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/react/how-document-my-react-components-with-jsdoc</guid>
+            <pubDate>Mon, 16 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Generate documentation for your React components automatically with JSDoc and publish it as a static site — the setup, the annotations that matter, and how to deploy it.</description>
+            <category>node</category>
+        </item>
+        <item>
+            <title>How to translate URL slugs in a Next.js site</title>
+            <link>https://xabierlameiro.com/blog/nextjs/translate-slugs-web-pages</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/translate-slugs-web-pages</guid>
+            <pubDate>Thu, 12 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Translate your URLs per language for a fully internationalized Next.js site using static MDX pages — map localized slugs, keep canonicals clean, and link locales with hreflang.</description>
+            <category>intl</category>
+        </item>
+        <item>
+            <title>Counter for github stars repository</title>
+            <link>https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository</guid>
+            <pubDate>Wed, 11 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Build a GitHub stars counter for your site with a Next.js API route and Octokit — cache the GitHub API to dodge rate limits and render a live star count. Full code included.</description>
+            <category>node</category>
+        </item>
+        <item>
+            <title>Make a views counter with google analytics</title>
+            <link>https://xabierlameiro.com/blog/nextjs/make-a-views-counter-with-google-analytics</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/make-a-views-counter-with-google-analytics</guid>
+            <pubDate>Tue, 10 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Add a page-views counter to your Next.js blog using the Google Analytics Data API (BetaAnalyticsDataClient) behind an API route — auth, the report query and caching explained.</description>
+            <category>node</category>
+        </item>
+        <item>
+            <title>How to fix Minified React error #425 (hydration mismatch)</title>
+            <link>https://xabierlameiro.com/blog/error/uncaught-error-minified-react-error</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/error/uncaught-error-minified-react-error</guid>
+            <pubDate>Thu, 05 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Fix Minified React error #425 (&quot;Text content does not match server-rendered HTML&quot;): every common cause of a hydration mismatch — dates, random values, locale formatting, browser-only APIs, invalid HTML — and the right fix for each, with Next.js examples.</description>
+            <category>hydration</category>
+            <category>ssr</category>
+        </item>
+        <item>
+            <title>Deploying my storybook is very simple</title>
+            <link>https://xabierlameiro.com/blog/react/deploying-my-storybook-is-very-simple</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/react/deploying-my-storybook-is-very-simple</guid>
+            <pubDate>Wed, 04 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Deploy your Storybook as a static site so anyone can browse your React components online — the build command, where to host it, and how to wire it into CI. Step by step.</description>
+            <category>storybook</category>
+            <category>ci</category>
+        </item>
+        <item>
+            <title>Fix &quot;Failed to replace env in config: $\{NPM_TOKEN}&quot; in npm and yarn</title>
+            <link>https://xabierlameiro.com/blog/error/npm-token-solution-error</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/error/npm-token-solution-error</guid>
+            <pubDate>Tue, 03 Jan 2023 00:00:00 +0000</pubDate>
+            <description>How to fix the npm/yarn error &quot;Failed to replace env in config: ${NPM_TOKEN}&quot; in one minute: define the missing environment variable that your .npmrc expects, or remove the stale entry.</description>
+            <category>npm</category>
+            <category>yarn</category>
+            <category>ci</category>
+        </item>
+        <item>
+            <title>EADDRINUSE: address already in use — how to free the port</title>
+            <link>https://xabierlameiro.com/blog/error/solve-address-in-use-error</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/error/solve-address-in-use-error</guid>
+            <pubDate>Mon, 02 Jan 2023 00:00:00 +0000</pubDate>
+            <description>Fix the Node.js error &quot;listen EADDRINUSE: address already in use&quot;: find and kill the process holding the port on macOS, Linux and Windows, free it with one command, or just run on another port.</description>
+            <category>node</category>
+            <category>cli</category>
+        </item>
+        <item>
+            <title>How to publish the test coverage report in your React application</title>
+            <link>https://xabierlameiro.com/blog/react/publish-report-testing-react</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/react/publish-report-testing-react</guid>
+            <pubDate>Sun, 01 Jan 2023 00:00:00 +0000</pubDate>
+            <description>I show you how to publish the testing coverage report with jest in your React or Nextjs application, so you or people can see the testing coverage of your project.</description>
+            <category>jest</category>
+            <category>testing</category>
+            <category>ci</category>
+        </item>
+    </channel>
+</rss>
