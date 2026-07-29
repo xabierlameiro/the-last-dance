@@ -57,7 +57,11 @@ jobs:
               run: |
                   cd unit-report
                   cp -r ../public/coverage/ .
-                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  # Deliberately no `Disallow: /` here. A crawler blocked by robots.txt
+                  # never fetches the page, so it never sees the X-Robots-Tag below — and a URL
+                  # Google already knows about then sits in the index instead of dropping out of
+                  # it. `noindex` only removes a page if Googlebot is allowed to crawl it. These
+                  # printf lines were also dead: /robots.txt 404s on every report host today.
                   printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"
@@ -80,7 +84,11 @@ jobs:
               run: |
                   cd e2e-report
                   cp -r ../playwright-report/index.html index.html
-                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  # Deliberately no `Disallow: /` here. A crawler blocked by robots.txt
+                  # never fetches the page, so it never sees the X-Robots-Tag below — and a URL
+                  # Google already knows about then sits in the index instead of dropping out of
+                  # it. `noindex` only removes a page if Googlebot is allowed to crawl it. These
+                  # printf lines were also dead: /robots.txt 404s on every report host today.
                   printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"
@@ -118,7 +126,11 @@ jobs:
               run: |
                   cd doc
                   cp -r ../public/docs/ .
-                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  # Deliberately no `Disallow: /` here. A crawler blocked by robots.txt
+                  # never fetches the page, so it never sees the X-Robots-Tag below — and a URL
+                  # Google already knows about then sits in the index instead of dropping out of
+                  # it. `noindex` only removes a page if Googlebot is allowed to crawl it. These
+                  # printf lines were also dead: /robots.txt 404s on every report host today.
                   printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"
@@ -136,7 +148,11 @@ jobs:
                   npm run build-storybook
                   cd stb-report
                   cp -r ../storybook-static/ .
-                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  # Deliberately no `Disallow: /` here. A crawler blocked by robots.txt
+                  # never fetches the page, so it never sees the X-Robots-Tag below — and a URL
+                  # Google already knows about then sits in the index instead of dropping out of
+                  # it. `noindex` only removes a page if Googlebot is allowed to crawl it. These
+                  # printf lines were also dead: /robots.txt 404s on every report host today.
                   printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"
@@ -173,7 +189,11 @@ jobs:
               run: |
                   cd performance-report
                   cp -r ../lighthouse .
-                  printf 'User-agent: *\nDisallow: /\n' > robots.txt
+                  # Deliberately no `Disallow: /` here. A crawler blocked by robots.txt
+                  # never fetches the page, so it never sees the X-Robots-Tag below — and a URL
+                  # Google already knows about then sits in the index instead of dropping out of
+                  # it. `noindex` only removes a page if Googlebot is allowed to crawl it. These
+                  # printf lines were also dead: /robots.txt 404s on every report host today.
                   printf '{ "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] } ] }\n' > vercel.json
                   git config --global user.email "action@github.com"
                   git config --global user.name "GitHub Action"

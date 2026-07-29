@@ -27,6 +27,21 @@ const Document = (props: Props) => {
                  */}
                 <link rel="icon" href="/favicon.png" title="The favicon" />
                 <link rel="apple-touch-icon" href="/favicon.png" />
+                {/*
+                 * Feed autodiscovery. This lives in _document rather than the SEO
+                 * component so it is present on every page including the ones SEO does not cover
+                 * (the /blog and /blog/<category> hubs, which redirect from getStaticProps).
+                 * Filenames are suffixed, not prefixed: `public/es/feed.xml` would be served at
+                 * /es/feed.xml, but i18n consumes `/es` as a locale prefix before the static
+                 * handler sees the path, so it resolves to the English file. Keep in sync with
+                 * CHANNELS in scripts/generate-feeds.mjs.
+                 */}
+                <link
+                    rel="alternate"
+                    type="application/rss+xml"
+                    title={`Xabier Lameiro — Blog (${locale})`}
+                    href={locale === defaultLocale ? '/feed.xml' : `/feed.${locale}.xml`}
+                />
                 <script
                     type="application/ld+json"
                     key="website-jsonld"

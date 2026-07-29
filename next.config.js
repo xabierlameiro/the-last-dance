@@ -155,7 +155,32 @@ export default withMDX({
                     },
                     // CORS for API routes is handled per-route by src/helpers/cors.ts
                 ],
-            }
+            },
+            // API routes are JSON endpoints with no search value, but nothing ever told
+            // Google that — robots.txt allows everything and no route sets a directive. Search
+            // Console duly has /api/indexed-pages under "Crawled - currently not indexed" (last
+            // crawled 2026-05-31), i.e. Google spent crawl budget on it and decided by itself.
+            //
+            // A header rather than robots.txt Disallow, deliberately: Disallow stops the fetch, so
+            // the crawler never learns the page is noindex and an already-known URL never leaves
+            // the index. noindex only works on a page Googlebot is allowed to fetch.
+            {
+                source: '/api/:path*',
+                headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+            },
+            // The RSS feeds are static files generated into public/ at prebuild, and Vercel serves
+            // public/*.xml as text/xml. Readers accept that, but application/rss+xml is the
+            // registered type and feed validators warn on the generic one. Pinning it here is what
+            // lets the feeds stay static files rather than a serverless route whose only advantage
+            // would have been setting this header itself.
+            //
+            // The paths are listed one by one rather than as `/feed:suffix*.xml`: a named parameter
+            // matches any single segment, which is exactly the over-broad-matcher trap already
+            // removed from the rewrites block above.
+            ...['/feed.xml', '/feed.es.xml', '/feed.gl.xml'].map((source) => ({
+                source,
+                headers: [{ key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' }],
+            })),
         ];
     },
 });

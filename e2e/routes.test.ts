@@ -95,6 +95,98 @@ test.describe('Static pages', () => {
 });
 
 /**
+ * `/api/indexed-pages` sat in Search Console's "Crawled - currently not indexed" because
+ * nothing ever told Google to skip the API surface. Asserted here rather than in the unit suite
+ * because the directive is a `next.config.js` header — it exists only in a served response.
+ */
+test.describe('Index hygiene', () => {
+    test.describe.configure({ mode: 'parallel' });
+
+    // `/api/indexed-pages` is the route Search Console actually crawled. The unrouted paths are the
+    // stronger assertion: the header comes from a `/api/:path*` rule, so it covers the whole
+    // namespace — including any route added later — rather than the handlers that exist today.
+    //
+    // Deliberately not a route that calls a third party (`/api/github-stars` reaches GitHub): the
+    // assertion is about a response header, and waiting on someone else's API to read it is how a
+    // header test turns into a flaky network test.
+    for (const path of ['/api/indexed-pages', '/api/does-not-exist', '/api/nested/unrouted/path']) {
+        test(`should keep ${path} out of the index`, async ({ request }) => {
+            expect((await request.get(path)).headers()['x-robots-tag']).toBe('noindex, nofollow');
+        });
+    }
+
+    test('should leave the blog itself indexable', async ({ request }) => {
+        // The rule is scoped to /api. A wildcard here would silently de-index the whole site, and
+        // that failure would be invisible until traffic disappeared.
+        for (const path of ['/', '/es', '/blog/nextjs/dark-theme']) {
+            expect((await request.get(path)).headers()['x-robots-tag'], `${path} must stay indexable`).toBeUndefined();
+        }
+    });
+});
+
+/**
+ * The feeds are static files generated at prebuild, so a unit test could only assert that
+ * the generator's output matches the generator's own logic. What actually has to hold is served
+ * behaviour: that the build emitted them, that next.config.js overrode Vercel's text/xml, and that
+ * the links inside resolve — the last one matters because PR #164 made cross-locale post URLs 404,
+ * and a feed pointing at one would hand every subscriber a dead link.
+ */
+test.describe('RSS feeds', () => {
+    test.describe.configure({ mode: 'parallel' });
+
+    const FEEDS = {
+        '/feed.xml': { language: 'en', link: 'https://xabierlameiro.com' },
+        '/feed.es.xml': { language: 'es', link: 'https://xabierlameiro.com/es' },
+        '/feed.gl.xml': { language: 'gl', link: 'https://xabierlameiro.com/gl' },
+    };
+
+    for (const [path, { language, link }] of Object.entries(FEEDS)) {
+        test(`should serve ${path} as RSS 2.0 for ${language}`, async ({ request }) => {
+            const response = await request.get(path);
+
+            expect(response.status()).toBe(200);
+            expect(response.headers()['content-type']).toContain('application/rss+xml');
+
+            const body = await response.text();
+            expect(body).toContain('<rss version="2.0"');
+            expect(body).toContain(`<language>${language}</language>`);
+            expect(body).toContain(`<link>${link}</link>`);
+            // One item per post in this locale, each with the guid readers key "already seen" off.
+            expect(body.match(/<item>/g)).toHaveLength(15);
+            expect(body.match(/<guid isPermaLink="true">/g)).toHaveLength(15);
+        });
+    }
+
+    test('should only link post URLs that actually resolve', async ({ request }) => {
+        const body = await (await request.get('/feed.xml')).text();
+        const links = [...body.matchAll(/<link>(https:\/\/xabierlameiro\.com\/blog\/[^<]+)<\/link>/g)].map(
+            ([, url]) => new URL(url).pathname
+        );
+
+        expect(links.length).toBe(15);
+        for (const pathname of links) {
+            expect((await request.get(pathname)).status(), `${pathname} should not be a dead link`).toBe(200);
+        }
+    });
+
+    test('should not carry a noindex directive on the feeds themselves', async ({ request }) => {
+        // The /api/:path* rule must not bleed onto anything a reader subscribes to.
+        const response = await request.get('/feed.xml');
+
+        expect(response.headers()['x-robots-tag']).toBeUndefined();
+    });
+
+    test('should advertise the locale feed for autodiscovery', async ({ page }) => {
+        await page.goto('/es');
+
+        await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute(
+            'href',
+            '/feed.es.xml'
+        );
+    });
+});
+
+/**
  * Locale switching was untested at every level. The unit suite cannot see it — the router mock has
  * no `locale`, and the intl mock returns message ids rather than translations — so nothing in the
  * project verified that the three locale prefixes serve three different languages.

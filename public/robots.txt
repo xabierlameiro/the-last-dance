@@ -46,5 +46,7 @@ Allow: /
 
 # LLM-friendly site map (llmstxt.org): /llms.txt and /llms-full.txt
 
+# RSS feeds, one per locale: /feed.xml (en), /feed.es.xml, /feed.gl.xml
+
 # Sitemaps
 Sitemap: https://xabierlameiro.com/sitemap.xml
