@@ -1,5 +1,5 @@
-/** @type {import('next').NextConfig} */
-import { remarkPlugins } from './mdx.plugins.mjs';
+import type { NextConfig } from 'next';
+import { remarkPlugins } from './mdx.plugins.ts';
 import nextMDX from '@next/mdx';
 
 const withMDX = nextMDX({
@@ -8,7 +8,7 @@ const withMDX = nextMDX({
         /*
          * SDD-L09-T7: this pipeline had its own plugin array, without remark-gfm, while
          * next-mdx-remote had one with it. Same syntax, two sets of rules, depending only on how a
-         * given .mdx file happened to be loaded. Both import `mdx.plugins.mjs` now.
+         * given .mdx file happened to be loaded. Both import `mdx.plugins.ts` now.
          */
         // @next/mdx compiles a real module, so Code Hike can inject the `CH` import itself.
         remarkPlugins: remarkPlugins({ autoImport: true }),
@@ -18,7 +18,7 @@ const withMDX = nextMDX({
     },
 });
 
-export default withMDX({
+const nextConfig: NextConfig = {
     // /about and /contact were standalone pages rendering a plain white panel, which broke the
     // macOS-desktop premise: the only "apps" this site has are the Dock items. Both were already
     // duplicating the home page, where the VS Code window shows the bio (index.tsx), the
@@ -107,12 +107,12 @@ export default withMDX({
                 source: '/:path*',
                 headers: [
                     // Security headers
-                    { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
-                    { key: "X-Frame-Options", value: "DENY" },
-                    { key: "X-Content-Type-Options", value: "nosniff" },
-                    { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-                    { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-                    { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+                    { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+                    { key: 'X-Frame-Options', value: 'DENY' },
+                    { key: 'X-Content-Type-Options', value: 'nosniff' },
+                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+                    { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+                    { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
                     // connect-src must allow GA4 collection endpoints and script-src/frame-src
                     // must allow AdSense, otherwise the CSP silently drops analytics hits and ads.
                     //
@@ -150,8 +150,8 @@ export default withMDX({
                     // COEP `require-corp` is likewise not set: it would block GA4, AdSense and Google
                     // Fonts outright, none of which serve CORP headers.
                     {
-                        key: "Content-Security-Policy",
-                        value: "default-src 'self'; base-uri 'none'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep2.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.google-analytics.com https://*.googlesyndication.com https://ssl.gstatic.com https://gstatic.com https://code.visualstudio.com https://uploads-ssl.webflow.com https://googlecm.hit.gemius.pl; frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google; connect-src 'self' https://api.vercel.com https://api.coingecko.com https://www.ariston-net.remotethermo.com https://www.google.com https://news.google.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://ep1.adtrafficquality.google https://csi.gstatic.com;"
+                        key: 'Content-Security-Policy',
+                        value: "default-src 'self'; base-uri 'none'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep2.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.google-analytics.com https://*.googlesyndication.com https://ssl.gstatic.com https://gstatic.com https://code.visualstudio.com https://uploads-ssl.webflow.com https://googlecm.hit.gemius.pl; frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google; connect-src 'self' https://api.vercel.com https://api.coingecko.com https://www.ariston-net.remotethermo.com https://www.google.com https://news.google.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://ep1.adtrafficquality.google https://csi.gstatic.com;",
                     },
                     // CORS for API routes is handled per-route by src/helpers/cors.ts
                 ],
@@ -183,4 +183,6 @@ export default withMDX({
             })),
         ];
     },
-});
+};
+
+export default withMDX(nextConfig);

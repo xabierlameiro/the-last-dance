@@ -9,6 +9,11 @@
         // `record[key]` is typed as if the element always exists, which is how `e.touches[0]`,
         // `city.split('+')[0]` and a handful of `match[1]` reads got written with no guard.
         "noUncheckedIndexedAccess": true,
+        // SDD-L11. Node runs the migrated scripts through its own type stripping, which does not
+        // read this file and requires explicit `.ts` extensions on relative imports. Without this
+        // flag tsc rejects the very specifiers Node demands. It relaxes no check, and is safe
+        // because tsc never emits here (`noEmit` below); Next compiles with SWC.
+        "allowImportingTsExtensions": true,
         "forceConsistentCasingInFileNames": true,
         "noEmit": true,
         "esModuleInterop": true,

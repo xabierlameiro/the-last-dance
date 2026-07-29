@@ -1,3 +1,21 @@
+import type { Flags } from 'lighthouse/types/lh.js';
+
+/**
+ * SDD-L11-T8. Data for the Lighthouse report runner, typed.
+ *
+ * `translations` is keyed by the three site locales and read as `translations[lang]` in the runner,
+ * so the key type is stated rather than widened to `string`: that is what lets the compiler prove
+ * the lookups there cannot miss.
+ */
+export type Locale = 'en' | 'es' | 'gl';
+
+export type Translation = {
+    title: string;
+    subtitle: string;
+    description: string;
+    lang: string;
+};
+
 export const chart = {
     chart: {
         container: '#OrganiseChart-big-commpany',
@@ -32,7 +50,7 @@ export const nodeStructure = {
     },
 };
 
-export const options = {
+export const options: Flags = {
     logLevel: 'silent', //'info'
     output: 'html',
     onlyCategories: ['performance'],
@@ -58,7 +76,7 @@ export const options = {
 
 export const DOMAIN = 'https://xabierlameiro.com';
 
-export const translations = {
+export const translations: Record<Locale, Translation> = {
     es: {
         title: 'Informes de Lighthouse',
         subtitle: 'Más detalles en cada enlace',

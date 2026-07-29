@@ -1,0 +1,94 @@
+# Uploads each production build's manifests, traces and source maps, keyed by commit.
+#
+# Why this exists: the indexability guard detects when a deploy makes pages non-indexable, and then
+# has to say *which change did it*. Without a build's manifests it can only name a commit range —
+# "something between these twenty commits" — which is the difference between a finding someone acts
+# on and one they close. The artifacts are the map from a URL back to the source that produced it.
+#
+# Runs on `push: master` rather than on pull requests, deliberately. The artifact must describe the
+# commit that is actually serving traffic; a PR build describes a merge that may never happen, and
+# storing it would let attribution point at code that was never deployed.
+#
+# Authentication is OIDC, not an access key. This repository is public: a stored key is readable by
+# every workflow in it, stays valid until someone rotates it, and grants whatever it was given. The
+# federated token here expires in minutes and the role it assumes is pinned to this repo and this
+# ref, and can only PutObject under one prefix — it cannot read the history or delete anything.
+name: Build Artifacts
+
+on:
+    push:
+        branches: [master]
+    # Manual runs let the first upload happen without waiting for a merge.
+    workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    # `id-token: write` is what allows requesting the OIDC token. It is the only
+    # elevated permission here, and `contents: read` keeps the rest least-privilege.
+    contents: read
+    id-token: write
+
+jobs:
+    upload:
+        name: Build and upload attribution artifacts
+        runs-on: ubuntu-22.04
+        # Never block a deploy on the monitoring system's own bookkeeping. A missing
+        # artifact costs attribution detail; a failing job here would cost a red master.
+        continue-on-error: true
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 22
+                  cache: npm
+
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  npm ci --legacy-peer-deps --include=optional
+
+            - name: Build
+              run: npm run build
+
+            - name: Collect artifacts
+              id: collect
+              run: |
+                  set -euo pipefail
+                  mkdir -p artifacts
+                  # Manifests map routes to the chunks that serve them; the trace records what the
+                  # build actually did. Both are small. Missing ones are skipped rather than fatal,
+                  # because which files Next emits varies by router and version.
+                  for f in build-manifest.json prerender-manifest.json routes-manifest.json \
+                           app-build-manifest.json required-server-files.json trace; do
+                      if [ -f ".next/$f" ]; then cp ".next/$f" "artifacts/$f"; fi
+                  done
+
+                  # Source maps, if this build produced any. `productionBrowserSourceMaps` is not
+                  # enabled in next.config.js — turning it on would publish client source maps to
+                  # every visitor, which is the site owner's call and not this workflow's.
+                  if find .next -name '*.map' -print -quit | grep -q .; then
+                      find .next -name '*.map' -exec cp --parents {} artifacts/ \; 2>/dev/null || true
+                  fi
+
+                  echo "count=$(find artifacts -type f | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+                  find artifacts -type f | head -20
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v6
+              with:
+                  role-to-assume: ${{ secrets.AWS_ARTIFACT_ROLE_ARN }}
+                  aws-region: eu-west-1
+
+            - name: Upload to S3 keyed by commit
+              run: |
+                  set -euo pipefail
+                  # The commit SHA is the join key: the deploy webhook carries the same value, so
+                  # a finding can be traced back to exactly this build.
+                  aws s3 cp artifacts "s3://${{ vars.AWS_ARTIFACT_BUCKET }}/build-artifacts/${{ github.sha }}/" \
+                      --recursive --only-show-errors
+                  echo "Uploaded ${{ steps.collect.outputs.count }} files for ${{ github.sha }}"

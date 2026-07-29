@@ -4,19 +4,54 @@
 //
 // Build-time and static rather than a getServerSideProps route: the corpus is already parsed here
 // for llms.txt, and this site has taken a FUNCTION_INVOCATION_TIMEOUT in production, so a new
-// serverless entry point buys nothing that next.config.js headers cannot.
+// serverless entry point buys nothing that next.config.ts headers cannot.
+//
+// Like generate-llms.ts, this runs as `prebuild` and so sits on the deploy path: a throw here fails
+// the Vercel build. That is deliberate — a post that silently vanishes from the feed is worse than
+// a failed deploy, because subscribers never see what they did not receive.
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import * as z from 'zod/mini';
+import { postFrontmatterSchema } from '../src/types/upstream.ts';
+import { describeIssues } from '../src/types/schemas.ts';
 
 const DOMAIN = 'https://xabierlameiro.com';
 const BLOG_DIR = 'data/blog';
 const OUT_DIR = 'public';
 const DEFAULT_LOCALE = 'en';
 
-// Kept in sync with next.config.js `i18n.locales`. The channel metadata is per-locale because a
+/**
+ * The router's frontmatter contract, narrowed to what a feed item needs.
+ *
+ * `slug` and `locale` are required here although the shared schema leaves them optional: an item
+ * with no slug has no link, and one with no locale cannot be assigned to a feed. Sharing
+ * `postFrontmatterSchema` rather than hand-rolling a second contract is the point — `fileReader.ts`
+ * already validates every post, and a private notion of "valid" here would drift from it silently.
+ */
+const feedPostSchema = z.extend(postFrontmatterSchema, {
+    slug: z.string(),
+    locale: z.string(),
+    description: z.optional(z.string()),
+    excerpt: z.optional(z.string()),
+    tags: z.optional(z.array(z.string())),
+});
+
+type FeedPost = {
+    data: z.infer<typeof feedPostSchema>;
+    date: Date;
+};
+
+type Channel = {
+    file: string;
+    language: string;
+    title: string;
+    description: string;
+};
+
+// Kept in sync with next.config.ts `i18n.locales`. The channel metadata is per-locale because a
 // feed reader shows <title>/<description> verbatim in the subscription list.
-const CHANNELS = {
+const CHANNELS: Record<string, Channel> = {
     en: {
         file: 'feed.xml',
         language: 'en',
@@ -40,7 +75,7 @@ const CHANNELS = {
     },
 };
 
-const findMdxFiles = (dir) =>
+const findMdxFiles = (dir: string): string[] =>
     fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
         const full = path.join(dir, entry.name);
         if (entry.isDirectory()) return findMdxFiles(full);
@@ -53,10 +88,10 @@ const findMdxFiles = (dir) =>
  * non-ISO date as LOCAL midnight, which shifted every post one day early in timezones ahead of
  * UTC — the same bug already fixed for the sitemap's <lastmod>. See helpers/fileReader.ts.
  */
-const extractPostDate = (content) => {
+const extractPostDate = (content: string): Date | null => {
     const match = content.match(/<Date\s+date="(\d{2})-(\d{2})-(\d{4})"/);
     if (!match) return null;
-    const [, month, day, year] = match;
+    const [, month, day, year] = match as unknown as [string, string, string, string];
     const utcDate = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
     // Date.UTC rolls overflow over ("13-40-2023"), so a round-trip mismatch means it was never a
     // real calendar date.
@@ -64,22 +99,28 @@ const extractPostDate = (content) => {
     return utcDate;
 };
 
-const readPosts = () =>
-    findMdxFiles(BLOG_DIR)
-        .map((file) => {
-            const { data, content } = matter(fs.readFileSync(file, 'utf8'));
-            return { data, date: extractPostDate(content) };
-        })
-        .filter(({ data, date }) => data.slug && data.locale && date);
+const readPosts = (): FeedPost[] =>
+    findMdxFiles(BLOG_DIR).map((file) => {
+        const { data, content } = matter(fs.readFileSync(file, 'utf8'));
+        const parsed = feedPostSchema.safeParse(data);
+        if (!parsed.success) {
+            throw new Error(`Invalid frontmatter in ${path.basename(file)}: ${describeIssues(parsed.error.issues)}`);
+        }
+        const date = extractPostDate(content);
+        if (!date) {
+            throw new Error(`No parseable <Date date="MM-DD-YYYY" /> in ${path.basename(file)}`);
+        }
+        return { data: parsed.data, date };
+    });
 
 // English is the default locale and carries no prefix; the other two are served under /<locale>.
-const localeBase = (locale) => (locale === DEFAULT_LOCALE ? DOMAIN : `${DOMAIN}/${locale}`);
+const localeBase = (locale: string): string => (locale === DEFAULT_LOCALE ? DOMAIN : `${DOMAIN}/${locale}`);
 
-const postUrl = ({ locale, category, slug }) =>
+const postUrl = ({ locale, category, slug }: FeedPost['data']): string =>
     `${localeBase(locale)}/blog/${String(category).toLowerCase()}/${slug}`;
 
-const escapeXml = (value) =>
-    String(value)
+const escapeXml = (value: string): string =>
+    value
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
@@ -92,15 +133,15 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 // RSS 2.0 requires RFC 822 dates. toUTCString() emits "Sat, 18 Jul 2026 00:00:00 GMT" on Node,
 // but that is a spec'd *HTTP* format rather than a guaranteed RSS one — building it explicitly
 // keeps the output pinned to what feed validators expect.
-const toRfc822 = (date) => {
-    const pad = (n) => String(n).padStart(2, '0');
+const toRfc822 = (date: Date): string => {
+    const pad = (n: number): string => String(n).padStart(2, '0');
     return (
         `${DAYS[date.getUTCDay()]}, ${pad(date.getUTCDate())} ${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()} ` +
         `${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())} +0000`
     );
 };
 
-const renderItem = ({ data, date }) => {
+const renderItem = ({ data, date }: FeedPost): string => {
     const url = postUrl(data);
     return [
         '        <item>',
@@ -116,12 +157,11 @@ const renderItem = ({ data, date }) => {
     ].join('\n');
 };
 
-const renderFeed = (locale, posts) => {
-    const channel = CHANNELS[locale];
+const renderFeed = (locale: string, channel: Channel, posts: FeedPost[]): string => {
     const selfUrl = `${DOMAIN}/${channel.file}`;
-    // Newest post date, not Date.now(). The generated files are committed, so a
-    // wall-clock timestamp would put a spurious one-line diff in every single build.
-    const lastBuildDate = toRfc822(posts[0].date);
+    // Newest post date, not Date.now(). The generated files are committed, so a wall-clock
+    // timestamp would put a spurious one-line diff in every single build.
+    const lastBuildDate = toRfc822(posts[0]!.date);
 
     return [
         '<?xml version="1.0" encoding="UTF-8"?>',
@@ -147,13 +187,12 @@ for (const [locale, channel] of Object.entries(CHANNELS)) {
     const localePosts = posts
         .filter(({ data }) => data.locale === locale)
         // Newest first. Ties break on slug so the output does not depend on readdir order.
-        .sort((a, b) => b.date - a.date || a.data.slug.localeCompare(b.data.slug));
+        .sort((a, b) => b.date.getTime() - a.date.getTime() || a.data.slug.localeCompare(b.data.slug));
 
     if (localePosts.length === 0) {
-        console.error(`[feeds] no posts found for locale "${locale}" — skipping ${channel.file}`);
-        continue;
+        throw new Error(`No posts found for locale "${locale}" — refusing to write an empty ${channel.file}`);
     }
 
-    fs.writeFileSync(path.join(OUT_DIR, channel.file), renderFeed(locale, localePosts));
+    fs.writeFileSync(path.join(OUT_DIR, channel.file), renderFeed(locale, channel, localePosts));
     console.log(`[feeds] ${channel.file}: ${localePosts.length} items`);
 }

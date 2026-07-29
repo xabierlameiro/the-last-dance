@@ -1,0 +1,25 @@
+{
+    // SDD-L11-T9/T10. Config files the root tsconfig cannot see, checked with the same options.
+    //
+    // Two separate blind spots. First: the root `include` only matches `**/*.ts(x)`, so `allowJs` is inert and
+    // no `.js` file is in the compiler's scope — a `// @ts-check` header there would show squiggles
+    // in an editor and prove nothing in CI. This project adds the checkable ones to the same
+    // compiler options without touching the root config, and `npm run typecheck` runs both.
+    //
+    // Only `jest.config.js` is listed. The other three jest files use bare `jest`, `beforeEach` and
+    // friends, which have no ambient declarations here: `@types/jest` is not installed (jest@29 ships
+    // `@jest/globals` for explicit imports instead). Enabling `@ts-check` on them today produces 25
+    // errors that are all "this global has no type", not real defects, so they stay unchecked until
+    // either `@types/jest` is added or the mocks import from `@jest/globals`.
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        // The root config is incremental; a second project must not fight it for the same buildinfo.
+        "incremental": false
+    },
+    // Second: TypeScript's include globs skip directories whose name starts with a dot, so
+    // `**/*.ts` never matched `.storybook/`. Migrating those files to TypeScript in T7 therefore
+    // typechecked nothing until they were named here — found by injecting a deliberate error and
+    // watching `npm run typecheck` stay green.
+    "include": ["jest.config.js", ".storybook/**/*.ts", ".storybook/**/*.tsx"],
+    "exclude": ["node_modules"]
+}
