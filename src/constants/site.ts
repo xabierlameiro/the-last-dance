@@ -23,6 +23,17 @@ export const personDescription: Record<string, string> = {
     gl: 'Arquitecto de software galego. Desenvolve produtos web para os sectores bancario e retail —CaixaBank, Openbank e Inditex— traballando sobre todo con React, Next.js e TypeScript, con especial interese en testing, automatización e o IoT.',
 };
 
+/**
+ * SDD-L12-T2 (decision D5). This list used to carry five more entries — Storybook, Docs, Coverage,
+ * e2e and Lighthouse, the artifact subdomains. Together with the widgets, the header needed 1526 px
+ * of content at every viewport: 246 px of it unreachable on a 1280 px laptop and roughly 1150 px on
+ * a phone, since `.header` is a 24 px strip with `overflow: scroll`. Widgets sat off-screen with a
+ * horizontal drag as their only affordance, which is what a reader reported on 2026-07-30.
+ *
+ * Removing them also removes five followed outbound links from every page, which is the other half
+ * of decision D2 (`coverage.` is `noindex`ed separately). The subdomains are still published and
+ * still linked from the docs that reference them — they simply no longer ride on every page.
+ */
 export const socialLinks = [
     {
         href: 'https://www.linkedin.com/in/xlameiro',
@@ -41,36 +52,6 @@ export const socialLinks = [
         title: 'Reddit profile',
         name: 'Reddit',
         testId: 'reddit-link',
-    },
-    {
-        href: 'https://storybook.xabierlameiro.com',
-        title: 'Storybook',
-        name: 'Storybook',
-        testId: 'storybook-link',
-    },
-    {
-        href: 'https://docs.xabierlameiro.com',
-        title: 'Docs',
-        name: 'Docs',
-        testId: 'docs-link',
-    },
-    {
-        href: 'https://coverage.xabierlameiro.com',
-        title: 'Coverage',
-        name: 'Coverage',
-        testId: 'coverage-link',
-    },
-    {
-        href: 'https://e2e.xabierlameiro.com',
-        title: 'e2e',
-        name: 'e2e',
-        testId: 'e2e-link',
-    },
-    {
-        href: 'https://performance.xabierlameiro.com',
-        title: 'Lighthouse',
-        name: 'Lighthouse',
-        testId: 'lighthouse-link',
     },
 ];
 
