@@ -24,15 +24,19 @@ export const personDescription: Record<string, string> = {
 };
 
 /**
- * SDD-L12-T2 (decision D5). This list used to carry five more entries — Storybook, Docs, Coverage,
- * e2e and Lighthouse, the artifact subdomains. Together with the widgets, the header needed 1526 px
- * of content at every viewport: 246 px of it unreachable on a 1280 px laptop and roughly 1150 px on
- * a phone, since `.header` is a 24 px strip with `overflow: scroll`. Widgets sat off-screen with a
- * horizontal drag as their only affordance, which is what a reader reported on 2026-07-30.
+ * SDD-L12-T8 (decision D5, revised 2026-08-03). These eight are the header's **status items**, and
+ * they render as icons on the right, the way a macOS menu bar does: text menus on the left, icons on
+ * the right, clock last.
  *
- * Removing them also removes five followed outbound links from every page, which is the other half
- * of decision D2 (`coverage.` is `noindex`ed separately). The subdomains are still published and
- * still linked from the docs that reference them — they simply no longer ride on every page.
+ * T2 briefly deleted the five artifact entries to make the header fit. That bought the space but
+ * lost the shelf, and the shelf is part of what the design is *for* — so the space comes from the
+ * icons instead. Eight text labels cost 358 px; eight icons cost about a fifth of that.
+ *
+ * `priority` is how the bar behaves when it still does not fit, which below 768 px it will not:
+ * items drop from the right by ascending priority, exactly as macOS sheds status items on a narrow
+ * screen. 1 survives everywhere; 3 is the first to go.
+ *
+ * The icon itself lives in the Header component, not here — this file stays data, no React.
  */
 export const socialLinks = [
     {
@@ -40,18 +44,56 @@ export const socialLinks = [
         title: 'Linkedin profile',
         name: 'Linkedin',
         testId: 'linkedin-link',
+        priority: 2,
     },
     {
         href: 'https://github.com/xabierlameiro',
         title: 'Github profile',
         name: 'Github',
         testId: 'github-link',
+        priority: 2,
     },
     {
         href: 'https://www.reddit.com/user/xlameiro',
         title: 'Reddit profile',
         name: 'Reddit',
         testId: 'reddit-link',
+        priority: 2,
+    },
+    {
+        href: 'https://storybook.xabierlameiro.com',
+        title: 'Storybook',
+        name: 'Storybook',
+        testId: 'storybook-link',
+        priority: 3,
+    },
+    {
+        href: 'https://docs.xabierlameiro.com',
+        title: 'Docs',
+        name: 'Docs',
+        testId: 'docs-link',
+        priority: 3,
+    },
+    {
+        href: 'https://coverage.xabierlameiro.com',
+        title: 'Coverage',
+        name: 'Coverage',
+        testId: 'coverage-link',
+        priority: 3,
+    },
+    {
+        href: 'https://e2e.xabierlameiro.com',
+        title: 'e2e',
+        name: 'e2e',
+        testId: 'e2e-link',
+        priority: 3,
+    },
+    {
+        href: 'https://performance.xabierlameiro.com',
+        title: 'Lighthouse',
+        name: 'Lighthouse',
+        testId: 'lighthouse-link',
+        priority: 3,
     },
 ];
 

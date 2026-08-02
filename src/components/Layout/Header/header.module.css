@@ -1,26 +1,85 @@
+/**
+ * SDD-L12-T8. The menu bar, laid out the way macOS lays one out.
+ *
+ * It used to be a single nine-column grid — `auto max-content auto 1fr repeat(6, auto)` — with every
+ * widget in one run and `overflow: scroll` to absorb whatever did not fit. That is how 1526 px of
+ * content ended up inside a 1280 px window with 246 px of it unreachable.
+ *
+ * Now there are three zones. `.left` is the app identity (logo + route), `.right` is the status
+ * items and the clock, and `.center` is absolutely positioned so the countdown sits in the middle of
+ * the *window* rather than in the middle of whatever space the two sides happen to leave — the
+ * asymmetry between them is large, so a grid track would visibly push it off-centre.
+ */
 .header {
+    position: relative;
     height: 24px;
     background: var(--header-background);
     color: rgba(var(--blog-icons));
     display: grid;
-    grid-template-columns: auto max-content auto 1fr repeat(6, auto);
+    /**
+     * Three real tracks, not two plus an absolutely-positioned middle.
+     *
+     * The middle was `position: absolute; left: 50%` at first, so it sat on the window's true centre
+     * — and silently covered the last three status icons, because a positioned element does not
+     * negotiate space with anything. The hit test was unambiguous: `elementFromPoint` over the
+     * coverage, e2e and Lighthouse icons returned the countdown, so those three links were
+     * unclickable while looking perfectly fine.
+     *
+     * A grid track cannot do that. The cost is that the countdown sits in the middle of the space
+     * the two sides leave rather than the middle of the window: with a 66 px left zone and an
+     * ~870 px right zone, true centring at 1280 px is arithmetically impossible — the right zone
+     * would have to start before the countdown ends. It only becomes possible above ~1940 px.
+     * Not overlapping is worth more than being 200 px off centre.
+     */
+    grid-template-columns: auto 1fr auto;
     gap: 20px;
     align-items: center;
     padding: 0 18px;
     /**
-     * SDD-L12-T3. Was `overflow: scroll`, which paints a scrollbar whether or not there is anything
-     * to scroll. Chromium on macOS hid that behind overlay scrollbars; Firefox, and macOS with
-     * "Show scroll bars: Always", painted a bar across a 24px strip permanently — reported by a
-     * reader on 2026-07-30. `auto` paints one only when the content really does not fit, which
-     * after T2 means at 768px and below.
+     * SDD-L12-T3/T8. This was `overflow: scroll`, which paints a scrollbar whether or not there is
+     * anything to scroll — invisible under Chromium's overlay scrollbars on macOS, permanent in
+     * Firefox and under "Show scroll bars: Always". T3 made it `auto`; T8 makes it `visible`, which
+     * is what a menu bar actually needs.
      *
-     * The companion `::-webkit-scrollbar { display: none }` is gone with it. It hid the bar in
-     * WebKit while Gecko had no equivalent, so the two engines disagreed by construction — and
-     * SDD-L06 (`globals.css:126-131`) had already ruled that hiding this particular bar was wrong,
-     * because it is the only cue that widgets continue past the edge.
+     * The reason is the weather panel: it is a 400 px `position: absolute` popover anchored to the
+     * clock, and a closed popover still has a box. Any scroll container it hangs off — `scroll` or
+     * `auto`, no difference — counts it as content and grows a scroll area by 440 px at every
+     * viewport. Measured: `header.scrollWidth` was `clientWidth + 440` at 1024, 1280 and 1920 alike,
+     * which is the signature of a positioned child rather than of a bar that does not fit.
+     *
+     * So part of the original "the header overflows" reading was never menu-bar content at all. The
+     * bar itself now fits by construction (T8's three zones plus priority shedding); popovers are
+     * supposed to escape it, which is exactly what `visible` allows and what a real menu bar does.
+     *
+     * The companion `::-webkit-scrollbar { display: none }` is gone too. It hid the bar in WebKit
+     * while Gecko had no equivalent, so the two engines disagreed by construction — and SDD-L06
+     * (`globals.css:126-131`) had already ruled that hiding this particular bar was wrong.
      */
-    overflow: auto;
+    overflow: visible;
     white-space: nowrap;
+}
+
+.left {
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Centred within its own track, so it can never sit on top of the status items. */
+.center {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    min-width: 0;
+}
+
+.right {
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: end;
+    gap: 14px;
 }
 
 .header svg {
@@ -52,16 +111,64 @@
     font-family: inherit;
 }
 
+/**
+ * SDD-L12-T8. The status items, as icons. They were text labels — eight of them, 358 px — which is
+ * most of why the bar did not fit. macOS puts text menus on the left and icons on the right, so
+ * this is both the cheaper and the more faithful arrangement.
+ */
 .navLinks {
     display: grid;
     grid-auto-flow: column;
-    gap: 20px;
+    gap: 14px;
     width: max-content;
+    align-items: center;
 }
 
 .navLinks a {
-    font-size: 14px;
-    font-weight: 400;
+    display: flex;
+    align-items: center;
     color: rgba(var(--blog-icons));
     text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.navLinks a:hover svg {
+    opacity: 0.7;
+}
+
+/**
+ * Priority-based shedding, which is what macOS does when the bar runs out of room: status items drop
+ * from the right and the clock never does. Ascending priority goes first.
+ *
+ * `priority1` is implicit — anything without one of these classes stays at every width. The two
+ * breakpoints are the ones the rest of the layout already uses (768, 1023), so the bar changes shape
+ * at the same widths as everything else instead of inventing a third set.
+ */
+@media screen and (max-width: 1023px) {
+    /**
+     * `.navLinks a` sets `display: flex` and is one selector more specific than a bare `.priority3`,
+     * so the plain class lost and every icon stayed visible at every width — measured as
+     * `visibleLinks: 8` at 375 px. Both forms are listed rather than reaching for `!important`.
+     */
+    .priority3,
+    .navLinks a.priority3 {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .priority2,
+    .navLinks a.priority2 {
+        display: none;
+    }
+
+    /* Below the tablet breakpoint the middle is the first thing to collide with the two sides. */
+    .center {
+        display: none;
+    }
+
+    .header {
+        gap: 12px;
+    }
 }

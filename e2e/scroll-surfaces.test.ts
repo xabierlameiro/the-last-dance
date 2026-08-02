@@ -8,8 +8,13 @@ import { expect, test } from './fixtures';
  *
  * 1. **The header does not fit.** Measured on `master` @ `4d1d898`, its content needed 1526 px at
  *    every viewport: 246 px unreachable on a 1280 px laptop, 1151 px on a phone. The widgets past
- *    the fold could only be reached by dragging horizontally inside a 24-pixel-tall strip. L12-T2
- *    removed the five artifact links (decision D5) and brought that down to 1168 px.
+ *    the fold could only be reached by dragging horizontally inside a 24-pixel-tall strip.
+ *
+ *    L12-T2 first removed the five artifact links, which fixed 1280 and 1920 and left 768 and 375
+ *    still overflowing — the remaining width was widgets, not links. L12-T8 replaced that approach
+ *    with the layout the design was reaching for: three zones, status items as icons on the right,
+ *    and priority-based shedding below 1023 px and 768 px, the way a macOS menu bar behaves. The
+ *    links came back. All four viewports are asserted, none skipped.
  *
  * 2. **`overflow: scroll` where `auto` was meant.** `scroll` paints a scrollbar unconditionally;
  *    `auto` paints one only when there is something to scroll. Chromium on macOS hides the
@@ -34,6 +39,42 @@ const VIEWPORTS = [
     { width: 1280, height: 720, name: 'laptop' },
     { width: 1920, height: 1080, name: 'desktop' },
 ];
+
+/**
+ * Measures the *bar*, not the scroll box.
+ *
+ * `header.scrollWidth` looked like the obvious metric and is the wrong one: the weather popover is a
+ * 400 px absolutely-positioned child, and a closed popover still has a box, so scrollWidth read
+ * `clientWidth + 440` at 1024, 1280 and 1920 alike — a constant offset that says "a positioned child
+ * hangs off the edge", not "the menu bar does not fit". Popovers are supposed to escape a menu bar.
+ *
+ * What actually matters is that the three zones fit inside the header and do not run into each
+ * other, so that is what is measured.
+ */
+const readHeaderZones = (page: Page) =>
+    page.evaluate(() => {
+        const header = document.querySelector('header');
+        if (!header) throw new Error('no <header> in the document');
+
+        const bounds = header.getBoundingClientRect();
+        const zone = (selector: string) => {
+            const element = header.querySelector(selector);
+            if (!element || getComputedStyle(element).display === 'none') return null;
+            const rect = element.getBoundingClientRect();
+            return { left: Math.round(rect.left), right: Math.round(rect.right), width: Math.round(rect.width) };
+        };
+
+        return {
+            headerLeft: Math.round(bounds.left),
+            headerRight: Math.round(bounds.right),
+            left: zone('[class*="left"]'),
+            center: zone('[class*="center"]'),
+            right: zone('[class*="right"]'),
+            visibleLinks: [...header.querySelectorAll('nav a')].filter(
+                (link) => getComputedStyle(link).display !== 'none',
+            ).length,
+        };
+    });
 
 const readHeaderWidths = (page: Page) =>
     page.evaluate(() => {
@@ -64,33 +105,77 @@ const waitForStableHeader = async (page: Page) => {
 test.describe('Scroll surfaces', () => {
     for (const viewport of VIEWPORTS) {
         test(`header fits without horizontal scrolling at ${viewport.width}px (${viewport.name})`, async ({ page }) => {
-            /**
-             * L12-T2 removed the five artifact links and the header went from 1526 px to 1168 px —
-             * so it now fits a 1280 px laptop and anything wider, which is where the defect was
-             * reported. It does **not** fit 768 or 375, and no further link removal will make it:
-             * the remaining 1168 px is widgets (a five-segment countdown, weather, crypto, two
-             * counters, heating, date) inside a 24 px strip.
-             *
-             * Closing these two needs the narrow-viewport half of D5 — option 3, priority-based
-             * hiding or an overflow menu — which is a product decision, not a CSS fix. Skipped
-             * with the reason attached rather than deleted, so the gap stays visible and measured.
-             */
-            test.skip(
-                viewport.width < 1280,
-                'needs the narrow-viewport decision (D5 option 3): 1168px of widgets cannot fit a 24px strip',
-            );
-
             await page.setViewportSize({ width: viewport.width, height: viewport.height });
             await page.goto('/');
             await expect(page.getByTestId('header')).toBeVisible();
+            await waitForStableHeader(page);
 
-            const { scrollWidth, clientWidth } = await waitForStableHeader(page);
+            const zones = await readHeaderZones(page);
+            const describe = JSON.stringify(zones);
+
+            expect(zones.left, `no left zone at ${viewport.width}px: ${describe}`).not.toBeNull();
+            expect(zones.right, `no right zone at ${viewport.width}px: ${describe}`).not.toBeNull();
 
             expect(
-                scrollWidth,
-                `header needs ${scrollWidth}px but has ${clientWidth}px: ` +
-                    `${scrollWidth - clientWidth}px of it is unreachable without a horizontal drag`,
-            ).toBeLessThanOrEqual(clientWidth);
+                zones.right!.right,
+                `the status items run past the right edge of the bar at ${viewport.width}px: ${describe}`,
+            ).toBeLessThanOrEqual(zones.headerRight);
+
+            expect(
+                zones.left!.left,
+                `the app identity starts before the left edge at ${viewport.width}px: ${describe}`,
+            ).toBeGreaterThanOrEqual(zones.headerLeft);
+
+            // The middle zone is the one that collides first when the two sides grow. Below 768px it
+            // is deliberately not rendered.
+            //
+            // Both neighbours are asserted. The first version of this test only checked the left
+            // side, and the countdown was covering the last three status icons on the right the
+            // whole time — `elementFromPoint` over the coverage, e2e and Lighthouse links returned
+            // the countdown, so three links were unclickable and this suite said nothing.
+            if (zones.center) {
+                expect(
+                    zones.center.left,
+                    `the countdown overlaps the app identity at ${viewport.width}px: ${describe}`,
+                ).toBeGreaterThanOrEqual(zones.left!.right);
+
+                expect(
+                    zones.center.right,
+                    `the countdown overlaps the status items at ${viewport.width}px: ${describe}`,
+                ).toBeLessThanOrEqual(zones.right!.left);
+            }
+        });
+
+        test(`every status item is clickable at ${viewport.width}px (${viewport.name})`, async ({ page }) => {
+            await page.setViewportSize({ width: viewport.width, height: viewport.height });
+            await page.goto('/');
+            await expect(page.getByTestId('header')).toBeVisible();
+            await waitForStableHeader(page);
+
+            /**
+             * Geometry alone is not enough: an element can be inside the bar and still be covered by
+             * something painted over it. This asks the browser what is actually on top at each
+             * icon's centre — the check that would have caught the countdown overlap immediately.
+             */
+            const covered = await page.evaluate(() => {
+                const header = document.querySelector('header');
+                if (!header) throw new Error('no <header> in the document');
+
+                return [...header.querySelectorAll('nav a')]
+                    .filter((link) => getComputedStyle(link).display !== 'none')
+                    .map((link) => {
+                        const rect = link.getBoundingClientRect();
+                        const top = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                        const reachable = top === link || link.contains(top);
+                        return reachable
+                            ? null
+                            : `${(link as HTMLElement).dataset.testid} is covered by ` +
+                                  `${top?.tagName.toLowerCase()}.${String(top?.className).slice(0, 40)}`;
+                    })
+                    .filter(Boolean);
+            });
+
+            expect(covered, `status items are not reachable: ${covered.join(' | ')}`).toEqual([]);
         });
     }
 

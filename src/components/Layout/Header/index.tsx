@@ -1,6 +1,17 @@
 import React, { ReactNode } from 'react';
 import styles from './header.module.css';
-import { SiBitcoincash } from 'react-icons/si';
+import type { IconType } from 'react-icons';
+import {
+    SiBitcoincash,
+    SiCodecov,
+    SiGithub,
+    SiLighthouse,
+    SiLinkedin,
+    SiPlaywright,
+    SiReadthedocs,
+    SiReddit,
+    SiStorybook,
+} from 'react-icons/si';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import { socialLinks, translateRoute } from '@/constants/site';
@@ -79,7 +90,23 @@ const Route = () => {
 };
 
 /**
- * @description Social links component
+ * SDD-L12-T8. One icon per status item, keyed by `testId` so a rename in `site.ts` fails loudly
+ * here rather than silently rendering nothing. Kept in the component because `site.ts` is data —
+ * importing React components into it would make every consumer of the constants pull in icons.
+ */
+const STATUS_ICONS: Record<string, IconType> = {
+    'linkedin-link': SiLinkedin,
+    'github-link': SiGithub,
+    'reddit-link': SiReddit,
+    'storybook-link': SiStorybook,
+    'docs-link': SiReadthedocs,
+    'coverage-link': SiCodecov,
+    'e2e-link': SiPlaywright,
+    'lighthouse-link': SiLighthouse,
+};
+
+/**
+ * @description The status items of the menu bar: profile and artifact links, as icons on the right.
  * @returns {JSX.Element}
  */
 const NavLinks = () => {
@@ -89,18 +116,27 @@ const NavLinks = () => {
         // SDD-L05: landmark navigation listed "navigation, navigation" (four of them on a post page)
         // with nothing to tell the social links from the Dock from the category sidebar.
         <nav className={styles.navLinks} aria-label={f({ id: 'nav.social' })}>
-            {socialLinks.map((item) => (
-                <a
-                    key={item.href}
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title={item.title}
-                    data-testid={item.testId}
-                >
-                    {item.name}
-                </a>
-            ))}
+            {socialLinks.map((item) => {
+                const Icon = STATUS_ICONS[item.testId];
+
+                return (
+                    <a
+                        key={item.href}
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={item.title}
+                        data-testid={item.testId}
+                        // SDD-L12-T8: the visible label is now an icon, so the accessible name has
+                        // to come from here. Without it these read as "link, link, link" — the
+                        // exact defect L05/L06 spent two phases removing from the rest of the page.
+                        aria-label={item.title}
+                        className={styles[`priority${item.priority}`]}
+                    >
+                        {Icon ? <Icon aria-hidden="true" /> : item.name}
+                    </a>
+                );
+            })}
         </nav>
     );
 };
@@ -124,19 +160,43 @@ const Header = ({ children }: { children?: ReactNode }) => {
 
     return (
         <header data-testid="header" className={styles.header}>
-            <SiBitcoincash aria-hidden="true" />
-            <Route />
-            <NavLinks />
-            <CountDown date="2026-12-11T00:00:00+00:00" caption={f({ id: 'countdown.caption' })} />
-            <DeploymentStatus />
-            <CryptoPrice />
-            <IndexedCounter />
-            <ViewCounter all />
-            <Heating />
-            <DateAndHour>
-                <Weather cities={['limerick+ireland', 'moraña+galicia', 'vilagarcía+galicia']} />
-            </DateAndHour>
-            {children}
+            {/**
+             * SDD-L12-T8. Three zones, because that is what a macOS menu bar is: the app identity on
+             * the left, the clock and status items on the right, and — here — the countdown holding
+             * the middle. It replaced a nine-column grid that laid every widget out in a single run
+             * and simply overflowed when the run got long.
+             */}
+            <div className={styles.left}>
+                <SiBitcoincash aria-hidden="true" />
+                <Route />
+            </div>
+
+            <div className={styles.center}>
+                <CountDown date="2026-12-11T00:00:00+00:00" caption={f({ id: 'countdown.caption' })} />
+            </div>
+
+            <div className={styles.right}>
+                <NavLinks />
+                <span className={styles.priority2}>
+                    <DeploymentStatus />
+                </span>
+                <span className={styles.priority3}>
+                    <CryptoPrice />
+                </span>
+                <span className={styles.priority3}>
+                    <IndexedCounter />
+                </span>
+                <span className={styles.priority3}>
+                    <ViewCounter all />
+                </span>
+                <span className={styles.priority3}>
+                    <Heating />
+                </span>
+                <DateAndHour>
+                    <Weather cities={['limerick+ireland', 'moraña+galicia', 'vilagarcía+galicia']} />
+                </DateAndHour>
+                {children}
+            </div>
         </header>
     );
 };
