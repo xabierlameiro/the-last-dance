@@ -17,7 +17,14 @@
 }
 
 .container {
-    overflow-y: scroll;
+    /**
+     * SDD-L12-T4. A real scroller, kept: this is the news ticker, with `scroll-snap-type` and smooth
+     * behaviour built on top of it. `auto` rather than `scroll` so an empty or one-item feed does
+     * not render a bar for nothing. The custom 2px `::-webkit-scrollbar` below is deliberate and
+     * left alone — though note it disagrees with the 8px SDD-L06 set globally, which is a contrast
+     * and target-size question for that phase, not this one.
+     */
+    overflow-y: auto;
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
     height: inherit;

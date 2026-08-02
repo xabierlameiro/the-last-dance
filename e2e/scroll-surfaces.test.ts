@@ -21,6 +21,13 @@ import { expect, test } from './fixtures';
  * wide — which is exactly why this went unnoticed on the development machine.
  */
 
+/**
+ * One route per surface that owns a scroller: the home window, the blog (body + article controls)
+ * and a legal document. `/blog` rather than a single post, so the check does not depend on a slug
+ * surviving a future content edit.
+ */
+const SCROLLER_ROUTES = ['/', '/blog', '/legal/privacy-policy'];
+
 const VIEWPORTS = [
     { width: 375, height: 812, name: 'mobile' },
     { width: 768, height: 1024, name: 'tablet' },
@@ -56,9 +63,7 @@ const waitForStableHeader = async (page: Page) => {
 
 test.describe('Scroll surfaces', () => {
     for (const viewport of VIEWPORTS) {
-        test(`header fits without horizontal scrolling at ${viewport.width}px (${viewport.name})`, async ({
-            page,
-        }) => {
+        test(`header fits without horizontal scrolling at ${viewport.width}px (${viewport.name})`, async ({ page }) => {
             /**
              * L12-T2 removed the five artifact links and the header went from 1526 px to 1168 px —
              * so it now fits a 1280 px laptop and anything wider, which is where the defect was
@@ -72,7 +77,7 @@ test.describe('Scroll surfaces', () => {
              */
             test.skip(
                 viewport.width < 1280,
-                'needs the narrow-viewport decision (D5 option 3): 1168px of widgets cannot fit a 24px strip'
+                'needs the narrow-viewport decision (D5 option 3): 1168px of widgets cannot fit a 24px strip',
             );
 
             await page.setViewportSize({ width: viewport.width, height: viewport.height });
@@ -84,37 +89,67 @@ test.describe('Scroll surfaces', () => {
             expect(
                 scrollWidth,
                 `header needs ${scrollWidth}px but has ${clientWidth}px: ` +
-                    `${scrollWidth - clientWidth}px of it is unreachable without a horizontal drag`
+                    `${scrollWidth - clientWidth}px of it is unreachable without a horizontal drag`,
             ).toBeLessThanOrEqual(clientWidth);
         });
     }
 
     /**
-     * Marked `test.fail()`: the defect is real today, so the assertion below is expected to fail and
-     * the suite stays green while it does. L12-T3/T4 change `overflow: scroll` to `auto` on the
-     * header and the dialog body and sweep the rest — at which point this test starts *passing*,
-     * Playwright reports the unexpected pass as a failure, and whoever did T3 removes the marker.
-     * That is the point: unlike a skip, this cannot be forgotten, and it never stops running.
+     * L12-T3/T4. This shipped as `test.fail()` while the defect existed: the suite stayed green, and
+     * the moment T3 changed `scroll` to `auto` Playwright reported "expected to fail, but passed" —
+     * which is how the marker got removed instead of forgotten.
+     *
+     * The routes are the ones that own the remaining scrollers: the blog body and the article
+     * controls (T4), and the legal document surface (T4). Checking only `/` would have declared the
+     * sweep done while three untouched `overflow: scroll` rules were still live one route away.
      */
-    test('no element paints a scrollbar it does not need', async ({ page }) => {
-        // Inside the body, so it marks this test only — at describe scope it would mark every test.
-        test.fail();
+    for (const route of SCROLLER_ROUTES) {
+        test(`no element paints a scrollbar it does not need on ${route}`, async ({ page }) => {
+            await page.setViewportSize({ width: 1280, height: 720 });
+            await page.goto(route);
+            await expect(page.getByTestId('header')).toBeVisible();
+            await waitForStableHeader(page);
 
+            const gratuitous = await page.evaluate(() =>
+                [...document.querySelectorAll('*')]
+                    .filter((element) => {
+                        const style = getComputedStyle(element);
+                        if (style.overflowX !== 'scroll' && style.overflowY !== 'scroll') return false;
+                        return (
+                            element.scrollWidth <= element.clientWidth && element.scrollHeight <= element.clientHeight
+                        );
+                    })
+                    .map((element) => `${element.tagName.toLowerCase()}.${element.className}`),
+            );
+
+            expect(gratuitous, `these declare overflow: scroll but never overflow: ${gratuitous.join(', ')}`).toEqual(
+                [],
+            );
+        });
+    }
+
+    /**
+     * The other half of T4: proving the sweep removed bars without removing *scrolling*. `auto` and
+     * `scroll` differ only in whether the bar is painted when there is nothing to scroll, so this
+     * should hold by construction — but "should hold by construction" is exactly the claim that
+     * earns a test, and the article body is the surface a reader would notice losing.
+     */
+    test('the article body still scrolls after the sweep', async ({ page }) => {
         await page.setViewportSize({ width: 1280, height: 720 });
-        await page.goto('/');
+        await page.goto('/blog');
         await expect(page.getByTestId('header')).toBeVisible();
-        await waitForStableHeader(page);
 
-        const gratuitous = await page.evaluate(() =>
-            [...document.querySelectorAll('*')]
-                .filter((element) => {
-                    const style = getComputedStyle(element);
-                    if (style.overflowX !== 'scroll' && style.overflowY !== 'scroll') return false;
-                    return element.scrollWidth <= element.clientWidth && element.scrollHeight <= element.clientHeight;
-                })
-                .map((element) => `${element.tagName.toLowerCase()}.${element.className}`)
-        );
+        const body = page.locator('[class*="blog_body"]').first();
+        await expect(body).toBeVisible();
 
-        expect(gratuitous, `these declare overflow: scroll but never overflow: ${gratuitous.join(', ')}`).toEqual([]);
+        const scrolled = await body.evaluate((element) => {
+            const overflows = element.scrollHeight > element.clientHeight;
+            element.scrollTop = 300;
+            return { overflows, scrollTop: element.scrollTop, overflowY: getComputedStyle(element).overflowY };
+        });
+
+        expect(scrolled.overflowY, 'the article body must stay a scroller').toBe('auto');
+        expect(scrolled.overflows, 'a full post should be taller than its pinned container').toBe(true);
+        expect(scrolled.scrollTop, 'setting scrollTop must actually move the body').toBeGreaterThan(0);
     });
 });

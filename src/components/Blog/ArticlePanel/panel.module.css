@@ -21,11 +21,17 @@
     .articleControls {
         width: calc(100vw - 40px);
         grid-template-columns: 200px repeat(2, max-content) 1fr repeat(5, max-content) 220px;
-        overflow: scroll;
+        /**
+         * SDD-L12-T4. A real horizontal scroller, kept: the fixed columns above already sum past a
+         * 768px viewport, so this row genuinely does not fit and scrolling it is the intent.
+         * `auto` rather than `scroll` only so the bar disappears if it ever does fit.
+         *
+         * Its `::-webkit-scrollbar { display: none }` is gone (same defect as the header, U-N3):
+         * WebKit hid the bar, Gecko could not, so the row scrolled with no affordance in one engine
+         * and with one in the other. SDD-L06 chose visible-and-thin over hidden.
+         */
+        overflow: auto;
         padding: 0 10px;
-    }
-    .articleControls::-webkit-scrollbar {
-        display: none;
     }
 }
 .articleControls svg {

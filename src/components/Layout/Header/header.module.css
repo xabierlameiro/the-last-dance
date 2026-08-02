@@ -7,12 +7,20 @@
     gap: 20px;
     align-items: center;
     padding: 0 18px;
-    overflow: scroll;
+    /**
+     * SDD-L12-T3. Was `overflow: scroll`, which paints a scrollbar whether or not there is anything
+     * to scroll. Chromium on macOS hid that behind overlay scrollbars; Firefox, and macOS with
+     * "Show scroll bars: Always", painted a bar across a 24px strip permanently — reported by a
+     * reader on 2026-07-30. `auto` paints one only when the content really does not fit, which
+     * after T2 means at 768px and below.
+     *
+     * The companion `::-webkit-scrollbar { display: none }` is gone with it. It hid the bar in
+     * WebKit while Gecko had no equivalent, so the two engines disagreed by construction — and
+     * SDD-L06 (`globals.css:126-131`) had already ruled that hiding this particular bar was wrong,
+     * because it is the only cue that widgets continue past the edge.
+     */
+    overflow: auto;
     white-space: nowrap;
-}
-
-.header::-webkit-scrollbar {
-    display: none;
 }
 
 .header svg {
