@@ -17,21 +17,14 @@
     color: rgba(var(--blog-icons));
     display: grid;
     /**
-     * Three real tracks, not two plus an absolutely-positioned middle.
+     * Two tracks — identity and status items — with the countdown absolutely centred on top.
      *
-     * The middle was `position: absolute; left: 50%` at first, so it sat on the window's true centre
-     * — and silently covered the last three status icons, because a positioned element does not
-     * negotiate space with anything. The hit test was unambiguous: `elementFromPoint` over the
-     * coverage, e2e and Lighthouse icons returned the countdown, so those three links were
-     * unclickable while looking perfectly fine.
-     *
-     * A grid track cannot do that. The cost is that the countdown sits in the middle of the space
-     * the two sides leave rather than the middle of the window: with a 66 px left zone and an
-     * ~870 px right zone, true centring at 1280 px is arithmetically impossible — the right zone
-     * would have to start before the countdown ends. It only becomes possible above ~1940 px.
-     * Not overlapping is worth more than being 200 px off centre.
+     * The countdown is centred on the **window**, which is what it has to be: a grid track puts it
+     * in the middle of the space the sides leave, and with a 66 px left zone and an 867 px right one
+     * that is visibly off-centre. So the middle is positioned, and the collision it can cause is
+     * prevented arithmetically instead — see the shedding block at the bottom of this file.
      */
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr;
     gap: 20px;
     align-items: center;
     padding: 0 18px;
@@ -66,12 +59,16 @@
     gap: 12px;
 }
 
-/* Centred within its own track, so it can never sit on top of the status items. */
+/**
+ * Centred on the window. Nothing else may enter the band it occupies — the shedding rules below
+ * guarantee that by width, not by hope.
+ */
 .center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
-    justify-self: center;
-    min-width: 0;
 }
 
 .right {
@@ -138,32 +135,78 @@
 }
 
 /**
- * Priority-based shedding, which is what macOS does when the bar runs out of room: status items drop
- * from the right and the clock never does. Ascending priority goes first.
+ * Progressive shedding, which is what macOS does when the bar runs out of room: status items drop
+ * from the right, the clock never does.
  *
- * `priority1` is implicit — anything without one of these classes stays at every width. The two
- * breakpoints are the ones the rest of the layout already uses (768, 1023), so the bar changes shape
- * at the same widths as everything else instead of inventing a third set.
+ * The breakpoints are **derived, not chosen**. A window-centred countdown occupies
+ * `[W/2 - 85, W/2 + 85]`, and the right zone runs from `W - 18 - rightWidth` to `W - 18`, so they
+ * stay clear of each other exactly while
+ *
+ *     W >= 2 * (rightWidth + 103)
+ *
+ * Measured widths at 1920 px, in the order they are shed — most expensive first:
+ *
+ * | Item              | Width | Right zone after it goes | Needs    | Breakpoint |
+ * |-------------------|-------|--------------------------|----------|------------|
+ * | view counter      | 160   | 895 with it               | 1997     | 2020       |
+ * | heating           |  85   | 721                       | 1649     | 1660       |
+ * | crypto price      |  80   | 622                       | 1451     | 1480       |
+ * | indexed counter   |  70   | 528                       | 1263     | 1320       |
+ * | 5 artifact icons  | 160   | 444                       | 1095     | 1180       |
+ * | (3 social icons)  |  82   | 270                       |  747     |  769       |
+ *
+ * Each breakpoint sits above what the arithmetic demands, so a widget that grows a digit — a
+ * four-figure view count, a longer XRP price — does not silently start an overlap.
+ *
+ * An earlier attempt used two round breakpoints (1023, 768) picked for tidiness rather than from
+ * measurements. Just above 1023 px every widget was visible in a window that could not hold them,
+ * and since `overflow` is `visible` they did not clip, they **overlapped** — the countdown and the
+ * icons drawn on top of each other, which is what the owner saw.
+ *
+ * `.navLinks a` sets `display: flex` and outranks a bare class on specificity, so each rule lists
+ * both forms rather than reaching for `!important`.
  */
-@media screen and (max-width: 1023px) {
-    /**
-     * `.navLinks a` sets `display: flex` and is one selector more specific than a bare `.priority3`,
-     * so the plain class lost and every icon stayed visible at every width — measured as
-     * `visibleLinks: 8` at 375 px. Both forms are listed rather than reaching for `!important`.
-     */
-    .priority3,
-    .navLinks a.priority3 {
+@media screen and (max-width: 2019px) {
+    .shed1 {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1659px) {
+    .shed2 {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1479px) {
+    .shed3 {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1319px) {
+    .shed4 {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1179px) {
+    .shed5,
+    .navLinks a.shed5 {
         display: none;
     }
 }
 
 @media screen and (max-width: 768px) {
-    .priority2,
-    .navLinks a.priority2 {
+    .shed6,
+    .navLinks a.shed6 {
         display: none;
     }
 
-    /* Below the tablet breakpoint the middle is the first thing to collide with the two sides. */
+    /**
+     * No countdown on a phone — the owner's call, and the arithmetic agrees: below 769 px the two
+     * sides and a centred middle cannot coexist whatever is shed.
+     */
     .center {
         display: none;
     }

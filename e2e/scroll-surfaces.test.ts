@@ -33,11 +33,32 @@ import { expect, test } from './fixtures';
  */
 const SCROLLER_ROUTES = ['/', '/blog', '/legal/privacy-policy'];
 
+/**
+ * Both sides of every shedding breakpoint, plus the three ordinary sizes.
+ *
+ * The first version of this list held four round numbers — 375, 768, 1280, 1920 — and passed while
+ * the bar was visibly broken at 1024, because that width sits just above a breakpoint where every
+ * widget was still rendered in a window too narrow to hold them. A breakpoint is precisely where a
+ * layout changes behaviour, so it is precisely where it has to be measured: one pixel below and one
+ * above each.
+ */
 const VIEWPORTS = [
     { width: 375, height: 812, name: 'mobile' },
-    { width: 768, height: 1024, name: 'tablet' },
+    { width: 768, height: 1024, name: 'tablet, no countdown' },
+    { width: 769, height: 1024, name: 'tablet, countdown appears' },
+    { width: 1024, height: 800, name: 'small laptop' },
+    { width: 1179, height: 800, name: 'below artifact icons' },
+    { width: 1181, height: 800, name: 'artifact icons appear' },
     { width: 1280, height: 720, name: 'laptop' },
+    { width: 1319, height: 800, name: 'below indexed counter' },
+    { width: 1321, height: 800, name: 'indexed counter appears' },
+    { width: 1479, height: 800, name: 'below crypto' },
+    { width: 1481, height: 800, name: 'crypto appears' },
+    { width: 1659, height: 900, name: 'below heating' },
+    { width: 1661, height: 900, name: 'heating appears' },
     { width: 1920, height: 1080, name: 'desktop' },
+    { width: 2019, height: 1080, name: 'below view counter' },
+    { width: 2021, height: 1080, name: 'view counter appears' },
 ];
 
 /**
@@ -64,12 +85,32 @@ const readHeaderZones = (page: Page) =>
             return { left: Math.round(rect.left), right: Math.round(rect.right), width: Math.round(rect.width) };
         };
 
+        /**
+         * The right zone is a `1fr` grid track that starts right after the identity, while its
+         * contents are pushed to the end with `justify-content: end`. Measuring the track says the
+         * status items begin at x=104 on a 1280px window, which is not where anything is painted —
+         * an overlap check against that reads as a collision at every width. So the *content* box is
+         * what gets measured: the union of the visible children.
+         */
+        const contentBox = (selector: string) => {
+            const container = header.querySelector(selector);
+            if (!container) return null;
+            const visible = [...container.children].filter(
+                (child) => getComputedStyle(child).display !== 'none' && child.getBoundingClientRect().width > 0,
+            );
+            if (visible.length === 0) return null;
+            const rects = visible.map((child) => child.getBoundingClientRect());
+            const left = Math.min(...rects.map((rect) => rect.left));
+            const right = Math.max(...rects.map((rect) => rect.right));
+            return { left: Math.round(left), right: Math.round(right), width: Math.round(right - left) };
+        };
+
         return {
             headerLeft: Math.round(bounds.left),
             headerRight: Math.round(bounds.right),
             left: zone('[class*="left"]'),
             center: zone('[class*="center"]'),
-            right: zone('[class*="right"]'),
+            right: contentBox('[class*="right"]'),
             visibleLinks: [...header.querySelectorAll('nav a')].filter(
                 (link) => getComputedStyle(link).display !== 'none',
             ).length,
@@ -126,23 +167,39 @@ test.describe('Scroll surfaces', () => {
                 `the app identity starts before the left edge at ${viewport.width}px: ${describe}`,
             ).toBeGreaterThanOrEqual(zones.headerLeft);
 
-            // The middle zone is the one that collides first when the two sides grow. Below 768px it
-            // is deliberately not rendered.
+            // The countdown is centred on the window and the sides must stay out of its band. Both
+            // neighbours are asserted: the first version of this test only checked the left, and the
+            // countdown was covering the last three status icons on the right the whole time.
             //
-            // Both neighbours are asserted. The first version of this test only checked the left
-            // side, and the countdown was covering the last three status icons on the right the
-            // whole time — `elementFromPoint` over the coverage, e2e and Lighthouse links returned
-            // the countdown, so three links were unclickable and this suite said nothing.
-            if (zones.center) {
+            // Below 769px there is deliberately no countdown — the owner's call, and the arithmetic
+            // agrees that nothing would fit.
+            if (viewport.width > 768) {
                 expect(
-                    zones.center.left,
+                    zones.center,
+                    `the countdown should be rendered at ${viewport.width}px: ${describe}`,
+                ).not.toBeNull();
+
+                expect(
+                    zones.center!.left,
                     `the countdown overlaps the app identity at ${viewport.width}px: ${describe}`,
                 ).toBeGreaterThanOrEqual(zones.left!.right);
 
                 expect(
-                    zones.center.right,
+                    zones.center!.right,
                     `the countdown overlaps the status items at ${viewport.width}px: ${describe}`,
                 ).toBeLessThanOrEqual(zones.right!.left);
+
+                // Centred on the window, not on the leftover space: that is the whole point of
+                // positioning it, so it is worth asserting rather than assuming. 2px of tolerance
+                // for sub-pixel rounding.
+                const centreOfWindow = viewport.width / 2;
+                const centreOfCountdown = (zones.center!.left + zones.center!.right) / 2;
+                expect(
+                    Math.abs(centreOfCountdown - centreOfWindow),
+                    `the countdown is off-centre at ${viewport.width}px: ${describe}`,
+                ).toBeLessThanOrEqual(2);
+            } else {
+                expect(zones.center, `no countdown below 769px: ${describe}`).toBeNull();
             }
         });
 

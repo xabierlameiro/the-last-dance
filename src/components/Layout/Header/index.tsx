@@ -131,7 +131,7 @@ const NavLinks = () => {
                         // to come from here. Without it these read as "link, link, link" — the
                         // exact defect L05/L06 spent two phases removing from the rest of the page.
                         aria-label={item.title}
-                        className={styles[`priority${item.priority}`]}
+                        className={styles[`shed${item.shed}`]}
                     >
                         {Icon ? <Icon aria-hidden="true" /> : item.name}
                     </a>
@@ -175,21 +175,26 @@ const Header = ({ children }: { children?: ReactNode }) => {
                 <CountDown date="2026-12-11T00:00:00+00:00" caption={f({ id: 'countdown.caption' })} />
             </div>
 
+            {/**
+             * Shed order, cheapest information per pixel first. The classes are `shedN`, and the
+             * widths behind each breakpoint are tabulated in `header.module.css` — they are derived
+             * from measurements, not chosen for tidiness.
+             */}
             <div className={styles.right}>
                 <NavLinks />
-                <span className={styles.priority2}>
+                <span>
                     <DeploymentStatus />
                 </span>
-                <span className={styles.priority3}>
+                <span className={styles.shed3}>
                     <CryptoPrice />
                 </span>
-                <span className={styles.priority3}>
+                <span className={styles.shed4}>
                     <IndexedCounter />
                 </span>
-                <span className={styles.priority3}>
+                <span className={styles.shed1}>
                     <ViewCounter all />
                 </span>
-                <span className={styles.priority3}>
+                <span className={styles.shed2}>
                     <Heating />
                 </span>
                 <DateAndHour>

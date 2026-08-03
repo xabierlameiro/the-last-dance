@@ -32,9 +32,10 @@ export const personDescription: Record<string, string> = {
  * lost the shelf, and the shelf is part of what the design is *for* — so the space comes from the
  * icons instead. Eight text labels cost 358 px; eight icons cost about a fifth of that.
  *
- * `priority` is how the bar behaves when it still does not fit, which below 768 px it will not:
- * items drop from the right by ascending priority, exactly as macOS sheds status items on a narrow
- * screen. 1 survives everywhere; 3 is the first to go.
+ * `shed` is the shedding step: the class `shedN` hides the item below the breakpoint derived for it
+ * in `header.module.css`. The three profile icons are `shed6` (they survive down to 769 px); the five
+ * artifact icons are `shed5` (they go below 1180 px), because a window-centred countdown and an
+ * 867 px right zone cannot both fit before then. The numbers are measured, not chosen.
  *
  * The icon itself lives in the Header component, not here — this file stays data, no React.
  */
@@ -44,56 +45,56 @@ export const socialLinks = [
         title: 'Linkedin profile',
         name: 'Linkedin',
         testId: 'linkedin-link',
-        priority: 2,
+        shed: 6,
     },
     {
         href: 'https://github.com/xabierlameiro',
         title: 'Github profile',
         name: 'Github',
         testId: 'github-link',
-        priority: 2,
+        shed: 6,
     },
     {
         href: 'https://www.reddit.com/user/xlameiro',
         title: 'Reddit profile',
         name: 'Reddit',
         testId: 'reddit-link',
-        priority: 2,
+        shed: 6,
     },
     {
         href: 'https://storybook.xabierlameiro.com',
         title: 'Storybook',
         name: 'Storybook',
         testId: 'storybook-link',
-        priority: 3,
+        shed: 5,
     },
     {
         href: 'https://docs.xabierlameiro.com',
         title: 'Docs',
         name: 'Docs',
         testId: 'docs-link',
-        priority: 3,
+        shed: 5,
     },
     {
         href: 'https://coverage.xabierlameiro.com',
         title: 'Coverage',
         name: 'Coverage',
         testId: 'coverage-link',
-        priority: 3,
+        shed: 5,
     },
     {
         href: 'https://e2e.xabierlameiro.com',
         title: 'e2e',
         name: 'e2e',
         testId: 'e2e-link',
-        priority: 3,
+        shed: 5,
     },
     {
         href: 'https://performance.xabierlameiro.com',
         title: 'Lighthouse',
         name: 'Lighthouse',
         testId: 'lighthouse-link',
-        priority: 3,
+        shed: 5,
     },
 ];
 
