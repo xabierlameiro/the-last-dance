@@ -195,10 +195,16 @@ const Header = ({ children }: { children?: ReactNode }) => {
                 <span className={`${styles.statusItem} ${styles.shed4}`}>
                     <IndexedCounter />
                 </span>
-                <span className={`${styles.statusItem} ${styles.shed1}`}>
+                {/**
+                 * SDD-L12-T10. These two carry a wider slot because they render TWO values each:
+                 * `ViewCounter all` is page views AND new users, with an icon on each, and `Heating`
+                 * is the outside and measured temperatures. Sized on the default 96px slot, the view
+                 * counter lost 69px off its left edge in production — the defect the owner reported.
+                 */}
+                <span className={`${styles.statusItem} ${styles.slotViews} ${styles.shed1}`}>
                     <ViewCounter all />
                 </span>
-                <span className={`${styles.statusItem} ${styles.shed2}`}>
+                <span className={`${styles.statusItem} ${styles.slotHeating} ${styles.shed2}`}>
                     <Heating />
                 </span>
                 <DateAndHour>

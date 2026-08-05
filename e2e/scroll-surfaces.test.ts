@@ -58,23 +58,27 @@ const VIEWPORTS = [
     { width: 939, height: 800, name: 'below crypto' },
     { width: 940, height: 800, name: 'crypto appears' },
     { width: 1024, height: 800, name: 'small laptop' },
-    { width: 1129, height: 800, name: 'below heating' },
-    { width: 1130, height: 800, name: 'heating appears' },
+    { width: 1179, height: 800, name: 'below heating' },
+    { width: 1180, height: 800, name: 'heating appears' },
     { width: 1280, height: 720, name: 'laptop' },
-    { width: 1329, height: 800, name: 'below view counter' },
-    { width: 1330, height: 800, name: 'view counter appears' },
+    { width: 1549, height: 800, name: 'below views and users' },
+    { width: 1550, height: 800, name: 'views and users appear' },
     { width: 1920, height: 1080, name: 'desktop' },
+    { width: 2000, height: 1080, name: 'wide desktop, the width the defect was reported at' },
 ];
 
 /**
- * SDD-L12-T9. The status area is a fixed pitch, and these are the only widths a slot may have.
+ * SDD-L12-T9/T10. Every width a status slot is allowed to have.
  *
- * T8 sized the slots with `auto` tracks, so each one was as wide as whatever its widget happened to
- * be showing — and when three widgets were in an error state the row read as randomly spaced, which
- * is what the owner reported. Pinning the numbers here means a future `auto` or a stray `gap` fails
- * as a test rather than as a screenshot.
+ * T8 sized the slots with `auto` tracks, so each was as wide as whatever its widget happened to be
+ * showing, and the row read as randomly spaced. T9 made them fixed but gave them all ONE width,
+ * which broke the two widgets that render two values each: the view counter (page views AND new
+ * users, an icon on each) wants 166px and had 96, so 69px vanished off its left edge in production.
+ *
+ * Pinning the numbers means a future `auto`, a stray `gap`, or a widget growing a second value fails
+ * as a test rather than as a screenshot a month later.
  */
-const SLOT_WIDTHS = { deploymentDot: 24, value: 96, clock: 140 };
+const SLOT_WIDTHS = { deploymentDot: 24, value: 96, views: 184, heating: 120, clock: 140 };
 
 /**
  * Measures the *bar*, not the scroll box.
@@ -307,6 +311,98 @@ test.describe('Scroll surfaces', () => {
                 layout.trailingGap,
                 `the status items are not flush to the bar's right edge at ${width}px: ${describe}`,
             ).toBe(layout.paddingLeft);
+        });
+    }
+
+    /**
+     * SDD-L12-T10. No status widget may be clipped by its own slot.
+     *
+     * This is the check that was missing, and its absence is why a 69px-wide hole in the view counter
+     * shipped. The obvious test — `scrollWidth > clientWidth` — **cannot see this defect**: the slots
+     * are `justify-content: flex-end`, so content that does not fit escapes towards the inline-START
+     * edge, and `scrollWidth` only measures overflow past the inline-END edge. The clipped slot
+     * reported `scrollWidth === clientWidth === 96` and read as perfectly healthy.
+     *
+     * So compare boxes instead: the content's own bounding box against the slot's, on both sides.
+     *
+     * Absolutely-positioned descendants are excluded, because escaping the bar is their job — the
+     * clock's weather popover is 400px wide and anchored to it, and counting it would report every
+     * run as a failure. That exclusion is also why measuring `header.scrollWidth` was abandoned.
+     *
+     * 2000px is included deliberately: that is the width the defect was reported at, and every
+     * narrower viewport hides the view counter behind a shedding breakpoint.
+     */
+    for (const width of [1550, 2000]) {
+        test(`no status widget is clipped by its slot at ${width}px`, async ({ page }) => {
+            /**
+             * The values are mocked, and that is not a convenience — it is what makes this a test.
+             * Neither this machine nor CI has Google Analytics or Ariston credentials, so both render
+             * an error glyph roughly 15px wide, which fits any slot. Measured against a failure state
+             * the check passes while the widget is unreadable in production, which is precisely the
+             * hole the reported defect fell through. Serving worst-case values makes the assertion
+             * mean the same thing everywhere.
+             */
+            await page.route('**/api/analytics*', (route) =>
+                route.fulfill({ json: { pageViews: 999999, newUsers: 888888 } }),
+            );
+            await page.route('**/api/heating*', (route) =>
+                route.fulfill({ json: { outsideTemp: -12.5, zoneMeasuredTemp: 100.5 } }),
+            );
+
+            await page.setViewportSize({ width, height: 900 });
+            await page.goto('/');
+            await expect(page.getByTestId('header')).toBeVisible();
+            await expect(page.getByTestId('views')).toContainText('999999');
+            await waitForStableHeader(page);
+
+            const clipped = await page.evaluate(() => {
+                const header = document.querySelector('header');
+                if (!header) throw new Error('no <header> in the document');
+                const right = header.querySelector('[class*="right"]');
+                if (!right) throw new Error('no right zone in the header');
+
+                return [...right.children]
+                    .filter((slot) => getComputedStyle(slot).display !== 'none')
+                    .map((slot) => {
+                        const box = slot.getBoundingClientRect();
+                        /**
+                         * Excluding nodes that are themselves absolute is not enough: the weather
+                         * popover is absolute, but its contents are static children of it, so they
+                         * pass that filter and drag the measurement 457px past the clock. Walk up to
+                         * the slot and drop anything with a positioned ancestor.
+                         */
+                        const escapes = (node: Element) => {
+                            for (let el: Element | null = node; el && el !== slot; el = el.parentElement) {
+                                const position = getComputedStyle(el).position;
+                                if (position === 'absolute' || position === 'fixed') return true;
+                            }
+                            return false;
+                        };
+
+                        const laidOut = [...slot.querySelectorAll('*')].filter((node) => {
+                            if (getComputedStyle(node).display === 'none' || escapes(node)) return false;
+                            const rect = node.getBoundingClientRect();
+                            return rect.width > 0 && rect.height > 0;
+                        });
+                        if (laidOut.length === 0) return null;
+
+                        const rects = laidOut.map((node) => node.getBoundingClientRect());
+                        const lostLeft = Math.round(box.left - Math.min(...rects.map((rect) => rect.left)));
+                        const lostRight = Math.round(Math.max(...rects.map((rect) => rect.right)) - box.right);
+                        if (lostLeft <= 1 && lostRight <= 1) return null;
+
+                        return (
+                            `${(slot.className.match(/header_(\w+?)__/) || [])[1] || slot.className}` +
+                            ` (${Math.round(box.width)}px slot, "${(slot.textContent || '').trim().slice(0, 20)}")` +
+                            ` loses ${lostLeft > 1 ? lostLeft + 'px off its left' : ''}` +
+                            `${lostLeft > 1 && lostRight > 1 ? ' and ' : ''}` +
+                            `${lostRight > 1 ? lostRight + 'px off its right' : ''}`
+                        );
+                    })
+                    .filter(Boolean);
+            });
+
+            expect(clipped, `status widgets clipped at ${width}px: ${clipped.join(' | ')}`).toEqual([]);
         });
     }
 

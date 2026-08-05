@@ -76,7 +76,7 @@
 }
 
 /**
- * SDD-L12-T9. Status items on a fixed pitch.
+ * SDD-L12-T9/T10. Status items in fixed slots, one width per widget.
  *
  * T8 left this as `grid-auto-flow: column` with `auto` tracks, so every slot was as wide as whatever
  * it happened to contain: the XRP price and the view count sat at different pitches, and both moved
@@ -87,27 +87,32 @@
  * `auto` tracks a four-figure view count silently widened the zone and ate the margin that keeps the
  * countdown clear.
  *
- * The widths are not measured from local content and must not be — several widgets render empty on
- * this machine because their APIs have no credentials, so a local measurement would size every slot
- * to an error state. They are sized to worst-case content instead, measured by rendering candidate
- * strings in the slot's own computed font (16px -apple-system) in an unconstrained probe:
+ * **One width for every slot was wrong, and shipped.** The owner reported the total-visits number
+ * cut off, and it was: `<ViewCounter all />` renders TWO counters, each with its own icon — page
+ * views AND new users — so it is intrinsically about twice the width of a single value. Measured on
+ * production it wants 166 px and had 96, losing 69 px off its left edge. Heating was next in line:
+ * it renders two temperatures and measures 85 px today, but 105 px as soon as one of them gains a
+ * digit, so it was clipping-in-waiting rather than working.
  *
- * | Worst case          | Text | + icon | Fits 96 px |
- * |---------------------|------|--------|------------|
- * | `1.234.567` indexed |  72  |   96   | yes, exactly |
- * | `999.999` views     |  63  |   87   | yes        |
- * | `-12,5 °C` heating  |  60  |   84   | yes        |
- * | `$99.9999` XRP      |  68  |   92   | yes        |
- * | `$1,234.5678` XRP   |  91  |  115   | NO         |
+ * The widths below are therefore PER WIDGET, measured on production by lifting the constraint
+ * (`width: max-content`) and re-measuring with a digit added to every number in the slot:
  *
- * So the slot holds about eight characters, and anything longer is clipped by `overflow: hidden`
- * rather than widening the zone. That is the deliberate trade: a slot that grows is a slot that
- * moves everything beside it, which is the jitter this rule exists to remove. XRP's all-time high is
- * about $3.84, so `$99.9999` is ~25x headroom — but if a widget is ever pointed at an asset priced
- * in four figures, widen `--status-slot` and re-derive the table below, do not let it clip.
+ * | Slot            | Natural | +1 digit | Assigned | Headroom |
+ * |-----------------|---------|----------|----------|----------|
+ * | deployment dot  |    15   |    15    |    24    |   9      |
+ * | XRP price       |    80   |    80    |    96    |  16      |
+ * | indexed pages   |    70   |    70    |    96    |  26      |
+ * | **views+users** |   166   |   174    |   184    |  10      |
+ * | **heating**     |    85   |   105    |   120    |  15      |
+ * | clock           |     -   |     -    |   140    |   6      |
  *
- * The clock is 140 px because it is the one slot whose content is locale-dependent: the longest
- * Spanish rendering measured, `mié 30 sept 23:59`, is 134 px.
+ * Measured on production and not here: several widgets render an error glyph on this machine
+ * because their APIs have no credentials, so a local measurement would size every slot to a failure
+ * state. The clock's 140 px comes from the longest Spanish rendering, `mié 30 sept 23:59` at 134 px.
+ *
+ * Content is still clipped rather than allowed to widen the zone — a slot that grows moves
+ * everything beside it, which is the jitter these rules exist to remove. The difference is that each
+ * slot is now sized for what its own widget can actually produce.
  */
 .right {
     display: grid;
@@ -125,8 +130,12 @@
  * ~12 px, so centring it in a 96 px slot opens 42 px of dead space on each side and the row reads as
  * randomly spaced — which is what it did on the owner's screen, where three widgets were in an error
  * state because their APIs have no credentials locally. Right-aligned, every item's trailing edge
- * lands on the same 96 px pitch and the whole zone reads as one column flush to the bar's edge,
- * whatever each widget happens to be showing.
+ * lands on the bar's own edge and the zone reads as one column, whatever each widget is showing.
+ *
+ * Right alignment has one consequence worth naming, because it hid the bug this rule now documents:
+ * overflow escapes towards the **left**, and `scrollWidth` only measures overflow past the
+ * inline-END edge. So a clipped slot reports `scrollWidth === clientWidth` and looks healthy. The
+ * e2e check compares the content's bounding box against the slot's on both sides instead.
  */
 .statusItem {
     display: flex;
@@ -134,6 +143,16 @@
     justify-content: flex-end;
     width: var(--status-slot);
     overflow: hidden;
+}
+
+/* Two counters with two icons — page views and new users. Wants 166px, grows to 174px. */
+.slotViews {
+    width: 184px;
+}
+
+/* Two temperatures, outside and measured. 85px today, 105px once either gains a digit. */
+.slotHeating {
+    width: 120px;
 }
 
 /* The deployment indicator is a dot, not a value; a full slot for it would be a 96 px hole. */
@@ -223,13 +242,18 @@
  * `W >= 2 * (leftWidth + 103)` is a real constraint that T8's ladder did not contain. A ladder that
  * only watches one side is how the bar ended up drawn on top of itself at 1024 px the first time.
  *
- * Zone widths are now arithmetic, not measurement, because the slots are fixed:
- * right = 24 (dot) + 96 per visible value slot + 140 (clock); left = 66 + 18 per icon + 14 per gap.
+ * Zone widths are arithmetic, not measurement, because the slots are fixed:
+ * right = 24 (dot) + 96 (XRP) + 96 (indexed) + 184 (views) + 120 (heating) + 140 (clock);
+ * left = 66 + 18 per icon + 14 per gap.
+ *
+ * Re-derived again once the views and heating slots were sized correctly — widening two slots by
+ * 112 px in total moves every breakpoint that depends on the right zone, which is the whole reason
+ * these are computed from the widths rather than picked.
  *
  * | Below   | What sheds        | Left | Right | Left needs | Right needs |
  * |---------|-------------------|------|-------|------------|-------------|
- * | 1329 px | view counter      | 320  | 548   |  846       | 1302        |
- * | 1129 px | heating           | 320  | 452   |  846       | 1110        |
+ * | 1549 px | views + users     | 320  | 660   |  846       | 1526        |
+ * | 1179 px | heating           | 320  | 476   |  846       | 1158        |
  * |  939 px | crypto price      | 320  | 356   |  846       |  918        |
  * |  869 px | 5 artifact icons  | 320  | 260   |  846       |  726        |
  * |  768 px | indexed counter   | 160  | 260   |  526       |  726        |
@@ -243,13 +267,13 @@
  * `.navLinks a` sets `display: flex` and outranks a bare class on specificity, so each rule lists
  * both forms rather than reaching for `!important`.
  */
-@media screen and (max-width: 1329px) {
+@media screen and (max-width: 1549px) {
     .shed1 {
         display: none;
     }
 }
 
-@media screen and (max-width: 1129px) {
+@media screen and (max-width: 1179px) {
     .shed2 {
         display: none;
     }
