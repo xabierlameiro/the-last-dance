@@ -23,54 +23,78 @@ export const personDescription: Record<string, string> = {
     gl: 'Arquitecto de software galego. Desenvolve produtos web para os sectores bancario e retail —CaixaBank, Openbank e Inditex— traballando sobre todo con React, Next.js e TypeScript, con especial interese en testing, automatización e o IoT.',
 };
 
+/**
+ * SDD-L12-T8 (decision D5, revised 2026-08-03). These eight are the header's **status items**, and
+ * they render as icons on the right, the way a macOS menu bar does: text menus on the left, icons on
+ * the right, clock last.
+ *
+ * T2 briefly deleted the five artifact entries to make the header fit. That bought the space but
+ * lost the shelf, and the shelf is part of what the design is *for* — so the space comes from the
+ * icons instead. Eight text labels cost 358 px; eight icons cost about a fifth of that.
+ *
+ * `shed` is the shedding step: the class `shedN` hides the item below the breakpoint derived for it
+ * in `header.module.css`. The three profile icons are `shed6` (they survive down to 769 px); the five
+ * artifact icons are `shed5` (they go below 1180 px), because a window-centred countdown and an
+ * 867 px right zone cannot both fit before then. The numbers are measured, not chosen.
+ *
+ * The icon itself lives in the Header component, not here — this file stays data, no React.
+ */
 export const socialLinks = [
     {
         href: 'https://www.linkedin.com/in/xlameiro',
         title: 'Linkedin profile',
         name: 'Linkedin',
         testId: 'linkedin-link',
+        shed: 6,
     },
     {
         href: 'https://github.com/xabierlameiro',
         title: 'Github profile',
         name: 'Github',
         testId: 'github-link',
+        shed: 6,
     },
     {
         href: 'https://www.reddit.com/user/xlameiro',
         title: 'Reddit profile',
         name: 'Reddit',
         testId: 'reddit-link',
+        shed: 6,
     },
     {
         href: 'https://storybook.xabierlameiro.com',
         title: 'Storybook',
         name: 'Storybook',
         testId: 'storybook-link',
+        shed: 5,
     },
     {
         href: 'https://docs.xabierlameiro.com',
         title: 'Docs',
         name: 'Docs',
         testId: 'docs-link',
+        shed: 5,
     },
     {
         href: 'https://coverage.xabierlameiro.com',
         title: 'Coverage',
         name: 'Coverage',
         testId: 'coverage-link',
+        shed: 5,
     },
     {
         href: 'https://e2e.xabierlameiro.com',
         title: 'e2e',
         name: 'e2e',
         testId: 'e2e-link',
+        shed: 5,
     },
     {
         href: 'https://performance.xabierlameiro.com',
         title: 'Lighthouse',
         name: 'Lighthouse',
         testId: 'lighthouse-link',
+        shed: 5,
     },
 ];
 

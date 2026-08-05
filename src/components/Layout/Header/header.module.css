@@ -1,18 +1,155 @@
+/**
+ * SDD-L12-T8. The menu bar, laid out the way macOS lays one out.
+ *
+ * It used to be a single nine-column grid — `auto max-content auto 1fr repeat(6, auto)` — with every
+ * widget in one run and `overflow: scroll` to absorb whatever did not fit. That is how 1526 px of
+ * content ended up inside a 1280 px window with 246 px of it unreachable.
+ *
+ * Now there are three zones. `.left` is the app identity (logo + route), `.right` is the status
+ * items and the clock, and `.center` is absolutely positioned so the countdown sits in the middle of
+ * the *window* rather than in the middle of whatever space the two sides happen to leave — the
+ * asymmetry between them is large, so a grid track would visibly push it off-centre.
+ */
 .header {
+    position: relative;
     height: 24px;
     background: var(--header-background);
     color: rgba(var(--blog-icons));
     display: grid;
-    grid-template-columns: auto max-content auto 1fr repeat(6, auto);
+    /**
+     * Two tracks — identity and status items — with the countdown absolutely centred on top.
+     *
+     * The countdown is centred on the **window**, which is what it has to be: a grid track puts it
+     * in the middle of the space the sides leave, and with a 66 px left zone and an 867 px right one
+     * that is visibly off-centre. So the middle is positioned, and the collision it can cause is
+     * prevented arithmetically instead — see the shedding block at the bottom of this file.
+     */
+    grid-template-columns: auto 1fr;
     gap: 20px;
     align-items: center;
     padding: 0 18px;
-    overflow: scroll;
+    /**
+     * SDD-L12-T3/T8. This was `overflow: scroll`, which paints a scrollbar whether or not there is
+     * anything to scroll — invisible under Chromium's overlay scrollbars on macOS, permanent in
+     * Firefox and under "Show scroll bars: Always". T3 made it `auto`; T8 makes it `visible`, which
+     * is what a menu bar actually needs.
+     *
+     * The reason is the weather panel: it is a 400 px `position: absolute` popover anchored to the
+     * clock, and a closed popover still has a box. Any scroll container it hangs off — `scroll` or
+     * `auto`, no difference — counts it as content and grows a scroll area by 440 px at every
+     * viewport. Measured: `header.scrollWidth` was `clientWidth + 440` at 1024, 1280 and 1920 alike,
+     * which is the signature of a positioned child rather than of a bar that does not fit.
+     *
+     * So part of the original "the header overflows" reading was never menu-bar content at all. The
+     * bar itself now fits by construction (T8's three zones plus priority shedding); popovers are
+     * supposed to escape it, which is exactly what `visible` allows and what a real menu bar does.
+     *
+     * The companion `::-webkit-scrollbar { display: none }` is gone too. It hid the bar in WebKit
+     * while Gecko had no equivalent, so the two engines disagreed by construction — and SDD-L06
+     * (`globals.css:126-131`) had already ruled that hiding this particular bar was wrong.
+     */
+    overflow: visible;
     white-space: nowrap;
 }
 
-.header::-webkit-scrollbar {
-    display: none;
+/**
+ * SDD-L12-T9. Identity, route and the navigation icons — the icons live here, next to the logo,
+ * which is where they were before T8 and where a macOS menu bar puts navigation.
+ */
+.left {
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    gap: 12px;
+}
+
+/**
+ * Centred on the window. Nothing else may enter the band it occupies — the shedding rules below
+ * guarantee that by width, not by hope.
+ */
+.center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+}
+
+/**
+ * SDD-L12-T9. Status items on a fixed pitch.
+ *
+ * T8 left this as `grid-auto-flow: column` with `auto` tracks, so every slot was as wide as whatever
+ * it happened to contain: the XRP price and the view count sat at different pitches, and both moved
+ * whenever a digit appeared. A menu bar's status area does not do that — each item owns a slot.
+ *
+ * The slots are FIXED, and that is the point: a fixed slot makes the zone's width a constant, so the
+ * shedding arithmetic below no longer depends on what the APIs happened to return. Under the old
+ * `auto` tracks a four-figure view count silently widened the zone and ate the margin that keeps the
+ * countdown clear.
+ *
+ * The widths are not measured from local content and must not be — several widgets render empty on
+ * this machine because their APIs have no credentials, so a local measurement would size every slot
+ * to an error state. They are sized to worst-case content instead, measured by rendering candidate
+ * strings in the slot's own computed font (16px -apple-system) in an unconstrained probe:
+ *
+ * | Worst case          | Text | + icon | Fits 96 px |
+ * |---------------------|------|--------|------------|
+ * | `1.234.567` indexed |  72  |   96   | yes, exactly |
+ * | `999.999` views     |  63  |   87   | yes        |
+ * | `-12,5 °C` heating  |  60  |   84   | yes        |
+ * | `$99.9999` XRP      |  68  |   92   | yes        |
+ * | `$1,234.5678` XRP   |  91  |  115   | NO         |
+ *
+ * So the slot holds about eight characters, and anything longer is clipped by `overflow: hidden`
+ * rather than widening the zone. That is the deliberate trade: a slot that grows is a slot that
+ * moves everything beside it, which is the jitter this rule exists to remove. XRP's all-time high is
+ * about $3.84, so `$99.9999` is ~25x headroom — but if a widget is ever pointed at an asset priced
+ * in four figures, widen `--status-slot` and re-derive the table below, do not let it clip.
+ *
+ * The clock is 140 px because it is the one slot whose content is locale-dependent: the longest
+ * Spanish rendering measured, `mié 30 sept 23:59`, is 134 px.
+ */
+.right {
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: end;
+    gap: 0;
+    --status-slot: 96px;
+}
+
+/**
+ * Contents align to the RIGHT of their slot, not to the centre.
+ *
+ * Centring looked correct with full-width values and wrong with anything narrower: an error glyph is
+ * ~12 px, so centring it in a 96 px slot opens 42 px of dead space on each side and the row reads as
+ * randomly spaced — which is what it did on the owner's screen, where three widgets were in an error
+ * state because their APIs have no credentials locally. Right-aligned, every item's trailing edge
+ * lands on the same 96 px pitch and the whole zone reads as one column flush to the bar's edge,
+ * whatever each widget happens to be showing.
+ */
+.statusItem {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: var(--status-slot);
+    overflow: hidden;
+}
+
+/* The deployment indicator is a dot, not a value; a full slot for it would be a 96 px hole. */
+.statusDot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 24px;
+}
+
+/* Four fields and a locale-dependent short weekday — the one slot that legitimately differs. */
+.clock {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 140px;
 }
 
 .header svg {
@@ -44,16 +181,119 @@
     font-family: inherit;
 }
 
+/**
+ * SDD-L12-T8. The status items, as icons. They were text labels — eight of them, 358 px — which is
+ * most of why the bar did not fit. macOS puts text menus on the left and icons on the right, so
+ * this is both the cheaper and the more faithful arrangement.
+ */
 .navLinks {
     display: grid;
     grid-auto-flow: column;
-    gap: 20px;
+    gap: 14px;
     width: max-content;
+    align-items: center;
 }
 
 .navLinks a {
-    font-size: 14px;
-    font-weight: 400;
+    display: flex;
+    align-items: center;
     color: rgba(var(--blog-icons));
     text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.navLinks a:hover svg {
+    opacity: 0.7;
+}
+
+/**
+ * Progressive shedding, which is what macOS does when the bar runs out of room: status items drop
+ * from the right, the clock never does.
+ *
+ * The breakpoints are **derived, not chosen**. A window-centred countdown occupies
+ * `[W/2 - 85, W/2 + 85]`, and the right zone runs from `W - 18 - rightWidth` to `W - 18`, so they
+ * stay clear of each other exactly while
+ *
+ *     W >= 2 * (rightWidth + 103)
+ *
+ * SDD-L12-T9 re-derived all of this, because T9 moved the navigation icons into the LEFT zone. That
+ * changes the problem: under T8 the left zone was 66 px and could never reach the middle, so only
+ * the right zone was ever checked. With eight icons beside the identity the left zone is 320 px, and
+ * `W >= 2 * (leftWidth + 103)` is a real constraint that T8's ladder did not contain. A ladder that
+ * only watches one side is how the bar ended up drawn on top of itself at 1024 px the first time.
+ *
+ * Zone widths are now arithmetic, not measurement, because the slots are fixed:
+ * right = 24 (dot) + 96 per visible value slot + 140 (clock); left = 66 + 18 per icon + 14 per gap.
+ *
+ * | Below   | What sheds        | Left | Right | Left needs | Right needs |
+ * |---------|-------------------|------|-------|------------|-------------|
+ * | 1329 px | view counter      | 320  | 548   |  846       | 1302        |
+ * | 1129 px | heating           | 320  | 452   |  846       | 1110        |
+ * |  939 px | crypto price      | 320  | 356   |  846       |  918        |
+ * |  869 px | 5 artifact icons  | 320  | 260   |  846       |  726        |
+ * |  768 px | indexed counter   | 160  | 260   |  526       |  726        |
+ * |  479 px | 3 profile icons   | 160  | 164   |  526       |  534        |
+ *
+ * Read the table as: above each row's width, the zones on that row coexist. Every breakpoint sits
+ * ~20 px above what the arithmetic demands, and below 769 px the countdown is hidden entirely, so
+ * from there down the only requirement is that the two zones fit side by side — 372 px at 480 px
+ * wide, 278 px once the profile icons go.
+ *
+ * `.navLinks a` sets `display: flex` and outranks a bare class on specificity, so each rule lists
+ * both forms rather than reaching for `!important`.
+ */
+@media screen and (max-width: 1329px) {
+    .shed1 {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1129px) {
+    .shed2 {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 939px) {
+    .shed3 {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 869px) {
+    .shed5,
+    .navLinks a.shed5 {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .shed4 {
+        display: none;
+    }
+
+    /**
+     * No countdown on a phone — the owner's call, and the arithmetic agrees: below 769 px the two
+     * sides and a centred middle cannot coexist whatever is shed.
+     */
+    .center {
+        display: none;
+    }
+
+    .header {
+        gap: 12px;
+    }
+}
+
+/**
+ * The three profile icons survive further than the artifact ones because they are the only
+ * navigation left. They go at 479 px, where the two zones would otherwise total 372 px in a 480 px
+ * window — fitting, but with nothing between them.
+ */
+@media screen and (max-width: 479px) {
+    .shed6,
+    .navLinks a.shed6 {
+        display: none;
+    }
 }

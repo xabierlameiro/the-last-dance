@@ -68,7 +68,14 @@
 .content {
     padding: 20px;
     margin-top: 50px;
-    overflow: scroll;
+    /**
+     * SDD-L12-T4. A real scroller — the legal documents are long — so this one stays, as `auto`
+     * rather than `scroll` so a short document does not get a bar it has no use for. The
+     * `::-webkit-scrollbar { display: none }` that sat below is gone (U-N3): it hid the scroll
+     * position in WebKit only, on the one surface where a reader most needs to know how much
+     * document is left.
+     */
+    overflow: auto;
     font-size: 14px;
     color: rgba(var(--blog-font));
 }
@@ -77,10 +84,6 @@
     .content {
         margin-top: 0;
     }
-}
-
-.content::-webkit-scrollbar {
-    display: none;
 }
 
 .content h1 {

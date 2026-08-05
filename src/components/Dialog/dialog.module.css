@@ -74,5 +74,12 @@
 
 .body {
     height: 100%;
-    overflow: scroll;
+    /**
+     * SDD-L12-T3. Was `overflow: scroll`. This box does not overflow on the home page, so the
+     * unconditional bar was pure noise in Firefox — and worse than noise: the surface behind it is
+     * `--white-color` (see the note on `.dialog` above) while the content is a dark terminal, so a
+     * reserved gutter frames the window in white. `auto` reserves nothing until there is something
+     * to scroll, which on a long article there genuinely is.
+     */
+    overflow: auto;
 }

@@ -51,7 +51,13 @@
 .body {
     padding: 20px 30px 60px;
     height: calc(100vh - 100px);
-    overflow-y: scroll;
+    /**
+     * SDD-L12-T4. A real scroller — the article body is taller than the viewport it is pinned to —
+     * so it stays, as `auto` so a short post does not get an inert bar. `overflow-x: hidden` is
+     * unchanged: wide tables and images are constrained by their own rules further down, and this
+     * is what stops them widening the column.
+     */
+    overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
     display: grid;
