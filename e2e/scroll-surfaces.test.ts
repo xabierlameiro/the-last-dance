@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Page, Route } from '@playwright/test';
 import { expect, test } from './fixtures';
 
 /**
@@ -160,6 +160,50 @@ const waitForStableHeader = async (page: Page) => {
     }
 
     return await readHeaderWidths(page);
+};
+
+/**
+ * SDD-L12-T10. Waits for the status widgets' **contents** to settle, which is a different question
+ * from `waitForStableHeader` and now the only useful one.
+ *
+ * That helper watches `header.scrollWidth`. It worked while the slots were `auto`, because a widget
+ * resolving made the bar wider. Fixed slots removed exactly that signal: the header's width is a
+ * constant from first paint, so the poll agrees with itself immediately and returns while widgets are
+ * still loading. Measured mid-load, the deployment indicator reported 3px of overflow at one viewport
+ * and none at another — the same page, two answers, which is how a flaky test is born.
+ *
+ * So poll what actually moves: every slot's content box, until two consecutive reads agree.
+ */
+const readStatusSignature = (page: Page) =>
+    page.evaluate(() => {
+        const zone = document.querySelector('header [class*="right"]');
+        if (!zone) return '';
+
+        const parts: string[] = [];
+        for (const slot of [...zone.children]) {
+            const rects = [...slot.querySelectorAll('*')].map((node) => node.getBoundingClientRect());
+            if (rects.length === 0) {
+                parts.push('empty');
+                continue;
+            }
+            const left = Math.round(Math.min(...rects.map((rect) => rect.left)));
+            const right = Math.round(Math.max(...rects.map((rect) => rect.right)));
+            parts.push(`${left}-${right}`);
+        }
+        return parts.join('|');
+    });
+
+const waitForStableStatusContent = async (page: Page) => {
+    let previous = '';
+
+    for (let attempt = 0; attempt < 60; attempt += 1) {
+        const signature = await readStatusSignature(page);
+        if (signature !== '' && signature === previous) return signature;
+        previous = signature;
+        await page.waitForTimeout(150);
+    }
+
+    return previous;
 };
 
 test.describe('Scroll surfaces', () => {
@@ -332,79 +376,99 @@ test.describe('Scroll surfaces', () => {
      * 2000px is included deliberately: that is the width the defect was reported at, and every
      * narrower viewport hides the view counter behind a shedding breakpoint.
      */
-    for (const width of [1550, 2000]) {
-        test(`no status widget is clipped by its slot at ${width}px`, async ({ page }) => {
-            /**
-             * The values are mocked, and that is not a convenience — it is what makes this a test.
-             * Neither this machine nor CI has Google Analytics or Ariston credentials, so both render
-             * an error glyph roughly 15px wide, which fits any slot. Measured against a failure state
-             * the check passes while the widget is unreadable in production, which is precisely the
-             * hole the reported defect fell through. Serving worst-case values makes the assertion
-             * mean the same thing everywhere.
-             */
-            await page.route('**/api/analytics*', (route) =>
-                route.fulfill({ json: { pageViews: 999999, newUsers: 888888 } }),
-            );
-            await page.route('**/api/heating*', (route) =>
-                route.fulfill({ json: { outsideTemp: -12.5, zoneMeasuredTemp: 100.5 } }),
-            );
+    test.describe('with the widgets serving worst-case values', () => {
+        /**
+         * `bypassCSP` is required, and finding out why cost a red CI run.
+         *
+         * The hooks build their URL from `NEXT_PUBLIC_DOMAIN`. That is `localhost:3000` on a
+         * developer machine, so the fetch is same-origin and everything works. CI injects the real
+         * domain from secrets while still serving the build on localhost, so the page asks for
+         * `https://xabierlameiro.com/api/analytics` — and the site's own `connect-src` refuses it.
+         * The request is blocked in the renderer **before it becomes a network request**, so
+         * `page.route` never sees it (`0` interceptions, measured) and no amount of CORS headers on
+         * the mocked response helps. The widget falls back to its error state and the assertion
+         * fails on an empty string.
+         *
+         * So the CSP is lifted for these two tests only. They measure slot geometry, not the
+         * site's connection policy — which the security headers in `next.config.ts` cover.
+         */
+        test.use({ bypassCSP: true });
 
-            await page.setViewportSize({ width, height: 900 });
-            await page.goto('/');
-            await expect(page.getByTestId('header')).toBeVisible();
-            await expect(page.getByTestId('views')).toContainText('999999');
-            await waitForStableHeader(page);
+        for (const width of [1550, 2000]) {
+            test(`no status widget is clipped by its slot at ${width}px`, async ({ page }) => {
+                /**
+                 * The values are mocked, and that is not a convenience — it is what makes this a
+                 * test. Neither this machine nor CI has Google Analytics or Ariston credentials, so
+                 * both render an error glyph roughly 15px wide, which fits any slot. Measured
+                 * against a failure state the check passes while the widget is unreadable in
+                 * production, which is precisely the hole the reported defect fell through.
+                 *
+                 * `access-control-allow-origin` covers the cross-origin half: with the CSP lifted
+                 * the request does go out, and on CI it goes to another origin.
+                 */
+                const mock = (json: object) => (route: Route) =>
+                    route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
 
-            const clipped = await page.evaluate(() => {
-                const header = document.querySelector('header');
-                if (!header) throw new Error('no <header> in the document');
-                const right = header.querySelector('[class*="right"]');
-                if (!right) throw new Error('no right zone in the header');
+                await page.route('**/api/analytics*', mock({ pageViews: 999999, newUsers: 888888 }));
+                await page.route('**/api/heating*', mock({ outsideTemp: -12.5, zoneMeasuredTemp: 100.5 }));
 
-                return [...right.children]
-                    .filter((slot) => getComputedStyle(slot).display !== 'none')
-                    .map((slot) => {
-                        const box = slot.getBoundingClientRect();
-                        /**
-                         * Excluding nodes that are themselves absolute is not enough: the weather
-                         * popover is absolute, but its contents are static children of it, so they
-                         * pass that filter and drag the measurement 457px past the clock. Walk up to
-                         * the slot and drop anything with a positioned ancestor.
-                         */
-                        const escapes = (node: Element) => {
-                            for (let el: Element | null = node; el && el !== slot; el = el.parentElement) {
-                                const position = getComputedStyle(el).position;
-                                if (position === 'absolute' || position === 'fixed') return true;
-                            }
-                            return false;
-                        };
+                await page.setViewportSize({ width, height: 900 });
+                await page.goto('/');
+                await expect(page.getByTestId('header')).toBeVisible();
+                await expect(page.getByTestId('views')).toContainText('999999');
+                await waitForStableStatusContent(page);
 
-                        const laidOut = [...slot.querySelectorAll('*')].filter((node) => {
-                            if (getComputedStyle(node).display === 'none' || escapes(node)) return false;
-                            const rect = node.getBoundingClientRect();
-                            return rect.width > 0 && rect.height > 0;
-                        });
-                        if (laidOut.length === 0) return null;
+                const clipped = await page.evaluate(() => {
+                    const header = document.querySelector('header');
+                    if (!header) throw new Error('no <header> in the document');
+                    const right = header.querySelector('[class*="right"]');
+                    if (!right) throw new Error('no right zone in the header');
 
-                        const rects = laidOut.map((node) => node.getBoundingClientRect());
-                        const lostLeft = Math.round(box.left - Math.min(...rects.map((rect) => rect.left)));
-                        const lostRight = Math.round(Math.max(...rects.map((rect) => rect.right)) - box.right);
-                        if (lostLeft <= 1 && lostRight <= 1) return null;
+                    return [...right.children]
+                        .filter((slot) => getComputedStyle(slot).display !== 'none')
+                        .map((slot) => {
+                            const box = slot.getBoundingClientRect();
+                            /**
+                             * Excluding nodes that are themselves absolute is not enough: the weather
+                             * popover is absolute, but its contents are static children of it, so they
+                             * pass that filter and drag the measurement 457px past the clock. Walk up to
+                             * the slot and drop anything with a positioned ancestor.
+                             */
+                            const escapes = (node: Element) => {
+                                for (let el: Element | null = node; el && el !== slot; el = el.parentElement) {
+                                    const position = getComputedStyle(el).position;
+                                    if (position === 'absolute' || position === 'fixed') return true;
+                                }
+                                return false;
+                            };
 
-                        return (
-                            `${(slot.className.match(/header_(\w+?)__/) || [])[1] || slot.className}` +
-                            ` (${Math.round(box.width)}px slot, "${(slot.textContent || '').trim().slice(0, 20)}")` +
-                            ` loses ${lostLeft > 1 ? lostLeft + 'px off its left' : ''}` +
-                            `${lostLeft > 1 && lostRight > 1 ? ' and ' : ''}` +
-                            `${lostRight > 1 ? lostRight + 'px off its right' : ''}`
-                        );
-                    })
-                    .filter(Boolean);
+                            const laidOut = [...slot.querySelectorAll('*')].filter((node) => {
+                                if (getComputedStyle(node).display === 'none' || escapes(node)) return false;
+                                const rect = node.getBoundingClientRect();
+                                return rect.width > 0 && rect.height > 0;
+                            });
+                            if (laidOut.length === 0) return null;
+
+                            const rects = laidOut.map((node) => node.getBoundingClientRect());
+                            const lostLeft = Math.round(box.left - Math.min(...rects.map((rect) => rect.left)));
+                            const lostRight = Math.round(Math.max(...rects.map((rect) => rect.right)) - box.right);
+                            if (lostLeft <= 1 && lostRight <= 1) return null;
+
+                            return (
+                                `${(slot.className.match(/header_(\w+?)__/) || [])[1] || slot.className}` +
+                                ` (${Math.round(box.width)}px slot, "${(slot.textContent || '').trim().slice(0, 20)}")` +
+                                ` loses ${lostLeft > 1 ? lostLeft + 'px off its left' : ''}` +
+                                `${lostLeft > 1 && lostRight > 1 ? ' and ' : ''}` +
+                                `${lostRight > 1 ? lostRight + 'px off its right' : ''}`
+                            );
+                        })
+                        .filter(Boolean);
+                });
+
+                expect(clipped, `status widgets clipped at ${width}px: ${clipped.join(' | ')}`).toEqual([]);
             });
-
-            expect(clipped, `status widgets clipped at ${width}px: ${clipped.join(' | ')}`).toEqual([]);
-        });
-    }
+        }
+    });
 
     /**
      * L12-T3/T4. This shipped as `test.fail()` while the defect existed: the suite stayed green, and
