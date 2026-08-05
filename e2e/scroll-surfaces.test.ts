@@ -12,9 +12,14 @@ import { expect, test } from './fixtures';
  *
  *    L12-T2 first removed the five artifact links, which fixed 1280 and 1920 and left 768 and 375
  *    still overflowing — the remaining width was widgets, not links. L12-T8 replaced that approach
- *    with the layout the design was reaching for: three zones, status items as icons on the right,
- *    and priority-based shedding below 1023 px and 768 px, the way a macOS menu bar behaves. The
- *    links came back. All four viewports are asserted, none skipped.
+ *    with three zones and priority-based shedding, the way a macOS menu bar behaves, and the links
+ *    came back. L12-T9 then moved the link icons into the LEFT zone, beside the identity, and put
+ *    the status values on a fixed pitch.
+ *
+ *    T9 is why the widths in `VIEWPORTS` all changed. With the icons on the left the left zone is
+ *    320 px rather than 66 px, so it can now reach the centred countdown too — `W >= 2 * (zone +
+ *    103)` has to hold for *both* sides, and every breakpoint was re-derived against the wider of
+ *    the two. A ladder that watches one side is how the bar ended up drawn over itself at 1024 px.
  *
  * 2. **`overflow: scroll` where `auto` was meant.** `scroll` paints a scrollbar unconditionally;
  *    `auto` paints one only when there is something to scroll. Chromium on macOS hides the
@@ -44,22 +49,32 @@ const SCROLLER_ROUTES = ['/', '/blog', '/legal/privacy-policy'];
  */
 const VIEWPORTS = [
     { width: 375, height: 812, name: 'mobile' },
+    { width: 479, height: 812, name: 'below profile icons' },
+    { width: 480, height: 812, name: 'profile icons appear' },
     { width: 768, height: 1024, name: 'tablet, no countdown' },
     { width: 769, height: 1024, name: 'tablet, countdown appears' },
+    { width: 869, height: 800, name: 'below artifact icons' },
+    { width: 870, height: 800, name: 'artifact icons appear' },
+    { width: 939, height: 800, name: 'below crypto' },
+    { width: 940, height: 800, name: 'crypto appears' },
     { width: 1024, height: 800, name: 'small laptop' },
-    { width: 1179, height: 800, name: 'below artifact icons' },
-    { width: 1181, height: 800, name: 'artifact icons appear' },
+    { width: 1129, height: 800, name: 'below heating' },
+    { width: 1130, height: 800, name: 'heating appears' },
     { width: 1280, height: 720, name: 'laptop' },
-    { width: 1319, height: 800, name: 'below indexed counter' },
-    { width: 1321, height: 800, name: 'indexed counter appears' },
-    { width: 1479, height: 800, name: 'below crypto' },
-    { width: 1481, height: 800, name: 'crypto appears' },
-    { width: 1659, height: 900, name: 'below heating' },
-    { width: 1661, height: 900, name: 'heating appears' },
+    { width: 1329, height: 800, name: 'below view counter' },
+    { width: 1330, height: 800, name: 'view counter appears' },
     { width: 1920, height: 1080, name: 'desktop' },
-    { width: 2019, height: 1080, name: 'below view counter' },
-    { width: 2021, height: 1080, name: 'view counter appears' },
 ];
+
+/**
+ * SDD-L12-T9. The status area is a fixed pitch, and these are the only widths a slot may have.
+ *
+ * T8 sized the slots with `auto` tracks, so each one was as wide as whatever its widget happened to
+ * be showing — and when three widgets were in an error state the row read as randomly spaced, which
+ * is what the owner reported. Pinning the numbers here means a future `auto` or a stray `gap` fails
+ * as a test rather than as a screenshot.
+ */
+const SLOT_WIDTHS = { deploymentDot: 24, value: 96, clock: 140 };
 
 /**
  * Measures the *bar*, not the scroll box.
@@ -233,6 +248,65 @@ test.describe('Scroll surfaces', () => {
             });
 
             expect(covered, `status items are not reachable: ${covered.join(' | ')}`).toEqual([]);
+        });
+    }
+
+    /**
+     * L12-T9. The owner's report was "each one takes a random amount of space, and they should be
+     * stuck to the right". Both halves are asserted, because they have different causes: the pitch
+     * comes from the fixed slot widths, and the flush edge from the zone's own alignment.
+     *
+     * Measured at two widths so the claim is not an artefact of one: at 1280 the crypto slot is shed
+     * and at 1920 it is not, so the check sees a different number of slots each time.
+     */
+    for (const width of [1280, 1920]) {
+        test(`the status items keep a fixed pitch, flush to the bar edge at ${width}px`, async ({ page }) => {
+            await page.setViewportSize({ width, height: 800 });
+            await page.goto('/');
+            await expect(page.getByTestId('header')).toBeVisible();
+            await waitForStableHeader(page);
+
+            const layout = await page.evaluate(() => {
+                const header = document.querySelector('header');
+                if (!header) throw new Error('no <header> in the document');
+                const right = header.querySelector('[class*="right"]');
+                if (!right) throw new Error('no right zone in the header');
+
+                const bounds = header.getBoundingClientRect();
+                const style = getComputedStyle(header);
+                const slots = [...right.children]
+                    .filter((child) => getComputedStyle(child).display !== 'none')
+                    .map((child) => ({
+                        width: Math.round(child.getBoundingClientRect().width),
+                        right: Math.round(child.getBoundingClientRect().right),
+                    }));
+
+                return {
+                    slots,
+                    paddingLeft: Math.round(parseFloat(style.paddingLeft)),
+                    trailingGap: slots.length
+                        ? Math.round(bounds.right - slots[slots.length - 1].right)
+                        : Number.NaN,
+                };
+            });
+
+            const describe = JSON.stringify(layout);
+            const allowed = Object.values(SLOT_WIDTHS);
+
+            expect(layout.slots.length, `no status items at ${width}px: ${describe}`).toBeGreaterThan(1);
+
+            for (const slot of layout.slots) {
+                expect(allowed, `a status slot is ${slot.width}px, which is not a fixed slot: ${describe}`).toContain(
+                    slot.width,
+                );
+            }
+
+            // Flush right: the gap left after the last slot is the bar's own padding, the same
+            // number as on the identity side. Anything else is the zone drifting off the edge.
+            expect(
+                layout.trailingGap,
+                `the status items are not flush to the bar's right edge at ${width}px: ${describe}`,
+            ).toBe(layout.paddingLeft);
         });
     }
 

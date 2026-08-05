@@ -52,6 +52,10 @@
     white-space: nowrap;
 }
 
+/**
+ * SDD-L12-T9. Identity, route and the navigation icons — the icons live here, next to the logo,
+ * which is where they were before T8 and where a macOS menu bar puts navigation.
+ */
 .left {
     display: grid;
     grid-auto-flow: column;
@@ -71,12 +75,81 @@
     align-items: center;
 }
 
+/**
+ * SDD-L12-T9. Status items on a fixed pitch.
+ *
+ * T8 left this as `grid-auto-flow: column` with `auto` tracks, so every slot was as wide as whatever
+ * it happened to contain: the XRP price and the view count sat at different pitches, and both moved
+ * whenever a digit appeared. A menu bar's status area does not do that — each item owns a slot.
+ *
+ * The slots are FIXED, and that is the point: a fixed slot makes the zone's width a constant, so the
+ * shedding arithmetic below no longer depends on what the APIs happened to return. Under the old
+ * `auto` tracks a four-figure view count silently widened the zone and ate the margin that keeps the
+ * countdown clear.
+ *
+ * The widths are not measured from local content and must not be — several widgets render empty on
+ * this machine because their APIs have no credentials, so a local measurement would size every slot
+ * to an error state. They are sized to worst-case content instead, measured by rendering candidate
+ * strings in the slot's own computed font (16px -apple-system) in an unconstrained probe:
+ *
+ * | Worst case          | Text | + icon | Fits 96 px |
+ * |---------------------|------|--------|------------|
+ * | `1.234.567` indexed |  72  |   96   | yes, exactly |
+ * | `999.999` views     |  63  |   87   | yes        |
+ * | `-12,5 °C` heating  |  60  |   84   | yes        |
+ * | `$99.9999` XRP      |  68  |   92   | yes        |
+ * | `$1,234.5678` XRP   |  91  |  115   | NO         |
+ *
+ * So the slot holds about eight characters, and anything longer is clipped by `overflow: hidden`
+ * rather than widening the zone. That is the deliberate trade: a slot that grows is a slot that
+ * moves everything beside it, which is the jitter this rule exists to remove. XRP's all-time high is
+ * about $3.84, so `$99.9999` is ~25x headroom — but if a widget is ever pointed at an asset priced
+ * in four figures, widen `--status-slot` and re-derive the table below, do not let it clip.
+ *
+ * The clock is 140 px because it is the one slot whose content is locale-dependent: the longest
+ * Spanish rendering measured, `mié 30 sept 23:59`, is 134 px.
+ */
 .right {
     display: grid;
     grid-auto-flow: column;
     align-items: center;
     justify-content: end;
-    gap: 14px;
+    gap: 0;
+    --status-slot: 96px;
+}
+
+/**
+ * Contents align to the RIGHT of their slot, not to the centre.
+ *
+ * Centring looked correct with full-width values and wrong with anything narrower: an error glyph is
+ * ~12 px, so centring it in a 96 px slot opens 42 px of dead space on each side and the row reads as
+ * randomly spaced — which is what it did on the owner's screen, where three widgets were in an error
+ * state because their APIs have no credentials locally. Right-aligned, every item's trailing edge
+ * lands on the same 96 px pitch and the whole zone reads as one column flush to the bar's edge,
+ * whatever each widget happens to be showing.
+ */
+.statusItem {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: var(--status-slot);
+    overflow: hidden;
+}
+
+/* The deployment indicator is a dot, not a value; a full slot for it would be a 96 px hole. */
+.statusDot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 24px;
+}
+
+/* Four fields and a locale-dependent short weekday — the one slot that legitimately differs. */
+.clock {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 140px;
 }
 
 .header svg {
@@ -144,53 +217,51 @@
  *
  *     W >= 2 * (rightWidth + 103)
  *
- * Measured widths at 1920 px, in the order they are shed — most expensive first:
+ * SDD-L12-T9 re-derived all of this, because T9 moved the navigation icons into the LEFT zone. That
+ * changes the problem: under T8 the left zone was 66 px and could never reach the middle, so only
+ * the right zone was ever checked. With eight icons beside the identity the left zone is 320 px, and
+ * `W >= 2 * (leftWidth + 103)` is a real constraint that T8's ladder did not contain. A ladder that
+ * only watches one side is how the bar ended up drawn on top of itself at 1024 px the first time.
  *
- * | Item              | Width | Right zone after it goes | Needs    | Breakpoint |
- * |-------------------|-------|--------------------------|----------|------------|
- * | view counter      | 160   | 895 with it               | 1997     | 2020       |
- * | heating           |  85   | 721                       | 1649     | 1660       |
- * | crypto price      |  80   | 622                       | 1451     | 1480       |
- * | indexed counter   |  70   | 528                       | 1263     | 1320       |
- * | 5 artifact icons  | 160   | 444                       | 1095     | 1180       |
- * | (3 social icons)  |  82   | 270                       |  747     |  769       |
+ * Zone widths are now arithmetic, not measurement, because the slots are fixed:
+ * right = 24 (dot) + 96 per visible value slot + 140 (clock); left = 66 + 18 per icon + 14 per gap.
  *
- * Each breakpoint sits above what the arithmetic demands, so a widget that grows a digit — a
- * four-figure view count, a longer XRP price — does not silently start an overlap.
+ * | Below   | What sheds        | Left | Right | Left needs | Right needs |
+ * |---------|-------------------|------|-------|------------|-------------|
+ * | 1329 px | view counter      | 320  | 548   |  846       | 1302        |
+ * | 1129 px | heating           | 320  | 452   |  846       | 1110        |
+ * |  939 px | crypto price      | 320  | 356   |  846       |  918        |
+ * |  869 px | 5 artifact icons  | 320  | 260   |  846       |  726        |
+ * |  768 px | indexed counter   | 160  | 260   |  526       |  726        |
+ * |  479 px | 3 profile icons   | 160  | 164   |  526       |  534        |
  *
- * An earlier attempt used two round breakpoints (1023, 768) picked for tidiness rather than from
- * measurements. Just above 1023 px every widget was visible in a window that could not hold them,
- * and since `overflow` is `visible` they did not clip, they **overlapped** — the countdown and the
- * icons drawn on top of each other, which is what the owner saw.
+ * Read the table as: above each row's width, the zones on that row coexist. Every breakpoint sits
+ * ~20 px above what the arithmetic demands, and below 769 px the countdown is hidden entirely, so
+ * from there down the only requirement is that the two zones fit side by side — 372 px at 480 px
+ * wide, 278 px once the profile icons go.
  *
  * `.navLinks a` sets `display: flex` and outranks a bare class on specificity, so each rule lists
  * both forms rather than reaching for `!important`.
  */
-@media screen and (max-width: 2019px) {
+@media screen and (max-width: 1329px) {
     .shed1 {
         display: none;
     }
 }
 
-@media screen and (max-width: 1659px) {
+@media screen and (max-width: 1129px) {
     .shed2 {
         display: none;
     }
 }
 
-@media screen and (max-width: 1479px) {
+@media screen and (max-width: 939px) {
     .shed3 {
         display: none;
     }
 }
 
-@media screen and (max-width: 1319px) {
-    .shed4 {
-        display: none;
-    }
-}
-
-@media screen and (max-width: 1179px) {
+@media screen and (max-width: 869px) {
     .shed5,
     .navLinks a.shed5 {
         display: none;
@@ -198,8 +269,7 @@
 }
 
 @media screen and (max-width: 768px) {
-    .shed6,
-    .navLinks a.shed6 {
+    .shed4 {
         display: none;
     }
 
@@ -213,5 +283,17 @@
 
     .header {
         gap: 12px;
+    }
+}
+
+/**
+ * The three profile icons survive further than the artifact ones because they are the only
+ * navigation left. They go at 479 px, where the two zones would otherwise total 372 px in a 480 px
+ * window — fitting, but with nothing between them.
+ */
+@media screen and (max-width: 479px) {
+    .shed6,
+    .navLinks a.shed6 {
+        display: none;
     }
 }

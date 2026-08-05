@@ -56,7 +56,7 @@ const DateAndHour = ({ children, minutes = 1 }: { children?: ReactNode; minutes?
     }, [minutes]);
 
     return (
-        <div>
+        <div className={styles.clock}>
             <Tooltip>
                 <Tooltip.Trigger>
                     <button type="button" className={styles.dateAndHour} onClick={handleWeatherClick}>
@@ -106,7 +106,11 @@ const STATUS_ICONS: Record<string, IconType> = {
 };
 
 /**
- * @description The status items of the menu bar: profile and artifact links, as icons on the right.
+ * @description The profile and artifact links, as icons in the left zone beside the identity.
+ *
+ * SDD-L12-T9. T8 put them in the right zone, which read as a second cluster of status items hanging
+ * off the countdown. They are navigation, not status — on a macOS menu bar that belongs next to the
+ * app identity — and that is also where they were before T8 moved them.
  * @returns {JSX.Element}
  */
 const NavLinks = () => {
@@ -169,6 +173,7 @@ const Header = ({ children }: { children?: ReactNode }) => {
             <div className={styles.left}>
                 <SiBitcoincash aria-hidden="true" />
                 <Route />
+                <NavLinks />
             </div>
 
             <div className={styles.center}>
@@ -181,20 +186,19 @@ const Header = ({ children }: { children?: ReactNode }) => {
              * from measurements, not chosen for tidiness.
              */}
             <div className={styles.right}>
-                <NavLinks />
-                <span>
+                <span className={styles.statusDot}>
                     <DeploymentStatus />
                 </span>
-                <span className={styles.shed3}>
+                <span className={`${styles.statusItem} ${styles.shed3}`}>
                     <CryptoPrice />
                 </span>
-                <span className={styles.shed4}>
+                <span className={`${styles.statusItem} ${styles.shed4}`}>
                     <IndexedCounter />
                 </span>
-                <span className={styles.shed1}>
+                <span className={`${styles.statusItem} ${styles.shed1}`}>
                     <ViewCounter all />
                 </span>
-                <span className={styles.shed2}>
+                <span className={`${styles.statusItem} ${styles.shed2}`}>
                     <Heating />
                 </span>
                 <DateAndHour>
