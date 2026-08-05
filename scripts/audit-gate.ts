@@ -35,27 +35,25 @@ type AllowlistEntry = {
     reviewBy: string;
 };
 
-const ALLOWLIST: AllowlistEntry[] = [
-    {
-        id: 1124334,
-        ghsa: 'GHSA-mh99-v99m-4gvg',
-        package: 'brace-expansion',
-        reason:
-            'DoS via unbounded brace expansion (CWE-400/770, CVSS 7.5), range <=5.0.7. Reached only ' +
-            'as googleapis -> googleapis-common -> gaxios -> rimraf -> glob -> minimatch -> ' +
-            "brace-expansion. rimraf runs on googleapis' own cleanup paths; no request-controlled " +
-            'string reaches a glob pattern anywhere in this app (searchConsole.ts passes fixed ' +
-            'resource names, and api/indexed-pages.ts reads a fixed literal path), so the ' +
-            'expansion this advisory abuses is never fed attacker input. ' +
-            'No upstream fix: googleapis is already at its latest (173.0.0) and the vulnerable ' +
-            'chain sits below it. Forcing brace-expansion to ^5.0.8 via overrides was tried and ' +
-            'REJECTED — it clears the audit but breaks runtime, because minimatch@9 calls ' +
-            'brace_expansion_1.default() and 5.x dropped the default export ' +
-            '("TypeError: (0, brace_expansion_1.default) is not a function"). A green audit over ' +
-            'broken globbing is worse than a documented exception.',
-        reviewBy: '2026-10-26',
-    },
-];
+/**
+ * Empty, and the gate insists on it staying honest: it fails on an entry whose advisory no longer
+ * appears, because an allowlist that outlives its advisory hides the regression if it comes back.
+ *
+ * The `brace-expansion` entry (1124334, GHSA-mh99-v99m-4gvg) lived here until 2026-08-05 and is gone
+ * because the advisory is fixed, not waived. Keep the reasoning that replaced it, though, because it
+ * is why `package.json` pins that package **per major** rather than forcing one version across the
+ * tree: forcing `^5.0.8` clears the audit and breaks runtime, since minimatch@9 calls
+ * `brace_expansion_1.default()` and 5.x dropped the default export. Three separate pins, each moved
+ * within its own major, is the shape that satisfies both.
+ */
+/*
+ * `sonarjs/no-empty-collection` reads the three usages below as dead because the literal is empty
+ * today. Empty is this collection's correct resting state, not a defect: it is a register of
+ * deliberate exceptions, and the gate's own stale-entry check exists to drive it back to empty.
+ * Deleting the reads to satisfy the rule would delete the gate.
+ */
+/* eslint-disable sonarjs/no-empty-collection */
+const ALLOWLIST: AllowlistEntry[] = [];
 
 /**
  * The report version this gate's extraction logic is written against. npm has emitted 2 since npm 7
