@@ -10,7 +10,7 @@ const es = {
     'blog.readtime': '{readTime, plural, one {# minuto de tiempo de lectura} other {# minutos de tiempo de lectura}}',
     'blog.breadcrumb': 'Notas',
     language: 'Español',
-    'home.seo.title': 'Xabier Lameiro | Software Architect, técnico en microinformática y redes',
+    'home.seo.title': 'Xabier Lameiro | Software Architect · Next.js y React',
     'home.seo.description':
         'Software Architect con más de 8 años de experiencia trabajando en el sector de la banca online, actualmente especializado en Nextjs y React. Apasionado de la tecnología y la programación, me gusta aprender cosas nuevas y compartir conocimientos con la comunidad. ',
     'home.breadcrumb': 'Código',
