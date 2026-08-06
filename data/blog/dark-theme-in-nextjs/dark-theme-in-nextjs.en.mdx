@@ -1,97 +1,185 @@
 ---
-title: 'Dark theme with Nextjs'
+title: 'Dark mode in Next.js without the flash of the wrong theme'
 slug: 'dark-theme'
 author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['css']
 locale: 'en'
-excerpt: 'One way to implement a dark theme with Nextjs is to use the CSS variables and once hooked to the theme change event, change the value of the variables.'
-description: 'Build a dark theme in Next.js with CSS variables and a theme-toggle event — no flash of the wrong theme and no heavy library. A step-by-step guide with the full code.'
+updated: '2026-08-06'
+excerpt: 'CSS variables are the easy part. The theme has to be resolved before the first paint, color-scheme has to follow it, and an explicit choice has to outrank the operating system.'
+description: 'Dark mode in Next.js with CSS variables: resolve the theme before the first paint, persist the choice, and set color-scheme so scrollbars and form controls follow it.'
 image: '/posts/dark-theme-in-nextjs.png'
 alternate: [{ lang: 'es', url: 'tema-oscuro' }, { lang: 'gl', url: 'tema-escuro' }]
+faq:
+    - question: 'How do I stop the flash of the wrong theme in Next.js?'
+      answer: 'Resolve the theme in a small synchronous script in the document head, before the body is parsed. It reads localStorage and prefers-color-scheme and sets data-theme on the html element. A useEffect cannot do this: it runs after React mounts, which is after the first paint, so the wrong palette is already on screen.'
+    - question: 'What does the CSS color-scheme property do?'
+      answer: 'It tells the browser which palette to use for the UI it renders itself: scrollbars, form controls, spellcheck underlines and the default canvas colour. Without it a dark page keeps light scrollbars and light select boxes. Bind it to the theme you are actually rendering, not to prefers-color-scheme, or an explicit toggle and the browser UI will disagree.'
+    - question: 'Should I use light-dark() instead of CSS variables per theme?'
+      answer: 'light-dark() removes one level of indirection — you write both values in a single declaration instead of redefining a variable in two blocks. It is Baseline since May 2024 and depends on color-scheme being set. It is a good fit for a new project; on an existing token set with dozens of variables the rewrite rarely pays for itself.'
+    - question: 'Why does prefers-color-scheme only work after I change the OS setting?'
+      answer: 'Because the code registers the change listener but never reads mediaQuery.matches on mount. addEventListener only fires when the preference changes during the session, so a visitor who already had dark mode on gets the light palette until they toggle their OS. Read matches once when the effect runs.'
 ---
 
-# Dark theme with Nextjs
+# Dark mode in Next.js without the flash of the wrong theme
 
 <Date date="02-03-2023" />
 
 <GoogleAdsense />
 
-There are many ways to manage style themes in React and Nextjs, but all of them involve having an array/object with all the styles of each of the different themes.
-another way is to use css or scss variables _these last ones are in more and more disuse_. I, in particular, am going to use css variables and set a default theme in my \_document. Why here ?
+## Quick answer
 
-Because \_document runs on server not like \_app which runs on client and if you use a useEffect to set your default theme or detect the one the user has on their operating system,
-in the time it takes to do this check and add it, there can be a flicker in the page styles. That can be strange.
+A dark theme in Next.js needs three things, and CSS variables are only the first one:
 
-I did it like this:
+-   **Define the palette per theme** — one `[data-theme='dark']` block, one `[data-theme='light']` block, with the tokens redefined in each.
+-   **Resolve the theme before the first paint** — a small synchronous `<script>` in `_document` that reads `localStorage` and `prefers-color-scheme` and sets `data-theme` on `<html>`. A `useEffect` runs too late: the wrong palette is already on screen.
+-   **Set `color-scheme`** — otherwise scrollbars, `<select>` boxes and the default canvas stay light on a dark page.
 
-## 1 - css variables
+The part almost every tutorial gets wrong (mine included, for three years) is the second one. Registering a `matchMedia` **change** listener is not the same as reading the preference: the listener only fires if the visitor flips their OS theme while the tab is open.
+
+## What I shipped, and why it never worked
+
+The original version of this post described exactly what this site was running: CSS variables, `data-theme="light"` hardcoded in `_document`, and a hook subscribed to `prefers-color-scheme`. It had two defects that cancelled each other out well enough that I did not notice for three years.
+
+The first is in the hook. It called `mediaQuery.addEventListener('change', handler)` and nothing else — it never read `mediaQuery.matches`. `change` fires when the preference *changes*, not when you subscribe, so a visitor who had dark mode enabled before opening the page got the light palette and kept it. The only way to see the dark theme was to toggle the OS setting with the tab already open, which is exactly what I did every time I "tested" it.
+
+The second is worse. The hook was mounted by a single page — the settings dialog — so on every other route `data-theme` never moved from the `"light"` written into `_document`. The dark palette was not just hard to reach, it effectively never rendered. When I finally applied it site-wide, a window surface that had been sitting there since 2023 turned out to be painting white on white, because it used a theme-independent `--white-color` token that nobody had ever seen in dark mode.
+
+Meanwhile `globals.css` carried this:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```css globals.css
+@media (prefers-color-scheme: dark) {
+    html {
+        color-scheme: dark;
+    }
+}
+```
+
+</CH.Code>
+
+That rule reads the operating system directly, while the palette on the page came from `data-theme`. On Next.js 15.5 in August 2026, with the OS set to dark, the page reported `data-theme="light"` and `color-scheme: dark` at the same time: light background, light text tokens, and dark scrollbars, because the browser had been told the page was dark and the CSS said otherwise.
+
+## 1 — CSS variables per theme
+
+This part of the original post was fine and has not changed. Colours live as raw channel triplets so they can be reused with an alpha value, and each theme redefines them:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
 ```css globals.css
 :root {
-    /* commons */
+    /* theme-independent */
     --white-color: 255, 255, 255;
-    --color-available-arrow: 95, 91 98;
-    ...;
+    --blue-color: 29, 88, 154;
 }
 
 [data-theme='dark'] {
-    --blog-nav: 48, 41, 51;
-    --blog-header: 53, 45, 55;
-    ...;
+    color-scheme: dark;
+    --blog-background: 30, 30, 30;
+    --blog-font: 223, 222, 223;
+    --blog-border: 107, 107, 107;
 }
 
 [data-theme='light'] {
-    --blog-nav: 204, 202, 219;
-    --blog-header: 255, 255, 255;
-    ...;
+    color-scheme: light;
+    --blog-background: 255, 255, 255;
+    --blog-font: 39, 39, 39;
+    --blog-border: 118, 118, 118;
 }
 ```
 
 </CH.Code>
 
-## 2 - Set default theme
+The trap is the `:root` block. Anything that stays there is theme-independent by definition, and a token like `--white-color` used as a surface colour will still be white under `[data-theme='dark']`. If a value names a colour rather than a role, it does not belong in a themed component.
+
+## 2 — color-scheme, the property that fixes the browser's own UI
+
+`color-scheme` is what tells the browser which palette to use for the parts of the page **it** renders: scrollbars, checkboxes, radio buttons, `<select>` dropdowns, spellcheck underlines, and the default canvas colour before your CSS loads. It has been Baseline — available in every major engine — since January 2022, and it is missing from most dark-theme tutorials, including the first version of this one.
+
+Two details matter more than the property itself:
+
+**Declare it inside the `[data-theme]` blocks, not in a media query.** A media query follows the operating system. Your palette follows whatever theme is applied, which after a toggle is not the same thing. Bind them to the same selector and they cannot drift apart.
+
+**It also fixes the pre-paint flash colour.** With `color-scheme: dark`, the browser paints its default canvas dark instead of white, so even the frame before your stylesheet applies is the right colour.
+
+## 3 — Resolve the theme before the first paint
+
+The server cannot know the visitor's preference — there is no request header for `prefers-color-scheme` — so the HTML has to ship with a default and be corrected in the browser. The correction has to happen before the body is painted, which rules out `useEffect`.
+
+A synchronous script in the head does it. It is parser-blocking, which is normally something to avoid, but this is a handful of bytes and it is the entire point:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```tsx _document.tsx mark=4
+```tsx _document.tsx
+const themeBootstrap = `(function(){try{var s=localStorage.getItem('theme');var t=s==='dark'||s==='light'?s:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})()`;
 
-const Document = (props: Props) => {
-    return (
-        <Html lang={props.__NEXT_DATA__.locale} data-theme="light">
-    )
-}
-
+const Document = (props: Props) => (
+    <Html lang={props.__NEXT_DATA__.locale} data-theme="light">
+        <Head>
+            <meta charSet="utf-8" />
+            <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+            {/* ...the rest of the head */}
+        </Head>
+        <body>
+            <Main />
+            <NextScript />
+        </body>
+    </Html>
+);
 ```
 
 </CH.Code>
 
-## 3 - Custom hook to change theme
+Notes on the details, because each one is there for a reason:
+
+-   **`data-theme="light"` stays in the markup.** It is the fallback for a visitor with JavaScript disabled, and the script overwrites it before anything is painted.
+-   **The stored value is checked first**, so an explicit choice outranks the OS. A toggle that the next OS change silently undoes is not a toggle.
+-   **`try/catch` around `localStorage`.** In private mode and behind some extensions, reading it throws. Without the guard, the whole script dies and every visitor gets the light theme.
+-   **It goes in `_document`, not `_app`.** `_document` renders on the server only and is never hydrated, so mutating `documentElement` from it causes no hydration mismatch.
+
+Putting it in the head is also what makes it independent of your component tree. That was the real failure in my case: the theme was applied by a hook that only one page mounted. In the head it runs on every route, regardless of what renders.
+
+## 4 — The hook: read the initial value, persist the choice
+
+The hook is still needed — for the toggle, and to follow the OS while the tab is open — but it must read `matches` on mount rather than waiting for a `change` event:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
 ```ts useDarkMode.ts
-import React from 'react';
+export const THEME_STORAGE_KEY = 'theme';
 
-const scheme = {
-    light: 'light' as const,
-    dark: 'dark' as const,
-};
-
-const useDarkMode = (): { theme: null | 'dark' | 'light'; toggleTheme: () => void; scheme: typeof scheme } => {
+const useDarkMode = () => {
     const [theme, setTheme] = React.useState<null | 'dark' | 'light'>(null);
 
     React.useEffect(() => {
-        if (typeof window !== 'undefined' && window.matchMedia) {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const handler = (event: MediaQueryListEvent) => {
-                setTheme(event.matches ? scheme.dark : scheme.light);
-            };
-            mediaQuery.addEventListener('change', handler);
-            return () => mediaQuery.removeEventListener('change', handler);
+        if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        let stored: string | null = null;
+        try {
+            stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+        } catch {
+            // Storage blocked (private mode, extensions). Fall through to the OS preference.
         }
+
+        // The line the original version of this post was missing.
+        if (stored === 'dark' || stored === 'light') setTheme(stored);
+        else setTheme(mediaQuery.matches ? 'dark' : 'light');
+
+        // Follow the OS only while the visitor has not made a choice of their own.
+        const handler = (event: MediaQueryListEvent) => {
+            let hasExplicitChoice = false;
+            try {
+                hasExplicitChoice = window.localStorage.getItem(THEME_STORAGE_KEY) !== null;
+            } catch {
+                hasExplicitChoice = false;
+            }
+            if (!hasExplicitChoice) setTheme(event.matches ? 'dark' : 'light');
+        };
+        mediaQuery.addEventListener('change', handler);
+        return () => mediaQuery.removeEventListener('change', handler);
     }, []);
 
     React.useEffect(() => {
@@ -100,49 +188,108 @@ const useDarkMode = (): { theme: null | 'dark' | 'light'; toggleTheme: () => voi
         }
     }, [theme]);
 
-    const toggleTheme = () => {
-        setTheme(theme === scheme.dark ? scheme.light : scheme.dark);
-    };
+    const toggleTheme = React.useCallback(() => {
+        setTheme((current) => {
+            const next = current === 'dark' ? 'light' : 'dark';
+            try {
+                window.localStorage.setItem(THEME_STORAGE_KEY, next);
+            } catch {
+                // The choice still applies to this page view.
+            }
+            return next;
+        });
+    }, []);
 
-    return { theme, scheme, toggleTheme };
+    return { theme, toggleTheme };
 };
-
-export default useDarkMode;
 ```
 
 </CH.Code>
 
-## 4 - Using the hook
+The `change` handler deliberately does nothing once a choice has been stored. Without that check, a visitor who picked light would be flipped back to dark the next time their laptop switched to night mode — the toggle would look broken rather than overridden.
+
+`toggleTheme` uses the functional form of `setTheme` instead of reading `theme` from the closure, so it does not need `theme` in its dependency list and cannot act on a stale value.
+
+## 5 — Wiring the toggle
+
+Nothing special left at this point. The component reads the current theme for its label and calls `toggleTheme`:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```tsx settings.tsx mark=3,4,5,6,15,16
-const Content = () => {
-    const { formatMessage: f } = useIntl();
-    const {
-        theme,
-        scheme: { dark },
-        toggleTheme,
-    } = useDarkMode();
+```tsx settings.tsx
+const { theme, toggleTheme } = useDarkMode();
 
-    return (
-        <div className={styles.container}>
-            <section className={styles.confg}>
-                <IconWithName
-                    icon="/theme.png"
-                    alt={f({ id: 'settings.langAlt' })}
-                    name={f({ id: theme === dark ? 'settings.dark' : 'settings.light' })}
-                    onClick={toggleTheme}
-                />
-            </section>
-            <section className={styles.confg}></section>
-        </div>
-    );
-};
+return (
+    <IconWithName
+        icon="/settings/theme.png"
+        alt=""
+        name={f({ id: theme === 'dark' ? 'settings.dark' : 'settings.light' })}
+        onClick={toggleTheme}
+        pressed={theme === 'dark'}
+    />
+);
 ```
 
 </CH.Code>
 
-To do the live test, you can change the theme on your operating system and you will see that my website updates automatically or you can also go to my settings page and change the theme.
+`theme` is `null` on the first render — the value is only resolved inside the effect, because reading `localStorage` or `matchMedia` during render would make the server and client markup disagree and produce a hydration error. Label the control from `data-theme` on the document if you need the text to be correct in the server HTML too.
+
+## light-dark(), and whether it is worth it
+
+`light-dark()` puts both values in one declaration and picks between them based on the element's used colour scheme:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```css light-dark.css
+:root {
+    color-scheme: light dark;
+    --blog-background: light-dark(#ffffff, #1e1e1e);
+    --blog-font: light-dark(#272727, #dfdedf);
+}
+```
+
+</CH.Code>
+
+It became Baseline in May 2024, so it is usable today with a fallback, and it removes a genuine annoyance: the two-block structure where every token has to be declared twice in two distant places, and adding one means remembering to add it in both.
+
+I have not migrated this site to it, and the reason is not browser support. `light-dark()` resolves against `color-scheme`, so it only handles the light/dark pair — the moment you want a third theme, or a per-section override, you are back to redefining variables under a selector. With a token set already split across two blocks, the rewrite buys tidier CSS and nothing a visitor can see. On a new project I would start with it.
+
+## The caveat nobody mentions: theme-color
+
+`<meta name="theme-color">` colours the browser chrome on mobile, and it accepts a `media` attribute:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```html theme-color.html
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1E1E1E" media="(prefers-color-scheme: dark)" />
+```
+
+</CH.Code>
+
+That media attribute reads the OS, and a `<meta>` element cannot read `localStorage`. So a visitor who overrides the theme gets a page in one palette and browser chrome in the other. Swapping the `content` attribute from the toggle handler is the only way to keep them in sync, and it is worth deciding whether you care before writing that code.
+
+## How to check it actually works
+
+Three checks, in the browser console, with the OS set to dark:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```js console.js
+// 1. The bootstrap ran and matched the OS.
+document.documentElement.getAttribute('data-theme'); // "dark"
+
+// 2. The browser's own UI follows the same theme.
+getComputedStyle(document.documentElement).colorScheme; // "dark"
+
+// 3. An explicit choice outranks the OS, and survives a reload.
+localStorage.setItem('theme', 'light');
+location.reload();
+// -> data-theme "light", colorScheme "light"
+```
+
+</CH.Code>
+
+The second one is the check that caught the bug in this site: `data-theme` said `light` while `colorScheme` said `dark`. If those two ever disagree, the palette and the browser UI are reading different sources.
 
 > All the code in my github repository, if you like this project, or if the content has helped you in any way you can reward me with a ⭐️, Thanks!
