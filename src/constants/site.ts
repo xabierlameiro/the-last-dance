@@ -6,7 +6,7 @@ export const defaultLocale = 'en';
 export const author = 'Xabier Lameiro';
 export const authorAlternateName = 'Xabier Lameiro Cardama';
 export const socialNetworks = [
-    'https://www.linkedin.com/in/xlameiro',
+    'https://www.linkedin.com/in/xabierlameiro',
     'https://github.com/xabierlameiro',
     'https://www.reddit.com/user/xlameiro',
     'https://x.com/xlameirodev',
@@ -41,7 +41,7 @@ export const personDescription: Record<string, string> = {
  */
 export const socialLinks = [
     {
-        href: 'https://www.linkedin.com/in/xlameiro',
+        href: 'https://www.linkedin.com/in/xabierlameiro',
         title: 'Linkedin profile',
         name: 'Linkedin',
         testId: 'linkedin-link',

@@ -55,7 +55,7 @@ const CONTACT = {
     phoneLabel: '603 018 268',
     email: 'xabier.lameiro@gmail.com',
     github: 'https://github.com/xabierlameiro',
-    linkedin: 'https://www.linkedin.com/in/xlameiro/',
+    linkedin: 'https://www.linkedin.com/in/xabierlameiro/',
     cv: '/xabierlameiro.com.pdf',
 };
 
