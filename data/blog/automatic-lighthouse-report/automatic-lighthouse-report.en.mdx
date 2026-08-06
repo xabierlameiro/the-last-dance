@@ -5,6 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Javascript'
 tags: ['node']
 locale: 'en'
+updated: '2026-08-06'
 excerpt: 'Automation of Lighthouse reporting using playwright and the lightouse api on a deployed website in a real example'
 description: 'Automation of Lighthouse reporting using playwright and the lightouse api on a deployed website in a real example'
 image: '/posts/automatic-lighthouse-report.png'
@@ -21,7 +22,9 @@ alternate:
 
 <GoogleAdsense />
 
-An easy way to have automated Lighthouse reports is using the Google tool called [Lighthouse CI](https://github.com/GoogleChrome/lighthouse 'Ligthouse repository') that allows us to pass the ligthouse test to a website and save the results on a server to compare them with the results of other executions.
+An easy way to have automated Lighthouse reports is to drive Google's [Lighthouse](https://github.com/GoogleChrome/lighthouse 'Lighthouse repository') from a script: run the audit against a site and save the results so you can compare them with other runs.
+
+Worth being precise about the name, because the two get conflated: this uses **Lighthouse**, the auditing engine. [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) is a different project — the `@lhci/cli` and `@lhci/server` packages, which exist to store runs and compare them against a budget. If you want assertions and a history server rather than a script you control, that is the one to reach for.
 
 You can see the improvements in performance, accessibility, SEO, etc. of your website. You can even add new rules with custom plugins, for example, to check that no html has been added that does not comply with the accessibility rules.
 
@@ -40,7 +43,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage();
 await page.goto('https://xabierlameiro.com/sitemap.xml');
 // get site map inside a body
-const sitemap = await page.$eval('body', (el) => el.innerHTML);
+const sitemap = await page.locator('body').innerHTML();
 // get all urls inside sitemap - Fixed: Use safer regex pattern
 const urls = sitemap.match(/<loc>([^<]+)<\/loc>/g)?.map((url) => url.replace(/<\/?loc>/g, '')) || [];
 // split urls in locales bearing in mind that 'en' is the default locale and it's not included in the url

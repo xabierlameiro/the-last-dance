@@ -5,6 +5,7 @@ author: 'Xabier Lameiro'
 category: 'React'
 tags: ['node']
 locale: 'gl'
+updated: '2026-08-06'
 excerpt: 'Enquisa para que os recruiters poidan saber se son compatible cunha posición de traballo concreta'
 description: 'Enquisa para que os recruiters poidan saber se son compatible cunha posición de traballo concreta'
 image: '/posts/filter-for-positions.png'
@@ -245,42 +246,18 @@ export default useSurvey;
 
 </CH.Code>
 
-Meu backend
+**Esta parte xa non funciona.** A enquisa enviaba as súas respostas por POST a unha ruta `/api/email`
+montada sobre nodemailer, e o endpoint xa non existe — a enquisa non manda ningún correo. Deixo a nota en
+vez do código porque o snippet tiña dous problemas que paga a pena nomear.
 
-<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+`nodemailer.createTransport({ service: process.env.EMAIL_HOST })` usa mal `service`: agarda o
+identificador dun provedor coñecido (`"gmail"`), non un host SMTP calquera, así que apuntalo a un host
+propio non configura o transporte. Para iso van `host`, `port` e `secure`.
 
-```ts email.ts
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer from 'nodemailer';
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
-    const transporter = nodemailer.createTransport({
-        service: process.env.EMAIL_HOST,
-        auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASSWORD,
-        },
-    });
-
-    const { subject, message } = req.body;
-
-    const mailOptions = {
-        from: process.env.EMAIL,
-        to: process.env.EMAIL,
-        subject: subject,
-        html: message,
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        res.status(200).json({ success: true });
-    } catch (error) {
-        res.status(500).json({ success: error });
-    }
-}
-```
-
-</CH.Code>
+E o corpo da mensaxe construíase interpolando valores directamente en HTML — incluído un `name`
+sacado da query string e `navigator.userAgent`. Todo o que veña do usuario e acabe nun correo HTML hai
+que escapalo antes. A enquisa agora valida ese nome contra un patrón antes de usalo en ningún sitio, que
+é o costume que paga a pena copiar deste post.
 
 ## Resultado
 

@@ -5,9 +5,9 @@ author: 'Xabier Lameiro'
 category: 'Error'
 tags: ['node', 'cli']
 locale: 'es'
-updated: '2026-07-17'
+updated: '2026-08-06'
 excerpt: 'Significa que la combinación de dirección de red y puerto especificada en el mensaje de error ya está siendo utilizada por otro proceso que se está ejecutando en su ordenador. Esto puede ocurrir cuando se intenta iniciar un servidor en un puerto que ya está siendo utilizado por otro programa.'
-description: 'Arregla el error de Node.js "listen EADDRINUSE: address already in use": encuentra y mata el proceso que ocupa el puerto en macOS, Linux y Windows, libéralo con un comando, o arranca en otro puerto.'
+description: 'Arregla "address already in use" en Node.js, Python, Docker, netcat y Playwright: encuentra y mata el proceso que ocupa el puerto en macOS, Linux y Windows, o arranca en otro puerto.'
 image: '/posts/address-in-use.png'
 alternate: [{ lang: 'en', url: 'solve-address-in-use-error' }, { lang: 'gl', url: 'arranxar-direccion-en-uso-erro' }]
 faq:
@@ -17,6 +17,10 @@ faq:
       answer: 'Encuentra el proceso con lsof -i :PUERTO en macOS/Linux (o netstat -ano | findstr :PUERTO en Windows) y termínalo con kill -9 PID (o taskkill /PID pid /F en Windows). O libéralo de un paso con npx kill-port PUERTO, o arranca tu servidor en otro puerto.'
     - question: '¿Cómo arranco mi servidor en otro puerto?'
       answer: 'Define la variable de entorno PORT (PORT=3001 npm run dev) o pasa el flag del framework, por ejemplo next dev -p 3001.'
+    - question: '¿EADDRINUSE es solo un error de Node.js?'
+      answer: 'No. Es el sistema operativo rechazando el bind, así que cada herramienta lo cuenta a su manera: Python lanza OSError [Errno 48] en macOS y [Errno 98] en Linux, netcat imprime "nc: Address already in use", Docker falla con "bind: address already in use" y Go devuelve "bind: address already in use". El diagnóstico y el arreglo son idénticos: encuentra el proceso que ocupa el puerto y páralo.'
+    - question: '¿Qué es el puerto 9323 de Playwright, y rompe mis tests si está ocupado?'
+      answer: 'Es el puerto por defecto del servidor del informe HTML. No rompe la ejecución: Playwright trata el 9323 como puerto preferido, captura EADDRINUSE y cae a un puerto libre elegido por el sistema, así que el informe simplemente sale en otro sitio. Lo que sí tumba una ejecución es el bloque webServer, que dice "http://localhost:3000 is already used" — pon reuseExistingServer: true si el proceso de ese puerto es tu propio servidor de desarrollo.'
 ---
 
 # EADDRINUSE: address already in use — cómo liberar el puerto
@@ -59,6 +63,93 @@ Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
 ## Por qué ocurre
 
 `EADDRINUSE` significa que la dirección y el puerto que quiere tu servidor ya están ocupados. En una máquina de desarrollo la causa habitual es un **servidor de desarrollo anterior que no se cerró bien** — un proceso que crasheó, un job en segundo plano suelto, o una segunda terminal que sigue ejecutándolo. Menos a menudo, otra aplicación ocupa el puerto de verdad: otro servicio, un contenedor de Docker o un demonio del sistema.
+
+## El mismo error en cualquier otra herramienta
+
+`EADDRINUSE` no es cosa de Node.js. Es el sistema operativo rechazando la llamada a `bind()`, y cada runtime cuenta ese mismo rechazo a su manera. Si buscaste la cadena exacta que imprimió tu herramienta y acabaste aquí, esta es la tabla de traducción:
+
+| Herramienta | Lo que imprime                                                          |
+| ----------- | ------------------------------------------------------------------------ |
+| Node.js     | `Error: listen EADDRINUSE: address already in use 0.0.0.0:3000`          |
+| Python      | `OSError: [Errno 48] Address already in use` (48 en macOS, 98 en Linux)  |
+| netcat      | `nc: Address already in use`, código de salida 1                         |
+| Docker      | `bind: address already in use`                                           |
+| Go          | `listen tcp :8080: bind: address already in use`                         |
+| Playwright  | `http://localhost:3000 is already used, make sure that nothing is running on the port/url` |
+
+Los números del mensaje de Python son la constante `errno` cruda, y cambian según la plataforma — **48 en macOS y los BSD, 98 en Linux**. Eso despista cuando un contenedor reproduce el mismo fallo con un número distinto al del portátil. Reproducido en macOS 26.5:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```python errno.py
+>>> import socket
+>>> s1 = socket.socket(); s1.bind(('127.0.0.1', 51234)); s1.listen(1)
+>>> s2 = socket.socket(); s2.bind(('127.0.0.1', 51234))
+OSError: [Errno 48] Address already in use
+```
+
+</CH.Code>
+
+Lo imprimiera quien lo imprimiera, el diagnóstico no cambia: algo ocupa ya ese puerto. Los comandos de abajo sirven igual con cualquier herramienta.
+
+## Qué puerto es, y quién suele ocuparlo
+
+La mitad de estos casos no son un servidor de desarrollo zombi: son dos programas distintos que usan el mismo puerto por defecto. Los que conviene saberse:
+
+| Puerto        | Dueño habitual                                                          |
+| ------------- | ------------------------------------------------------------------------ |
+| 3000          | Next.js, Create React App, Rails, Grafana                                |
+| 3001          | El segundo servidor que arrancaste después de que el 3000 estuviera pillado |
+| 5000 / 7000   | En macOS, ControlCenter cuando el **receptor de AirPlay** está activado  |
+| 5173          | Vite                                                                     |
+| 8080          | Tomcat, Jenkins y aproximadamente todo lo que se llame "HTTP alternativo" |
+| 9323          | El servidor del informe HTML de Playwright                               |
+| 5432 / 6379   | PostgreSQL / Redis — normalmente un contenedor peleando con una instalación local |
+
+El caso del 5000 en macOS es el que más tiempo hace perder, porque no lo ocupa nada que hayas arrancado tú. El receptor de AirPlay se queda con el 5000 y el 7000, así que una app de Flask en su puerto por defecto falla en una máquina donde el desarrollador no instaló nada. `lsof` lo delata al instante: el dueño es ControlCenter, no `node` ni `python`. Desactívalo en Ajustes del Sistema → General → AirDrop y Handoff, o mueve tu app.
+
+El 9323 es el de Playwright, y se porta mejor de lo que la gente espera — conviene saberlo antes de ponerse a cazar un PID. El reporter HTML sirve ahí el informe por defecto, pero trata el 9323 como puerto _preferido_, no obligatorio. Leyendo `playwright-core/lib/server/utils/httpServer.js` en Playwright 1.57:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```js httpServer.js
+if (options.preferredPort) {
+    try {
+        await this._tryStart(options.preferredPort, host);
+    } catch (e) {
+        if (!e || !e.message || !e.message.includes('EADDRINUSE')) throw e;
+        await this._tryStart(void 0, host);
+    }
+}
+```
+
+</CH.Code>
+
+Captura el `EADDRINUSE` y reintenta sin puerto, dejando que el sistema elija uno libre. Así que un informe abierto en una pestaña **no** rompe la siguiente ejecución: solo hace que el informe salga en un puerto distinto del esperado.
+
+Lo que sí tumba una ejecución de Playwright es el bloque `webServer` de la configuración, y es otro mensaje con otro arreglo:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```text webserver.txt
+http://localhost:3000 is already used, make sure that nothing is running on the
+port/url or set reuseExistingServer:true in config.webServer.
+```
+
+</CH.Code>
+
+El error te da el arreglo: si lo que ocupa el puerto es tu propio servidor de desarrollo, que es lo normal, `reuseExistingServer: true` hace que Playwright lo reutilice en vez de intentar levantar un segundo.
+
+## La dirección importa tanto como el puerto
+
+`EADDRINUSE` va de una **dirección** y un puerto, no de un puerto suelto — por eso el mensaje nombra una, como `0.0.0.0:3000` o `::1:9323`.
+
+Esa distinción es real: `127.0.0.1:3000` (loopback IPv4) y `[::1]:3000` (loopback IPv6) son direcciones distintas. Un servidor atado a una no choca necesariamente con otro atado a la otra, y uno atado a `0.0.0.0` choca con ambos porque reclama todas las interfaces IPv4 de la máquina. Eso explica dos situaciones confusas:
+
+-   `lsof -i :3000` no enseña nada y aun así tu servidor falla — mira la dirección exacta del error y comprueba la otra familia de protocolo.
+-   Dos servidores conviven tan ricamente "en el mismo puerto", hasta que un tercero se ata a `0.0.0.0` y revienta todo.
+
+Usa `lsof -nP -iTCP:3000 -sTCP:LISTEN` para ver la dirección además del PID: `-n` y `-P` se saltan las resoluciones de DNS y de nombre de servicio, así que obtienes `*:3000` en vez del `TCP *:hbci` de la salida de arriba — `hbci` es solo `/etc/services` renombrándote el puerto 3000.
 
 ## Liberar el puerto en macOS y Linux
 
@@ -125,3 +216,23 @@ next dev -p 3001        # Next.js
 ## Dentro de Docker
 
 Si el servidor corre en un contenedor, el puerto del host lo ocupa el mapeo de puertos, no un PID local — `lsof` apuntará a `com.docker`. Para el contenedor (`docker ps` y luego `docker stop <id>`) o cambia el mapeo (`-p 3001:3000`).
+
+Docker lo dice de forma lo bastante distinta como para que la gente no lo relacione con `EADDRINUSE`:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```text docker.txt
+Error response from daemon: driver failed programming external connectivity on
+endpoint web: Bind for 0.0.0.0:3000 failed: port is already allocated
+```
+
+</CH.Code>
+
+`port is already allocated` es la contabilidad interna de Docker — el demonio sabe que ya publicó ese puerto —, mientras que `bind: address already in use` es el kernel rechazando, igual que en todo lo demás. El primero puede sobrevivir a un contenedor que ya terminó: `docker ps -a` y borrar el contenedor muerto lo arregla, y `docker compose down` es la versión bruta.
+
+## Cuando nada de esto funciona
+
+Dos casos en los que el puerto no es tuyo para cogerlo:
+
+-   **Los puertos por debajo de 1024 necesitan privilegios.** Atarse al 80 o al 443 como usuario normal falla con `EACCES`, no con `EADDRINUSE`. Otro error, otro arreglo: si lees `EACCES`, deja de buscar un proceso al que matar.
+-   **El puerto está en `TIME_WAIT`.** Después de cerrar un socket, el sistema retiene el par hasta un par de minutos. `lsof -i :3000` enseña una conexión pero ningún listener, y no hay nada que matar. Los servidores lo evitan con `SO_REUSEADDR`, que la mayoría de frameworks ya ponen por ti; esperar también funciona.

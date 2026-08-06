@@ -5,6 +5,7 @@ author: 'Xabier Lameiro'
 category: 'React'
 tags: ['node']
 locale: 'en'
+updated: '2026-08-06'
 excerpt: 'Survey for recruiters to find out if I am compatible with a specific job position'
 description: 'Survey for recruiters to find out if I am compatible with a specific job position'
 image: '/posts/filter-for-positions.png'
@@ -172,7 +173,7 @@ const useSurvey = () => {
     // Prepotency here!
     const questions = [
         {
-            questionText: 'Which came first, the chicken or the egg?
+            questionText: 'Which came first, the chicken or the egg?',
             questionHtml: `<h2>Which came first the chicken or the egg?</h2>`,
             answerOptions: [{ answerText: 'Egg', isCorrect: true, }, { answerText: 'Chicken', isCorrect: false }],
         },
@@ -245,42 +246,18 @@ export default useSurvey;
 
 </CH.Code>
 
-My endpoint
+**This part no longer runs.** The survey used to POST its answers to an `/api/email` route built on
+nodemailer, and the endpoint is gone — the survey no longer emails anything. I am leaving the note rather
+than the code because the snippet had two problems worth naming.
 
-<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+`nodemailer.createTransport({ service: process.env.EMAIL_HOST })` misuses `service`: it takes a
+well-known provider id (`"gmail"`), not an arbitrary SMTP hostname, so pointing it at a custom host does
+not configure the transport. Use `host`, `port` and `secure` for that.
 
-```ts email.ts
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer from 'nodemailer';
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
-    const transporter = nodemailer.createTransport({
-        service: process.env.EMAIL_HOST,
-        auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASSWORD,
-        },
-    });
-
-    const { subject, message } = req.body;
-
-    const mailOptions = {
-        from: process.env.EMAIL,
-        to: process.env.EMAIL,
-        subject: subject,
-        html: message,
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        res.status(200).json({ success: true });
-    } catch (error) {
-        res.status(500).json({ success: error });
-    }
-}
-```
-
-</CH.Code>
+And the message body was built by interpolating values straight into HTML — including a `name` taken
+from the query string and `navigator.userAgent`. Anything user-controlled that lands in an HTML email
+has to be escaped first. The survey now validates that name against a pattern before it is used
+anywhere, which is the habit worth copying from this post.
 
 ## Result
 

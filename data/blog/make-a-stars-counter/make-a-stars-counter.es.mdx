@@ -1,118 +1,209 @@
 ---
-title: 'Contador de estrellas de un repositorio de GitHub'
+title: 'Lee las estrellas de un repo de GitHub sin agotar el límite'
 slug: 'contador-de-estrellas-de-github'
 author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['node']
 locale: 'es'
-excerpt: 'Este es un contador simple para el repositorio de estrellas de github. Puedes usarlo en tu sitio web o blog. Usando Nextjs api y octokit.'
-description: 'Crea un contador de estrellas de GitHub para tu sitio con una API route de Next.js y Octokit: cachea la API de GitHub para evitar rate limits y muestra el número de estrellas en vivo. Código incluido.'
+updated: '2026-08-06'
+excerpt: 'Un campo, stargazers_count, un endpoint, y 60 peticiones por hora antes de que GitHub te corte. El contador es lo fácil; no quemar la cuota es el resto del post.'
+description: 'Lee el número de estrellas de un repositorio de GitHub con stargazers_count, entiende los límites de 60 y 5.000 peticiones por hora, y cachea la llamada para que un contador cueste una petición a la hora.'
 image: '/posts/counter-for-github-stars-repository.png'
 alternate:
-    [{ lang: 'en', url: 'counter-for-github-stars-repository' }, { lang: 'gl', url: 'contador-de-estrelas-de-github' }]
+    [{ lang: 'en', url: 'counter-for-github-stars-repository' }, { lang: 'gl', url: 'contador-de-estrellas-de-github' }]
+faq:
+    - question: '¿Cómo obtengo el número de estrellas de un repositorio de GitHub?'
+      answer: 'Llama a https://api.github.com/repos/OWNER/REPO y lee el campo stargazers_count. Funciona con curl y no necesita token para un repositorio público. La respuesta es el objeto completo del repositorio, así que pásalo por jq -r .stargazers_count si solo quieres el número.'
+    - question: '¿Cuál es el límite de la API de GitHub para leer estrellas?'
+      answer: '60 peticiones por hora sin autenticar, contadas por dirección IP, y 5.000 por hora con un token de acceso personal. Leer stargazers_count es una petición REST normal y consume cuota como cualquier otra, así que un contador que llame a la API en cada visita la agotará.'
+    - question: '¿Necesito un token solo para leer un repositorio público?'
+      answer: 'No. Los datos de un repositorio público se leen sin autenticar. El token lo quieres por la cuota: 60 peticiones a la hora por IP dan para un script y no para una web, y en IPs compartidas o de cloud estás repartiendo esas 60 con todo el que esté en esa dirección.'
+    - question: '¿Cómo cacheo la API de GitHub para que el contador no queme la cuota?'
+      answer: 'Mete la llamada en tu propio endpoint y cachea la respuesta en el edge con Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400. Tus visitantes pegan al CDN, el CDN pega a GitHub una vez a la hora, y stale-while-revalidate sirve el último número conocido en vez de un error mientras refresca.'
 ---
 
-# Contador de estrellas de un repositorio de GitHub
+# Lee las estrellas de un repo de GitHub sin agotar el límite
 
 <Date date="01-11-2023" />
 
 <GoogleAdsense />
 
-Este es un contador de estrellas para tu respositorio de Github. Puedes usarlo en tu sitio web o blog.
+## Respuesta rápida
 
-¿Cómo usarlo? Simplemente usa la API y obtendrás la cantidad de estrellas.
-
-## 1. Crea un token de github
-
-> Utilice la variable de entorno para almacenar el token.
+El número de estrellas de cualquier repositorio público es un campo de un endpoint, y no necesitas token para leerlo:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```ts github.ts
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+```bash stars.sh
+curl -s https://api.github.com/repos/vercel/next.js | jq -r .stargazers_count
 ```
 
 </CH.Code>
 
-## 2. Write the GET method
+`stargazers_count` es el número. El endpoint devuelve el objeto completo del repositorio, así que `jq` está solo para sacar un campo de ahí.
+
+Esa es toda la respuesta si estás haciendo un script. El resto del post es la parte que muerde cuando lo pones en una web: **60 peticiones por hora sin autenticar, 5.000 con token**, y un contador que llame a la API en cada visita se come cualquiera de las dos.
+
+## El campo, y los que se confunden con él
+
+El objeto del repositorio trae varios contadores que parecen intercambiables y no lo son:
+
+| Campo                | Qué cuenta                                                                  |
+| -------------------- | --------------------------------------------------------------------------- |
+| `stargazers_count`   | Estrellas. Es el número que se ve en la página del repo                      |
+| `watchers_count`     | Históricamente un duplicado del contador de estrellas en este endpoint       |
+| `subscribers_count`  | Gente que de verdad está vigilando el repo para recibir notificaciones       |
+| `forks_count`        | Forks                                                                        |
+
+Si alguna vez te has preguntado por qué `watchers_count` coincide exactamente con tus estrellas, es por eso: el nombre del campo sobrevivió al cambio de significado de "starring". Usa `stargazers_count` y sé explícito.
+
+## Los límites, que son lo que de verdad decide tu diseño
+
+La API REST de GitHub permite [60 peticiones por hora sin autenticar y 5.000 por hora con un token de acceso personal](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api). Dos detalles importan más que los números:
+
+**El límite sin autenticar es por dirección IP.** En un portátil, esa es tu cuota. En un host de cloud, un runner de CI o cualquier cosa detrás de un NAT compartido, estás repartiendo esas 60 peticiones por hora con el resto de inquilinos de la dirección — que es por lo que el mismo script que iba bien en local empieza a devolver 403 en cuanto corre en CI.
+
+**Leer un repo público también cuenta.** No hay tarifa gratuita para "solo un número". Cada llamada a `/repos/{owner}/{repo}` gasta una petición leas un campo o todos.
+
+Puedes comprobar cómo vas sin gastar cuota:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
-```ts github.ts
+```bash ratelimit.sh
+curl -s https://api.github.com/rate_limit | jq '.rate'
+```
+
+</CH.Code>
+
+Juntando las dos cosas, el diseño se cae solo: una web pública no puede llamar a la API de GitHub por visitante. Necesita su propio endpoint, un token y una caché.
+
+## 1 — Tu propio endpoint, con el token en el servidor
+
+El token va en una variable de entorno leída en servidor. Un token enviado al navegador es un token publicado:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```ts github-stars.ts
+import { NextApiRequest, NextApiResponse } from 'next';
+import { Octokit } from 'octokit';
+
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
 const REPOSITORY = {
     owner: 'xabierlameiro',
     repo: 'the-last-dance',
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+type GitHubStarsResponse = number | { statusCode: number; message: string };
+
+export default async function handler(_req: NextApiRequest, res: NextApiResponse<GitHubStarsResponse>) {
     try {
         const {
             data: { stargazers_count },
         } = await octokit.rest.repos.get(REPOSITORY);
+        res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
         res.status(200).json(stargazers_count);
-    } catch (err: Error) {
-        res.status(500).json({ statusCode: 500, message: err.message });
+    } catch (err: unknown) {
+        console.error('GitHub stars API Error:', err);
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(500).json({ statusCode: 500, message: 'Internal server error' });
     }
 }
 ```
 
 </CH.Code>
 
-## 3. Úselo en su componente
+Dos cosas de ahí son correcciones a lo que este post publicaba antes, y merecen decirse claras.
 
-No es necesario usar el gancho `useEffect` para obtener información. Puede usar los ganchos `getStaticProps` o `getServerSideProps`.
-En mi caso, uso este enlace porque el blog es un sitio estático y el punto final no está disponible en el tiempo de compilación.
+**`catch (err: unknown)`, no `catch (err: Error)`.** La versión anterior de este post anotaba la variable del catch como `Error`, que no es TypeScript legal — el compilador lo rechaza con el TS1196, _"Catch clause variable type annotation must be `any` or `unknown` if specified"_. Es un error duro, no una opción de estrictez: se puede lanzar cualquier cosa, así que el compilador no te deja afirmar lo contrario. Estrecha el tipo dentro del bloque si necesitas el mensaje.
+
+**No reenvíes al cliente el mensaje de error de arriba.** La versión vieja devolvía `message: err.message` tal cual desde Octokit. Eso filtra: bajo límite de peticiones GitHub responde `API rate limit exceeded for user ID 12345`, que revela el id de la cuenta detrás del token, y con un token revocado responde `Bad credentials`, lo que convierte tu endpoint público en un oráculo en vivo de si el PAT sigue funcionando. Registra el detalle en servidor y devuelve un mensaje plano.
+
+## 2 — La caché es todo el asunto
+
+La cabecera `Cache-Control` de arriba es lo que hace gratis el contador:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```text cache-control.txt
+public, s-maxage=3600, stale-while-revalidate=86400
+```
+
+</CH.Code>
+
+`s-maxage=3600` le dice al CDN que guarde la respuesta una hora, así que mil visitantes en esa hora producen **una** llamada a GitHub — 1 de tus 5.000, no 1.000. `stale-while-revalidate=86400` es la parte que la gente se salta: durante un día después de caducar, el edge sigue sirviendo el último número conocido mientras refresca por detrás. Si GitHub está caído o te han limitado, el widget enseña un número algo viejo en vez de un error.
+
+El trato sale barato porque un contador de estrellas no es urgente. Nadie nota un número de hace cincuenta minutos; todo el mundo nota un widget roto.
+
+## 3 — El componente
+
+Hacer el fetch en un `useEffect` y codificar los estados como números mágicos es lo que hacía la versión original de este post, y ha envejecido mal. `0` significaba cargando, `-1` error, y había una rama para `-2` que nadie asignaba nunca — código muerto renderizando un estado imposible.
+
+Una librería de fetching te da los tres estados como estados de verdad:
+
+<CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
+
+```ts useGithubStars.ts
+import useSWR from 'swr';
+
+const url = `${process.env.NEXT_PUBLIC_DOMAIN}/api/github-stars`;
+
+const useGithubStars = (): { data: number | undefined; error: Error | undefined; loading: boolean } => {
+    const { data, error, isLoading } = useSWR<number, Error>(url, fetchGithubStars, {
+        fallbackData: 0,
+        dedupingInterval: 5000,
+    });
+
+    return { data, error, loading: isLoading };
+};
+```
+
+</CH.Code>
+
+`dedupingInterval` importa más de lo que parece: sin él, varios componentes pidiendo la misma clave montan y cada uno lanza su petición. Con él, comparten una.
+
+El componente ya renderiza carga, error y éxito sin inventarse valores centinela:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
 ```tsx StarCounter.tsx
 const StarCounter = () => {
-    const [stars, setStars] = React.useState(0);
-
-    React.useEffect(() => {
-        (async () => {
-            try {
-                const stars = await fetch('/api/github').then((res) => res.json());
-                setStars(stars);
-            } catch (e) {
-                setStars(-1);
-            }
-        })();
-    }, []);
-
-    if (stars === -2)
-        return (
-            <Container>
-                <AiFillStar className={styles.starred} title="Starred" />
-            </Container>
-        );
-
-    if (stars === -1)
-        return (
-            <Container>
-                <RxCross2 className={styles.error} title="Error endpoint" />
-            </Container>
-        );
-
-    if (stars === 0)
-        return (
-            <Container>
-                <FaSpinner className={styles.spinner} title="Loading stars" />
-            </Container>
-        );
+    const { data, error, loading } = useGithubStars();
+    const { formatMessage: f } = useIntl();
 
     return (
-        <Container>
-            <span>{stars}</span>
-        </Container>
+        <a
+            className={styles.stars}
+            href="https://github.com/xabierlameiro/the-last-dance"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={f({ id: 'starCounter.label' })}
+        >
+            <AiOutlineStar aria-hidden="true" />
+            <RenderManager loading={loading} error={error}>
+                <span data-testid="star-counter">{data}</span>
+            </RenderManager>
+        </a>
     );
 };
-
-export default StarCounter;
 ```
 
 </CH.Code>
 
-Ahora mismo solo tienes que mirar hacia arriba para ver el resultado, el contador está resaltado con una estrella amarilla.
+El `aria-label` no es decoración. Sin él, todo el contenido de este enlace es un icono de estrella y un número pelado — y mientras carga, un spinner y nada más. Una comprobación de accesibilidad en esta web lo marcó como enlace sin nombre accesible, anunciado a un lector de pantalla como "enlace" y sin destino.
+
+## Si solo necesitas el número una vez
+
+Todo lo anterior es para un contador en vivo. Si el número solo tiene que ser correcto en tiempo de build, sáltate el endpoint y léelo en `getStaticProps`: una petición por build, sin cuota en runtime y sin caché que razonar. Esta web no lo hace porque el valor tiene que actualizarse entre despliegues y el blog es estático — el endpoint existe para darle a una página estática un número vivo.
+
+## Los errores que conviene recordar
+
+-   `catch (err: Error)` no compila. Usa `unknown`.
+-   Nunca devuelvas el mensaje de error de arriba desde un endpoint público.
+-   Las 60 peticiones por hora son por IP, y las IPs compartidas la comparten.
+-   Cachea en el edge, no en una variable de módulo — las funciones serverless no la conservan.
+-   `stale-while-revalidate` es lo que convierte una caída en un número algo viejo.
+
+Ahora mismo solo tienes que mirar arriba para ver el resultado, el contador está resaltado con una estrella.
 
 Por favor, si crees que este contenido te ha ayudado o te gusta, dame tu estrella. <span className="emoji">🤩</span>

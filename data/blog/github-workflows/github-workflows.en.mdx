@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['github-actions', 'ci', 'devops']
 locale: 'en'
-updated: '2026-07-18'
+updated: '2026-08-06'
 excerpt: 'Continuous integration and continuous deployment with using the github workflow actions in a nextjs project and deploying to vercel'
 description: 'Set up CI/CD for a Next.js project with GitHub Actions: lint, test and build on every push, then deploy to Vercel. The workflow YAML explained step by step.'
 image: '/posts/continuous-integration-with-github-actions-workflow.png'
@@ -57,21 +57,23 @@ name: Workflow Pre-Deploy
 on:
     push:
         branches: [dev]
+
+# Cancels superseded runs. Replaces a third-party action that needed a token.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+# Least privilege by default; jobs that need to write raise it themselves.
+permissions:
+    contents: read
+
 jobs:
-    cancel_redundancy:
-        name: Cancel Redundant Workflow Runs
-        runs-on: ubuntu-latest
-        steps:
-            - name: Cancel previous redundant workflow runs
-              uses: styfle/cancel-workflow-action@0.12.1
-              with:
-                  access_token: ${{ secrets.TOKEN_GITHUB }}
     code_checking:
         name: Linting
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v4
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
               with:
                   node-version: 22
                   cache: npm
@@ -81,7 +83,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --legacy-peer-deps
+                  npm ci --legacy-peer-deps
             - name: Linter
               run: npm run lint
 ```
@@ -90,10 +92,12 @@ jobs:
 
 Full workflow [in my github](https://github.com/xabierlameiro/the-last-dance/actions/workflows/pre-deploy.yml 'in my github')
 
-## Three things worth doing from day one
+## Five things worth doing from day one
 
 - **Cache the install.** `actions/setup-node` with `cache: npm` restores `node_modules`-worth of downloads between runs and cuts minutes off every job. Point it at your real lockfile.
-- **Cancel redundant runs.** Pushing three times in a row should not run three full pipelines. The cancel step above (or the built-in `concurrency:` key) kills superseded runs.
+- **Cancel redundant runs with `concurrency:`, not an action.** Pushing three times in a row should not run three full pipelines. This used to be a `styfle/cancel-workflow-action` step here, and I removed it from my own pipeline for two reasons. It was pinned by a **mutable tag**, which GitHub's [hardening guide](https://docs.github.com/en/actions/reference/security/secure-use) tells you not to do for third-party actions — a tag can be repointed at new code, which is exactly how the `tj-actions/changed-files` compromise reached thousands of repositories in March 2025. And it needed `access_token`, so I was handing a PAT with write access to five other repositories to a third party on every push. The native `concurrency:` key does the same job with no token and no third-party code.
+- **Set `permissions:` explicitly.** Without it the `GITHUB_TOKEN` gets the repository default, which is broader than a linting job needs. `contents: read` at the top of the file, raised per job where something genuinely has to write, is the whole change.
+- **Keep the action majors current.** `actions/checkout@v4` and `setup-node@v4` still run, but they declare the Node 20 action runtime, which GitHub has been retiring from the runners. `@v7` is the current major for both and runs on Node 24.
 - **Keep secrets in secrets.** The registry token comes from `${{ secrets.NPM_TOKEN }}`, never from the file. If a token ever lands in a committed `.npmrc`, rotate it — the runner reads it from the environment, not the repo.
 
 ## Results

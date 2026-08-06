@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['github-actions', 'ci', 'devops']
 locale: 'gl'
-updated: '2026-07-18'
+updated: '2026-08-06'
 excerpt: 'Integración continua e despregamento continuo con usando as github workflow actions nun proxecto de nextjs e despregando en vercel'
 description: 'Configura CI/CD para un proxecto Next.js con GitHub Actions: lint, tests e build en cada push, e despregamento en Vercel. O YAML do workflow explicado paso a paso.'
 image: '/posts/continuous-integration-with-github-actions-workflow.png'
@@ -57,21 +57,23 @@ name: Workflow Pre-Deploy
 on:
     push:
         branches: [dev]
+
+# Cancels superseded runs. Replaces a third-party action that needed a token.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+# Least privilege by default; jobs that need to write raise it themselves.
+permissions:
+    contents: read
+
 jobs:
-    cancel_redundancy:
-        name: Cancel Redundant Workflow Runs
-        runs-on: ubuntu-latest
-        steps:
-            - name: Cancel previous redundant workflow runs
-              uses: styfle/cancel-workflow-action@0.12.1
-              with:
-                  access_token: ${{ secrets.TOKEN_GITHUB }}
     code_checking:
         name: Linting
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v4
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
               with:
                   node-version: 22
                   cache: npm
@@ -81,7 +83,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --legacy-peer-deps
+                  npm ci --legacy-peer-deps
             - name: Linter
               run: npm run lint
 ```
@@ -90,10 +92,12 @@ jobs:
 
 Workflow completo [no meu github](https://github.com/xabierlameiro/the-last-dance/actions/workflows/pre-deploy.yml 'no meu github')
 
-## Tres cousas que paga a pena facer desde o día un
+## Cinco cousas que paga a pena facer desde o día un
 
 - **Cachea a instalación.** `actions/setup-node` con `cache: npm` restaura as descargas entre runs e recorta minutos de cada job. Apúntao ao teu lockfile real.
-- **Cancela runs redundantes.** Facer push tres veces seguidas non debería lanzar tres pipelines enteiros. O paso de cancelación de arriba (ou a clave `concurrency:` nativa) mata os runs superados.
+- **Cancela runs redundantes con `concurrency:`, non cunha action.** Facer push tres veces seguidas non debería lanzar tres pipelines enteiros. Aquí había un paso de `styfle/cancel-workflow-action`, e quiteino do meu propio pipeline por dous motivos. Estaba fixado cun **tag mutable**, que é xusto o que a [guía de hardening de GitHub](https://docs.github.com/en/actions/reference/security/secure-use) che di que non fagas con actions de terceiros — un tag pódese reapuntar a código novo, que é exactamente como o compromiso de `tj-actions/changed-files` chegou a milleiros de repositorios en marzo de 2025. E precisaba `access_token`, así que en cada push entregáballe a un terceiro un PAT con permisos de escritura sobre outros cinco repositorios. A clave nativa `concurrency:` fai o mesmo sen token e sen código alleo.
+- **Define `permissions:` explicitamente.** Sen ela, o `GITHUB_TOKEN` leva o valor por defecto do repositorio, que é máis amplo do que un job de linting precisa. `contents: read` arriba do ficheiro, e subilo por job onde algo teña que escribir de verdade, é todo o cambio.
+- **Mantén ao día os majors das actions.** `actions/checkout@v4` e `setup-node@v4` seguen funcionando, pero declaran o runtime de Node 20, que GitHub leva tempo retirando dos runners. O major actual de ambas é `@v7`, e corre sobre Node 24.
 - **Garda os segredos en secrets.** O token do rexistro sae de `${{ secrets.NPM_TOKEN }}`, nunca do ficheiro. Se un token chega a un `.npmrc` subido, rótao — o runner léeo do contorno, non do repo.
 
 ## Resultados
