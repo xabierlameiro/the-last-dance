@@ -7,7 +7,7 @@ tags: ['memory-leak', 'node', 'performance']
 locale: 'es'
 updated: '2026-08-06'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
-description: 'Tres fugas de memoria de Next.js 15.5–16.3, cómo identificar la tuya con heap snapshots y por qué en serverless la fuga se disfraza de un 504.'
+description: 'Las tres fugas de memoria de Next.js que medí y ayudé a confirmar, ya corregidas en 16.3.0: cuál tienes, cómo demostrarlo y por qué en serverless se disfrazan de 504.'
 image: '/posts/nextjs-memory-leak.png'
 alternate:
     [
@@ -16,7 +16,7 @@ alternate:
     ]
 faq:
     - question: '¿Por qué la memoria de mi servidor Next.js no para de crecer?'
-      answer: 'Tres fugas en el propio framework cubrían de Next.js 15.5 a 16.3: la caché LRU del router no contabiliza sus claves (issue 94890), el árbol RSC queda retenido por request cuando el cliente corta el stream (issue 94919) y los timeouts del middleware quedan retenidos por el sandbox (issue 95094). Las tres se cerraron como resueltas upstream entre el 25 y el 27 de julio de 2026, así que actualizar es el primer paso — pero si sigues en una versión afectada, compara la curva de heap con las URLs únicas, el tráfico total y las rutas concretas antes de auditar tu código: cada fuga tiene una forma distinta.'
+      answer: 'Entre Next.js 15.5 y 16.2 hubo tres fugas en el propio framework: la caché LRU del router no contabilizaba sus claves (issue 94890), el árbol RSC quedaba retenido por request cuando el cliente cortaba el stream (issue 94919) y los timeouts del middleware quedaban retenidos por el sandbox (issue 95094). Las tres están corregidas en 16.3.0, así que lo primero es mirar tu versión. Si estás clavado por debajo, compara la curva de heap con las URLs únicas, el tráfico total y las rutas concretas: cada fuga tiene una forma distinta.'
     - question: '¿Cómo hago un heap snapshot de Next.js en producción?'
       answer: 'Arranca el servidor con NODE_OPTIONS=--inspect, conecta Chrome DevTools al puerto del inspector y toma dos snapshots separados por tráfico en la pestaña Memory; la vista Comparison y los retainers dicen qué objeto crece y quién lo sujeta. Para la build, next build --experimental-debug-memory-usage vuelca snapshots automáticamente y responde a la señal SIGUSR2.'
     - question: '¿Sirve --max-old-space-size para arreglar una fuga de memoria?'
@@ -35,13 +35,15 @@ faq:
 
 ## Respuesta rápida
 
-Si tu servidor Next.js autoalojado crece en memoria hasta morir con `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — o el contenedor cae con `OOMKilled` (exit code 137) — no empieces auditando tu código. Hay tres fugas de memoria documentadas en el propio framework, de Next.js 15.5 a 16.3, y son lo primero que hay que descartar:
+Si tu servidor Next.js autoalojado crece en memoria hasta morir con `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — o el contenedor cae con `OOMKilled` (exit code 137) — no empieces auditando tu código. **Mira antes tu versión de Next.js.** Entre la 15.5 y la 16.2 hubo tres fugas de memoria documentadas en el propio framework, y las tres están corregidas en la **16.3.0**:
 
--   **La caché LRU del router no contabiliza sus claves** ([#94890](https://github.com/vercel/next.js/issues/94890)): deriva lenta durante días, proporcional a las URLs únicas que recibes, no a tu tráfico.
--   **El árbol RSC queda retenido por request** ([#94919](https://github.com/vercel/next.js/issues/94919)): crece con el tráfico, mucho peor en Node 22/24 y cuando el cliente corta la conexión a medio stream.
--   **Los `setTimeout` del middleware quedan registrados para siempre** ([#95094](https://github.com/vercel/next.js/issues/95094)): crecimiento a escalones ligado al tráfico que atraviesa el middleware.
+-   **La caché LRU del router no contabilizaba sus claves** ([#94890](https://github.com/vercel/next.js/issues/94890)): deriva lenta durante días, proporcional a las URLs únicas que recibes, no a tu tráfico. Corregida por la [#96229](https://github.com/vercel/next.js/pull/96229).
+-   **El árbol RSC quedaba retenido por request** ([#94919](https://github.com/vercel/next.js/issues/94919)): crece con el tráfico, mucho peor en Node 22/24 y cuando el cliente corta la conexión a medio stream. Corregida por la [#96173](https://github.com/vercel/next.js/pull/96173).
+-   **Los `setTimeout` del middleware quedaban registrados para siempre** ([#95094](https://github.com/vercel/next.js/issues/95094)): crecimiento a escalones ligado al tráfico que atraviesa el middleware. Corregida por la [#96161](https://github.com/vercel/next.js/pull/96161).
 
-**Actualización, agosto de 2026: las tres se cerraron como resueltas upstream entre el 25 y el 27 de julio de 2026**, días después de publicarse este post. Eso no deja obsoleto lo que viene debajo: sigues corriendo la versión que desplegaste, y las tres formas son justo lo que distingue "estoy en una versión que aún la tiene" de "la fuga es mía". Mira en los issues enlazados qué release lleva cada arreglo, y actualiza antes de auditar tu propio código. El [#84884](https://github.com/vercel/next.js/issues/84884) (axios con `AbortSignal` en middleware) sigue abierto a día de hoy.
+Así que el arreglo más corto es actualizar. Si estás clavado por debajo de la 16.3.0 —y muchas apps en producción lo están—, el resto del post es cómo saber cuál de las tres llevas encima, y cómo demostrarlo en vez de suponerlo.
+
+Dos de ellas las medí de forma independiente mientras seguían abiertas, y publiqué los números en las issues: la [#94890 reproducida con una décima parte de la carga original](https://github.com/vercel/next.js/issues/94890#issuecomment-5035231906), y la [#95094 reproducida](https://github.com/vercel/next.js/issues/95094#issuecomment-5035131691) y después [vuelta a medir contra `16.3.0-canary.97` para confirmar que el arreglo aguantaba](https://github.com/vercel/next.js/issues/95094#issuecomment-5081146010). Todo lo que viene es ese método, generalizado.
 
 En serverless (Vercel) casi nunca lo verás como OOM: la instancia se recicla antes. Allí el mismo problema de fondo asoma como un `504 FUNCTION_INVOCATION_TIMEOUT` — me pasó en este blog y más abajo están mis números.
 
@@ -169,9 +171,9 @@ Dos datos honestos de medir las tres: #94890 reprodujo con una décima parte de 
 
 Mi checklist después de este viaje:
 
-1. **Mira los retenedores, no las corazonadas.** `LRUNode`, `reactServerStream` o el `TimeoutsManager` del sandbox en la traza → es una de las tres fugas del framework; súmate al issue con tus datos. Closures y estructuras de tus módulos → es tuyo.
+1. **Mira los retenedores, no las corazonadas.** `LRUNode`, `reactServerStream` o el `TimeoutsManager` del sandbox en la traza → es una de las tres fugas del framework, así que actualiza a la 16.3.0. Closures y estructuras de tus módulos → es tuyo.
 2. **Correlaciona antes de culpar.** Heap que sigue a las URLs únicas → fuga 1. Heap que sigue al tráfico y a los aborts → fuga 2. Escalones con middleware → fuga 3. Una ruta concreta que dispara la curva → casi seguro tu código.
 3. **`--max-old-space-size` no arregla nada** — dimensiona el heap a tu contenedor para no morir antes de tiempo, pero una pendiente monótona acabará chocando contra cualquier límite.
 4. **En serverless, perfila tiempo en vez de memoria.** Si ves 504, busca el trabajo cuadrático o repetido por request; mi caso entero está en el punto anterior.
 
-Las versiones citadas son las de los informes (Next 15.5.11–16.3.0-canary.50, Node 20/22/24, julio de 2026); si lees esto meses después, revisa los tres issues enlazados — con suerte, alguno estará cerrado.
+**Actualización, agosto de 2026.** Los tres issues están cerrados y los arreglos salieron en Next.js 16.3.0 — la #95094 y la #94919 entraron en `16.3.0-canary.97` el 25 de julio; la #94890, dos días después. Las medidas de aquí abajo se tomaron con las fugas aún abiertas, contra las versiones de los informes (Next 15.5.11–16.3.0-canary.50, Node 20/22/24). Se quedan porque el método sobrevive a los bugs: la próxima fuga no traerá un número de issue esperándote, y la forma de encontrarla es la misma.

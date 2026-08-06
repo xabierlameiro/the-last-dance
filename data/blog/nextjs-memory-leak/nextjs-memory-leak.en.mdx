@@ -7,7 +7,7 @@ tags: ['memory-leak', 'node', 'performance']
 locale: 'en'
 updated: '2026-08-06'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
-description: 'Three memory leaks in Next.js 15.5–16.3, how to tell which one you have from heap snapshots, and why on serverless a leak shows up as a 504 timeout.'
+description: 'The three Next.js memory leaks I measured and helped confirm, all fixed in 16.3.0: which one you have, how to prove it, and why serverless hides them as 504s.'
 image: '/posts/nextjs-memory-leak.png'
 alternate:
     [
@@ -16,7 +16,7 @@ alternate:
     ]
 faq:
     - question: 'Why does my Next.js server keep growing in memory?'
-      answer: 'Three leaks in the framework itself covered Next.js 15.5 to 16.3: the router LRU cache does not count its keys (issue 94890), the RSC render tree is retained per request when the client aborts the stream (issue 94919), and middleware timeouts are retained by the sandbox (issue 95094). All three were closed as completed upstream between 25 and 27 July 2026, so upgrading is the first move — but if you are still on an affected version, compare the heap curve against unique URLs, total traffic and specific routes before auditing your own code: each leak has a distinct shape.'
+      answer: 'Between Next.js 15.5 and 16.2 there were three leaks in the framework itself: the router LRU cache did not count its keys (issue 94890), the RSC render tree was retained per request when the client aborted the stream (issue 94919), and middleware timeouts were retained by the sandbox (issue 95094). All three are fixed in 16.3.0, so check your version first. If you are pinned below it, compare the heap curve against unique URLs, total traffic and specific routes: each leak has a distinct shape.'
     - question: 'How do I take a heap snapshot of Next.js in production?'
       answer: 'Start the server with NODE_OPTIONS=--inspect, connect Chrome DevTools to the inspector port, and take two snapshots separated by traffic in the Memory tab; the Comparison view and the retainers show which object grows and what is holding it. For build-time issues, next build --experimental-debug-memory-usage dumps snapshots automatically and responds to the SIGUSR2 signal.'
     - question: 'Does --max-old-space-size fix a memory leak?'
@@ -35,13 +35,15 @@ faq:
 
 ## Quick answer
 
-If your self-hosted Next.js server grows until it dies with `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — or the container gets `OOMKilled` (exit code 137) — don't start by auditing your own code. Three documented memory leaks in the framework itself, spanning Next.js 15.5 to 16.3, are the first thing to rule out:
+If your self-hosted Next.js server grows until it dies with `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — or the container gets `OOMKilled` (exit code 137) — don't start by auditing your own code. **Check your Next.js version first.** Between 15.5 and 16.2 there were three documented memory leaks in the framework itself, and all three are fixed in **16.3.0**:
 
--   **The router LRU cache doesn't count its keys** ([#94890](https://github.com/vercel/next.js/issues/94890)): a slow drift over days, proportional to the unique URLs you receive, not to your traffic.
--   **The RSC render tree is retained per request** ([#94919](https://github.com/vercel/next.js/issues/94919)): grows with traffic, much worse on Node 22/24 and when clients abort the connection mid-stream.
--   **Middleware `setTimeout` ids are registered forever** ([#95094](https://github.com/vercel/next.js/issues/95094)): stepwise growth tied to traffic that passes through middleware.
+-   **The router LRU cache didn't count its keys** ([#94890](https://github.com/vercel/next.js/issues/94890)): a slow drift over days, proportional to the unique URLs you receive, not to your traffic. Fixed by [#96229](https://github.com/vercel/next.js/pull/96229).
+-   **The RSC render tree was retained per request** ([#94919](https://github.com/vercel/next.js/issues/94919)): grows with traffic, much worse on Node 22/24 and when clients abort the connection mid-stream. Fixed by [#96173](https://github.com/vercel/next.js/pull/96173).
+-   **Middleware `setTimeout` ids were registered forever** ([#95094](https://github.com/vercel/next.js/issues/95094)): stepwise growth tied to traffic that passes through middleware. Fixed by [#96161](https://github.com/vercel/next.js/pull/96161).
 
-**Update, August 2026: all three were closed as completed upstream between 25 and 27 July 2026**, days after this post first went out. That does not make the section below obsolete — you are still running whatever version you deployed, and the three shapes are exactly how you tell "I'm on a version that still has it" from "the leak is mine". Check the linked issues for the release that carries each fix, then upgrade before auditing your own code. [#84884](https://github.com/vercel/next.js/issues/84884) (axios with `AbortSignal` in middleware) is still open at the time of writing.
+So the shortest fix is an upgrade. If you're pinned below 16.3.0 — and plenty of production apps are — the rest of this post is how to tell which of the three you're carrying, and how to prove it rather than guess.
+
+I measured two of them independently while they were still open and posted the numbers on the issues: [#94890 reproduced at a tenth of the reported load](https://github.com/vercel/next.js/issues/94890#issuecomment-5035231906), and [#95094 reproduced](https://github.com/vercel/next.js/issues/95094#issuecomment-5035131691) and then [re-measured against `16.3.0-canary.97` to confirm the fix held](https://github.com/vercel/next.js/issues/95094#issuecomment-5081146010). Everything below is that method, generalised.
 
 On serverless (Vercel) you'll almost never see the OOM: the instance recycles first. There, the same underlying problem surfaces as a `504 FUNCTION_INVOCATION_TIMEOUT` — it happened to this blog, and my numbers are below.
 
@@ -169,9 +171,9 @@ Two honest data points from measuring all three: #94890 reproduced with a tenth 
 
 My checklist after this trip:
 
-1. **Look at retainers, not hunches.** `LRUNode`, `reactServerStream` or the sandbox `TimeoutsManager` in the trace → it's one of the three framework leaks; add your data to the issue. Closures and structures from your own modules → it's yours.
+1. **Look at retainers, not hunches.** `LRUNode`, `reactServerStream` or the sandbox `TimeoutsManager` in the trace → it's one of the three framework leaks, so upgrade to 16.3.0. Closures and structures from your own modules → it's yours.
 2. **Correlate before you blame.** Heap tracking unique URLs → leak 1. Heap tracking traffic and aborts → leak 2. Steps with middleware → leak 3. One specific route driving the curve → almost certainly your code.
 3. **`--max-old-space-size` fixes nothing** — size the heap to your container so you don't die early, but a monotonic slope will eventually hit any limit.
 4. **On serverless, profile time instead of memory.** If you're seeing 504s, hunt for quadratic or repeated per-request work; my whole case is in the previous section.
 
-The versions cited are the ones in the reports (Next 15.5.11–16.3.0-canary.50, Node 20/22/24, July 2026); if you're reading this months later, check the three linked issues — with luck, one of them will be closed.
+**Update, August 2026.** All three issues are now closed and the fixes shipped in Next.js 16.3.0 — #95094 and #94919 landed in `16.3.0-canary.97` on 25 July, #94890 two days later. The measurements below were taken while they were still open, against the versions cited in the reports (Next 15.5.11–16.3.0-canary.50, Node 20/22/24). They stay here because the method outlives the bugs: the next leak will not have an issue number waiting for you, and the way you find it is the same.

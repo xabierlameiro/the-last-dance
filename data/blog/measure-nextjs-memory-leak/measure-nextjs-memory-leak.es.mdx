@@ -33,7 +33,7 @@ faq:
 
 Casi todos los reportes de fugas de memoria mueren en el mismo sitio. Alguien publica una gráfica que sube, un maintainer pide heap snapshots tomados tras un GC forzado, y nadie vuelve. No creo que sea pereza — tomar esos snapshots _correctamente_ es más difícil de lo que el hilo da a entender, y hacerlo mal te deja números que parecen convincentes y no significan nada.
 
-Así que cogí un issue abierto y lo hice bien: [vercel/next.js#95094](https://github.com/vercel/next.js/issues/95094), _"Memory leak from retained sandbox timeouts causes stepwise heap growth"_. La afirmación es que `setTimeout` dentro del middleware fuga, porque el sandbox guarda cada id de timeout y no lo suelta nunca. (Tanto ese issue como el #94890 de más abajo se cerraron como resueltos upstream a finales de julio de 2026, pocos días después de publicarse esto. Aquí lo que importa es el método, no el estado del ticket.)
+Así que cogí un issue abierto y lo hice bien: [vercel/next.js#95094](https://github.com/vercel/next.js/issues/95094), _"Memory leak from retained sandbox timeouts causes stepwise heap growth"_. La afirmación es que `setTimeout` dentro del middleware fuga, porque el sandbox guarda cada id de timeout y no lo suelta nunca. (Tanto ese issue como el #94890 de más abajo están ya arreglados, y el arreglo salió en Next.js 16.3.0 — días después de publicarse esto. Aquí lo que importa es el método, no el estado del ticket.)
 
 Esa afirmación es fácil de creer y fácil de equivocar. El crecimiento escalonado es también lo que parecen el calentamiento del JIT y las cachés perezosas. Distinguir una cosa de la otra es todo el trabajo.
 

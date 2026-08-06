@@ -10,7 +10,7 @@ const gl = {
     'blog.readtime': '{readTime, plural, one {# minuto de tempo de lectura} other {# minutos de tempo de lectura}}',
     'blog.breadcrumb': 'Notas',
     language: 'Galego',
-    'home.seo.title': 'Xabier Lameiro | Software Architect, técnico en microinformática e redes',
+    'home.seo.title': 'Xabier Lameiro | Software Architect · Next.js e React',
     'home.breadcrumb': 'Código',
     'home.seo.description':
         'Software Architect con máis de 8 anos de experiencia traballando no sector da banca online, actualmente especializado en Nextjs e React. Apasionado da tecnoloxía e a programación, gustame aprender cousas novas e compartir coñecemento coa comunidade. ',
@@ -19,7 +19,7 @@ const gl = {
     'settings.seo.description':
         'Páxina web de configuración de preferencias de usuario para a súa experiencia na web, permite cambiar o idioma, o tema e a rexión',
     'settings.title': 'Preferencias do sistema',
-    'settings.desc': 'Software Architect, aplicacións web, microinformática e redes',
+    'settings.desc': 'Software Architect · Next.js e React',
     'settings.lang': 'Idioma e Rexión',
     'settings.langAlt': 'Icono de Idioma e Rexión',
     'settings.lang.preferred': 'Idiomas preferidos:',

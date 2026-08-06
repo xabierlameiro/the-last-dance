@@ -33,7 +33,7 @@ faq:
 
 Most memory leak reports die in the same place. Someone posts a graph that climbs, a maintainer asks for heap snapshots taken after a forced GC, and nobody comes back. I don't think that's laziness — taking those snapshots _correctly_ is harder than the thread makes it sound, and getting it wrong gives you numbers that look convincing and mean nothing.
 
-So I took one open issue and did it properly: [vercel/next.js#95094](https://github.com/vercel/next.js/issues/95094), _"Memory leak from retained sandbox timeouts causes stepwise heap growth"_. The claim is that `setTimeout` inside middleware leaks, because the sandbox keeps every timeout id and never lets go. (Both that issue and #94890 below were closed as completed upstream in late July 2026, a few days after this went out. The method is the point here, not the ticket status.)
+So I took one open issue and did it properly: [vercel/next.js#95094](https://github.com/vercel/next.js/issues/95094), _"Memory leak from retained sandbox timeouts causes stepwise heap growth"_. The claim is that `setTimeout` inside middleware leaks, because the sandbox keeps every timeout id and never lets go. (Both that issue and #94890 below are now fixed, and shipped in Next.js 16.3.0 — days after this went out. The method is the point here, not the ticket status.)
 
 That claim is easy to believe and easy to get wrong. Stepwise growth is also what JIT warm-up and lazy caches look like. Telling those two apart is the whole job.
 
