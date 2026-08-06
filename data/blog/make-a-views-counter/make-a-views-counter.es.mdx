@@ -5,6 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['node']
 locale: 'es'
+updated: '2026-08-06'
 excerpt: 'Crea un contador de vistas para su blog con google analytics y nextjs api route. Uso de BetaAnalyticsDataClient desde la API de datos de Google Analytics'
 description: 'Añade un contador de visitas a tu blog Next.js con la API de datos de Google Analytics (BetaAnalyticsDataClient) tras una API route: autenticación, la consulta del informe y el cacheo explicados.'
 image: '/posts/make-a-views-counter.png'
@@ -86,14 +87,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return;
     }
 
-    let total = response.rows.reduce((prev: Object, curr: Object) => {
-        return prev + parseInt(curr.metricValues[0].value, 0);
+    // GA4 always returns metric values as strings, and a malformed one must not turn the
+    // total into NaN — Number() plus a finite check is enough, and parseInt's second argument
+    // is a radix, not a fallback: parseInt(value, 0) was never doing what it looked like.
+    const toCount = (value: string | null | undefined): number => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    const total = response.rows.reduce((sum: number, row: (typeof response.rows)[number]) => {
+        return sum + toCount(row.metricValues?.[0]?.value);
     }, 0);
 
     try {
         res.status(200).json({ total });
-    } catch (err: Error) {
-        res.status(500).json({ error: err });
+    } catch (err: unknown) {
+        console.error('Analytics API Error:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 }
 ```
@@ -122,7 +132,7 @@ const Container = ({ children }: Props) => {
     );
 };
 
-const StarCounter = () => {
+const ViewCounter = () => {
     const [views, setViews] = React.useState(-1);
     const { asPath } = useRouter();
 
@@ -158,7 +168,7 @@ const StarCounter = () => {
     );
 };
 
-export default StarCounter;
+export default ViewCounter;
 ```
 
 </CH.Code>

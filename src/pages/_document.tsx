@@ -1,5 +1,17 @@
 import { Html, Head, Main, NextScript } from 'next/document';
 import { author, authorAlternateName, defaultLocale, personDescription, socialNetworks } from '@/constants/site';
+import { THEME_STORAGE_KEY } from '@/hooks/useDarkMode';
+
+/**
+ * Resolves the theme before the first paint.
+ *
+ * `data-theme` below is rendered as "light" because the server cannot know the visitor's
+ * preference — there is no request header for it. `useDarkMode` corrects it, but only after React
+ * mounts, and only on the one page that mounts the hook (/settings), so every other route stayed
+ * light no matter what the OS said. This blocking script runs in the `<head>`, before the body is
+ * painted, on every route: no flash, and no dependency on which components happen to mount.
+ */
+const themeBootstrap = `(function(){try{var s=localStorage.getItem('${THEME_STORAGE_KEY}');var t=s==='dark'||s==='light'?s:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})()`;
 
 type Props = {
     __NEXT_DATA__: {
@@ -13,7 +25,18 @@ const Document = (props: Props) => {
         <Html lang={locale} data-theme="light">
             <Head>
                 <meta charSet="utf-8" />
-                <meta name="theme-color" content="#FFF" />
+                <script
+                    // skipcq: JS-0440 - static string built at module scope, no user input reaches it
+                    dangerouslySetInnerHTML={{ __html: themeBootstrap }}
+                />
+                {/*
+                 * One `theme-color` per scheme so the browser chrome matches the page. These follow
+                 * the OS preference rather than an explicit toggle — the meta element has no way to
+                 * read localStorage — so a visitor who overrides the theme keeps the chrome of their
+                 * OS setting. Values are --blog-background for each theme.
+                 */}
+                <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+                <meta name="theme-color" content="#1E1E1E" media="(prefers-color-scheme: dark)" />
                 <meta property="og:site_name" content={author} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@xlameirodev" />

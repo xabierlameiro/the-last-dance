@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['github-actions', 'ci', 'devops']
 locale: 'es'
-updated: '2026-07-18'
+updated: '2026-08-06'
 excerpt: 'Integración continua y despliegue continuo con usando las github workflow actions en un proyecto de nextjs y desplegando en vercel'
 description: 'Configura CI/CD para un proyecto Next.js con GitHub Actions: lint, tests y build en cada push, y despliegue en Vercel. El YAML del workflow explicado paso a paso.'
 image: '/posts/continuous-integration-with-github-actions-workflow.png'
@@ -41,11 +41,11 @@ Aquí de forma más gráfica:
 
 <Image
     src="/continuos-integration.svg"
-    alt="Coincidencia"
+    alt="Diagrama del pipeline de CI/CD: desde la rama dev se ejecutan en paralelo la cancelación de redundancia, la revisión de código, los tests unitarios y de extremo a extremo, y la generación de documentación con JSDoc y Storybook, publicando cada uno su informe; el versionado dispara después el despliegue al entorno de preproducción. Una pull request a la rama master dispara el despliegue a producción, tras el cual se ejecuta el test de rendimiento de Lighthouse y se publica su informe."
     width="1024"
     height="726"
-    layout="responsive"
-    style={{ margin: '20px 0 20px 0' }}
+    sizes="100vw"
+    style={{ width: '100%', height: 'auto', margin: '20px 0 20px 0' }}
 />
 
 Este es un fragmento de cómo se ve el workflow de pre-deploy (Node 22, npm — ajusta las versiones a tu proyecto, esto es de lo que se queda desactualizado):
@@ -57,21 +57,23 @@ name: Workflow Pre-Deploy
 on:
     push:
         branches: [dev]
+
+# Cancels superseded runs. Replaces a third-party action that needed a token.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+# Least privilege by default; jobs that need to write raise it themselves.
+permissions:
+    contents: read
+
 jobs:
-    cancel_redundancy:
-        name: Cancel Redundant Workflow Runs
-        runs-on: ubuntu-latest
-        steps:
-            - name: Cancel previous redundant workflow runs
-              uses: styfle/cancel-workflow-action@0.12.1
-              with:
-                  access_token: ${{ secrets.TOKEN_GITHUB }}
     code_checking:
         name: Linting
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v4
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
               with:
                   node-version: 22
                   cache: npm
@@ -81,7 +83,7 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --legacy-peer-deps
+                  npm ci --legacy-peer-deps
             - name: Linter
               run: npm run lint
 ```
@@ -90,10 +92,12 @@ jobs:
 
 Workflow completo [en mi github](https://github.com/xabierlameiro/the-last-dance/actions/workflows/pre-deploy.yml 'en mi github')
 
-## Tres cosas que merece la pena hacer desde el día uno
+## Cinco cosas que merece la pena hacer desde el día uno
 
 - **Cachea la instalación.** `actions/setup-node` con `cache: npm` restaura las descargas entre runs y recorta minutos de cada job. Apúntalo a tu lockfile real.
-- **Cancela runs redundantes.** Hacer push tres veces seguidas no debería lanzar tres pipelines enteros. El paso de cancelación de arriba (o la clave `concurrency:` nativa) mata los runs superados.
+- **Cancela runs redundantes con `concurrency:`, no con una action.** Hacer push tres veces seguidas no debería lanzar tres pipelines enteros. Aquí había un paso de `styfle/cancel-workflow-action`, y lo quité de mi propio pipeline por dos motivos. Estaba fijado con un **tag mutable**, que es justo lo que la [guía de hardening de GitHub](https://docs.github.com/en/actions/reference/security/secure-use) te dice que no hagas con actions de terceros — un tag se puede reapuntar a código nuevo, que es exactamente como el compromiso de `tj-actions/changed-files` llegó a miles de repositorios en marzo de 2025. Y necesitaba `access_token`, así que en cada push le entregaba a un tercero un PAT con permisos de escritura sobre otros cinco repositorios. La clave nativa `concurrency:` hace lo mismo sin token y sin código ajeno.
+- **Define `permissions:` explícitamente.** Sin ella, el `GITHUB_TOKEN` se lleva el valor por defecto del repositorio, que es más amplio de lo que un job de linting necesita. `contents: read` arriba del fichero, y subirlo por job donde algo tenga que escribir de verdad, es todo el cambio.
+- **Mantén al día los majors de las actions.** `actions/checkout@v4` y `setup-node@v4` siguen funcionando, pero declaran el runtime de Node 20, que GitHub lleva tiempo retirando de los runners. El major actual de ambas es `@v7`, y corre sobre Node 24.
 - **Guarda los secretos en secrets.** El token del registro sale de `${{ secrets.NPM_TOKEN }}`, nunca del fichero. Si un token llega a un `.npmrc` subido, rótalo — el runner lo lee del entorno, no del repo.
 
 ## Resultados

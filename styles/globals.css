@@ -25,6 +25,10 @@
 }
 
 [data-theme='dark'] {
+    /* Tells the browser which palette its own UI should use: scrollbars, form controls, the canvas
+       default. Bound to `data-theme`, not to `prefers-color-scheme`, so an explicit toggle moves it
+       too — the media query alone left a visitor who chose light with dark scrollbars. */
+    color-scheme: dark;
     /* Link colour that works ON a surface, per theme. --blue-color is theme-independent and
        computes 2.31:1 on the dark background, so it cannot be used for text there. 7.84:1. */
     --link-on-surface: 145, 180, 230;
@@ -48,6 +52,7 @@
 }
 
 [data-theme='light'] {
+    color-scheme: light;
     /* 7.20:1 on white — same value as --blue-color, which is correct in this theme. */
     --link-on-surface: 29, 88, 154;
     /* 5.33:1 on white. */
@@ -157,11 +162,13 @@ body {
     color: rgba(var(--blog-font));
 }
 
-@media (prefers-color-scheme: dark) {
-    html {
-        color-scheme: dark;
-    }
-}
+/*
+ * `@media (prefers-color-scheme: dark) { html { color-scheme: dark } }` used to sit here. It read
+ * the OS directly instead of the theme the page is actually rendering, so it disagreed with the
+ * palette on two counts: before the bootstrap script existed the page was always light, and a
+ * visitor who explicitly picks light still gets dark browser UI. `color-scheme` now lives in the
+ * `[data-theme]` blocks above, where it follows whatever theme is applied.
+ */
 
 /* SDD-L06: was --blue-color, which is theme-independent and computes 2.31:1 on the dark
    background — every in-content link in the blog and legal documents was near-invisible in dark

@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'React'
 tags: ['storybook', 'ci']
 locale: 'es'
-updated: '2026-07-18'
+updated: '2026-08-06'
 excerpt: 'Despliegue de componentes React con Storybook: Una manera fácil de mostrar tu trabajo. Estás buscando una manera fácil de mostrar tus componentes React y compartirlos?'
 description: 'Despliega tu Storybook como sitio estático para que cualquiera pueda ver tus componentes React online: el comando de build, dónde alojarlo y cómo integrarlo en CI. Paso a paso.'
 image: '/posts/deploying-storybook.png'
@@ -80,7 +80,7 @@ Primary.args = {
 
 ## Stories en el Storybook actual (CSF3)
 
-Ese par `ComponentStory` / `ComponentMeta` es la API de Storybook 6 y está **deprecada** desde Storybook 7. En Storybook 8 (el major actual en 2026) el formato es CSF3, que elimina el boilerplate del template — una story es solo un objeto con `args`:
+Ese par `ComponentStory` / `ComponentMeta` es la API de Storybook 6 y está **deprecada** desde Storybook 7. El sustituto es CSF3, y desde entonces no ha cambiado — igual en el 8, el 9 y el 10 (10.5 es el major actual al escribir esto; esta web sigue en el 8.6). Elimina el boilerplate del template: una story es solo un objeto con `args`:
 
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
@@ -137,7 +137,7 @@ Para reconstruir en cada push, el job de CI es corto:
 <CH.Code style={{maxWidth: 'max-content', margin: '20px 0'}}>
 
 ```yaml storybook.yml
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v7
   with:
       node-version: 22
 - run: npm ci

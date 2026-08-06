@@ -5,8 +5,8 @@ author: 'Xabier Lameiro'
 category: 'Error'
 tags: ['hydration', 'ssr']
 locale: 'gl'
-updated: '2026-07-17'
-excerpt: 'Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.'
+updated: '2026-08-06'
+excerpt: 'Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.'
 description: 'Arranxa o Minified React error #425 ("Text content does not match server-rendered HTML"): todas as causas dun erro de hidratación —datas, valores aleatorios, formato por locale, APIs do navegador, HTML inválido— e o arranxo correcto para cada unha, con exemplos en Next.js.'
 image: '/posts/uncaught-error.png'
 alternate:
@@ -22,7 +22,7 @@ faq:
     - question: 'Que causa un erro de hidratación ademais das datas?'
       answer: 'Math.random(), o formato de números/moeda por locale, ler window/localStorage/navigator durante o render, Date.now(), o aniñamento HTML inválido (un <div> dentro dun <p>) e as extensións do navegador que modifican o DOM antes de que React hidrate.'
     - question: 'Son o mesmo erro o #418, o #422 e o #425?'
-      answer: 'Son a mesma familia de erros de hidratación. O #418 e o #423 son fallos de hidratación, o #422 é "a hidratación rematou pero contiña discrepancias" e o #425 é a discrepancia de texto. A forma de depuralos é idéntica: executa unha build de desenvolvemento e reconcilia a saída do servidor e a do cliente.'
+      answer: 'Son a mesma familia de erros de hidratación, e React distíngueos por ata onde tivo que recuar. O #418 é o fallo de hidratación en si; o #422 significa que React se recuperou renderizando en cliente desde o límite Suspense máis próximo; o #423, que tivo que renderizar en cliente a raíz enteira; o #425 é a discrepancia de texto. A forma de depuralos é idéntica: executa unha build de desenvolvemento e reconcilia a saída do servidor e a do cliente.'
 ---
 
 # Como arranxar Minified React error #425 (erro de hidratación)
@@ -40,11 +40,11 @@ O erro #425 de React —**"Text content does not match server-rendered HTML"**�
 -   O compoñente enteiro é só-cliente → cárgao con `next/dynamic` e `ssr: false` (Arranxo 3).
 -   O teu HTML é inválido (un `<div>` dentro dun `<p>`) → corrixe o aniñamento (Arranxo 4).
 
-O erro completo en produción é: `Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.`
+En React 19 o erro completo en produción é: `Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.` En React 18 o mesmo erro apuntaba a `https://reactjs.org/docs/error-decoder.html?invariant=425` — esa URL segue a funcionar, redirixe cun 308 á páxina de react.dev.
 
 ## Que significa realmente "Minified React error #425"
 
-Nunha build de produción React envía as mensaxes de erro **minificadas** para manter o bundle pequeno, así que en vez dunha frase recibes un número e unha ligazón descodificadora (`invariant=425`). O #425 descodifica a **"Text content does not match server-rendered HTML"**.
+Nunha build de produción React envía as mensaxes de erro **minificadas** para manter o bundle pequeno, así que en vez dunha frase recibes un número e unha ligazón descodificadora (`react.dev/errors/425`, ou `?invariant=425` en React 18). O #425 descodifica a **"Text content does not match server-rendered HTML"**.
 
 Iso só ocorre con renderizado no servidor (Next.js, Remix, `renderToString`): React renderiza o HTML unha vez no servidor, envíao ao navegador e logo **hidrata** —reutiliza ese HTML e só engancha os manexadores de eventos, agardando que o primeiro render do cliente produza _exactamente_ a mesma saída—. Cando un anaco de texto sae distinto, a hidratación dese subárbore falla e aparece o #425.
 
@@ -188,14 +188,16 @@ React rexistra algo como _"Warning: Text content did not match. Server: '14:32' 
 
 ## #418, #422, #423, #425 — a familia de erros de hidratación
 
-Se as túas procuras trouxeron números veciños, son o mesmo problema visto desde ángulos distintos:
+Se as túas procuras trouxeron números veciños, son o mesmo problema visto desde ángulos distintos. O que os separa é ata onde tivo que recuar React cando fallou a hidratación — estas son as mensaxes literais do propio `scripts/error-codes/codes.json` de React:
 
-| Erro  | Significado                                               |
-| ----- | -------------------------------------------------------- |
-| #418  | A hidratación fallou porque a UI inicial difería         |
-| #422  | A hidratación rematou pero contiña discrepancias         |
-| #423  | Erro ao hidratar; a árbore caeu a renderizado en cliente |
-| #425  | O contido de texto non coincide co HTML do servidor      |
+| Erro  | Significado                                                                                  |
+| ----- | ---------------------------------------------------------------------------------------------- |
+| #418  | A hidratación fallou porque o HTML do servidor non coincidía co cliente; a árbore rexenérase   |
+| #422  | React recuperouse renderizando en cliente desde o límite Suspense máis próximo                  |
+| #423  | React recuperouse renderizando en cliente a raíz enteira                                        |
+| #425  | O contido de texto non coincide co HTML do servidor                                             |
+
+A distinción paga a pena coñecela porque che di canta páxina acabas de perder. O #425 cústache un nodo de texto; o #423 significa que React tirou o HTML do servidor de **toda a raíz** e volveuno renderizar no navegador, que é o beneficio do SSR perdido.
 
 O arranxo é sempre a mesma disciplina: executa unha build de desenvolvemento, atopa o valor que difire entre servidor e cliente, e reconcíliao cun dos catro arranxos de arriba.
 

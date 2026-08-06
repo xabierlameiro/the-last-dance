@@ -5,8 +5,8 @@ author: 'Xabier Lameiro'
 category: 'Error'
 tags: ['hydration', 'ssr']
 locale: 'es'
-updated: '2026-07-17'
-excerpt: 'Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.'
+updated: '2026-08-06'
+excerpt: 'Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.'
 description: 'Arregla el Minified React error #425 ("Text content does not match server-rendered HTML"): todas las causas de un error de hidratación —fechas, valores aleatorios, formato por locale, APIs del navegador, HTML inválido— y el arreglo correcto para cada una, con ejemplos en Next.js.'
 image: '/posts/uncaught-error.png'
 alternate:
@@ -22,7 +22,7 @@ faq:
     - question: '¿Qué causa un error de hidratación además de las fechas?'
       answer: 'Math.random(), el formato de números/moneda por locale, leer window/localStorage/navigator durante el render, Date.now(), el anidamiento HTML inválido (un <div> dentro de un <p>) y las extensiones del navegador que modifican el DOM antes de que React hidrate.'
     - question: '¿Son el mismo error el #418, el #422 y el #425?'
-      answer: 'Son la misma familia de errores de hidratación. El #418 y el #423 son fallos de hidratación, el #422 es "la hidratación terminó pero contenía discrepancias" y el #425 es la discrepancia de texto. La forma de depurarlos es idéntica: ejecuta una build de desarrollo y reconcilia la salida del servidor y la del cliente.'
+      answer: 'Son la misma familia de errores de hidratación, y React los distingue por hasta dónde tuvo que retroceder. El #418 es el fallo de hidratación en sí; el #422 significa que React se recuperó renderizando en cliente desde el límite Suspense más cercano; el #423, que tuvo que renderizar en cliente la raíz entera; el #425 es la discrepancia de texto. La forma de depurarlos es idéntica: ejecuta una build de desarrollo y reconcilia la salida del servidor y la del cliente.'
 ---
 
 # Cómo arreglar Minified React error #425 (error de hidratación)
@@ -40,11 +40,11 @@ El error #425 de React —**"Text content does not match server-rendered HTML"**
 -   El componente entero es solo-cliente → cárgalo con `next/dynamic` y `ssr: false` (Arreglo 3).
 -   Tu HTML es inválido (un `<div>` dentro de un `<p>`) → corrige el anidamiento (Arreglo 4).
 
-El error completo en producción es: `Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.`
+En React 19 el error completo en producción es: `Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.` En React 18 el mismo error apuntaba a `https://reactjs.org/docs/error-decoder.html?invariant=425` — esa URL sigue funcionando, redirige con un 308 a la página de react.dev.
 
 ## Qué significa realmente "Minified React error #425"
 
-En una build de producción React envía los mensajes de error **minificados** para mantener el bundle pequeño, así que en vez de una frase recibes un número y un enlace descodificador (`invariant=425`). El #425 descodifica a **"Text content does not match server-rendered HTML"**.
+En una build de producción React envía los mensajes de error **minificados** para mantener el bundle pequeño, así que en vez de una frase recibes un número y un enlace descodificador (`react.dev/errors/425`, o `?invariant=425` en React 18). El #425 descodifica a **"Text content does not match server-rendered HTML"**.
 
 Eso solo ocurre con renderizado en servidor (Next.js, Remix, `renderToString`): React renderiza el HTML una vez en el servidor, lo envía al navegador y luego **hidrata** —reutiliza ese HTML y solo engancha los manejadores de eventos, esperando que el primer render del cliente produzca _exactamente_ la misma salida—. Cuando un trozo de texto sale distinto, la hidratación de ese subárbol falla y aparece el #425.
 
@@ -188,14 +188,16 @@ React registra algo como _"Warning: Text content did not match. Server: '14:32' 
 
 ## #418, #422, #423, #425 — la familia de errores de hidratación
 
-Si tus búsquedas trajeron números vecinos, son el mismo problema visto desde ángulos distintos:
+Si tus búsquedas trajeron números vecinos, son el mismo problema visto desde ángulos distintos. Lo que los separa es hasta dónde tuvo que retroceder React cuando falló la hidratación — estos son los mensajes literales del propio `scripts/error-codes/codes.json` de React:
 
-| Error | Significado                                                |
-| ----- | --------------------------------------------------------- |
-| #418  | La hidratación falló porque la UI inicial difería         |
-| #422  | La hidratación terminó pero contenía discrepancias        |
-| #423  | Error al hidratar; el árbol cayó a renderizado en cliente |
-| #425  | El contenido de texto no coincide con el HTML del servidor |
+| Error | Significado                                                                                   |
+| ----- | --------------------------------------------------------------------------------------------- |
+| #418  | La hidratación falló porque el HTML del servidor no coincidía con el cliente; el árbol se regenera |
+| #422  | React se recuperó renderizando en cliente desde el límite Suspense más cercano                 |
+| #423  | React se recuperó renderizando en cliente la raíz entera                                       |
+| #425  | El contenido de texto no coincide con el HTML del servidor                                      |
+
+La distinción merece conocerse porque te dice cuánta página acabas de perder. El #425 te cuesta un nodo de texto; el #423 significa que React tiró el HTML del servidor de **toda la raíz** y volvió a renderizarlo en el navegador, que es el beneficio del SSR perdido.
 
 El arreglo es siempre la misma disciplina: ejecuta una build de desarrollo, encuentra el valor que difiere entre servidor y cliente, y reconcílialo con uno de los cuatro arreglos de arriba.
 

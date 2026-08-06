@@ -5,8 +5,8 @@ author: 'Xabier Lameiro'
 category: 'Error'
 tags: ['hydration', 'ssr']
 locale: 'en'
-updated: '2026-07-17'
-excerpt: 'Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.'
+updated: '2026-08-06'
+excerpt: 'Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.'
 description: 'Fix Minified React error #425 ("Text content does not match server-rendered HTML"): every common cause of a hydration mismatch — dates, random values, locale formatting, browser-only APIs, invalid HTML — and the right fix for each, with Next.js examples.'
 image: '/posts/uncaught-error.png'
 alternate:
@@ -22,7 +22,7 @@ faq:
     - question: 'What causes a hydration mismatch besides dates?'
       answer: 'Math.random(), locale/number/currency formatting, reading window/localStorage/navigator during render, Date.now(), invalid HTML nesting (a <div> inside a <p>), and browser extensions that mutate the DOM before React hydrates.'
     - question: 'Are #418, #422 and #425 the same error?'
-      answer: 'They are the same family of hydration errors. #418 and #423 are hydration failures, #422 is "hydration completed but contained mismatches", and #425 is the text-content mismatch. The debugging approach is identical: run a dev build and reconcile server and client output.'
+      answer: 'They are the same family of hydration errors, and React distinguishes them by how far it had to fall back. #418 is the hydration failure itself; #422 means React recovered by client-rendering from the nearest Suspense boundary; #423 means it had to client-render the entire root; #425 is the text-content mismatch. The debugging approach is identical: run a dev build and reconcile server and client output.'
 ---
 
 # How to fix Minified React error #425 (hydration mismatch)
@@ -40,11 +40,11 @@ React error #425 — **"Text content does not match server-rendered HTML"** — 
 -   The whole component is client-only → load it with `next/dynamic` and `ssr: false` (Fix 3).
 -   Your HTML is invalid (a `<div>` inside a `<p>`) → fix the nesting (Fix 4).
 
-The full production error reads: `Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.`
+On React 19 the full production error reads: `Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.` On React 18 the same error pointed at `https://reactjs.org/docs/error-decoder.html?invariant=425` — that URL still works, it 308-redirects to the react.dev page.
 
 ## What "Minified React error #425" actually means
 
-In a production build React ships **minified** error messages to keep the bundle small, so instead of a sentence you get a number and a decoder link (`invariant=425`). #425 decodes to **"Text content does not match server-rendered HTML"**.
+In a production build React ships **minified** error messages to keep the bundle small, so instead of a sentence you get a number and a decoder link (`react.dev/errors/425`, or `?invariant=425` on React 18). #425 decodes to **"Text content does not match server-rendered HTML"**.
 
 That only happens with server-side rendering (Next.js, Remix, `renderToString`): React renders the HTML once on the server, sends it to the browser, and then **hydrates** — it reuses that HTML and only attaches the event handlers, expecting the client's first render to produce _exactly_ the same output. When a piece of text comes out different, hydration for that subtree fails and you get #425.
 
@@ -188,14 +188,16 @@ React logs something like _"Warning: Text content did not match. Server: '14:32'
 
 ## #418, #422, #423, #425 — the hydration error family
 
-If your searches turned up neighbouring numbers, they are the same problem seen from different angles:
+If your searches turned up neighbouring numbers, they are the same problem seen from different angles. What separates them is how far React had to fall back once hydration failed — these are the messages verbatim from React's own `scripts/error-codes/codes.json`:
 
-| Error | Meaning                                          |
-| ----- | ------------------------------------------------ |
-| #418  | Hydration failed because the initial UI differed |
-| #422  | Hydration completed but contained mismatches     |
-| #423  | Error while hydrating; the tree fell back to CSR |
-| #425  | Text content does not match server-rendered HTML |
+| Error | Meaning                                                                                              |
+| ----- | ---------------------------------------------------------------------------------------------------- |
+| #418  | Hydration failed because the server rendered HTML didn't match the client; the tree is regenerated    |
+| #422  | React recovered by client-rendering from the nearest Suspense boundary                                |
+| #423  | React recovered by client-rendering the entire root                                                   |
+| #425  | Text content does not match server-rendered HTML                                                      |
+
+The distinction is worth knowing because it tells you how much of the page you just lost. #425 costs you one text node; #423 means React threw away the server HTML for the **whole root** and re-rendered everything in the browser, which is the SSR benefit gone.
 
 The fix is always the same discipline: run a dev build, find the value that differs between server and client, and reconcile it with one of the four fixes above.
 
