@@ -5,9 +5,9 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['memory-leak', 'node', 'performance']
 locale: 'gl'
-updated: '2026-07-22'
+updated: '2026-08-06'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
-description: 'Tres fugas de memoria abertas en Next.js 15.5–16.3, como identificar a túa con heap snapshots e por que en serverless a fuga se disfraza dun 504.'
+description: 'Tres fugas de memoria de Next.js 15.5–16.3, como identificar a túa con heap snapshots e por que en serverless a fuga se disfraza dun 504.'
 image: '/posts/nextjs-memory-leak.png'
 alternate:
     [
@@ -16,7 +16,7 @@ alternate:
     ]
 faq:
     - question: 'Por que a memoria do meu servidor Next.js non para de medrar?'
-      answer: 'A xullo de 2026 hai tres fugas abertas no propio framework (Next.js 15.5–16.3): a caché LRU do router non contabiliza as súas chaves (issue 94890), a árbore RSC queda retida por request cando o cliente corta o stream (issue 94919) e os timeouts do middleware quedan retidos polo sandbox (issue 95094). Antes de auditar o teu código, compara a curva de heap coas URLs únicas, o tráfico total e as rutas concretas: cada fuga ten unha forma distinta.'
+      answer: 'Tres fugas no propio framework cubrían de Next.js 15.5 a 16.3: a caché LRU do router non contabiliza as súas chaves (issue 94890), a árbore RSC queda retida por request cando o cliente corta o stream (issue 94919) e os timeouts do middleware quedan retidos polo sandbox (issue 95094). As tres pecháronse como resoltas upstream entre o 25 e o 27 de xullo de 2026, así que actualizar é o primeiro paso — pero se segues nunha versión afectada, compara a curva de heap coas URLs únicas, o tráfico total e as rutas concretas antes de auditar o teu código: cada fuga ten unha forma distinta.'
     - question: 'Como fago un heap snapshot de Next.js en produción?'
       answer: 'Arranca o servidor con NODE_OPTIONS=--inspect, conecta Chrome DevTools ao porto do inspector e toma dous snapshots separados por tráfico na pestana Memory; a vista Comparison e os retainers din que obxecto medra e quen o suxeita. Para a build, next build --experimental-debug-memory-usage volca snapshots automaticamente e responde ao sinal SIGUSR2.'
     - question: 'Serve --max-old-space-size para arranxar unha fuga de memoria?'
@@ -35,11 +35,13 @@ faq:
 
 ## Resposta rápida
 
-Se o teu servidor Next.js autoaloxado medra en memoria ata morrer con `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — ou o contedor cae con `OOMKilled` (exit code 137) — non empeces auditando o teu código. A xullo de 2026 hai tres fugas de memoria documentadas e **abertas no propio framework**, de Next.js 15.5 a 16.3:
+Se o teu servidor Next.js autoaloxado medra en memoria ata morrer con `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — ou o contedor cae con `OOMKilled` (exit code 137) — non empeces auditando o teu código. Hai tres fugas de memoria documentadas no propio framework, de Next.js 15.5 a 16.3, e son o primeiro que hai que descartar:
 
 -   **A caché LRU do router non contabiliza as súas chaves** ([#94890](https://github.com/vercel/next.js/issues/94890)): deriva lenta durante días, proporcional ás URLs únicas que recibes, non ao teu tráfico.
 -   **A árbore RSC queda retida por request** ([#94919](https://github.com/vercel/next.js/issues/94919)): medra co tráfico, moito peor en Node 22/24 e cando o cliente corta a conexión a medio stream.
 -   **Os `setTimeout` do middleware quedan rexistrados para sempre** ([#95094](https://github.com/vercel/next.js/issues/95094)): crecemento a chanzos ligado ao tráfico que atravesa o middleware.
+
+**Actualización, agosto de 2026: as tres pecháronse como resoltas upstream entre o 25 e o 27 de xullo de 2026**, días despois de publicarse este post. Iso non deixa obsoleto o que vén debaixo: segues a correr a versión que despregaches, e as tres formas son xusto o que distingue "estou nunha versión que aínda a ten" de "a fuga é miña". Mira nos issues ligados que release leva cada arranxo, e actualiza antes de auditar o teu propio código. O [#84884](https://github.com/vercel/next.js/issues/84884) (axios con `AbortSignal` en middleware) segue aberto a día de hoxe.
 
 En serverless (Vercel) case nunca o verás como OOM: a instancia recíclase antes. Alí o mesmo problema de fondo asoma como un `504 FUNCTION_INVOCATION_TIMEOUT` — pasoume neste blog e máis abaixo están os meus números.
 
