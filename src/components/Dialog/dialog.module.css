@@ -8,19 +8,17 @@
     height: calc(100vh - 50px);
     transform: scale(0);
     /**
-     * SDD-L06 NOTE, deliberately left as `--white-color`.
+     * Theme-scoped, not `--white-color`.
      *
-     * This is theme-independent, so every window stays white even under `[data-theme='dark']` while
-     * the text tokens inside it switch — light-on-white. Changing it to `--blog-background` was tried
-     * and reverted in the same phase: the token resolves correctly on this element (verified as
-     * `30,30,30` in the browser) yet `background-color` still computes white, and the cause was not
-     * isolated. Shipping a half-working dark surface is worse than a consistently light one.
-     *
-     * It has never surfaced in production because the dark theme has effectively never run —
-     * `useDarkMode` is mounted only by /settings, so `data-theme` stays at the "light" hardcoded in
-     * _document.tsx everywhere else. Fixing the theme and fixing this surface have to land together.
+     * SDD-L06 left this as the theme-independent white and recorded that `--blog-background` had been
+     * tried and reverted because `background-color` "still computes white". That reading did not
+     * reproduce: with `data-theme="dark"` forced on the live page, a probe element appended to this
+     * very dialog with `background: rgba(var(--blog-background))` computes `rgb(30, 30, 30)`. The
+     * substitution was never the problem — the page simply never carried `data-theme="dark"`, because
+     * `useDarkMode` mounted only on /settings. The `_document.tsx` bootstrap script fixes that, so
+     * every window would have rendered light-on-white; the token had to move with it.
      */
-    background: rgba(var(--white-color));
+    background: rgba(var(--blog-background));
     box-shadow: 0 8px 32px 0 rgb(31 38 135 / 37%);
     transition: all 0.3s ease-in;
     overflow: hidden;
