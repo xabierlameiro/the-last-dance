@@ -19,7 +19,7 @@ const es = {
     'settings.seo.description':
         'Pagina web de configuración de preferencias de usuario para su experiencia en la web, permite cambiar el idioma, el tema y la región',
     'settings.title': 'Preferencias del sistema',
-    'settings.desc': 'Software Architect, aplicaciones web, microinformática y redes',
+    'settings.desc': 'Software Architect · Next.js y React',
     'settings.lang': 'Idioma y Región',
     'settings.langAlt': 'Icono de Idioma y Región',
     'settings.lang.preferred': 'Idiomas preferidos:',

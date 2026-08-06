@@ -19,7 +19,7 @@ const gl = {
     'settings.seo.description':
         'Páxina web de configuración de preferencias de usuario para a súa experiencia na web, permite cambiar o idioma, o tema e a rexión',
     'settings.title': 'Preferencias do sistema',
-    'settings.desc': 'Software Architect, aplicacións web, microinformática e redes',
+    'settings.desc': 'Software Architect · Next.js e React',
     'settings.lang': 'Idioma e Rexión',
     'settings.langAlt': 'Icono de Idioma e Rexión',
     'settings.lang.preferred': 'Idiomas preferidos:',

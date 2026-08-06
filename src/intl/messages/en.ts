@@ -18,7 +18,7 @@ const en = {
     'settings.seo.description':
         'Web page for user preferences settings for your experience on the web, allows you to change the language, theme and region',
     'settings.title': 'System Preferences',
-    'settings.desc': 'Software Architect, web applications, microcomputing and networks',
+    'settings.desc': 'Software Architect · Next.js & React',
     'settings.lang': 'Language & Region',
     'settings.langAlt': 'Language & Region Icon',
     'settings.lang.preferred': 'Preferred languages:',
