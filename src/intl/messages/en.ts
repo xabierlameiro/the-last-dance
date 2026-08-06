@@ -11,14 +11,14 @@ const en = {
     'blog.tags': 'Tags',
     language: 'English',
     'home.breadcrumb': 'Code',
-    'home.seo.title': 'Xabier Lameiro | Software Architect, microcomputing and networks Technician',
+    'home.seo.title': 'Xabier Lameiro | Software Architect · Next.js & React',
     'home.seo.description':
         "I'm a Software Architect with more than 8 years of experience working in the online banking sector, currently specialized in Nextjs and React. Passionate about technology and programming, I like to learn new things and share knowledge with the community.",
     'settings.seo.title': 'Customized language, theme and region preferences for a web application',
     'settings.seo.description':
         'Web page for user preferences settings for your experience on the web, allows you to change the language, theme and region',
     'settings.title': 'System Preferences',
-    'settings.desc': 'Software Architect, web applications, microcomputing and networks',
+    'settings.desc': 'Software Architect · Next.js & React',
     'settings.lang': 'Language & Region',
     'settings.langAlt': 'Language & Region Icon',
     'settings.lang.preferred': 'Preferred languages:',
