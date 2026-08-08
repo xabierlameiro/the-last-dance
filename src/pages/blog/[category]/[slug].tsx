@@ -14,7 +14,7 @@ import { AsidePanel, ArticlePanel, NavList, PostList } from '@/components/Blog';
 import usePostComponents from '@/components/Blog/PostByline';
 import Loading from '@/components/RenderManager/Loading';
 import styles from '@/styles/blog.module.css';
-import { clx } from '@/helpers';
+import { clx, getLang } from '@/helpers';
 import dynamic from 'next/dynamic';
 import useWindowResize from '@/hooks/useWindowResize';
 import SEO from '@/components/SEO';
@@ -59,6 +59,8 @@ type Props = {
             title: string;
             excerpt: string;
             slug: string;
+            /** The post's own primary category, so its link is the canonical URL rather than the facet. */
+            category: string;
         };
     }[];
 };
@@ -120,7 +122,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                         >
                             <AsidePanel />
                             <div className={styles.postLinks}>
-                                <PostList posts={posts} slug={slug} category={category} />
+                                <PostList posts={posts} slug={slug} />
                             </div>
                             {/* SDD-L05: these two rendered with no handleClick, so the only visible
                                 affordance for the side panels did nothing and the real gesture was
@@ -162,6 +164,48 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     );
 };
 
+/**
+ * @description A 301 to the post's own canonical URL, for a slug requested under the wrong locale.
+ *
+ * SDD-L04 made `findPostBySlug` filter by locale, so a Spanish slug no longer answers under the
+ * English prefix — it throws, and the page 404s. Right about the URL being wrong, wrong about what to
+ * do next: those URLs had been indexed for months, so the 404 discards the equity they accumulated
+ * and leaves Search Console reporting "No se ha encontrado" on pages still taking real traffic
+ * (/blog/yarn/npm-token-solucion-erro: 43 impressions in 28 days into a dead end). The article did
+ * not disappear, it lives one prefix over.
+ *
+ * So the slug is looked up again without the locale filter, and if it exists elsewhere the request is
+ * redirected instead of dropped. The destination is built from the post's own frontmatter — never
+ * from the request — so it is always the canonical URL, the same one `resolveSeoUrls` emits and the
+ * sitemap submits. A slug that exists in no locale still 404s.
+ *
+ * Caveat worth knowing: two posts can legitimately share a slug across locales (the es and gl
+ * `integracion-continua-con-github-actions-workflow` are spelled identically), and a locale-less
+ * lookup returns whichever comes first in the corpus. Both are translations of the same article, so
+ * either destination is a real page and the redirect is stable per build — it just is not meaningful
+ * to ask which of the two is "the" target.
+ */
+const redirectToPostLocale = (params: { params: { category: string; slug: string } }) => {
+    let post;
+    try {
+        post = getPostBySlug(params);
+    } catch {
+        return null;
+    }
+
+    const { locale: postLocale, category, slug } = post.meta ?? {};
+    if (!postLocale || !category || !slug) return null;
+
+    return {
+        redirect: {
+            destination: `${getLang(postLocale)}/blog/${category.toLowerCase()}/${slug}`,
+            permanent: true,
+        },
+        // Same cadence as a rendered post: the mapping only changes when the content does.
+        revalidate: 86400,
+    } as const;
+};
+
 export const getStaticProps = async (data: {
     params: {
         category: string;
@@ -179,25 +223,11 @@ export const getStaticProps = async (data: {
     try {
         post = getPostBySlug(data, locale);
     } catch {
-        // Retry a missing slug within a minute (e.g. a just-added post), without hammering.
-        return {
-            notFound: true as const,
-            revalidate: 60,
-        };
-    }
+        // Wrong locale rather than unknown slug? Send it to the real article instead of a dead end.
+        const localeRedirect = redirectToPostLocale(data);
+        if (localeRedirect) return localeRedirect;
 
-    /**
-     * SDD-L04. `findPostBySlug` matches on slug or filename only, with no locale filter, and
-     * `fallback: 'blocking'` renders anything unprerendered with a 200. So a Spanish slug answered
-     * under the English prefix — and `resolveSeoUrls` built the canonical from the *router* locale, so
-     * the page self-canonicalised at whatever prefix was asked for. Search Console confirmed the
-     * result: the same Spanish article indexed twice, at /blog/... and /es/blog/..., each claiming
-     * itself canonical. Surface was 45 posts x 3 prefixes.
-     *
-     * Note this is deliberately narrower than it looks. Faceted *category* URLs stay valid (see the
-     * comment below); only a mismatched **locale** 404s.
-     */
-    if (post.meta?.locale && post.meta.locale !== locale) {
+        // Retry a missing slug within a minute (e.g. a just-added post), without hammering.
         return {
             notFound: true as const,
             revalidate: 60,
@@ -218,8 +248,28 @@ export const getStaticProps = async (data: {
     // 29,180 characters `posts` occupied were `content` nobody reads — 82%, shipped to every visitor
     // and growing linearly with the number of posts in a category. The `Props` type above already
     // declared only these three, so the type was honest and the payload was not.
+    /*
+     * `category` here is the *requested* segment, which for a tag URL is the tag, not the post's
+     * category. PostList used to build every href from it, so browsing inside a tag minted a facet
+     * URL for each post in the list — and those links sit in the sidebar of every page, which made
+     * them the most-linked version of each post on the whole site. That is the signal Google weighs
+     * against rel=canonical, and on /blog/testing/publish-report-testing-react it won: Search Console
+     * reports Google picking the facet over the canonical the page itself declares.
+     *
+     * Google's guidance for this is rel=canonical plus *consistent* signals, and explicitly not
+     * noindex (which must not be combined with a canonical, since it can carry over to the target)
+     * and not a 301 here (SDD-009 — that bounced tag clicks out of the blog). So the fix is to stop
+     * contradicting our own canonical: each post carries its own category and PostList links to that.
+     * The facet URL still resolves 200 with the tag-filtered list, so entering a tag still works; what
+     * goes away is minting a new facet URL on every click through that list.
+     */
     const posts = findPostsByCategoryOrTag(locale, category).map(({ meta }) => ({
-        meta: { title: meta.title, excerpt: meta.excerpt, slug: meta.slug },
+        meta: {
+            title: meta.title,
+            excerpt: meta.excerpt,
+            slug: meta.slug,
+            category: meta.category.toLowerCase(),
+        },
     }));
 
     return {

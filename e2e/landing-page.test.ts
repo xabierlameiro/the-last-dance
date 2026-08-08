@@ -1,4 +1,5 @@
 import { socialLinks } from '@/constants/site';
+import en from '../src/intl/messages/en';
 import { expect, test } from './fixtures';
 
 /**
@@ -22,8 +23,16 @@ test.describe('Landing page', () => {
         await page.goto('/');
     });
 
+    /*
+     * Asserted against the message catalogue rather than a copied literal. The previous version
+     * inlined the title text, so when #184 rewrote it for the SERP the assertion kept checking a
+     * string the site no longer served and the suite went red on master — a test failing for the one
+     * reason a test should never fail, that the copy it duplicated moved on without it. Reading the
+     * value from the same place the page reads it keeps the check ("the home renders its SEO title")
+     * while removing the duplication that made it brittle.
+     */
     test('should navigate to landing page', async ({ page }) => {
-        await expect(page).toHaveTitle(/Software Architect, microcomputing and networks Technician/);
+        await expect(page).toHaveTitle(en['home.seo.title']);
     });
 
     /**
