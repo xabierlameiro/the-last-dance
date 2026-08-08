@@ -21,13 +21,13 @@ export const Primary = Template.bind({});
 
 Primary.args = {
     slug: 'post-1',
+    category: 'blog',
     posts: [
         {
             meta: {
                 title: 'The first post',
                 excerpt: 'Resume of the first post',
                 slug: 'post-1',
-                category: 'react',
             },
         },
         {
@@ -35,7 +35,6 @@ Primary.args = {
                 title: 'The second post',
                 excerpt: 'Resume of the second post',
                 slug: 'post-2',
-                category: 'nextjs',
             },
         },
     ],
