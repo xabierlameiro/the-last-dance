@@ -14,11 +14,10 @@ describe('PostList', () => {
                     title: 'title',
                     excerpt: 'excerpt',
                     slug: 'slug',
-                    category: 'react',
                 },
             },
         ];
-        render(<PostList posts={posts} slug="slug" />);
+        render(<PostList posts={posts} slug="slug" category="category" />);
         expect(screen.getByTestId('post-list')).toBeInTheDocument();
     });
 
@@ -29,46 +28,46 @@ describe('PostList', () => {
                     title: 'title',
                     excerpt: 'excerpt',
                     slug: 'slug',
-                    category: 'react',
                 },
             },
         ];
-        render(<PostList posts={posts} slug="slug" />);
+        render(<PostList posts={posts} slug="slug" category="category" />);
         expect(screen.getByTestId('post-list')).toBeInTheDocument();
         expect(screen.getByTestId('post-list').children[0].className).toBe('selected');
     });
 
-    // Each href must come from the post's own category, not from whatever segment the current URL
-    // used. Building them from the route param turned every tag listing into a set of faceted
-    // duplicates that out-linked the canonical, which is what made Google index the facet instead.
-    it('should link each post to its own category, not to the browsed one', () => {
+    /*
+     * The regression #186 shipped, pinned so it cannot come back: every link has to stay inside the
+     * segment being browsed. When they were rebuilt from each post's own category, clicking a post
+     * inside a tag listing jumped to /blog/<that post's category>/… and the sidebar deselected the
+     * tag, which made walking a tag impossible.
+     */
+    it('should keep the browsed segment in every link so the tag stays selected', () => {
         const posts = [
             {
                 meta: {
                     title: 'Publish the coverage report',
                     excerpt: 'excerpt',
                     slug: 'publish-report-testing-react',
-                    category: 'react',
                 },
             },
             {
                 meta: {
-                    title: 'Find a memory leak',
+                    title: 'Deploying my storybook',
                     excerpt: 'excerpt',
-                    slug: 'nextjs-memory-leak-in-production',
-                    category: 'nextjs',
+                    slug: 'deploying-my-storybook-is-very-simple',
                 },
             },
         ];
-        render(<PostList posts={posts} slug="publish-report-testing-react" />);
+        render(<PostList posts={posts} slug="publish-report-testing-react" category="ci" />);
 
         expect(screen.getByTitle('Publish the coverage report')).toHaveAttribute(
             'href',
-            '/blog/react/publish-report-testing-react'
+            '/blog/ci/publish-report-testing-react',
         );
-        expect(screen.getByTitle('Find a memory leak')).toHaveAttribute(
+        expect(screen.getByTitle('Deploying my storybook')).toHaveAttribute(
             'href',
-            '/blog/nextjs/nextjs-memory-leak-in-production'
+            '/blog/ci/deploying-my-storybook-is-very-simple',
         );
     });
 });

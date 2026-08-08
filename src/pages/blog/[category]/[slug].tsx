@@ -59,8 +59,6 @@ type Props = {
             title: string;
             excerpt: string;
             slug: string;
-            /** The post's own primary category, so its link is the canonical URL rather than the facet. */
-            category: string;
         };
     }[];
 };
@@ -122,7 +120,7 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
                         >
                             <AsidePanel />
                             <div className={styles.postLinks}>
-                                <PostList posts={posts} slug={slug} />
+                                <PostList posts={posts} slug={slug} category={category} />
                             </div>
                             {/* SDD-L05: these two rendered with no handleClick, so the only visible
                                 affordance for the side panels did nothing and the real gesture was
@@ -248,28 +246,8 @@ export const getStaticProps = async (data: {
     // 29,180 characters `posts` occupied were `content` nobody reads — 82%, shipped to every visitor
     // and growing linearly with the number of posts in a category. The `Props` type above already
     // declared only these three, so the type was honest and the payload was not.
-    /*
-     * `category` here is the *requested* segment, which for a tag URL is the tag, not the post's
-     * category. PostList used to build every href from it, so browsing inside a tag minted a facet
-     * URL for each post in the list — and those links sit in the sidebar of every page, which made
-     * them the most-linked version of each post on the whole site. That is the signal Google weighs
-     * against rel=canonical, and on /blog/testing/publish-report-testing-react it won: Search Console
-     * reports Google picking the facet over the canonical the page itself declares.
-     *
-     * Google's guidance for this is rel=canonical plus *consistent* signals, and explicitly not
-     * noindex (which must not be combined with a canonical, since it can carry over to the target)
-     * and not a 301 here (SDD-009 — that bounced tag clicks out of the blog). So the fix is to stop
-     * contradicting our own canonical: each post carries its own category and PostList links to that.
-     * The facet URL still resolves 200 with the tag-filtered list, so entering a tag still works; what
-     * goes away is minting a new facet URL on every click through that list.
-     */
     const posts = findPostsByCategoryOrTag(locale, category).map(({ meta }) => ({
-        meta: {
-            title: meta.title,
-            excerpt: meta.excerpt,
-            slug: meta.slug,
-            category: meta.category.toLowerCase(),
-        },
+        meta: { title: meta.title, excerpt: meta.excerpt, slug: meta.slug },
     }));
 
     return {
