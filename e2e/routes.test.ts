@@ -1,3 +1,6 @@
+import en from '../src/intl/messages/en';
+import es from '../src/intl/messages/es';
+import gl from '../src/intl/messages/gl';
 import { expect, test } from './fixtures';
 
 /**
@@ -194,10 +197,17 @@ test.describe('RSS feeds', () => {
 test.describe('Locales', () => {
     test.describe.configure({ mode: 'parallel' });
 
+    /*
+     * Taken from the three catalogues rather than copied out of them. As literals these went stale
+     * the moment #184 rewrote the SERP titles, and the suite failed on master for a change that was
+     * intentional. The point of the check is that the three prefixes serve three *different*
+     * languages, which the catalogues express directly — and they cannot drift from the page,
+     * because the page renders these same values.
+     */
     const HOME_TITLE = {
-        '/': /microcomputing and networks Technician/,
-        '/es': /técnico en microinformática y redes/,
-        '/gl': /técnico en microinformática e redes/,
+        '/': en['home.seo.title'],
+        '/es': es['home.seo.title'],
+        '/gl': gl['home.seo.title'],
     };
 
     for (const [path, title] of Object.entries(HOME_TITLE)) {
