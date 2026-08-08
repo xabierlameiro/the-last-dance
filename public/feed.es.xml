@@ -24,7 +24,7 @@
             <link>https://xabierlameiro.com/es/blog/nextjs/fuga-de-memoria-nextjs-en-produccion</link>
             <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/fuga-de-memoria-nextjs-en-produccion</guid>
             <pubDate>Sat, 18 Jul 2026 00:00:00 +0000</pubDate>
-            <description>Tres fugas de memoria abiertas en Next.js 15.5–16.3, cómo identificar la tuya con heap snapshots y por qué en serverless la fuga se disfraza de un 504.</description>
+            <description>Las tres fugas de memoria de Next.js que medí y ayudé a confirmar, ya corregidas en 16.3.0: cuál tienes, cómo demostrarlo y por qué en serverless se disfrazan de 504.</description>
             <category>memory-leak</category>
             <category>node</category>
             <category>performance</category>
@@ -48,11 +48,11 @@
             <category>node</category>
         </item>
         <item>
-            <title>Tema oscuro con Nextjs</title>
+            <title>Tema oscuro en Next.js sin parpadeo del tema equivocado</title>
             <link>https://xabierlameiro.com/es/blog/nextjs/tema-oscuro</link>
             <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/tema-oscuro</guid>
             <pubDate>Fri, 03 Feb 2023 00:00:00 +0000</pubDate>
-            <description>Implementa un tema oscuro en Next.js con variables CSS y un evento de cambio de tema: sin parpadeo del tema equivocado y sin librerías pesadas. Guía paso a paso con el código completo.</description>
+            <description>Tema oscuro en Next.js con variables CSS: resuelve el tema antes del primer pintado, guarda la elección y usa color-scheme para que scrollbars y formularios lo sigan.</description>
             <category>css</category>
         </item>
         <item>
@@ -80,11 +80,11 @@
             <category>intl</category>
         </item>
         <item>
-            <title>Contador de estrellas de un repositorio de GitHub</title>
+            <title>Lee las estrellas de un repo de GitHub sin agotar el límite</title>
             <link>https://xabierlameiro.com/es/blog/nextjs/contador-de-estrellas-de-github</link>
             <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/contador-de-estrellas-de-github</guid>
             <pubDate>Wed, 11 Jan 2023 00:00:00 +0000</pubDate>
-            <description>Crea un contador de estrellas de GitHub para tu sitio con una API route de Next.js y Octokit: cachea la API de GitHub para evitar rate limits y muestra el número de estrellas en vivo. Código incluido.</description>
+            <description>Lee el número de estrellas de un repositorio de GitHub con stargazers_count, entiende los límites de 60 y 5.000 peticiones por hora, y cachea la llamada para que un contador cueste una petición a la hora.</description>
             <category>node</category>
         </item>
         <item>
@@ -128,7 +128,7 @@
             <link>https://xabierlameiro.com/es/blog/error/resolver-direccion-en-uso-error</link>
             <guid isPermaLink="true">https://xabierlameiro.com/es/blog/error/resolver-direccion-en-uso-error</guid>
             <pubDate>Mon, 02 Jan 2023 00:00:00 +0000</pubDate>
-            <description>Arregla el error de Node.js &quot;listen EADDRINUSE: address already in use&quot;: encuentra y mata el proceso que ocupa el puerto en macOS, Linux y Windows, libéralo con un comando, o arranca en otro puerto.</description>
+            <description>Arregla &quot;address already in use&quot; en Node.js, Python, Docker, netcat y Playwright: encuentra y mata el proceso que ocupa el puerto en macOS, Linux y Windows, o arranca en otro puerto.</description>
             <category>node</category>
             <category>cli</category>
         </item>

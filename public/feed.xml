@@ -24,7 +24,7 @@
             <link>https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production</link>
             <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production</guid>
             <pubDate>Sat, 18 Jul 2026 00:00:00 +0000</pubDate>
-            <description>Three open memory leaks in Next.js 15.5–16.3, how to tell which one you have from heap snapshots, and why on serverless a leak shows up as a 504 timeout.</description>
+            <description>The three Next.js memory leaks I measured and helped confirm, all fixed in 16.3.0: which one you have, how to prove it, and why serverless hides them as 504s.</description>
             <category>memory-leak</category>
             <category>node</category>
             <category>performance</category>
@@ -48,11 +48,11 @@
             <category>node</category>
         </item>
         <item>
-            <title>Dark theme with Nextjs</title>
+            <title>Dark mode in Next.js without the flash of the wrong theme</title>
             <link>https://xabierlameiro.com/blog/nextjs/dark-theme</link>
             <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/dark-theme</guid>
             <pubDate>Fri, 03 Feb 2023 00:00:00 +0000</pubDate>
-            <description>Build a dark theme in Next.js with CSS variables and a theme-toggle event — no flash of the wrong theme and no heavy library. A step-by-step guide with the full code.</description>
+            <description>Dark mode in Next.js with CSS variables: resolve the theme before the first paint, persist the choice, and set color-scheme so scrollbars and form controls follow it.</description>
             <category>css</category>
         </item>
         <item>
@@ -80,11 +80,11 @@
             <category>intl</category>
         </item>
         <item>
-            <title>Counter for github stars repository</title>
+            <title>Get a GitHub repo&apos;s star count without hitting rate limits</title>
             <link>https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository</link>
             <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository</guid>
             <pubDate>Wed, 11 Jan 2023 00:00:00 +0000</pubDate>
-            <description>Build a GitHub stars counter for your site with a Next.js API route and Octokit — cache the GitHub API to dodge rate limits and render a live star count. Full code included.</description>
+            <description>Read a GitHub repository&apos;s star count from stargazers_count, understand the 60 vs 5,000 requests-per-hour limits, and cache the call so a live counter costs one API request an hour.</description>
             <category>node</category>
         </item>
         <item>
@@ -114,7 +114,7 @@
             <category>ci</category>
         </item>
         <item>
-            <title>Fix &quot;Failed to replace env in config: $\{NPM_TOKEN}&quot; in npm and yarn</title>
+            <title>Fix &quot;Failed to replace env in config: ${NPM_TOKEN}&quot; in npm and yarn</title>
             <link>https://xabierlameiro.com/blog/error/npm-token-solution-error</link>
             <guid isPermaLink="true">https://xabierlameiro.com/blog/error/npm-token-solution-error</guid>
             <pubDate>Tue, 03 Jan 2023 00:00:00 +0000</pubDate>
@@ -128,7 +128,7 @@
             <link>https://xabierlameiro.com/blog/error/solve-address-in-use-error</link>
             <guid isPermaLink="true">https://xabierlameiro.com/blog/error/solve-address-in-use-error</guid>
             <pubDate>Mon, 02 Jan 2023 00:00:00 +0000</pubDate>
-            <description>Fix the Node.js error &quot;listen EADDRINUSE: address already in use&quot;: find and kill the process holding the port on macOS, Linux and Windows, free it with one command, or just run on another port.</description>
+            <description>Fix &quot;address already in use&quot; in Node.js, Python, Docker, netcat and Playwright: find and kill the process holding the port on macOS, Linux and Windows, or run on another port.</description>
             <category>node</category>
             <category>cli</category>
         </item>
