@@ -4,7 +4,7 @@
 
 ---
 
-# Fix "Failed to replace env in config: $\{NPM_TOKEN}" in npm and yarn
+# Fix "Failed to replace env in config: ${NPM_TOKEN}" in npm and yarn
 
 - URL: https://xabierlameiro.com/blog/error/npm-token-solution-error
 - Author: Xabier Lameiro
@@ -77,7 +77,7 @@ The most common place this bites is continuous integration, because the runner i
 - name: Install dependencies
   env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  run: npm install --legacy-peer-deps
+  run: npm ci --legacy-peer-deps
 ```
 
 If you generate the `.npmrc` on the runner instead of committing it, write the auth line straight into the home file before installing:
@@ -102,7 +102,7 @@ One last thing, because it is a mistake I see often. The `.npmrc` that reference
 - URL: https://xabierlameiro.com/blog/error/solve-address-in-use-error
 - Author: Xabier Lameiro
 - Category: Error · Tags: node, cli
-- Summary: Fix the Node.js error "listen EADDRINUSE: address already in use": find and kill the process holding the port on macOS, Linux and Windows, free it with one command, or just run on another port.
+- Summary: Fix "address already in use" in Node.js, Python, Docker, netcat and Playwright: find and kill the process holding the port on macOS, Linux and Windows, or run on another port.
 
 # EADDRINUSE: address already in use — how to free the port
 
@@ -138,6 +138,81 @@ Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
 ## Why it happens
 
 `EADDRINUSE` means the address and port your server wants are already taken. On a dev machine the usual cause is a **previous dev server that did not shut down cleanly** — a crashed process, a detached background job, or a second terminal still running it. Less often another app genuinely owns the port: another service, a Docker container, or a system daemon.
+
+## The same error in every other tool
+
+`EADDRINUSE` is not a Node.js thing. It is the operating system refusing the `bind()` call, and every runtime surfaces the same refusal in its own words. If you searched the exact string your tool printed and landed here, this is the translation table:
+
+| Tool          | What it prints                                                        |
+| ------------- | --------------------------------------------------------------------- |
+| Node.js       | `Error: listen EADDRINUSE: address already in use 0.0.0.0:3000`       |
+| Python        | `OSError: [Errno 48] Address already in use` (48 on macOS, 98 on Linux) |
+| netcat        | `nc: Address already in use`, exit code 1                              |
+| Docker        | `bind: address already in use`                                         |
+| Go            | `listen tcp :8080: bind: address already in use`                       |
+| Playwright    | `http://localhost:3000 is already used, make sure that nothing is running on the port/url` |
+
+The numbers in the Python message are the raw `errno` constant, and they differ per platform — **48 on macOS and the BSDs, 98 on Linux**. That trips people up when a container reproduces the same failure with a different number than their laptop. Reproduced on macOS 26.5:
+
+```python errno.py
+>>> import socket
+>>> s1 = socket.socket(); s1.bind(('127.0.0.1', 51234)); s1.listen(1)
+>>> s2 = socket.socket(); s2.bind(('127.0.0.1', 51234))
+OSError: [Errno 48] Address already in use
+```
+
+Whatever printed it, the diagnosis does not change: something already holds that port. The commands below work regardless of which tool hit the error.
+
+## Which port is it, and who usually owns it
+
+Half of these reports are not a stale dev server at all — they are two different programs that default to the same port. The ones worth knowing:
+
+| Port          | Usual owner                                                             |
+| ------------- | ------------------------------------------------------------------------ |
+| 3000          | Next.js, Create React App, Rails, Grafana                                |
+| 3001          | The second dev server you started after 3000 was taken                   |
+| 5000 / 7000   | On macOS, ControlCenter when **AirPlay Receiver** is enabled             |
+| 5173          | Vite                                                                     |
+| 8080          | Tomcat, Jenkins, and roughly every "alternative HTTP" default            |
+| 9323          | Playwright's HTML report server                                          |
+| 5432 / 6379   | PostgreSQL / Redis — usually a container fighting a local install        |
+
+The macOS 5000 case is the one that wastes the most time, because nothing you started is holding it. AirPlay Receiver binds 5000 and 7000, so a Flask app on its default port fails on a machine where the developer installed nothing. `lsof` gives it away immediately — the owner is ControlCenter, not `node` or `python`. Turn it off in System Settings → General → AirDrop & Handoff, or move your app.
+
+Port 9323 is Playwright's, and it behaves better than people expect — which is worth knowing before you go hunting for a PID. The HTML reporter serves the report there by default, but it treats 9323 as a _preferred_ port, not a required one. Reading `playwright-core/lib/server/utils/httpServer.js` on Playwright 1.57:
+
+```js httpServer.js
+if (options.preferredPort) {
+    try {
+        await this._tryStart(options.preferredPort, host);
+    } catch (e) {
+        if (!e || !e.message || !e.message.includes('EADDRINUSE')) throw e;
+        await this._tryStart(void 0, host);
+    }
+}
+```
+
+It catches `EADDRINUSE` and retries with no port at all, letting the OS pick a free one. So an open report in a browser tab does **not** break the next run — you just get the report on a different port than you expected.
+
+What actually stops a Playwright run is the `webServer` block in the config, and it is a different message with a different fix:
+
+```text webserver.txt
+http://localhost:3000 is already used, make sure that nothing is running on the
+port/url or set reuseExistingServer:true in config.webServer.
+```
+
+The error tells you the fix: if the thing on that port is your own dev server, which is usually the case, `reuseExistingServer: true` makes Playwright use it instead of trying to start a second one.
+
+## The address matters as much as the port
+
+`EADDRINUSE` is about an **address** and a port, not a port alone — which is why the message names one, like `0.0.0.0:3000` or `::1:9323`.
+
+That distinction is real: `127.0.0.1:3000` (IPv4 loopback) and `[::1]:3000` (IPv6 loopback) are different addresses. A server bound to one does not necessarily collide with a server bound to the other, and a server bound to `0.0.0.0` collides with both because it claims every IPv4 interface on the machine. It explains two confusing cases:
+
+-   `lsof -i :3000` shows nothing, but your server still fails — look at the exact address in the error, and check the other protocol family.
+-   Two servers on "the same port" happily coexist, until a third one binds `0.0.0.0` and everything breaks.
+
+Use `lsof -nP -iTCP:3000 -sTCP:LISTEN` to see the address as well as the PID: `-n` and `-P` skip the DNS and service-name lookups, so you get `*:3000` instead of the `TCP *:hbci` in the output above — `hbci` is just `/etc/services` renaming port 3000 at you.
 
 ## Free the port on macOS and Linux
 
@@ -185,6 +260,22 @@ next dev -p 3001        # Next.js
 
 If the server runs in a container, the host port is held by the port mapping, not by a local PID — `lsof` will point at `com.docker`. Stop the container (`docker ps` then `docker stop <id>`) or change the mapping (`-p 3001:3000`).
 
+Docker phrases it differently enough that people do not connect it to `EADDRINUSE`:
+
+```text docker.txt
+Error response from daemon: driver failed programming external connectivity on
+endpoint web: Bind for 0.0.0.0:3000 failed: port is already allocated
+```
+
+`port is already allocated` is Docker's own bookkeeping — the daemon knows it already published that port — whereas `bind: address already in use` is the kernel refusing, same as everywhere else. The first can survive a container that has already exited; `docker ps -a` and removing the stale container clears it, and `docker compose down` is the blunt version.
+
+## When none of this works
+
+Two cases where the port genuinely is not yours to take:
+
+-   **Ports below 1024 need privileges.** Binding 80 or 443 as a normal user fails with `EACCES`, not `EADDRINUSE`. Different error, different fix — if you are reading `EACCES`, stop looking for a process to kill.
+-   **The port is in `TIME_WAIT`.** After a socket closes, the OS holds the pair for up to a couple of minutes. `lsof -i :3000` shows a connection but no listener, and there is nothing to kill. Servers avoid this with `SO_REUSEADDR`, which most frameworks set for you; waiting also works.
+
 ---
 
 # How to fix Minified React error #425 (hydration mismatch)
@@ -207,11 +298,11 @@ React error #425 — **"Text content does not match server-rendered HTML"** — 
 -   The whole component is client-only → load it with `next/dynamic` and `ssr: false` (Fix 3).
 -   Your HTML is invalid (a `<div>` inside a `<p>`) → fix the nesting (Fix 4).
 
-The full production error reads: `Uncaught Error: Minified React error visit https://reactjs.org/docs/error-decoder.html?invariant=425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.`
+On React 19 the full production error reads: `Uncaught Error: Minified React error #425; visit https://react.dev/errors/425 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.` On React 18 the same error pointed at `https://reactjs.org/docs/error-decoder.html?invariant=425` — that URL still works, it 308-redirects to the react.dev page.
 
 ## What "Minified React error #425" actually means
 
-In a production build React ships **minified** error messages to keep the bundle small, so instead of a sentence you get a number and a decoder link (`invariant=425`). #425 decodes to **"Text content does not match server-rendered HTML"**.
+In a production build React ships **minified** error messages to keep the bundle small, so instead of a sentence you get a number and a decoder link (`react.dev/errors/425`, or `?invariant=425` on React 18). #425 decodes to **"Text content does not match server-rendered HTML"**.
 
 That only happens with server-side rendering (Next.js, Remix, `renderToString`): React renders the HTML once on the server, sends it to the browser, and then **hydrates** — it reuses that HTML and only attaches the event handlers, expecting the client's first render to produce _exactly_ the same output. When a piece of text comes out different, hydration for that subtree fails and you get #425.
 
@@ -339,14 +430,16 @@ React logs something like _"Warning: Text content did not match. Server: '14:32'
 
 ## #418, #422, #423, #425 — the hydration error family
 
-If your searches turned up neighbouring numbers, they are the same problem seen from different angles:
+If your searches turned up neighbouring numbers, they are the same problem seen from different angles. What separates them is how far React had to fall back once hydration failed — these are the messages verbatim from React's own `scripts/error-codes/codes.json`:
 
-| Error | Meaning                                          |
-| ----- | ------------------------------------------------ |
-| #418  | Hydration failed because the initial UI differed |
-| #422  | Hydration completed but contained mismatches     |
-| #423  | Error while hydrating; the tree fell back to CSR |
-| #425  | Text content does not match server-rendered HTML |
+| Error | Meaning                                                                                              |
+| ----- | ---------------------------------------------------------------------------------------------------- |
+| #418  | Hydration failed because the server rendered HTML didn't match the client; the tree is regenerated    |
+| #422  | React recovered by client-rendering from the nearest Suspense boundary                                |
+| #423  | React recovered by client-rendering the entire root                                                   |
+| #425  | Text content does not match server-rendered HTML                                                      |
+
+The distinction is worth knowing because it tells you how much of the page you just lost. #425 costs you one text node; #423 means React threw away the server HTML for the **whole root** and re-rendered everything in the browser, which is the SSR benefit gone.
 
 The fix is always the same discipline: run a dev build, find the value that differs between server and client, and reconcile it with one of the four fixes above.
 
@@ -365,7 +458,9 @@ You can read more about the attribute in the [React documentation](https://react
 
 Published: 01-24-2023
 
-An easy way to have automated Lighthouse reports is using the Google tool called [Lighthouse CI](https://github.com/GoogleChrome/lighthouse 'Ligthouse repository') that allows us to pass the ligthouse test to a website and save the results on a server to compare them with the results of other executions.
+An easy way to have automated Lighthouse reports is to drive Google's [Lighthouse](https://github.com/GoogleChrome/lighthouse 'Lighthouse repository') from a script: run the audit against a site and save the results so you can compare them with other runs.
+
+Worth being precise about the name, because the two get conflated: this uses **Lighthouse**, the auditing engine. [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) is a different project — the `@lhci/cli` and `@lhci/server` packages, which exist to store runs and compare them against a budget. If you want assertions and a history server rather than a script you control, that is the one to reach for.
 
 You can see the improvements in performance, accessibility, SEO, etc. of your website. You can even add new rules with custom plugins, for example, to check that no html has been added that does not comply with the accessibility rules.
 
@@ -382,7 +477,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage();
 await page.goto('https://xabierlameiro.com/sitemap.xml');
 // get site map inside a body
-const sitemap = await page.$eval('body', (el) => el.innerHTML);
+const sitemap = await page.locator('body').innerHTML();
 // get all urls inside sitemap - Fixed: Use safer regex pattern
 const urls = sitemap.match(/<loc>([^<]+)<\/loc>/g)?.map((url) => url.replace(/<\/?loc>/g, '')) || [];
 // split urls in locales bearing in mind that 'en' is the default locale and it's not included in the url
@@ -494,21 +589,23 @@ name: Workflow Pre-Deploy
 on:
     push:
         branches: [dev]
+
+# Cancels superseded runs. Replaces a third-party action that needed a token.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+# Least privilege by default; jobs that need to write raise it themselves.
+permissions:
+    contents: read
+
 jobs:
-    cancel_redundancy:
-        name: Cancel Redundant Workflow Runs
-        runs-on: ubuntu-latest
-        steps:
-            - name: Cancel previous redundant workflow runs
-              uses: styfle/cancel-workflow-action@0.12.1
-              with:
-                  access_token: ${{ secrets.TOKEN_GITHUB }}
     code_checking:
         name: Linting
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v4
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
               with:
                   node-version: 22
                   cache: npm
@@ -518,17 +615,19 @@ jobs:
               run: |
                   echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  npm install --legacy-peer-deps
+                  npm ci --legacy-peer-deps
             - name: Linter
               run: npm run lint
 ```
 
 Full workflow [in my github](https://github.com/xabierlameiro/the-last-dance/actions/workflows/pre-deploy.yml 'in my github')
 
-## Three things worth doing from day one
+## Five things worth doing from day one
 
 - **Cache the install.** `actions/setup-node` with `cache: npm` restores `node_modules`-worth of downloads between runs and cuts minutes off every job. Point it at your real lockfile.
-- **Cancel redundant runs.** Pushing three times in a row should not run three full pipelines. The cancel step above (or the built-in `concurrency:` key) kills superseded runs.
+- **Cancel redundant runs with `concurrency:`, not an action.** Pushing three times in a row should not run three full pipelines. This used to be a `styfle/cancel-workflow-action` step here, and I removed it from my own pipeline for two reasons. It was pinned by a **mutable tag**, which GitHub's [hardening guide](https://docs.github.com/en/actions/reference/security/secure-use) tells you not to do for third-party actions — a tag can be repointed at new code, which is exactly how the `tj-actions/changed-files` compromise reached thousands of repositories in March 2025. And it needed `access_token`, so I was handing a PAT with write access to five other repositories to a third party on every push. The native `concurrency:` key does the same job with no token and no third-party code.
+- **Set `permissions:` explicitly.** Without it the `GITHUB_TOKEN` gets the repository default, which is broader than a linting job needs. `contents: read` at the top of the file, raised per job where something genuinely has to write, is the whole change.
+- **Keep the action majors current.** `actions/checkout@v4` and `setup-node@v4` still run, but they declare the Node 20 action runtime, which GitHub has been retiring from the runners. `@v7` is the current major for both and runs on Node 24.
 - **Keep secrets in secrets.** The registry token comes from `${{ secrets.NPM_TOKEN }}`, never from the file. If a token ever lands in a committed `.npmrc`, rotate it — the runner reads it from the environment, not the repo.
 
 ## Results
@@ -549,182 +648,325 @@ Every time I add a component in React or a page in Next.js, a battery of tests c
 
 ---
 
-# Counter for github stars repository
+# Get a GitHub repo's star count without hitting rate limits
 
 - URL: https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository
 - Author: Xabier Lameiro
 - Category: Nextjs · Tags: node
-- Summary: Build a GitHub stars counter for your site with a Next.js API route and Octokit — cache the GitHub API to dodge rate limits and render a live star count. Full code included.
+- Summary: Read a GitHub repository's star count from stargazers_count, understand the 60 vs 5,000 requests-per-hour limits, and cache the call so a live counter costs one API request an hour.
 
-# Counter for github stars repository
+# Get a GitHub repo's star count without hitting rate limits
 
 Published: 01-11-2023
 
-This is a simple counter for github stars repository. You can use it in your website or blog.
+## Quick answer
 
-How to use it? Just fetch the api and you will get the number of stars.
+The star count of any public repository is one field in one endpoint, and you do not need a token to read it:
 
-## 1. Create a github token
-
-> Please use the environment variable to store the token.
-
-```ts github.ts
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+```bash stars.sh
+curl -s https://api.github.com/repos/vercel/next.js | jq -r .stargazers_count
 ```
 
-## 2. Write the GET method
+`stargazers_count` is the number. The endpoint returns the whole repository object, so `jq` is only there to pull one field out of it.
 
-```ts github.ts
+That is the whole answer if you are scripting. The rest of this post is the part that bites when you put it on a website: **60 requests per hour unauthenticated, 5,000 with a token**, and a counter that calls the API on every page view will burn through either.
+
+## The field, and the ones people confuse it with
+
+The repository object carries several counts that look interchangeable and are not:
+
+| Field                | What it counts                                                             |
+| -------------------- | -------------------------------------------------------------------------- |
+| `stargazers_count`   | Stars. This is the number shown on the repo page                            |
+| `watchers_count`     | Historically a duplicate of the star count in this endpoint, not "watching" |
+| `subscribers_count`  | People actually watching for notifications                                  |
+| `forks_count`        | Forks                                                                       |
+
+If you have ever wondered why `watchers_count` matches your star count exactly, that is why — the field name outlived the change in what starring means. Use `stargazers_count` and be explicit about it.
+
+## The rate limits, which is what actually decides your design
+
+GitHub's REST API allows [60 requests per hour unauthenticated and 5,000 per hour with a personal access token](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api). Two details matter more than the numbers:
+
+**The unauthenticated limit is per IP address.** On a laptop that is your quota. On a cloud host, a CI runner or anything behind a shared NAT, you are sharing those 60 requests an hour with every other tenant on the address — which is why the same script that worked locally starts returning 403 the moment it runs in CI.
+
+**Reading a public repo still counts.** There is no free tier for "just a number". Every call to `/repos/{owner}/{repo}` spends one request whether you read one field or all of them.
+
+You can check where you stand without spending a request against the limit:
+
+```bash ratelimit.sh
+curl -s https://api.github.com/rate_limit | jq '.rate'
+```
+
+Put those two facts together and the design follows: a public site cannot call the GitHub API per visitor. It needs its own endpoint, a token, and a cache.
+
+## 1 — Your own endpoint, with the token on the server
+
+The token belongs in an environment variable read on the server. A token shipped to the browser is a token published:
+
+```ts github-stars.ts
+import { NextApiRequest, NextApiResponse } from 'next';
+import { Octokit } from 'octokit';
+
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
 const REPOSITORY = {
     owner: 'xabierlameiro',
     repo: 'the-last-dance',
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+type GitHubStarsResponse = number | { statusCode: number; message: string };
+
+export default async function handler(_req: NextApiRequest, res: NextApiResponse<GitHubStarsResponse>) {
     try {
         const {
             data: { stargazers_count },
         } = await octokit.rest.repos.get(REPOSITORY);
+        res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
         res.status(200).json(stargazers_count);
-    } catch (err: Error) {
-        res.status(500).json({ statusCode: 500, message: err.message });
+    } catch (err: unknown) {
+        console.error('GitHub stars API Error:', err);
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(500).json({ statusCode: 500, message: 'Internal server error' });
     }
 }
 ```
 
-## 3. Use it in your component
+Two things in there are corrections to what this post used to publish, and both are worth stating plainly.
 
-Not is necessary to use the `useEffect` hook for fetch information. You can use the `getStaticProps` or `getServerSideProps` hooks.
-In my case, I use this hook because the blog is a static site and the endpoint is not available in the build time.
+**`catch (err: unknown)`, not `catch (err: Error)`.** The earlier version of this post annotated the catch variable as `Error`, which is not legal TypeScript — the compiler rejects it with TS1196, _"Catch clause variable type annotation must be `any` or `unknown` if specified"_. It is a hard error, not a strictness setting: anything can be thrown, so the compiler refuses to let you claim otherwise. Narrow inside the block if you need the message.
+
+**Do not forward the upstream error message to the client.** The old version returned `message: err.message` straight from Octokit. That leaks: under rate limiting GitHub answers `API rate limit exceeded for user ID 12345`, which discloses the account id behind the token, and on a revoked token it answers `Bad credentials`, which turns your public endpoint into a live oracle for whether the PAT is still working. Log the detail server-side, return a flat message.
+
+## 2 — The cache is the whole point
+
+The `Cache-Control` header above is what makes the counter free:
+
+```text cache-control.txt
+public, s-maxage=3600, stale-while-revalidate=86400
+```
+
+`s-maxage=3600` tells the CDN to keep the response for an hour, so a thousand visitors in that hour produce **one** call to GitHub — 1 of your 5,000, not 1,000. `stale-while-revalidate=86400` is the part people skip: for a day after the response goes stale, the edge keeps serving the last known number while it refreshes in the background. If GitHub is down or you are rate-limited, the widget shows a slightly old count instead of an error.
+
+That trade is easy here because star counts are not urgent. Nobody notices a number that is fifty minutes old; everybody notices a broken widget.
+
+## 3 — The component
+
+Fetching in a `useEffect` and encoding states as magic numbers is what the original version of this post did, and it aged badly. `0` meant loading, `-1` meant error, and there was a branch for `-2` that nothing ever assigned — dead code rendering a state that could not happen.
+
+A data-fetching library gives you the three states as actual states:
+
+```ts useGithubStars.ts
+import useSWR from 'swr';
+
+const url = `${process.env.NEXT_PUBLIC_DOMAIN}/api/github-stars`;
+
+const useGithubStars = (): { data: number | undefined; error: Error | undefined; loading: boolean } => {
+    const { data, error, isLoading } = useSWR<number, Error>(url, fetchGithubStars, {
+        fallbackData: 0,
+        dedupingInterval: 5000,
+    });
+
+    return { data, error, loading: isLoading };
+};
+```
+
+`dedupingInterval` matters more than it looks: without it, several components asking for the same key mount and each fires its own request. With it, they share one.
+
+The component then renders loading, error and success without inventing sentinel values:
 
 ```tsx StarCounter.tsx
 const StarCounter = () => {
-    const [stars, setStars] = React.useState(0);
-
-    React.useEffect(() => {
-        (async () => {
-            try {
-                const stars = await fetch('/api/github').then((res) => res.json());
-                setStars(stars);
-            } catch (e) {
-                setStars(-1);
-            }
-        })();
-    }, []);
-
-    if (stars === -2)
-        return (
-            <Container>
-                <AiFillStar className={styles.starred} title="Starred" />
-            </Container>
-        );
-
-    if (stars === -1)
-        return (
-            <Container>
-                <RxCross2 className={styles.error} title="Error endpoint" />
-            </Container>
-        );
-
-    if (stars === 0)
-        return (
-            <Container>
-                <FaSpinner className={styles.spinner} title="Loading stars" />
-            </Container>
-        );
+    const { data, error, loading } = useGithubStars();
+    const { formatMessage: f } = useIntl();
 
     return (
-        <Container>
-            <span>{stars}</span>
-        </Container>
+        <a
+            className={styles.stars}
+            href="https://github.com/xabierlameiro/the-last-dance"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={f({ id: 'starCounter.label' })}
+        >
+            <AiOutlineStar aria-hidden="true" />
+            <RenderManager loading={loading} error={error}>
+                <span data-testid="star-counter">{data}</span>
+            </RenderManager>
+        </a>
     );
 };
-
-export default StarCounter;
 ```
 
-Right now you only have to look up to see the result, the counter is highlighted with a yellow star.
+The `aria-label` is not decoration. Without it this link's entire content is a star icon and a bare number — and while the count is loading, a spinner and nothing else. An accessibility check on this site flagged it as a link with no accessible name, announced to a screen reader as "link" with no destination.
+
+## If you only need the number once
+
+All of the above is for a live counter. If the count only has to be right at build time, skip the endpoint entirely and read it in `getStaticProps`: one request per build, no runtime quota, no cache to reason about. The reason this site does not is that the value has to update between deploys and the blog is statically generated — the endpoint exists to give a static page one live number.
+
+## The mistakes worth remembering
+
+-   `catch (err: Error)` does not compile. Use `unknown`.
+-   Never return the upstream error message from a public endpoint.
+-   60 requests an hour is per IP, and shared IPs share it.
+-   Cache at the edge, not in a module variable — serverless functions do not keep it.
+-   `stale-while-revalidate` is what turns an outage into a slightly stale number.
+
+Right now you only have to look up to see the result, the counter is highlighted with a star.
 
 Please if you think this content has helped you or you like it, please give me your star. <span className="emoji">🤩</span>
 
 ---
 
-# Dark theme with Nextjs
+# Dark mode in Next.js without the flash of the wrong theme
 
 - URL: https://xabierlameiro.com/blog/nextjs/dark-theme
 - Author: Xabier Lameiro
 - Category: Nextjs · Tags: css
-- Summary: Build a dark theme in Next.js with CSS variables and a theme-toggle event — no flash of the wrong theme and no heavy library. A step-by-step guide with the full code.
+- Summary: Dark mode in Next.js with CSS variables: resolve the theme before the first paint, persist the choice, and set color-scheme so scrollbars and form controls follow it.
 
-# Dark theme with Nextjs
+# Dark mode in Next.js without the flash of the wrong theme
 
 Published: 02-03-2023
 
-There are many ways to manage style themes in React and Nextjs, but all of them involve having an array/object with all the styles of each of the different themes.
-another way is to use css or scss variables _these last ones are in more and more disuse_. I, in particular, am going to use css variables and set a default theme in my \_document. Why here ?
+## Quick answer
 
-Because \_document runs on server not like \_app which runs on client and if you use a useEffect to set your default theme or detect the one the user has on their operating system,
-in the time it takes to do this check and add it, there can be a flicker in the page styles. That can be strange.
+A dark theme in Next.js needs three things, and CSS variables are only the first one:
 
-I did it like this:
+-   **Define the palette per theme** — one `[data-theme='dark']` block, one `[data-theme='light']` block, with the tokens redefined in each.
+-   **Resolve the theme before the first paint** — a small synchronous `<script>` in `_document` that reads `localStorage` and `prefers-color-scheme` and sets `data-theme` on `<html>`. A `useEffect` runs too late: the wrong palette is already on screen.
+-   **Set `color-scheme`** — otherwise scrollbars, `<select>` boxes and the default canvas stay light on a dark page.
 
-## 1 - css variables
+The part almost every tutorial gets wrong (mine included, for three years) is the second one. Registering a `matchMedia` **change** listener is not the same as reading the preference: the listener only fires if the visitor flips their OS theme while the tab is open.
+
+## What I shipped, and why it never worked
+
+The original version of this post described exactly what this site was running: CSS variables, `data-theme="light"` hardcoded in `_document`, and a hook subscribed to `prefers-color-scheme`. It had two defects that cancelled each other out well enough that I did not notice for three years.
+
+The first is in the hook. It called `mediaQuery.addEventListener('change', handler)` and nothing else — it never read `mediaQuery.matches`. `change` fires when the preference *changes*, not when you subscribe, so a visitor who had dark mode enabled before opening the page got the light palette and kept it. The only way to see the dark theme was to toggle the OS setting with the tab already open, which is exactly what I did every time I "tested" it.
+
+The second is worse. The hook was mounted by a single page — the settings dialog — so on every other route `data-theme` never moved from the `"light"` written into `_document`. The dark palette was not just hard to reach, it effectively never rendered. When I finally applied it site-wide, a window surface that had been sitting there since 2023 turned out to be painting white on white, because it used a theme-independent `--white-color` token that nobody had ever seen in dark mode.
+
+Meanwhile `globals.css` carried this:
+
+```css globals.css
+@media (prefers-color-scheme: dark) {
+    html {
+        color-scheme: dark;
+    }
+}
+```
+
+That rule reads the operating system directly, while the palette on the page came from `data-theme`. On Next.js 15.5 in August 2026, with the OS set to dark, the page reported `data-theme="light"` and `color-scheme: dark` at the same time: light background, light text tokens, and dark scrollbars, because the browser had been told the page was dark and the CSS said otherwise.
+
+## 1 — CSS variables per theme
+
+This part of the original post was fine and has not changed. Colours live as raw channel triplets so they can be reused with an alpha value, and each theme redefines them:
 
 ```css globals.css
 :root {
-    /* commons */
+    /* theme-independent */
     --white-color: 255, 255, 255;
-    --color-available-arrow: 95, 91 98;
-    ...;
+    --blue-color: 29, 88, 154;
 }
 
 [data-theme='dark'] {
-    --blog-nav: 48, 41, 51;
-    --blog-header: 53, 45, 55;
-    ...;
+    color-scheme: dark;
+    --blog-background: 30, 30, 30;
+    --blog-font: 223, 222, 223;
+    --blog-border: 107, 107, 107;
 }
 
 [data-theme='light'] {
-    --blog-nav: 204, 202, 219;
-    --blog-header: 255, 255, 255;
-    ...;
+    color-scheme: light;
+    --blog-background: 255, 255, 255;
+    --blog-font: 39, 39, 39;
+    --blog-border: 118, 118, 118;
 }
 ```
 
-## 2 - Set default theme
+The trap is the `:root` block. Anything that stays there is theme-independent by definition, and a token like `--white-color` used as a surface colour will still be white under `[data-theme='dark']`. If a value names a colour rather than a role, it does not belong in a themed component.
 
-```tsx _document.tsx mark=4
+## 2 — color-scheme, the property that fixes the browser's own UI
 
-const Document = (props: Props) => {
-    return (
-        <Html lang={props.__NEXT_DATA__.locale} data-theme="light">
-    )
-}
+`color-scheme` is what tells the browser which palette to use for the parts of the page **it** renders: scrollbars, checkboxes, radio buttons, `<select>` dropdowns, spellcheck underlines, and the default canvas colour before your CSS loads. It has been Baseline — available in every major engine — since January 2022, and it is missing from most dark-theme tutorials, including the first version of this one.
 
+Two details matter more than the property itself:
+
+**Declare it inside the `[data-theme]` blocks, not in a media query.** A media query follows the operating system. Your palette follows whatever theme is applied, which after a toggle is not the same thing. Bind them to the same selector and they cannot drift apart.
+
+**It also fixes the pre-paint flash colour.** With `color-scheme: dark`, the browser paints its default canvas dark instead of white, so even the frame before your stylesheet applies is the right colour.
+
+## 3 — Resolve the theme before the first paint
+
+The server cannot know the visitor's preference — there is no request header for `prefers-color-scheme` — so the HTML has to ship with a default and be corrected in the browser. The correction has to happen before the body is painted, which rules out `useEffect`.
+
+A synchronous script in the head does it. It is parser-blocking, which is normally something to avoid, but this is a handful of bytes and it is the entire point:
+
+```tsx _document.tsx
+const themeBootstrap = `(function(){try{var s=localStorage.getItem('theme');var t=s==='dark'||s==='light'?s:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})()`;
+
+const Document = (props: Props) => (
+    <Html lang={props.__NEXT_DATA__.locale} data-theme="light">
+        <Head>
+            <meta charSet="utf-8" />
+            <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+            {/* ...the rest of the head */}
+        </Head>
+        <body>
+            <Main />
+            <NextScript />
+        </body>
+    </Html>
+);
 ```
 
-## 3 - Custom hook to change theme
+Notes on the details, because each one is there for a reason:
+
+-   **`data-theme="light"` stays in the markup.** It is the fallback for a visitor with JavaScript disabled, and the script overwrites it before anything is painted.
+-   **The stored value is checked first**, so an explicit choice outranks the OS. A toggle that the next OS change silently undoes is not a toggle.
+-   **`try/catch` around `localStorage`.** In private mode and behind some extensions, reading it throws. Without the guard, the whole script dies and every visitor gets the light theme.
+-   **It goes in `_document`, not `_app`.** `_document` renders on the server only and is never hydrated, so mutating `documentElement` from it causes no hydration mismatch.
+
+Putting it in the head is also what makes it independent of your component tree. That was the real failure in my case: the theme was applied by a hook that only one page mounted. In the head it runs on every route, regardless of what renders.
+
+## 4 — The hook: read the initial value, persist the choice
+
+The hook is still needed — for the toggle, and to follow the OS while the tab is open — but it must read `matches` on mount rather than waiting for a `change` event:
 
 ```ts useDarkMode.ts
-import React from 'react';
+export const THEME_STORAGE_KEY = 'theme';
 
-const scheme = {
-    light: 'light' as const,
-    dark: 'dark' as const,
-};
-
-const useDarkMode = (): { theme: null | 'dark' | 'light'; toggleTheme: () => void; scheme: typeof scheme } => {
+const useDarkMode = () => {
     const [theme, setTheme] = React.useState<null | 'dark' | 'light'>(null);
 
     React.useEffect(() => {
-        if (typeof window !== 'undefined' && window.matchMedia) {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const handler = (event: MediaQueryListEvent) => {
-                setTheme(event.matches ? scheme.dark : scheme.light);
-            };
-            mediaQuery.addEventListener('change', handler);
-            return () => mediaQuery.removeEventListener('change', handler);
+        if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        let stored: string | null = null;
+        try {
+            stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+        } catch {
+            // Storage blocked (private mode, extensions). Fall through to the OS preference.
         }
+
+        // The line the original version of this post was missing.
+        if (stored === 'dark' || stored === 'light') setTheme(stored);
+        else setTheme(mediaQuery.matches ? 'dark' : 'light');
+
+        // Follow the OS only while the visitor has not made a choice of their own.
+        const handler = (event: MediaQueryListEvent) => {
+            let hasExplicitChoice = false;
+            try {
+                hasExplicitChoice = window.localStorage.getItem(THEME_STORAGE_KEY) !== null;
+            } catch {
+                hasExplicitChoice = false;
+            }
+            if (!hasExplicitChoice) setTheme(event.matches ? 'dark' : 'light');
+        };
+        mediaQuery.addEventListener('change', handler);
+        return () => mediaQuery.removeEventListener('change', handler);
     }, []);
 
     React.useEffect(() => {
@@ -733,44 +975,91 @@ const useDarkMode = (): { theme: null | 'dark' | 'light'; toggleTheme: () => voi
         }
     }, [theme]);
 
-    const toggleTheme = () => {
-        setTheme(theme === scheme.dark ? scheme.light : scheme.dark);
-    };
+    const toggleTheme = React.useCallback(() => {
+        setTheme((current) => {
+            const next = current === 'dark' ? 'light' : 'dark';
+            try {
+                window.localStorage.setItem(THEME_STORAGE_KEY, next);
+            } catch {
+                // The choice still applies to this page view.
+            }
+            return next;
+        });
+    }, []);
 
-    return { theme, scheme, toggleTheme };
-};
-
-export default useDarkMode;
-```
-
-## 4 - Using the hook
-
-```tsx settings.tsx mark=3,4,5,6,15,16
-const Content = () => {
-    const { formatMessage: f } = useIntl();
-    const {
-        theme,
-        scheme: { dark },
-        toggleTheme,
-    } = useDarkMode();
-
-    return (
-        <div className={styles.container}>
-            <section className={styles.confg}>
-                <IconWithName
-                    icon="/theme.png"
-                    alt={f({ id: 'settings.langAlt' })}
-                    name={f({ id: theme === dark ? 'settings.dark' : 'settings.light' })}
-                    onClick={toggleTheme}
-                />
-            </section>
-            <section className={styles.confg}></section>
-        </div>
-    );
+    return { theme, toggleTheme };
 };
 ```
 
-To do the live test, you can change the theme on your operating system and you will see that my website updates automatically or you can also go to my settings page and change the theme.
+The `change` handler deliberately does nothing once a choice has been stored. Without that check, a visitor who picked light would be flipped back to dark the next time their laptop switched to night mode — the toggle would look broken rather than overridden.
+
+`toggleTheme` uses the functional form of `setTheme` instead of reading `theme` from the closure, so it does not need `theme` in its dependency list and cannot act on a stale value.
+
+## 5 — Wiring the toggle
+
+Nothing special left at this point. The component reads the current theme for its label and calls `toggleTheme`:
+
+```tsx settings.tsx
+const { theme, toggleTheme } = useDarkMode();
+
+return (
+    <IconWithName
+        icon="/settings/theme.png"
+        alt=""
+        name={f({ id: theme === 'dark' ? 'settings.dark' : 'settings.light' })}
+        onClick={toggleTheme}
+        pressed={theme === 'dark'}
+    />
+);
+```
+
+`theme` is `null` on the first render — the value is only resolved inside the effect, because reading `localStorage` or `matchMedia` during render would make the server and client markup disagree and produce a hydration error. Label the control from `data-theme` on the document if you need the text to be correct in the server HTML too.
+
+## light-dark(), and whether it is worth it
+
+`light-dark()` puts both values in one declaration and picks between them based on the element's used colour scheme:
+
+```css light-dark.css
+:root {
+    color-scheme: light dark;
+    --blog-background: light-dark(#ffffff, #1e1e1e);
+    --blog-font: light-dark(#272727, #dfdedf);
+}
+```
+
+It became Baseline in May 2024, so it is usable today with a fallback, and it removes a genuine annoyance: the two-block structure where every token has to be declared twice in two distant places, and adding one means remembering to add it in both.
+
+I have not migrated this site to it, and the reason is not browser support. `light-dark()` resolves against `color-scheme`, so it only handles the light/dark pair — the moment you want a third theme, or a per-section override, you are back to redefining variables under a selector. With a token set already split across two blocks, the rewrite buys tidier CSS and nothing a visitor can see. On a new project I would start with it.
+
+## The caveat nobody mentions: theme-color
+
+`<meta name="theme-color">` colours the browser chrome on mobile, and it accepts a `media` attribute:
+
+```html theme-color.html
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1E1E1E" media="(prefers-color-scheme: dark)" />
+```
+
+That media attribute reads the OS, and a `<meta>` element cannot read `localStorage`. So a visitor who overrides the theme gets a page in one palette and browser chrome in the other. Swapping the `content` attribute from the toggle handler is the only way to keep them in sync, and it is worth deciding whether you care before writing that code.
+
+## How to check it actually works
+
+Three checks, in the browser console, with the OS set to dark:
+
+```js console.js
+// 1. The bootstrap ran and matched the OS.
+document.documentElement.getAttribute('data-theme'); // "dark"
+
+// 2. The browser's own UI follows the same theme.
+getComputedStyle(document.documentElement).colorScheme; // "dark"
+
+// 3. An explicit choice outranks the OS, and survives a reload.
+localStorage.setItem('theme', 'light');
+location.reload();
+// -> data-theme "light", colorScheme "light"
+```
+
+The second one is the check that caught the bug in this site: `data-theme` said `light` while `colorScheme` said `dark`. If those two ever disagree, the palette and the browser UI are reading different sources.
 
 > All the code in my github repository, if you like this project, or if the content has helped you in any way you can reward me with a ⭐️, Thanks!
 
@@ -850,14 +1139,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return;
     }
 
-    let total = response.rows.reduce((prev: Object, curr: Object) => {
-        return prev + parseInt(curr.metricValues[0].value, 0);
+    // GA4 always returns metric values as strings, and a malformed one must not turn the
+    // total into NaN — Number() plus a finite check is enough, and parseInt's second argument
+    // is a radix, not a fallback: parseInt(value, 0) was never doing what it looked like.
+    const toCount = (value: string | null | undefined): number => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    const total = response.rows.reduce((sum: number, row: (typeof response.rows)[number]) => {
+        return sum + toCount(row.metricValues?.[0]?.value);
     }, 0);
 
     try {
         res.status(200).json({ total });
-    } catch (err: Error) {
-        res.status(500).json({ error: err });
+    } catch (err: unknown) {
+        console.error('Analytics API Error:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 }
 ```
@@ -882,7 +1180,7 @@ const Container = ({ children }: Props) => {
     );
 };
 
-const StarCounter = () => {
+const ViewCounter = () => {
     const [views, setViews] = React.useState(-1);
     const { asPath } = useRouter();
 
@@ -918,7 +1216,7 @@ const StarCounter = () => {
     );
 };
 
-export default StarCounter;
+export default ViewCounter;
 ```
 
 ## 3. Include your component wherever you want to display it
@@ -944,7 +1242,7 @@ Published: 07-22-2026
 
 Most memory leak reports die in the same place. Someone posts a graph that climbs, a maintainer asks for heap snapshots taken after a forced GC, and nobody comes back. I don't think that's laziness — taking those snapshots _correctly_ is harder than the thread makes it sound, and getting it wrong gives you numbers that look convincing and mean nothing.
 
-So I took one open issue and did it properly: [vercel/next.js#95094](https://github.com/vercel/next.js/issues/95094), _"Memory leak from retained sandbox timeouts causes stepwise heap growth"_. The claim is that `setTimeout` inside middleware leaks, because the sandbox keeps every timeout id and never lets go.
+So I took one open issue and did it properly: [vercel/next.js#95094](https://github.com/vercel/next.js/issues/95094), _"Memory leak from retained sandbox timeouts causes stepwise heap growth"_. The claim is that `setTimeout` inside middleware leaks, because the sandbox keeps every timeout id and never lets go. (Both that issue and #94890 below are now fixed, and shipped in Next.js 16.3.0 — days after this went out. The method is the point here, not the ticket status.)
 
 That claim is easy to believe and easy to get wrong. Stepwise growth is also what JIT warm-up and lazy caches look like. Telling those two apart is the whole job.
 
@@ -1049,7 +1347,7 @@ If you're coming at this from the other end — a graph climbing in production a
 - URL: https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production
 - Author: Xabier Lameiro
 - Category: Nextjs · Tags: memory-leak, node, performance
-- Summary: Three open memory leaks in Next.js 15.5–16.3, how to tell which one you have from heap snapshots, and why on serverless a leak shows up as a 504 timeout.
+- Summary: The three Next.js memory leaks I measured and helped confirm, all fixed in 16.3.0: which one you have, how to prove it, and why serverless hides them as 504s.
 
 # How to find a Next.js memory leak in production
 
@@ -1057,11 +1355,15 @@ Published: 07-18-2026
 
 ## Quick answer
 
-If your self-hosted Next.js server grows until it dies with `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — or the container gets `OOMKilled` (exit code 137) — don't start by auditing your own code. As of July 2026 there are three documented memory leaks **open in the framework itself**, spanning Next.js 15.5 to 16.3:
+If your self-hosted Next.js server grows until it dies with `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — or the container gets `OOMKilled` (exit code 137) — don't start by auditing your own code. **Check your Next.js version first.** Between 15.5 and 16.2 there were three documented memory leaks in the framework itself, and all three are fixed in **16.3.0**:
 
--   **The router LRU cache doesn't count its keys** ([#94890](https://github.com/vercel/next.js/issues/94890)): a slow drift over days, proportional to the unique URLs you receive, not to your traffic.
--   **The RSC render tree is retained per request** ([#94919](https://github.com/vercel/next.js/issues/94919)): grows with traffic, much worse on Node 22/24 and when clients abort the connection mid-stream.
--   **Middleware `setTimeout` ids are registered forever** ([#95094](https://github.com/vercel/next.js/issues/95094)): stepwise growth tied to traffic that passes through middleware.
+-   **The router LRU cache didn't count its keys** ([#94890](https://github.com/vercel/next.js/issues/94890)): a slow drift over days, proportional to the unique URLs you receive, not to your traffic. Fixed by [#96229](https://github.com/vercel/next.js/pull/96229).
+-   **The RSC render tree was retained per request** ([#94919](https://github.com/vercel/next.js/issues/94919)): grows with traffic, much worse on Node 22/24 and when clients abort the connection mid-stream. Fixed by [#96173](https://github.com/vercel/next.js/pull/96173).
+-   **Middleware `setTimeout` ids were registered forever** ([#95094](https://github.com/vercel/next.js/issues/95094)): stepwise growth tied to traffic that passes through middleware. Fixed by [#96161](https://github.com/vercel/next.js/pull/96161).
+
+So the shortest fix is an upgrade. If you're pinned below 16.3.0 — and plenty of production apps are — the rest of this post is how to tell which of the three you're carrying, and how to prove it rather than guess.
+
+I measured two of them independently while they were still open and posted the numbers on the issues: [#94890 reproduced at a tenth of the reported load](https://github.com/vercel/next.js/issues/94890#issuecomment-5035231906), and [#95094 reproduced](https://github.com/vercel/next.js/issues/95094#issuecomment-5035131691) and then [re-measured against `16.3.0-canary.97` to confirm the fix held](https://github.com/vercel/next.js/issues/95094#issuecomment-5081146010). Everything below is that method, generalised.
 
 On serverless (Vercel) you'll almost never see the OOM: the instance recycles first. There, the same underlying problem surfaces as a `504 FUNCTION_INVOCATION_TIMEOUT` — it happened to this blog, and my numbers are below.
 
@@ -1189,12 +1491,12 @@ Two honest data points from measuring all three: #94890 reproduced with a tenth 
 
 My checklist after this trip:
 
-1. **Look at retainers, not hunches.** `LRUNode`, `reactServerStream` or the sandbox `TimeoutsManager` in the trace → it's one of the three framework leaks; add your data to the issue. Closures and structures from your own modules → it's yours.
+1. **Look at retainers, not hunches.** `LRUNode`, `reactServerStream` or the sandbox `TimeoutsManager` in the trace → it's one of the three framework leaks, so upgrade to 16.3.0. Closures and structures from your own modules → it's yours.
 2. **Correlate before you blame.** Heap tracking unique URLs → leak 1. Heap tracking traffic and aborts → leak 2. Steps with middleware → leak 3. One specific route driving the curve → almost certainly your code.
 3. **`--max-old-space-size` fixes nothing** — size the heap to your container so you don't die early, but a monotonic slope will eventually hit any limit.
 4. **On serverless, profile time instead of memory.** If you're seeing 504s, hunt for quadratic or repeated per-request work; my whole case is in the previous section.
 
-The versions cited are the ones in the reports (Next 15.5.11–16.3.0-canary.50, Node 20/22/24, July 2026); if you're reading this months later, check the three linked issues — with luck, one of them will be closed.
+**Update, August 2026.** All three issues are now closed and the fixes shipped in Next.js 16.3.0 — #95094 and #94919 landed in `16.3.0-canary.97` on 25 July, #94890 two days later. The measurements below were taken while they were still open, against the versions cited in the reports (Next 15.5.11–16.3.0-canary.50, Node 20/22/24). They stay here because the method outlives the bugs: the next leak will not have an issue number waiting for you, and the way you find it is the same.
 
 ---
 
@@ -1444,7 +1746,7 @@ Primary.args = {
 
 ## Stories on current Storybook (CSF3)
 
-That `ComponentStory` / `ComponentMeta` pair is the Storybook 6 API and is **deprecated** from Storybook 7 onward. On Storybook 8 (the current major in 2026) the format is CSF3, which drops the template boilerplate — a story is just an object with `args`:
+That `ComponentStory` / `ComponentMeta` pair is the Storybook 6 API and is **deprecated** from Storybook 7 onward. The replacement is CSF3, and it has been stable ever since — unchanged through 8, 9 and 10 (10.5 is the current major at the time of writing; this site is still on 8.6). It drops the template boilerplate: a story is just an object with `args`:
 
 ```tsx Avatar.stories.tsx
 import type { Meta, StoryObj } from '@storybook/react';
@@ -1491,7 +1793,7 @@ Point any static host at that folder:
 To rebuild on every push, the shape of the CI job is short:
 
 ```yaml storybook.yml
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v7
   with:
       node-version: 22
 - run: npm ci
@@ -1671,7 +1973,7 @@ const useSurvey = () => {
     // Prepotency here!
     const questions = [
         {
-            questionText: 'Which came first, the chicken or the egg?
+            questionText: 'Which came first, the chicken or the egg?',
             questionHtml: `<h2>Which came first the chicken or the egg?</h2>`,
             answerOptions: [{ answerText: 'Egg', isCorrect: true, }, { answerText: 'Chicken', isCorrect: false }],
         },
@@ -1742,38 +2044,18 @@ const useSurvey = () => {
 export default useSurvey;
 ```
 
-My endpoint
+**This part no longer runs.** The survey used to POST its answers to an `/api/email` route built on
+nodemailer, and the endpoint is gone — the survey no longer emails anything. I am leaving the note rather
+than the code because the snippet had two problems worth naming.
 
-```ts email.ts
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer from 'nodemailer';
+`nodemailer.createTransport({ service: process.env.EMAIL_HOST })` misuses `service`: it takes a
+well-known provider id (`"gmail"`), not an arbitrary SMTP hostname, so pointing it at a custom host does
+not configure the transport. Use `host`, `port` and `secure` for that.
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
-    const transporter = nodemailer.createTransport({
-        service: process.env.EMAIL_HOST,
-        auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASSWORD,
-        },
-    });
-
-    const { subject, message } = req.body;
-
-    const mailOptions = {
-        from: process.env.EMAIL,
-        to: process.env.EMAIL,
-        subject: subject,
-        html: message,
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        res.status(200).json({ success: true });
-    } catch (error) {
-        res.status(500).json({ success: error });
-    }
-}
-```
+And the message body was built by interpolating values straight into HTML — including a `name` taken
+from the query string and `navigator.userAgent`. Anything user-controlled that lands in an HTML email
+has to be escaped first. The survey now validates that name against a pattern before it is used
+anywhere, which is the habit worth copying from this post.
 
 ## Result
 
@@ -1832,8 +2114,7 @@ yarn add jsdoc-babel -D
         "extensions": ["tsx"],
         "ignore": ["**/*.(test|spec).ts"],
         "babelrc": false,
-        "presets": [["@babel/preset-env", { "targets": { "node": true } }], "@babel/preset-typescript"],
-        "plugins": ["@babel/proposal-class-properties", "@babel/proposal-object-rest-spread"]
+        "presets": ["@babel/preset-typescript"]
     },
     "opts": {
         "encoding": "utf8",
@@ -1846,24 +2127,29 @@ yarn add jsdoc-babel -D
 
 ## 3. Customise your report
 
-```javascript custom-docs.js mark=13
+```javascript custom-docs.js
+import { readFile, writeFile } from 'fs/promises';
+import { glob } from 'glob';
 
-import { readFile, writeFile } from 'fs';
-import glob from 'glob';
+const files = await glob('public/docs/**/*.?(html|css)');
 
-glob('public/docs/**/*.?(html|css)', function (err, files) {
-    if (err) {
-        console.log('err', err);
-        return;
-    }
+await Promise.all(
+    files.map(async (path) => {
+        const data = await readFile(path, 'utf8');
 
-    files.forEach((path) => {
-        readFile(path, 'utf8', (err, data) => {
-            ...code
-        });
-    });
-});
+        let replaced = data.replace(
+            /Code coverage generated by\n\s*<a href="https:\/\/istanbul\.js\.org\/"/g,
+            `Code coverage automatically generated by Xabier Lameiro on ${new Date().toLocaleDateString()}`
+        );
 
+        if (path === 'public/docs/index.html') {
+            replaced = replaced.replace(/src="/g, 'src="docs/');
+            replaced = replaced.replace(/href="/g, 'href="docs/');
+        }
+
+        await writeFile(path, replaced, 'utf-8');
+    })
+);
 ```
 
 > There you should find the code you need to modify your report and overwrite it.
@@ -1934,40 +2220,28 @@ The report references its CSS/JS/images with relative paths that break once it i
 > If you prefer a class, use a Jest [CustomReporter](https://jestjs.io/docs/configuration 'Jest configuration') and implement `onRunComplete`.
 
 ```javascript custom-reporter.js
-import { readFile, writeFile } from 'fs';
-import glob from 'glob';
+import { readFile, writeFile } from 'fs/promises';
+import { glob } from 'glob';
 
-glob('public/coverage/**/*.?(html|css)', function (err, files) {
-    if (err) {
-        console.log('err', err);
-        return;
-    }
+const files = await glob('public/coverage/**/*.?(html|css)');
 
-    files.forEach((path) => {
-        readFile(path, 'utf8', (err, data) => {
-            if (err) {
-                console.log('err', err);
-                return;
-            }
-            let replaced = data.replace(
-                /Code coverage generated by\n\s*<a href="https:\/\/istanbul\.js\.org\/"/g,
-                `Code coverage automatically generated by Xabier Lameiro on ${new Date().toLocaleDateString()}`
-            );
+await Promise.all(
+    files.map(async (path) => {
+        const data = await readFile(path, 'utf8');
 
-            if (path === 'public/coverage/index.html') {
-                replaced = replaced.replace(/src="/g, 'src="coverage/');
-                replaced = replaced.replace(/href="/g, 'href="coverage/');
-            }
+        let replaced = data.replace(
+            /Code coverage generated by\n\s*<a href="https:\/\/istanbul\.js\.org\/"/g,
+            `Code coverage automatically generated by Xabier Lameiro on ${new Date().toLocaleDateString()}`
+        );
 
-            writeFile(path, replaced, 'utf-8', function (err, a) {
-                if (err) {
-                    console.log('err', err);
-                    return;
-                }
-            });
-        });
-    });
-});
+        if (path === 'public/coverage/index.html') {
+            replaced = replaced.replace(/src="/g, 'src="coverage/');
+            replaced = replaced.replace(/href="/g, 'href="coverage/');
+        }
+
+        await writeFile(path, replaced, 'utf-8');
+    })
+);
 ```
 
 ## 3. Generate the report on build

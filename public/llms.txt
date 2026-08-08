@@ -11,8 +11,8 @@
 
 ## Blog: Error
 
-- [Fix "Failed to replace env in config: $\{NPM_TOKEN}" in npm and yarn](https://xabierlameiro.com/blog/error/npm-token-solution-error): How to fix the npm/yarn error "Failed to replace env in config: ${NPM_TOKEN}" in one minute: define the missing environment variable that your .npmrc expects, or remove the stale entry.
-- [EADDRINUSE: address already in use — how to free the port](https://xabierlameiro.com/blog/error/solve-address-in-use-error): Fix the Node.js error "listen EADDRINUSE: address already in use": find and kill the process holding the port on macOS, Linux and Windows, free it with one command, or just run on another port.
+- [Fix "Failed to replace env in config: ${NPM_TOKEN}" in npm and yarn](https://xabierlameiro.com/blog/error/npm-token-solution-error): How to fix the npm/yarn error "Failed to replace env in config: ${NPM_TOKEN}" in one minute: define the missing environment variable that your .npmrc expects, or remove the stale entry.
+- [EADDRINUSE: address already in use — how to free the port](https://xabierlameiro.com/blog/error/solve-address-in-use-error): Fix "address already in use" in Node.js, Python, Docker, netcat and Playwright: find and kill the process holding the port on macOS, Linux and Windows, or run on another port.
 - [How to fix Minified React error #425 (hydration mismatch)](https://xabierlameiro.com/blog/error/uncaught-error-minified-react-error): Fix Minified React error #425 ("Text content does not match server-rendered HTML"): every common cause of a hydration mismatch — dates, random values, locale formatting, browser-only APIs, invalid HTML — and the right fix for each, with Next.js examples.
 
 ## Blog: Javascript
@@ -22,11 +22,11 @@
 ## Blog: Nextjs
 
 - [Continuous Integration with Github Actions workflow](https://xabierlameiro.com/blog/nextjs/continuous-integration-with-github-actions-workflow): Set up CI/CD for a Next.js project with GitHub Actions: lint, test and build on every push, then deploy to Vercel. The workflow YAML explained step by step.
-- [Counter for github stars repository](https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository): Build a GitHub stars counter for your site with a Next.js API route and Octokit — cache the GitHub API to dodge rate limits and render a live star count. Full code included.
-- [Dark theme with Nextjs](https://xabierlameiro.com/blog/nextjs/dark-theme): Build a dark theme in Next.js with CSS variables and a theme-toggle event — no flash of the wrong theme and no heavy library. A step-by-step guide with the full code.
+- [Get a GitHub repo's star count without hitting rate limits](https://xabierlameiro.com/blog/nextjs/counter-for-github-stars-repository): Read a GitHub repository's star count from stargazers_count, understand the 60 vs 5,000 requests-per-hour limits, and cache the call so a live counter costs one API request an hour.
+- [Dark mode in Next.js without the flash of the wrong theme](https://xabierlameiro.com/blog/nextjs/dark-theme): Dark mode in Next.js with CSS variables: resolve the theme before the first paint, persist the choice, and set color-scheme so scrollbars and form controls follow it.
 - [Make a views counter with google analytics](https://xabierlameiro.com/blog/nextjs/make-a-views-counter-with-google-analytics): Add a page-views counter to your Next.js blog using the Google Analytics Data API (BetaAnalyticsDataClient) behind an API route — auth, the report query and caching explained.
 - [How to measure a Next.js memory leak and prove the diagnosis](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak): The measurement protocol behind a confirmed Next.js memory leak: forced GC with --expose-gc, heap snapshot diffs and retainer chains, and the before/after pair that proves the diagnosis. Automated in next-leak.
-- [How to find a Next.js memory leak in production](https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production): Three open memory leaks in Next.js 15.5–16.3, how to tell which one you have from heap snapshots, and why on serverless a leak shows up as a 504 timeout.
+- [How to find a Next.js memory leak in production](https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production): The three Next.js memory leaks I measured and helped confirm, all fixed in 16.3.0: which one you have, how to prove it, and why serverless hides them as 504s.
 - [How to translate URL slugs in a Next.js site](https://xabierlameiro.com/blog/nextjs/translate-slugs-web-pages): Translate your URLs per language for a fully internationalized Next.js site using static MDX pages — map localized slugs, keep canonicals clean, and link locales with hreflang.
 
 ## Blog: React

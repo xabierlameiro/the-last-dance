@@ -24,7 +24,7 @@
             <link>https://xabierlameiro.com/gl/blog/nextjs/fuga-de-memoria-nextjs-en-producion</link>
             <guid isPermaLink="true">https://xabierlameiro.com/gl/blog/nextjs/fuga-de-memoria-nextjs-en-producion</guid>
             <pubDate>Sat, 18 Jul 2026 00:00:00 +0000</pubDate>
-            <description>Tres fugas de memoria abertas en Next.js 15.5–16.3, como identificar a túa con heap snapshots e por que en serverless a fuga se disfraza dun 504.</description>
+            <description>As tres fugas de memoria de Next.js que medín e axudei a confirmar, xa corrixidas na 16.3.0: cal tes, como demostralo e por que en serverless se disfrazan dun 504.</description>
             <category>memory-leak</category>
             <category>node</category>
             <category>performance</category>
@@ -48,11 +48,11 @@
             <category>node</category>
         </item>
         <item>
-            <title>Tema escuro con Nextjs</title>
+            <title>Tema escuro en Next.js sen parpadeo do tema equivocado</title>
             <link>https://xabierlameiro.com/gl/blog/nextjs/tema-escuro</link>
             <guid isPermaLink="true">https://xabierlameiro.com/gl/blog/nextjs/tema-escuro</guid>
             <pubDate>Fri, 03 Feb 2023 00:00:00 +0000</pubDate>
-            <description>Implementa un tema escuro en Next.js con variables CSS e un evento de cambio de tema: sen parpadeo do tema equivocado e sen librarías pesadas. Guía paso a paso co código completo.</description>
+            <description>Tema escuro en Next.js con variables CSS: resolve o tema antes do primeiro pintado, garda a escolla e usa color-scheme para que as barras de desprazamento e os formularios o sigan.</description>
             <category>css</category>
         </item>
         <item>
@@ -80,11 +80,11 @@
             <category>intl</category>
         </item>
         <item>
-            <title>Contador de estrelas dun repositorio de GitHub</title>
-            <link>https://xabierlameiro.com/gl/blog/nextjs/contador-de-estrelas-de-github</link>
-            <guid isPermaLink="true">https://xabierlameiro.com/gl/blog/nextjs/contador-de-estrelas-de-github</guid>
+            <title>Le as estrelas dun repo de GitHub sen esgotar o límite</title>
+            <link>https://xabierlameiro.com/gl/blog/nextjs/contador-de-estrellas-de-github</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/gl/blog/nextjs/contador-de-estrellas-de-github</guid>
             <pubDate>Wed, 11 Jan 2023 00:00:00 +0000</pubDate>
-            <description>Crea un contador de estrelas de GitHub para o teu sitio cunha API route de Next.js e Octokit: cachea a API de GitHub para evitar rate limits e mostra o número de estrelas en vivo. Código incluído.</description>
+            <description>Le o número de estrelas dun repositorio de GitHub con stargazers_count, entende os límites de 60 e 5.000 peticións por hora, e cachea a chamada para que un contador custe unha petición á hora.</description>
             <category>node</category>
         </item>
         <item>
@@ -114,7 +114,7 @@
             <category>ci</category>
         </item>
         <item>
-            <title>Solución ao erro &quot;Failed to replace env in config: $\{NPM_TOKEN}&quot; en npm e yarn</title>
+            <title>Solución ao erro &quot;Failed to replace env in config: ${NPM_TOKEN}&quot; en npm e yarn</title>
             <link>https://xabierlameiro.com/gl/blog/error/npm-token-solucion-erro</link>
             <guid isPermaLink="true">https://xabierlameiro.com/gl/blog/error/npm-token-solucion-erro</guid>
             <pubDate>Tue, 03 Jan 2023 00:00:00 +0000</pubDate>
@@ -128,7 +128,7 @@
             <link>https://xabierlameiro.com/gl/blog/error/arranxar-direccion-en-uso-erro</link>
             <guid isPermaLink="true">https://xabierlameiro.com/gl/blog/error/arranxar-direccion-en-uso-erro</guid>
             <pubDate>Mon, 02 Jan 2023 00:00:00 +0000</pubDate>
-            <description>Arranxa o erro de Node.js &quot;listen EADDRINUSE: address already in use&quot;: atopa e mata o proceso que ocupa o porto en macOS, Linux e Windows, libérao cun comando, ou arrinca noutro porto.</description>
+            <description>Arranxa &quot;address already in use&quot; en Node.js, Python, Docker, netcat e Playwright: atopa e mata o proceso que ocupa o porto en macOS, Linux e Windows, ou arrinca noutro porto.</description>
             <category>node</category>
             <category>cli</category>
         </item>
