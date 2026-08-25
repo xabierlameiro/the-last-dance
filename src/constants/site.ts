@@ -6,6 +6,11 @@ export const defaultLocale = 'en';
 export const author = 'Xabier Lameiro';
 export const authorAlternateName = 'Xabier Lameiro Cardama';
 export const socialNetworks = [
+    // The Wikidata item (Q141178217) carries the full legal name as its label, which this site only
+    // ever states as `alternateName`. Listing it here makes the link reciprocal — the item points
+    // back at this domain through P856 (official website) — and a reciprocal link is what lets a
+    // search engine merge the two records into one entity instead of treating them as two people.
+    'https://www.wikidata.org/wiki/Q141178217',
     'https://www.linkedin.com/in/xabierlameiro',
     'https://github.com/xabierlameiro',
     'https://www.reddit.com/user/xlameiro',
