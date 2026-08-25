@@ -18,7 +18,10 @@ const customJestConfig = {
         'src/components/Blog/index.tsx',
         'migration/',
     ],
-    testPathIgnorePatterns: ['e2e', 'migration'],
+    // '<rootDir>/.claude/' keeps Claude Code worktrees out of the run. Without it jest discovered
+    // 140 suites where the repo has 70: every test ran twice, once per checkout. Same root cause as
+    // the '.claude/**' entry in eslint.config.mjs.
+    testPathIgnorePatterns: ['e2e', 'migration', '<rootDir>/.claude/'],
     coverageDirectory: 'public/coverage',
     // SDD-L01. Coverage was collected and published for a long time without any threshold, so
     // nothing stopped it sliding. These numbers are the floor MEASURED on 2026-07-26 after the

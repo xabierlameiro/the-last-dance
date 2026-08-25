@@ -22,6 +22,12 @@ export default tseslint.config(
             // produced ~9,000 errors as soon as the suite had been run locally.
             'playwright-report/**',
             'test-results/**',
+            // Claude Code worktrees. Same failure mode as playwright-report above, from the other
+            // direction: the path sits in .git/info/exclude, so git ignores it, but flat config
+            // reads neither .gitignore nor git's exclude files — `eslint .` walked a second full
+            // checkout of this repo and reported ~10,300 errors. CI never saw it, because the
+            // directory is never committed, so local and CI disagreed on whether the lint passed.
+            '.claude/**',
         ],
     },
     js.configs.recommended,
@@ -126,5 +132,5 @@ export default tseslint.config(
         rules: {
             'sonarjs/slow-regex': 'off',
         },
-    }
+    },
 );
