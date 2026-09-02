@@ -52,7 +52,22 @@ jobs:
                   echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
                   npm ci --legacy-peer-deps --include=optional
 
+            # The same variables the deploy build gets. Without them the build
+            # fails prerendering /404 with `TypeError: Invalid URL`, because the
+            # SEO tags construct canonicals from NEXT_PUBLIC_DOMAIN and there is
+            # nothing to construct from. That is what happened: six runs, all
+            # reported successful, zero artifacts uploaded — `continue-on-error`
+            # below turns a failed job into a green workflow, which is exactly
+            # the shape of failure the guard these artifacts feed exists to
+            # catch.
+            #
+            # `production` rather than `preview`: the artifact has to describe
+            # the build that serves traffic, or attribution points at code that
+            # was never deployed.
             - name: Build
+              env:
+                  NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+                  NEXT_PUBLIC_ENV: 'production'
               run: npm run build
 
             - name: Collect artifacts
@@ -75,8 +90,18 @@ jobs:
                       find .next -name '*.map' -exec cp --parents {} artifacts/ \; 2>/dev/null || true
                   fi
 
-                  echo "count=$(find artifacts -type f | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+                  count=$(find artifacts -type f | wc -l | tr -d ' ')
+                  echo "count=$count" >> "$GITHUB_OUTPUT"
                   find artifacts -type f | head -20
+
+                  # Collecting nothing means the build produced no manifests, which
+                  # is a failure however green the build step looked. Failing here
+                  # is safe: `continue-on-error` still keeps master green, and the
+                  # job now reports red instead of claiming an upload it never made.
+                  if [ "$count" -eq 0 ]; then
+                      echo "::error::No build artifacts were collected — nothing to upload."
+                      exit 1
+                  fi
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v6
