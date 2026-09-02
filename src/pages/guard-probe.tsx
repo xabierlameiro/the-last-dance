@@ -24,6 +24,10 @@ const GuardProbe = () => (
                 title: 'Guard probe',
                 description:
                     'Temporary page used once to verify the indexability guard reports a deliberate regression.',
+                // The deliberate regression. This page was indexable when the
+                // guard recorded its baseline; this commit is the one it
+                // should name.
+                noindex: true,
             }}
         />
 
