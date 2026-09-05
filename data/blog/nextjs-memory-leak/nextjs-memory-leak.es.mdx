@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['memory-leak', 'node', 'performance']
 locale: 'es'
-updated: '2026-08-06'
+updated: '2026-09-05'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
 description: 'Las tres fugas de memoria de Next.js que medí y ayudé a confirmar, ya corregidas en 16.3.0: cuál tienes, cómo demostrarlo y por qué en serverless se disfrazan de 504.'
 image: '/posts/nextjs-memory-leak.png'
@@ -34,6 +34,8 @@ faq:
 <GoogleAdsense />
 
 ## Respuesta rápida
+
+**Actualización, septiembre de 2026.** Los tres issues de abajo están cerrados y los arreglos salieron en Next.js 16.3.0 (la #95094 y la #94919 entraron en `16.3.0-canary.97` el 25 de julio; la #94890, dos días después). Las medidas se tomaron con las fugas aún abiertas, contra las versiones de los informes (Next 15.5.11–16.3.0-canary.50, Node 20/22/24), y se quedan porque el método sobrevive a los bugs. Si estás en 16.3.x y sigues creciendo, tienes otra: la retención abierta de `use cache` se sigue en [vercel/next.js#97776](https://github.com/vercel/next.js/issues/97776) y su arreglo aún no está en ninguna versión estable. Para saber qué ruta crece y qué retiene la memoria, ejecuta `npx next-leak .` ([código y límites](https://github.com/xabierlameiro/next-leak)).
 
 Si tu servidor Next.js autoalojado crece en memoria hasta morir con `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — o el contenedor cae con `OOMKilled` (exit code 137) — no empieces auditando tu código. **Mira antes tu versión de Next.js.** Entre la 15.5 y la 16.2 hubo tres fugas de memoria documentadas en el propio framework, y las tres están corregidas en la **16.3.0**:
 
@@ -175,5 +177,3 @@ Mi checklist después de este viaje:
 2. **Correlaciona antes de culpar.** Heap que sigue a las URLs únicas → fuga 1. Heap que sigue al tráfico y a los aborts → fuga 2. Escalones con middleware → fuga 3. Una ruta concreta que dispara la curva → casi seguro tu código.
 3. **`--max-old-space-size` no arregla nada** — dimensiona el heap a tu contenedor para no morir antes de tiempo, pero una pendiente monótona acabará chocando contra cualquier límite.
 4. **En serverless, perfila tiempo en vez de memoria.** Si ves 504, busca el trabajo cuadrático o repetido por request; mi caso entero está en el punto anterior.
-
-**Actualización, agosto de 2026.** Los tres issues están cerrados y los arreglos salieron en Next.js 16.3.0 — la #95094 y la #94919 entraron en `16.3.0-canary.97` el 25 de julio; la #94890, dos días después. Las medidas de aquí abajo se tomaron con las fugas aún abiertas, contra las versiones de los informes (Next 15.5.11–16.3.0-canary.50, Node 20/22/24). Se quedan porque el método sobrevive a los bugs: la próxima fuga no traerá un número de issue esperándote, y la forma de encontrarla es la misma.
