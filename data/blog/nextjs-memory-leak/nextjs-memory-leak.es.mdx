@@ -5,7 +5,7 @@ author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['memory-leak', 'node', 'performance']
 locale: 'es'
-updated: '2026-09-05'
+updated: '2026-09-14'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
 description: 'Las tres fugas de memoria de Next.js que medí y ayudé a confirmar, ya corregidas en 16.3.0: cuál tienes, cómo demostrarlo y por qué en serverless se disfrazan de 504.'
 image: '/posts/nextjs-memory-leak.png'
@@ -35,7 +35,7 @@ faq:
 
 ## Respuesta rápida
 
-**Actualización, septiembre de 2026.** Los tres issues de abajo están cerrados y los arreglos salieron en Next.js 16.3.0 (la #95094 y la #94919 entraron en `16.3.0-canary.97` el 25 de julio; la #94890, dos días después). Las medidas se tomaron con las fugas aún abiertas, contra las versiones de los informes (Next 15.5.11–16.3.0-canary.50, Node 20/22/24), y se quedan porque el método sobrevive a los bugs. Si estás en 16.3.x y sigues creciendo, tienes otra: la retención abierta de `use cache` se sigue en [vercel/next.js#97776](https://github.com/vercel/next.js/issues/97776) y su arreglo aún no está en ninguna versión estable. Para saber qué ruta crece y qué retiene la memoria, ejecuta `npx next-leak .` ([código y límites](https://github.com/xabierlameiro/next-leak)).
+**Actualización, septiembre de 2026.** Los tres issues de abajo están cerrados y los arreglos salieron en Next.js 16.3.0 (la #95094 y la #94919 entraron en `16.3.0-canary.97` el 25 de julio; la #94890, dos días después). Las medidas se tomaron con las fugas aún abiertas, contra las versiones de los informes (Next 15.5.11–16.3.0-canary.50, Node 20/22/24), y se quedan porque el método sobrevive a los bugs. Si estás en 16.3.x y sigues creciendo, sube primero a 16.3.5 — salió el 11 de septiembre y arregla la retención de `use cache` que se sigue en [vercel/next.js#97938](https://github.com/vercel/next.js/issues/97938). ¿Sigues creciendo después? Tienes otra. Para saber qué ruta crece y qué retiene la memoria, ejecuta `npx next-leak .` ([código y límites](https://github.com/xabierlameiro/next-leak)).
 
 Si tu servidor Next.js autoalojado crece en memoria hasta morir con `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — o el contenedor cae con `OOMKilled` (exit code 137) — no empieces auditando tu código. **Mira antes tu versión de Next.js.** Entre la 15.5 y la 16.2 hubo tres fugas de memoria documentadas en el propio framework, y las tres están corregidas en la **16.3.0**:
 
