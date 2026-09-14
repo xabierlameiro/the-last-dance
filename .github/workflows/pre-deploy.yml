@@ -56,7 +56,11 @@ jobs:
         name: Testing
         runs-on: ubuntu-22.04
         env:
-            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            # Pull requests opened by Dependabot get no repository secrets, so this was empty on every
+            # one of them and the build failed prerendering /404 with `TypeError: Invalid URL` (#208,
+            # #210). Without the secret, fall back to what a developer machine uses: the build is
+            # served on localhost either way.
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000' }}
             VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
             VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
             NEXT_PUBLIC_ENV: 'preview'
