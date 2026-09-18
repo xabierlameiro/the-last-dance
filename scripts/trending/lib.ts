@@ -282,10 +282,13 @@ const claudePrompt = (topic: { title: string; url: string }): string =>
         '1) qué está pasando y por qué importa, 2) MI experiencia de primera mano con esto (pídeme los',
         'detalles concretos que necesites: proyectos, métricas, errores), 3) ejemplo práctico reproducible,',
         '4) conclusión con opinión. Prohibido el relleno genérico que cualquier blog podría publicar.',
+        'Antes de escribir, comprueba la puerta de docs/editorial-policy.md: tiene que ser una',
+        'investigación con mis propias mediciones, cuya respuesta no quepa en una frase, con un método',
+        'reproducible y que no sea el arreglo de un mensaje de error. Si no la pasa, dímelo y no escribas nada.',
         'Sigue el estándar editorial del repo (docs/editorial-standard.md): E-E-A-T con experiencia',
-        'de primera mano, mi voz (sin muletillas de IA), estructura problema→solución y título/meta',
-        'benefit-led. No inventes salidas de terminal ni capturas.',
-        'No lo publiques: es un borrador para que yo lo revise y lo traduzca a los tres idiomas.',
+        'de primera mano, mi voz (sin muletillas de IA), estructura hallazgo→método→mediciones y',
+        'título ≤ 60 / meta ≤ 155 benefit-led. No inventes salidas de terminal ni capturas.',
+        'No lo publiques: es un borrador en inglés para que yo lo revise.',
     ].join(' ');
 
 /** The subset `buildReport` reads per topic — scored items carry more. */
@@ -318,7 +321,8 @@ export const buildReport = (
         `# Trending content radar — ${generatedAt}`,
         '',
         '> SDD-006: this is a briefing, NOT content to publish. Pick at most one topic,',
-        '> draft it with Claude using the prompt, add first-hand experience, review all locales.',
+        '> check it against the investigation gate in docs/editorial-policy.md, then draft it in',
+        '> English with Claude using the prompt and add first-hand measurements.',
         '',
         `## Top topics (${topics.length})`,
         '',

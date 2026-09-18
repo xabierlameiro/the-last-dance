@@ -60,6 +60,7 @@ const customJestConfig = {
         'src/context/**/*.{ts,tsx}',
         'scripts/trending/lib.ts',
         'scripts/traffic-report/lib.ts',
+        'scripts/check-frontmatter/lib.ts',
     ],
     moduleNameMapper: {
         '^@/helpers(.*)$': '<rootDir>src/helpers/$1',

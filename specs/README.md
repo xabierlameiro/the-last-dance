@@ -23,6 +23,10 @@ live-site inspection (browser + prod API probes), and code audit of this repo.
 
 All code lives on branch `fix/sdd-001-header-widgets` (specs + implementation).
 
+Which posts get written, and in which language, is set by the
+[editorial policy](../docs/editorial-policy.md) (2026-09-18): investigation gate, error posts
+frozen, English first. It supersedes the content direction of 010 and 011 where they disagree.
+
 > Note: [001-quality-refactor.md](001-quality-refactor.md) is the earlier quality-refactor
 > spec shipped separately in PR #122 — it predates this numbering and is kept as-is.
 
