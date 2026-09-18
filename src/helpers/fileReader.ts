@@ -244,8 +244,9 @@ const toPost = ({ content, data }: ParsedPost) => {
             excerpt: data.excerpt,
             image: data.image,
             description: data.description,
-            alternate: data.alternate,
-            // null (not undefined) so the meta object survives getStaticProps serialization
+            // null (not undefined) so the meta object survives getStaticProps serialization;
+            // English-only posts have no alternate list
+            alternate: data.alternate ?? null,
             faq: data.faq ?? null,
         },
     };

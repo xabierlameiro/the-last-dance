@@ -62,6 +62,15 @@ describe('an English-only post', () => {
         expect(hreflangs.sort((a, b) => String(a).localeCompare(String(b)))).toEqual(['en', 'x-default']);
     });
 
+    it('has meta that getStaticProps can serialize without an alternate list', async () => {
+        // Next rejects `undefined` in props; Jest does not run that check, so a JSON round trip
+        // stands in for it. `toStrictEqual` fails on a key whose value is undefined.
+        const { getPostBySlug } = await importWithFixtureCorpus(() => import('@/helpers/fileReader'));
+        const { meta } = getPostBySlug(ENGLISH_ONLY_SLUG, 'en');
+
+        expect(JSON.parse(JSON.stringify(meta))).toStrictEqual(meta);
+    });
+
     it('is prerendered and submitted to the sitemap under en only', async () => {
         const [{ getStaticPaths }, { createSiteMap }] = await importWithFixtureCorpus(() =>
             Promise.all([import('../pages/blog/[category]/[slug]'), import('@/helpers/fileWritter')])
