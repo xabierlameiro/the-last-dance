@@ -1,0 +1,227 @@
+---
+title: 'One page, 32,800 file reads: the O(N²) behind a Vercel 504'
+slug: 'quadratic-mdx-loader-vercel-504'
+author: 'Xabier Lameiro'
+category: 'Nextjs'
+tags: ['performance', 'node', 'debugging']
+locale: 'en'
+updated: '2026-09-18'
+excerpt: '39 MDX files read 32,800 times per render · reads grow with N² · 32 ms once the corpus is read once'
+description: 'A tag page on my Next.js blog read its 39 MDX files 32,800 times per render and hit a Vercel 504. How I counted the reads, and the fix.'
+image: '/posts/quadratic-mdx-loader-vercel-504.png'
+faq:
+    - question: 'Why did only some pages of my Next.js blog return a 504?'
+      answer: 'The pages that failed were the ones not prerendered at build time. With fallback: blocking, getStaticProps runs inside the request for any path missing from getStaticPaths, so the visitor waits for it. Prerendered pages were served from the cache and were fine. On this blog the tag-faceted post URLs were rendered on demand, and their getStaticProps took long enough to hit FUNCTION_INVOCATION_TIMEOUT.'
+    - question: 'How do I find out whether a Node.js content loader is quadratic?'
+      answer: 'Count the file reads instead of timing the render. Patch fs.readFileSync to count calls on your content files, run one render, then double the number of files and run it again. If the count doubles, the loader is linear. If it roughly quadruples, it is quadratic. The count is deterministic; the timing on the same machine varied by more than 40% between runs.'
+    - question: 'Should I raise maxDuration on Vercel to fix FUNCTION_INVOCATION_TIMEOUT?'
+      answer: 'Only after you know what the function is doing. Here the render cost grew with the square of the number of posts, so a longer timeout would have bought a few more posts before the same 504 came back. Making the render fast fixed it: the per-page prerender went from about 32 seconds to about 1.6 seconds in the build.'
+    - question: 'Is caching MDX files in a module-level variable safe in Next.js?'
+      answer: 'For content that is fixed per deploy, yes: every function instance reads the corpus once and reuses it. Limit the cache to production, or key it on file modification times, so next dev still shows your edits. It is not a fit for content that changes between deploys without a rebuild.'
+---
+
+# One page, 32,800 file reads: the O(N²) behind a Vercel 504
+
+<Date date="09-18-2026" />
+
+<GoogleAdsense />
+
+## Quick answer
+
+In July some pages of this blog started answering with `504 FUNCTION_INVOCATION_TIMEOUT` on Vercel. The broken pages were not slow because of React, serialization or the network. To render one tag page, the MDX loader read the blog's 39 files **32,800 times**. The count grows with the square of the number of posts. Doubling the corpus made it 129,481 reads, and tripling it made it 290,044.
+
+The fix was to read the corpus once per process. After that one render made 39 reads the first time and zero after, at 32 ms. In the build, the per-page prerender went from about 32 s to about 1.6 s.
+
+This post is mostly about how I found it. I counted file reads instead of timing renders. The repository is public, so every number below can be reproduced from two commits.
+
+## The symptom: only some URLs timed out
+
+Each post on this blog lives at `/blog/<category>/<slug>`. At the time the sidebar also linked every post under each of its tags, as `/blog/<tag>/<slug>`. `getStaticPaths` only listed the category paths, and `fallback: 'blocking'` rendered the tag ones the first time someone asked for them.
+
+That detail decided which pages broke. For a path that was not prerendered, the [Next.js docs](https://nextjs.org/docs/pages/building-your-application/data-fetching/get-static-props) say `getStaticProps` is "called before the initial render". The visitor waits for it inside a serverless function. Category URLs came from the build cache and loaded fine. Tag URLs ran the whole loader at request time, and some of them ran out of time.
+
+I don't have the timing of a single failing request in production. I have two things: instrumentation of `getStaticProps` during a `next build` in July, and a benchmark I ran again today to write this post. I label each number with where it came from.
+
+## Four helpers that each looked fine
+
+This is the loader before the fix, at commit [`99ea971`](https://github.com/xabierlameiro/the-last-dance/blob/99ea97154bd33ea6838903959f030c8a87ef1a29/src/helpers/fileReader.ts), trimmed to the lines that matter. Resolving one slug read and parsed every file:
+
+```ts
+const findPostBySlug = (slug) => {
+    const paths = findMdxFiles(POST_PATH);
+    // ...
+    const [route] = paths.filter((filePath) => {
+        const document = fs.readFileSync(filePath, 'utf8');
+        const { data } = matter(document);
+        // ...
+        return data.slug?.normalize('NFC') === normalizedSlug /* ... */;
+    });
+    // ...
+    return matter(fs.readFileSync(route, 'utf8'));
+};
+```
+
+Loading all posts resolved every slug that way:
+
+```ts
+export const getAllPosts = () => {
+    const slugs = getPostSlugs();
+    return slugs.map((slug) => getPostBySlug(slug));
+};
+```
+
+And the sidebar called `getAllPosts` (through `getPostsByLocale`) once for the post list, once for the tag list, and once more for each category and each tag:
+
+```ts
+const getAllTags = (locale) => {
+    const posts = getPostsByLocale(locale);
+    const tags = posts.map((post) => post.meta.tags);
+    return [...new Set(tags.flat())].map((tag) => {
+        const postsBytag = getPostsByTag(tag, locale);
+        // ...
+    });
+};
+```
+
+Read one at a time, none of these looks dangerous. `findPostBySlug` is a linear scan over a few dozen files. `getAllPosts` is a `map`. `getAllTags` wants the first post of each tag. The cost only shows up when you multiply them, and nobody reviews the product of four functions.
+
+## Count the reads, don't time the render
+
+Timings on a laptop are noisy, and I didn't want to argue with noise. So I counted how many times the loader opened an `.mdx` file during one render. I patched `fs.readFileSync` before importing the loader, and called the same three functions that `getStaticProps` of the post page called:
+
+```js
+// Counts the .mdx reads behind one render of /blog/<tag>/<slug>.
+// Usage: NODE_ENV=production node count.mjs ./before.ts
+import fs from 'node:fs';
+import { performance } from 'node:perf_hooks';
+
+let reads = 0;
+const readFileSync = fs.readFileSync;
+fs.readFileSync = (file, ...rest) => {
+    if (String(file).endsWith('.mdx')) reads += 1;
+    return readFileSync(file, ...rest);
+};
+
+const loader = await import(process.argv[2]);
+
+// The three calls getStaticProps made for a tag-faceted post page.
+const render = () => {
+    loader.getPostBySlug({ params: { slug: 'solve-address-in-use-error' } });
+    loader.getAllCategories('en');
+    loader.getPostsByLocaleAndCategory('en', 'node');
+};
+
+for (let run = 1; run <= 3; run += 1) {
+    reads = 0;
+    const start = performance.now();
+    render();
+    console.log(`render ${run}: ${(performance.now() - start).toFixed(0)} ms, ${reads} .mdx reads`);
+}
+```
+
+To run it against the code as it was, I took the loader from the commit before the fix and from the fix, plus the posts as they were then. Save the script above as `repro/count.mjs`. Node 24 runs the `.ts` files directly because it strips the types:
+
+```bash
+git clone https://github.com/xabierlameiro/the-last-dance.git
+mkdir repro && cd repro
+git -C ../the-last-dance show 99ea971:src/helpers/fileReader.ts > before.ts
+git -C ../the-last-dance show 7f9519a:src/helpers/fileReader.ts > after.ts
+git -C ../the-last-dance archive 99ea971 data/blog | tar -x
+npm init -y && npm pkg set type=module && npm i gray-matter
+NODE_ENV=production node count.mjs ./before.ts
+NODE_ENV=production node count.mjs ./after.ts
+```
+
+On an Apple M2 Pro with Node 24.18.0:
+
+```
+render 1: 1827 ms, 32800 .mdx reads
+render 2: 1739 ms, 32800 .mdx reads
+render 3: 1713 ms, 32800 .mdx reads
+```
+
+```
+render 1: 41 ms, 39 .mdx reads
+render 2: 32 ms, 0 .mdx reads
+render 3: 32 ms, 0 .mdx reads
+```
+
+That is why I trust the count more than the clock. Earlier the same day, the same three renders of the old loader took 2,798, 2,629 and 2,730 ms. The read count was 32,800 both times.
+
+## Where 32,800 comes from
+
+The number can be derived exactly, which is a good sign the model is right. With N = 39 files:
+
+- One `findPostBySlug` reads all N files plus the matching one again: **40 reads**.
+- One `getAllPosts` does that for every post: 39 × 40 = **1,560 reads**.
+- One render calls `getAllPosts` **21 times**. That's three plain calls (the post list, the tag list, the listing next to the article), plus one per category (4 in English then) and one per tag (14).
+
+21 × 1,560 = 32,760, plus the 40 reads of the post itself: 32,800. That's the whole number, with nothing left over.
+
+## What quadratic looks like as the blog grows
+
+To see the growth rather than infer it, I duplicated every post with a suffixed slug to build corpora of 78 and 117 files. Then I ran the same script, three renders each:
+
+| MDX files | Reads per render, before | Render time, before | Reads, after (first / next) | Render time, after |
+| --------- | ------------------------ | ------------------- | --------------------------- | ------------------ |
+| 39        | 32,800                   | 2.6–2.8 s           | 39 / 0                      | 34–48 ms           |
+| 78        | 129,481                  | 13.0–13.5 s         | 78 / 0                      | 66–88 ms           |
+| 117       | 290,044                  | 17.4–31.4 s         | 117 / 0                     | 95–115 ms          |
+
+Twice the posts, 3.95 times the reads. Three times the posts, 8.84 times the reads. The same formula, 21 × N × (N + 1) + (N + 1), predicts all three counts exactly. After the fix the reads grow with N, and only on the first render of a process.
+
+The time column is the one to read with care. At 117 files the three renders ranged from 17 s to 31 s on the same idle machine. A regression test built on that number would be flaky. One built on the read count would not.
+
+This is the part that matters for a blog: **every new post made every page slower**, including pages that had nothing to do with it. Nothing changed in the code between the day it was fine and the day it wasn't. The corpus just grew.
+
+## The fix: read the corpus once
+
+The fix in [PR #132](https://github.com/xabierlameiro/the-last-dance/pull/132) reads and parses every file once and keeps the result in a module-level variable. Every helper then filters that array instead of going to disk:
+
+```ts
+let corpusCache: ParsedPost[] | null = null;
+
+const loadCorpus = (): ParsedPost[] => {
+    if (corpusCache && process.env.NODE_ENV === 'production') {
+        return corpusCache;
+    }
+    corpusCache = findMdxFiles(POST_PATH).map(buildPost);
+    return corpusCache;
+};
+```
+
+The cache is production-only so that `next dev` still shows content edits without a restart. A later change swapped that for a cache keyed on file modification times, so development got fast too.
+
+Measured during the build in July, before and after the change:
+
+| What                                                 | Before              | After               |
+| ---------------------------------------------------- | ------------------- | ------------------- |
+| `next build`, blog route                             | ~17.5 min           | 34 s                |
+| Prerender of one `/blog/[category]/[slug]` page      | ~32,000 ms          | ~1,600 ms           |
+| Tag URL rendered on demand (`next start`, warm)      | would time out      | ~134 ms             |
+
+The build numbers are higher than my isolated benchmark. The build prerenders many pages at once on the same machine, and I didn't measure how much they slowed each other down. So I treat 32 s as the build's number and 1.7–2.8 s as the cost of the loader alone.
+
+## Two suspects that were not the cause
+
+**Serialization.** Large props are a common reason for slow `getStaticProps`, and the rendered post content is not small. The instrumentation put it at about 94 ms, so it wasn't the problem.
+
+**`revalidate: 10`.** The page regenerated every 10 seconds, which looked guilty. But ISR regeneration is stale-while-revalidate: the visitor gets the last good page while the new one renders in the background. It could not cause a 504 on its own. What it did do was re-run a 32-second function in the background, up to every 10 seconds per page. I raised it to one day as a cost fix, not as the 504 fix.
+
+## Why I didn't raise the timeout
+
+Vercel's [page for this error](https://vercel.com/docs/errors/FUNCTION_INVOCATION_TIMEOUT) suggests making the function fit its maximum duration first, and raising the duration as another option. The project had no `maxDuration` configured, so it ran on whatever the plan's default was at the time. I didn't record that value, and Vercel's defaults have changed since with Fluid compute.
+
+A longer limit would have worked for a while. But the cost was quadratic in the number of posts, so a timeout four times longer only buys about twice as many posts. Then the same 504 comes back on a day when nothing in the code changed. Making the render fast was the only fix that didn't depend on how much I write.
+
+## Check your own loader
+
+If your site reads Markdown or MDX from disk in `getStaticProps`, a route handler or a build script, this takes a few minutes:
+
+1. Wrap `fs.readFileSync` (or `fs.promises.readFile`) to count reads of your content files, as in `count.mjs` above.
+2. Run one render and write the count down. If it is larger than your number of files, something reads the same file twice.
+3. Copy your content directory so it has twice the files, and run it again. If the count doubles, it's linear. If it roughly quadruples, look for a helper that loads everything, called inside a loop over everything.
+
+The count is more useful than the timing for a second reason: you can put it in a test. A test that asserts one render reads each file at most once will catch the next quadratic helper before the corpus grows into it. A timing assertion will fail on a busy CI runner for reasons that have nothing to do with the loader.
+
+The same idea runs through [how I prove a Next.js memory leak](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak). Measure something that doesn't depend on how busy the machine is. Then remove the suspected cause and check that the effect goes away with it.

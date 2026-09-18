@@ -68,7 +68,7 @@ topic appeal: a post is never scheduled before its data exists.
 | # | Working title | Source material | Data available | Gate (1·2·3·4) |
 | --- | --- | --- | --- | --- |
 | 1 | GA4 cannot see most visitors on a small site with Consent Mode v2 | `_app.tsx` consent defaults; GSC clicks vs GA4 sessions for the same 28-day window; Vercel visit counts if live | Now | pass · pass (the answer is the size of the gap on a real site, not the fact that one exists) · pass · pass |
-| 2 | A blog route went from 32 s to 1.6 s: the O(N²) loader behind a Vercel 504 | SDD-012 measurements, PR #132 | Now | pass · pass · pass · pass (the 504 is the symptom, the post is the profiling) |
+| 2 | A blog route went from 32 s to 1.6 s: the O(N²) loader behind a Vercel 504. Drafted 2026-09-18 as `data/blog/quadratic-mdx-loader-vercel-504` ("One page, 32,800 file reads: the O(N²) behind a Vercel 504"), awaiting owner review | SDD-012 measurements, PR #132; read-count benchmark of `99ea971` vs `7f9519a` at 39/78/117 files | Now | pass · pass · pass · pass (the 504 is the symptom, the post is the profiling) |
 | 3 | Why a path-segment facet cannot be redirected, noindexed or disallowed | SDD-009, PRs #186 / #189, result of `tag-facets-as-query-param` | After that change ships | pass · pass · pass · pass |
 | 4 | I let every AI crawler in and published llms.txt: what they took and what they sent back | `measure-real-traffic` data, 28 days minimum | 28 days after that change reaches production | pass · pass · pass · pass (blocked on data) |
 

@@ -200,6 +200,15 @@ const posts: Poster[] = [
         subhead: 'Force GC, diff the heap, then remove the cause',
         ghost: 'GC',
     },
+    {
+        file: 'quadratic-mdx-loader-vercel-504.png',
+        eyebrow: 'NEXT.JS · PERFORMANCE',
+        line1: '32,800 reads',
+        line2: 'for one ',
+        accentWord: 'page',
+        subhead: 'The O(N²) MDX loader behind a Vercel 504',
+        ghost: 'N²',
+    },
 ];
 
 let done = 0;
