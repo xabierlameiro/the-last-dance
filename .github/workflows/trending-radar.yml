@@ -43,5 +43,21 @@ jobs:
                   GH_TOKEN: ${{ github.token }}
               run: |
                   TITLE="Trending radar $(date +%G-W%V)"
-                  gh issue create --title "$TITLE" --body-file trending-report.md --label "content-radar" \
-                    || gh issue create --title "$TITLE" --body-file trending-report.md
+                  NEW_URL=$(gh issue create --title "$TITLE" --body-file trending-report.md --label "content-radar" \
+                    || gh issue create --title "$TITLE" --body-file trending-report.md)
+                  echo "$NEW_URL"
+                  echo "NEW_NUMBER=${NEW_URL##*/}" >> "$GITHUB_ENV"
+
+            # Only the current week stays open. A briefing is built from that week's trending
+            # signals, so an older one is stale by the time the next arrives; left open they
+            # piled up unread (W33-W38 were six open issues with no comments).
+            - name: Close previous radar issues
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  gh issue list --label content-radar --state open --limit 100 --json number --jq '.[].number' |
+                    while read -r number; do
+                      [ "$number" = "$NEW_NUMBER" ] && continue
+                      gh issue close "$number" --reason "not planned" \
+                        --comment "Superseded by #$NEW_NUMBER: this week's radar window has passed."
+                    done
