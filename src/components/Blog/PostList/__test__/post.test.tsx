@@ -14,6 +14,7 @@ describe('PostList', () => {
                     title: 'title',
                     excerpt: 'excerpt',
                     slug: 'slug',
+                    category: 'React',
                 },
             },
         ];
@@ -28,6 +29,7 @@ describe('PostList', () => {
                     title: 'title',
                     excerpt: 'excerpt',
                     slug: 'slug',
+                    category: 'React',
                 },
             },
         ];
@@ -37,10 +39,12 @@ describe('PostList', () => {
     });
 
     /*
-     * The regression #186 shipped, pinned so it cannot come back: every link has to stay inside the
-     * segment being browsed. When they were rebuilt from each post's own category, clicking a post
-     * inside a tag listing jumped to /blog/<that post's category>/… and the sidebar deselected the
-     * tag, which made walking a tag impossible.
+     * The regression #186 shipped, pinned so it cannot come back: every link has to keep the segment
+     * being browsed. When they were rebuilt from each post's own category with nothing else, clicking
+     * a post inside a tag listing jumped to /blog/<that post's category>/… and the sidebar deselected
+     * the tag, which made walking a tag impossible. Since tag-facets-as-query-param the path is the
+     * post's own category and the segment travels as `?tag=` (rewritten to the tag render in
+     * next.config.ts); what must never happen is a link that carries neither.
      */
     it('should keep the browsed segment in every link so the tag stays selected', () => {
         const posts = [
@@ -49,6 +53,7 @@ describe('PostList', () => {
                     title: 'Publish the coverage report',
                     excerpt: 'excerpt',
                     slug: 'publish-report-testing-react',
+                    category: 'React',
                 },
             },
             {
@@ -56,6 +61,7 @@ describe('PostList', () => {
                     title: 'Deploying my storybook',
                     excerpt: 'excerpt',
                     slug: 'deploying-my-storybook-is-very-simple',
+                    category: 'React',
                 },
             },
         ];
@@ -63,11 +69,30 @@ describe('PostList', () => {
 
         expect(screen.getByTitle('Publish the coverage report')).toHaveAttribute(
             'href',
-            '/blog/ci/publish-report-testing-react',
+            '/blog/react/publish-report-testing-react?tag=ci',
         );
         expect(screen.getByTitle('Deploying my storybook')).toHaveAttribute(
             'href',
-            '/blog/ci/deploying-my-storybook-is-very-simple',
+            '/blog/react/deploying-my-storybook-is-very-simple?tag=ci',
+        );
+    });
+
+    it('should link to the bare canonical URL when browsing the post\'s own category', () => {
+        const posts = [
+            {
+                meta: {
+                    title: 'Publish the coverage report',
+                    excerpt: 'excerpt',
+                    slug: 'publish-report-testing-react',
+                    category: 'React',
+                },
+            },
+        ];
+        render(<PostList posts={posts} slug="publish-report-testing-react" category="react" />);
+
+        expect(screen.getByTitle('Publish the coverage report')).toHaveAttribute(
+            'href',
+            '/blog/react/publish-report-testing-react',
         );
     });
 });

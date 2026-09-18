@@ -15,6 +15,7 @@ import usePostComponents from '@/components/Blog/PostByline';
 import Loading from '@/components/RenderManager/Loading';
 import styles from '@/styles/blog.module.css';
 import { clx, getLang } from '@/helpers';
+import { browsedSegment } from '@/helpers/postPath';
 import dynamic from 'next/dynamic';
 import useWindowResize from '@/hooks/useWindowResize';
 import SEO from '@/components/SEO';
@@ -59,6 +60,7 @@ type Props = {
             title: string;
             excerpt: string;
             slug: string;
+            category: string;
         };
     }[];
 };
@@ -75,9 +77,9 @@ const PostPage = ({ post, tags, categories, posts }: Props) => {
     const { open, dispatch } = useDialog();
     const { isMobile } = useWindowResize();
     const { left, onSideShiftLeft, right, onSideShiftRight, toggleLeft, toggleRight } = useSideShift();
-    const {
-        query: { category, slug },
-    } = useRouter();
+    const { query } = useRouter();
+    const { slug } = query;
+    const category = browsedSegment(query);
     const close = () => dispatch({ type: 'close' });
     const postComponents = usePostComponents(post.meta);
     const sideClass = resolveSideClass(left, right);
@@ -246,8 +248,10 @@ export const getStaticProps = async (data: {
     // 29,180 characters `posts` occupied were `content` nobody reads — 82%, shipped to every visitor
     // and growing linearly with the number of posts in a category. The `Props` type above already
     // declared only these three, so the type was honest and the payload was not.
+    // `category` joined them with tag-facets-as-query-param: each link is built from the post's own
+    // category (`postPath`), not from the segment being browsed.
     const posts = findPostsByCategoryOrTag(locale, category).map(({ meta }) => ({
-        meta: { title: meta.title, excerpt: meta.excerpt, slug: meta.slug },
+        meta: { title: meta.title, excerpt: meta.excerpt, slug: meta.slug, category: meta.category },
     }));
 
     return {

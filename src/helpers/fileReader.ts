@@ -3,6 +3,7 @@ import fs from 'fs';
 import matter from 'gray-matter';
 import { defaultLocale } from '@/constants/site';
 import { isSafeSlug } from './slug';
+import { postPath } from './postPath';
 import { describeIssues } from '../types/schemas';
 import { postFrontmatterSchema } from '../types/upstream';
 
@@ -439,7 +440,7 @@ const getAllTags = (locale: string) => {
                     {
                         tag,
                         total: tags.flat().filter((t) => t === tag).length,
-                        href: `/blog/${tag.toLowerCase()}/${firstPost.meta.slug}`,
+                        href: postPath(firstPost.meta, tag),
                     },
                 ];
             })

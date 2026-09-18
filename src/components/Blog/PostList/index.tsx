@@ -1,11 +1,13 @@
 import styles from './post.module.css';
 import Link from 'next/link';
+import { postPath } from '@/helpers/postPath';
 
 type PostListItem = {
     meta: {
         title: string;
         excerpt: string;
         slug: string;
+        category: string;
     };
 };
 
@@ -23,6 +25,9 @@ type Props = {
      * browsing deselected itself and there was no way to walk a tag. Reverted — the duplicate URLs
      * were the price of this menu working, and the real fix is to stop carrying taxonomy in the path
      * at all rather than to make the links disagree with the page you are on.
+     *
+     * That fix is `postPath`: the path is the post's own category and the segment travels as
+     * `?tag=`, which `next.config.ts` rewrites to the same tag render, so the selection survives.
      */
     category?: string | string[];
 };
@@ -45,7 +50,7 @@ const PostList = ({ posts, slug, category }: Props) => {
         <ul data-testid="post-list" className={styles.list}>
             {posts.map((item: PostListItem, index: number) => (
                 <li key={index} className={slug == item.meta.slug ? styles.selected : ''}>
-                    <Link href={`/blog/${category}/${item.meta.slug}`} title={item.meta.title}>
+                    <Link href={postPath(item.meta, category)} title={item.meta.title}>
                         <div className={styles.title}>{item.meta.title}</div>
                         <div className={styles.excerpt}>{item.meta.excerpt}</div>
                     </Link>
