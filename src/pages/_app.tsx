@@ -8,6 +8,7 @@ import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import CookieConsent, { CONSENT_STORAGE_KEY } from '@/components/CookieConsent';
 import Layout from '@/components/Layout';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import VercelAnalytics from '@/components/VercelAnalytics';
 
 type locales = 'en' | 'es' | 'gl';
 declare global {
@@ -129,6 +130,7 @@ const App = ({ Component, pageProps }: AppProps) => {
                     {analyticsBootstrap(measurementId)}
                 </Script>
             )}
+            {isProduction && <VercelAnalytics />}
 
             <IntlProvider locale={locale} messages={messages[locale as locales]} onError={handleIntlError}>
                 <ErrorBoundary>
