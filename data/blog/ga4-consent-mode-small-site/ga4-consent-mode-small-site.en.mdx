@@ -1,0 +1,112 @@
+---
+title: 'GA4 saw 12 of my 23 Google clicks. Where did the rest go?'
+slug: 'ga4-consent-mode-small-site'
+author: 'Xabier Lameiro'
+category: 'Nextjs'
+tags: ['analytics', 'seo']
+locale: 'en'
+updated: '2026-09-18'
+excerpt: 'Same 28 days: 23 Google clicks in Search Console, 12 google / organic sessions in GA4 · modeling not available · why a small site cannot close the gap'
+description: 'Same 28 days: Search Console counted 23 Google clicks, GA4 counted 12 sessions. Why Consent Mode v2 hides half the visits on a small site.'
+image: '/posts/ga4-consent-mode-small-site.png'
+faq:
+    - question: 'Why does GA4 show fewer visits than Search Console clicks?'
+      answer: 'Several reasons stack up. With Consent Mode v2 and analytics_storage denied by default, visitors who decline or ignore the banner are not reported unless the property qualifies for behavioral modeling. Ad blockers stop the Google tag entirely. And a click is not a session: someone can leave before the tag loads. On this blog, for the same 28 days, GA4 reported 12 google / organic sessions against 23 Google clicks in Search Console.'
+    - question: 'Does Consent Mode v2 model the visitors who decline cookies?'
+      answer: 'Only if the property qualifies. Google lists at least 1,000 events per day with analytics_storage denied for 7 days, and at least 1,000 daily users with analytics_storage granted for 7 of the previous 28 days, among other criteria. Below that, events from visitors who decline are not reported. You can check under Admin, Reporting identity: the Blended option says whether modeling is available for the property.'
+    - question: 'Is advanced Consent Mode worth it on a small site?'
+      answer: 'It loads the Google tag before consent and sends cookieless pings, which is what modeling needs. If the property will never reach the modeling thresholds, those pings do not show up in reports, so advanced mode shows a small site roughly the same numbers as basic mode. The choice then comes down to privacy and legal advice, not to data.'
+    - question: 'What should a small site use to count visits instead?'
+      answer: 'Use Search Console for anything about Google search, since it counts clicks on Google itself and does not depend on a banner. For total visits, use a count that needs no consent, such as server-side or cookieless analytics, after checking with whoever advises you on privacy law. Keep GA4 for what it still does well on a small site: behaviour of the visitors who accepted.'
+---
+
+# GA4 saw 12 of my 23 Google clicks. Where did the rest go?
+
+<Date date="09-18-2026" />
+
+<GoogleAdsense />
+
+## Quick answer
+
+From 19 August to 15 September 2026, Google Search Console counted **23 clicks** from Google search to this blog. Google Analytics 4, for the same 28 days, reported **12 sessions** from `google / organic`. So GA4 showed about half of the visits that Google itself says it sent.
+
+Most of that gap is by design. The site uses Consent Mode v2 with analytics denied until the visitor accepts. Google can fill the gap with behavioral modeling, but only above thresholds that a small site does not come close to. Below them, GA4 simply doesn't report visitors who decline. My property's settings say so directly: modeling isn't available for it.
+
+The rest of this post is the two numbers, the configuration behind them, and what I now trust each tool for.
+
+## The two numbers
+
+Both reports cover the same days. The Search Console number is filtered to the main domain, with final data only. The GA4 number is the Traffic acquisition report by session source and medium, with no filters.
+
+| Source                                   | 19 Aug – 15 Sep 2026 |
+| ---------------------------------------- | -------------------- |
+| Search Console, clicks from Google search | 23                   |
+| GA4, `google / organic` sessions          | 12                   |
+| GA4, all Organic Search sessions (Google, Bing and others) | 15 |
+| GA4, all sessions from every source      | 229                  |
+
+Twelve out of 23 is 52%. The numbers are small, and on a small site they always will be, so I don't read anything into the decimals. But half is not a rounding error. Only 3 of those 12 GA4 sessions counted as engaged, so the visible part is thin as well as small.
+
+A click and a session are not the same thing. Search Console counts clicks on a Google result. GA4 counts a session when the Google tag runs on the page and is allowed to report it. Everything between those two events is where the other 11 visits went.
+
+## What the consent setup does
+
+This is the start of the analytics bootstrap in the site's `_app.tsx`. Every storage type that can identify a visitor starts denied:
+
+```js
+gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied',
+    functionality_storage: 'granted',
+    security_storage: 'granted',
+    wait_for_update: 500
+});
+```
+
+The Google tag then loads for everyone, whether or not they have answered the banner. That's what Google calls the advanced implementation. While `analytics_storage` is denied, the tag sends cookieless pings instead of normal hits, with no client ID that would tie two page views to the same person. When a visitor accepts, the banner calls `gtag('consent', 'update', …)`, and the answer is stored and replayed on their later visits.
+
+So the site does send something to Google for every visitor that runs the tag. The question is what GA4 does with the pings from people who never accepted.
+
+## Why GA4 doesn't fill the gap
+
+Google's answer is [behavioral modeling for consent mode](https://support.google.com/analytics/answer/11161109). It trains a model on the visitors who accepted and uses it to estimate the ones who didn't. The help page lists the prerequisites, and two of them are about volume:
+
+- at least 1,000 events per day with `analytics_storage` denied, for at least 7 days;
+- at least 1,000 daily users with `analytics_storage` granted, for at least 7 of the previous 28 days.
+
+It also says what happens below that line: "events triggered by users who decline consent aren't reported."
+
+This blog had 229 sessions in 28 days across every source, which is about 8 a day. The threshold is 1,000 consenting users a day. It will not get there, and I checked instead of assuming. In GA4, under Admin, Data display, Reporting identity, the property is set to Blended. The line for modeled data says modeling is not available for this property, and that it will turn on by default if that changes.
+
+That leaves the reports with observed data only, which means visitors who accepted. The cookieless pings from everyone else are collected and never shown.
+
+## What else is in the gap
+
+Consent is the biggest documented cause, but it isn't the only one, and GA4 can't tell them apart. Every one of them looks the same from inside GA4, a visit that isn't there:
+
+- **Ad and tracker blockers** stop `gtag.js` from loading at all. Consent never comes into it.
+- **Quick exits.** The tag is injected after hydration, so someone who hits back within a second or two can count as a click and never become a session.
+- **Clicks that aren't unique people.** A visitor who clicks the same result twice is two clicks in Search Console and may be one session in GA4.
+
+The honest conclusion is an upper bound. At most about half of the visitors Google sent were visible to GA4, and I can't split the missing half between consent and blockers with the tools I have. Separating them needs a count that sees every request whatever the browser allows, which is the next thing I'm setting up on this site. I'll report it when there are 28 days of it.
+
+## What this changes on this blog
+
+**The view counter was reading the smaller number.** Each post shows a view count that comes from the GA4 Data API. It only ever counted page views from visitors who accepted cookies. It isn't wrong, but it's a count of consenting readers, not of readers.
+
+**Search questions go to Search Console.** When I decided which kind of post to write next, I used Search Console clicks, not GA4 sessions: one investigation post was taking most of the blog's clicks while the error-fix posts took none. Had I used GA4, I'd have been deciding on about half the visits, from samples already too small to lose half of.
+
+**GA4 keeps one job.** For the people who accepted, it still shows what they read and how long they stayed. That's useful, as long as I remember it describes a subset that chose to be counted.
+
+## Check your own site
+
+This takes ten minutes and needs no code:
+
+1. Pick a 28-day window that ended at least three days ago, so Search Console's data is final.
+2. In Search Console, Performance, filter to your own hostname and write down the clicks.
+3. In GA4, Reports, Acquisition, Traffic acquisition, switch the dimension to session source / medium, set the same dates, and write down the sessions for `google / organic`.
+4. In GA4, Admin, Data display, Reporting identity, expand Blended and read whether modeling is available.
+
+If the GA4 number is well under the Search Console one and modeling is not available, your reports are showing the visitors who said yes, and nobody else. That's fine if you know it. It's a problem if you're making decisions as if it were everyone.
