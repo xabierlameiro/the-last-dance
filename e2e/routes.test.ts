@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
 import en from '../src/intl/messages/en';
 import es from '../src/intl/messages/es';
 import gl from '../src/intl/messages/gl';
@@ -143,6 +146,17 @@ test.describe('RSS feeds', () => {
         '/feed.gl.xml': { language: 'gl', link: 'https://xabierlameiro.com/gl' },
     };
 
+    // A feed carries one item per post whose frontmatter names its locale (scripts/generate-feeds.ts),
+    // so the expected count is read from the corpus. It was pinned at 15 for every locale until the
+    // first English-only posts made the English feed longer than the other two.
+    const blogDir = path.join(process.cwd(), 'data/blog');
+    const postsInLocale = (locale: string): number =>
+        fs
+            .readdirSync(blogDir, { recursive: true })
+            .map(String)
+            .filter((file) => file.endsWith('.mdx'))
+            .filter((file) => matter(fs.readFileSync(path.join(blogDir, file), 'utf8')).data.locale === locale).length;
+
     for (const [path, { language, link }] of Object.entries(FEEDS)) {
         test(`should serve ${path} as RSS 2.0 for ${language}`, async ({ request }) => {
             const response = await request.get(path);
@@ -155,8 +169,8 @@ test.describe('RSS feeds', () => {
             expect(body).toContain(`<language>${language}</language>`);
             expect(body).toContain(`<link>${link}</link>`);
             // One item per post in this locale, each with the guid readers key "already seen" off.
-            expect(body.match(/<item>/g)).toHaveLength(15);
-            expect(body.match(/<guid isPermaLink="true">/g)).toHaveLength(15);
+            expect(body.match(/<item>/g)).toHaveLength(postsInLocale(language));
+            expect(body.match(/<guid isPermaLink="true">/g)).toHaveLength(postsInLocale(language));
         });
     }
 
@@ -166,7 +180,7 @@ test.describe('RSS feeds', () => {
             ([, url]) => new URL(url).pathname
         );
 
-        expect(links.length).toBe(15);
+        expect(links.length).toBe(postsInLocale('en'));
         for (const pathname of links) {
             expect((await request.get(pathname)).status(), `${pathname} should not be a dead link`).toBe(200);
         }
