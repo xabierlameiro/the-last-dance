@@ -20,6 +20,7 @@ live-site inspection (browser + prod API probes), and code audit of this repo.
 | [011](011-content-engine-editorial.md)    | Content engine: recurring GitHub issues + anti-AI editorial  | **Investigation / design** — extends SDD-006                |
 | [012](012-blog-render-timeout.md)         | Blog navigation timeouts (FUNCTION_INVOCATION_TIMEOUT)       | **Fixed** (2026-07-18) — O(N²) loader cached, 32s→1.6s      |
 | [013](013-llm-visibility-geo.md)          | LLM engine visibility (GEO): llms.txt, IndexNow, freshness   | **Implemented** — owner: register in Bing Webmaster Tools   |
+| [014](014-next-leak-app.md)               | next-leak as a sixth Dock app (indexable tool page)          | **Proposed** (2026-09-19) — design approved, not implemented |
 
 All code lives on branch `fix/sdd-001-header-widgets` (specs + implementation).
 
