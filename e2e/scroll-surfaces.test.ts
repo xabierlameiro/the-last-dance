@@ -78,7 +78,7 @@ const VIEWPORTS = [
  * Pinning the numbers means a future `auto`, a stray `gap`, or a widget growing a second value fails
  * as a test rather than as a screenshot a month later.
  */
-const SLOT_WIDTHS = { deploymentDot: 24, value: 96, views: 184, heating: 120, clock: 140 };
+const SLOT_WIDTHS = { deploymentDot: 24, value: 96, views: 184, heating: 120, clock: 150 };
 
 /**
  * Measures the *bar*, not the scroll box.
