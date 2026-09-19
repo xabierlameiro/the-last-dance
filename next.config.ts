@@ -1,6 +1,5 @@
 import type { NextConfig } from 'next';
 import { remarkPlugins } from './mdx.plugins.ts';
-import { TAG_VALUE_PATTERN } from './src/helpers/postPath.ts';
 import nextMDX from '@next/mdx';
 
 const withMDX = nextMDX({
@@ -48,20 +47,10 @@ const nextConfig: NextConfig = {
     //  - `/docs/:path* -> /docs/:path*` was byte-identical to its source, i.e. a no-op, and targeted
     //    a public/docs directory that does not exist (it is generated on demand by `npm run jsdoc`
     //    and excluded by .vercelignore).
-    // tag-facets-as-query-param: posts are linked only at /blog/<category>/<slug>, with the tag being
-    // browsed as `?tag=` (src/helpers/postPath.ts). This serves that URL from the tag render the site
-    // always had at /blog/<tag>/<slug>, so the server-rendered listing, the highlighted tag and the
-    // back button do not change; #186 changed the URL without the tag and broke exactly that. The
-    // browser keeps the canonical path, and robots.txt keeps `?tag=` out of the crawl. The source
-    // param is not called `category` so it cannot shadow the destination's own `category` in
-    // router.query, and the value is limited to a tag's shape so anything else renders the plain post.
-    rewrites: async () => [
-        {
-            source: '/blog/:postCategory/:slug',
-            has: [{ type: 'query', key: 'tag', value: `(?<tag>${TAG_VALUE_PATTERN})` }],
-            destination: '/blog/:tag/:slug',
-        },
-    ],
+    // tag-facets-as-query-param: the `?tag=` rewrite that used to live here, a `has` query rule from
+    // /blog/:postCategory/:slug to /blog/:tag/:slug, moved to src/middleware.ts. On Vercel it served
+    // full page loads but not the `/_next/data` request of a client-side navigation, so the tag
+    // stayed highlighted over the category's listing (see `tagRenderPath` in src/helpers/postPath.ts).
     // Append the default value with md extensions
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     experimental: {

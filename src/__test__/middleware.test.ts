@@ -96,4 +96,57 @@ describe('middleware', () => {
             (path) => expect(matcher.test(path)).toBe(false)
         );
     });
+
+    it('serves a post browsed from a tag from the tag render, keeping the query', async () => {
+        const middleware = await loadMiddleware();
+        const { event } = createEvent();
+
+        const response = middleware(request('/blog/error/solve-address-in-use-error?tag=node', CHROME), event);
+
+        const rewrite = new URL(String(response.headers.get('x-middleware-rewrite')));
+        expect(rewrite.pathname).toBe('/blog/node/solve-address-in-use-error');
+        expect(rewrite.searchParams.get('tag')).toBe('node');
+    });
+
+    it('does not rewrite a post without a valid tag', async () => {
+        const middleware = await loadMiddleware();
+        const { event } = createEvent();
+
+        ['/blog/error/solve-address-in-use-error', '/blog/error/solve-address-in-use-error?tag=Node'].forEach((path) => {
+            const response = middleware(request(path, CHROME), event);
+            expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+            expect(response.headers.get('x-middleware-next')).toBe('1');
+        });
+    });
+
+    it('rewrites and records a crawler that follows a tag link', async () => {
+        const middleware = await loadMiddleware();
+        const { event, pending } = createEvent();
+
+        const response = middleware(request('/blog/error/solve-address-in-use-error?tag=node', GPTBOT), event);
+        await Promise.all(pending);
+
+        expect(new URL(String(response.headers.get('x-middleware-rewrite'))).pathname).toBe(
+            '/blog/node/solve-address-in-use-error'
+        );
+        expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('matches the data request of a client-side navigation, as Next compiles the matcher', async () => {
+        // The raw-regex check above cannot see this: Next prefixes every matcher with an optional
+        // `/_next/data/<build>` and a `.json` suffix, and an excluded `.json` extension in the pattern
+        // silently kept every data request away from the middleware. Compiled by Next itself so an
+        // upgrade that changes the compilation shows up here.
+        jest.resetModules();
+        const { config } = await import('../middleware');
+        const { getMiddlewareMatchers } = await import('next/dist/build/analysis/get-page-static-info');
+        const [compiled] = getMiddlewareMatchers(config.matcher, {
+            i18n: { locales: ['en', 'es', 'gl'], defaultLocale: 'en' },
+        } as Parameters<typeof getMiddlewareMatchers>[1]);
+        const matcher = new RegExp(compiled.regexp);
+
+        expect(matcher.test('/en/blog/error/solve-address-in-use-error')).toBe(true);
+        expect(matcher.test('/_next/data/BUILD/en/blog/error/solve-address-in-use-error.json')).toBe(true);
+        expect(matcher.test('/_next/data/BUILD/es/blog/error/resolver-direccion-en-uso-error.json')).toBe(true);
+    });
 });
