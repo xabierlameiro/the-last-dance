@@ -1,5 +1,7 @@
+import path from 'path';
 import type { NextConfig } from 'next';
 import { remarkPlugins } from './mdx.plugins.ts';
+import { legacyFacetRedirects } from './src/helpers/legacyFacetRedirects.ts';
 import nextMDX from '@next/mdx';
 
 const withMDX = nextMDX({
@@ -36,6 +38,7 @@ const nextConfig: NextConfig = {
         return [
             { source: '/about', destination: '/', permanent: true },
             { source: '/contact', destination: '/', permanent: true },
+            ...legacyFacetRedirects(path.join(process.cwd(), 'data/blog')),
         ];
     },
     // SDD-L04: two rewrites removed here.
