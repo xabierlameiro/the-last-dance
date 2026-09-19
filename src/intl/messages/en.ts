@@ -127,6 +127,8 @@ const en = {
     'dock.terminal': 'Terminal',
     'dock.legal': 'Legal documents',
     'dock.settings': 'System Preferences',
+    'dock.legal.short': 'Legal',
+    'dock.settings.short': 'Settings',
     'dock.nextLeak': 'next-leak',
     /*
      * /next-leak. Copy only: route names, figures, retainer chains, issue rows and the verdict words

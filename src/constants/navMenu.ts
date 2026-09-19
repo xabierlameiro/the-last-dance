@@ -10,6 +10,12 @@
 type Item = {
     img: string;
     labelId: string;
+    /**
+     * A shorter label for touch devices, where every label is visible at once. Each slot is 60px and
+     * the labels do not wrap, so the full names ran into their neighbours ("Legal documents" is 86px
+     * wide at 10px). The full label is still the link's accessible name and its hover label.
+     */
+    shortLabelId?: string;
     link: { en: string; es: string; gl: string } | string;
     testId: string;
 };
@@ -38,12 +44,14 @@ export const menu: Array<Item> = [
     {
         img: '/menu/books.png',
         labelId: 'dock.legal',
+        shortLabelId: 'dock.legal.short',
         link: '/legal/cookies-policy',
         testId: 'legal',
     },
     {
         img: '/menu/settings.png',
         labelId: 'dock.settings',
+        shortLabelId: 'dock.settings.short',
         link: '/settings',
         testId: 'settings',
     },

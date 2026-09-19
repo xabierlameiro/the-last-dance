@@ -110,6 +110,8 @@ const gl = {
     'dock.terminal': 'Terminal',
     'dock.legal': 'Documentos legais',
     'dock.settings': 'Preferencias do sistema',
+    'dock.legal.short': 'Legal',
+    'dock.settings.short': 'Axustes',
     'dock.nextLeak': 'next-leak',
     /*
      * /next-leak. Copy only: route names, figures, retainer chains, issue rows and the verdict words

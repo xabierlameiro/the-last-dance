@@ -59,6 +59,42 @@
     pointer-events: none;
 }
 
+/*
+ * The Dock is `width: max-content`, so it grows with the number of apps: at 60px an icon, six apps
+ * make it 382px and a 360px phone clipped it on both sides (measured: left -11px, right 371px), with
+ * the first icon half off screen. Below 420px the icons and their labels step down one size, which
+ * fits six apps in 310px.
+ */
+@media (max-width: 420px) {
+    .dock img {
+        width: 48px;
+    }
+
+    .label {
+        font-size: 9px;
+    }
+}
+
+/* The full label is the one shown on hover; the short one exists only for touch, below. */
+.shortLabel {
+    display: none;
+}
+
+/*
+ * Without hover every label is on screen at once, and a slot is 60px wide. The full names of the
+ * legal and settings apps are 86px and 100px at this size, so they ran into their neighbours. Those
+ * two show a short name instead; the link's aria-label keeps the full one for assistive tech.
+ */
+@media (hover: none) {
+    .hasShortLabel .label:not(.shortLabel) {
+        display: none;
+    }
+
+    .hasShortLabel .shortLabel {
+        display: block;
+    }
+}
+
 @media (hover: hover) {
     .label {
         opacity: 0;
