@@ -64,6 +64,28 @@
     .dialog.open {
         top: 34.5px;
     }
+
+    /**
+     * The home terminal is shorter than `100% - 90px` on most screens, and the rest of the window
+     * showed as a white block under the code. Sized to its content instead, capped at that same box,
+     * and centred on the box's midpoint (34.5px + (100% - 90px) / 2), so a tall window lands exactly
+     * where it did before.
+     *
+     * `.body` has to go auto too. The terminal is `<CH.Code style={{ height: 'inherit' }}>`, which
+     * inherits `.body`'s `100%`, and Code Hike freezes the editor at whatever height it measures on
+     * mount: with `100%` it measured the cap and the window never shrank.
+     */
+    .dialog.modalMode.fitContent {
+        height: auto;
+        max-height: calc(100% - 90px);
+    }
+    .dialog.modalMode.fitContent .body {
+        height: auto;
+    }
+    .dialog.modalMode.fitContent.open {
+        top: calc(50% - 10.5px);
+        transform: translateY(-50%) scale(1);
+    }
 }
 
 .padding {

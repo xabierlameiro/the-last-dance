@@ -1,0 +1,25 @@
+/**
+ * `VisibilityManager` picks the editor from `window.innerWidth`, so it cannot choose on the server:
+ * the HTML carried both editors stacked in one window, twice its height, until hydration removed
+ * one. These rules pick the same one from the first paint. Breakpoints match `@/constants/devices`
+ * (`mobileMax` 767, `tabletMin` 768).
+ *
+ * `height: inherit` keeps the chain that `<CH.Code style={{ height: 'inherit' }}>` relies on to
+ * fill the window, which a plain wrapper would cut at `auto`.
+ */
+.mobileEditor,
+.desktopEditor {
+    height: inherit;
+}
+
+@media screen and (max-width: 767px) {
+    .desktopEditor {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .mobileEditor {
+        display: none;
+    }
+}
