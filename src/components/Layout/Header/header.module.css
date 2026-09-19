@@ -104,11 +104,32 @@
  * | indexed pages   |    70   |    70    |    96    |  26      |
  * | **views+users** |   166   |   174    |   184    |  10      |
  * | **heating**     |    85   |   105    |   120    |  15      |
- * | clock           |     -   |     -    |   140    |   6      |
+ * | clock           |    147  |    147   |   150    |   3      |
  *
  * Measured on production and not here: several widgets render an error glyph on this machine
  * because their APIs have no credentials, so a local measurement would size every slot to a failure
- * state. The clock's 140 px comes from the longest Spanish rendering, `mié 30 sept 23:59` at 134 px.
+ * state.
+ *
+ * The clock used to have 140 px, sized from the longest SPANISH rendering, `mié 30 sept 23:59` at
+ * 134 px — and Spanish is not the worst case. English renders a 12-hour clock with an AM/PM marker,
+ * which is 23 px wider than any 24-hour one: `Wed 30 May 10:44 AM` is 150 px at `gap: 5px`, so the
+ * slot clipped 10 px off its left edge for half of every day in the default locale. It read as a
+ * flaky e2e failure because it only bites when the time of day is wide enough.
+ *
+ * Re-measured per field, in Chromium at 14 px, over every weekday, every month, both day widths and
+ * all 1440 minutes, taking the widest of each field — the fields vary independently, so their sum is
+ * reachable. Galician came from Node's full-ICU data: the bundled Chromium has no `gl` and silently
+ * falls back to English, which would have hidden `dom.`/`xuño`.
+ *
+ * | Locale | Widest fields               | Content | + gaps |
+ * |--------|-----------------------------|---------|--------|
+ * | en     | Wed · 30 · May · 10:44 AM   |  135.1  | 147.1  |
+ * | gl     | dom. · 30 · xuño · 04:44    |  124.1  | 136.1  |
+ * | es     | dom · 30 · sept · 20:44     |  116.1  | 128.1  |
+ *
+ * The gap between the four fields is 4 px rather than 5, which is what pays for most of the widening:
+ * a space in this font at 14 px is ~3.9 px, so 4 px is the natural word spacing and 5 px was already
+ * wider than one. That leaves the slot 3 px of headroom in English and 14 px in Galician.
  *
  * Content is still clipped rather than allowed to widen the zone — a slot that grows moves
  * everything beside it, which is the jitter these rules exist to remove. The difference is that each
@@ -168,7 +189,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    width: 140px;
+    width: 150px;
 }
 
 .header svg {
@@ -190,7 +211,8 @@
     cursor: pointer;
     display: grid;
     grid-auto-flow: column;
-    gap: 5px;
+    /* 4 px, not 5: the natural word spacing at this size, and 3 px of what the slot needed. */
+    gap: 4px;
     font-size: 14px;
     color: rgba(var(--blog-icons));
     text-transform: capitalize;
@@ -243,7 +265,7 @@
  * only watches one side is how the bar ended up drawn on top of itself at 1024 px the first time.
  *
  * Zone widths are arithmetic, not measurement, because the slots are fixed:
- * right = 24 (dot) + 96 (XRP) + 96 (indexed) + 184 (views) + 120 (heating) + 140 (clock);
+ * right = 24 (dot) + 96 (XRP) + 96 (indexed) + 184 (views) + 120 (heating) + 150 (clock);
  * left = 66 + 18 per icon + 14 per gap.
  *
  * Re-derived again once the views and heating slots were sized correctly — widening two slots by
@@ -252,17 +274,21 @@
  *
  * | Below   | What sheds        | Left | Right | Left needs | Right needs |
  * |---------|-------------------|------|-------|------------|-------------|
- * | 1549 px | views + users     | 320  | 660   |  846       | 1526        |
- * | 1179 px | heating           | 320  | 476   |  846       | 1158        |
- * |  939 px | crypto price      | 320  | 356   |  846       |  918        |
- * |  869 px | 5 artifact icons  | 320  | 260   |  846       |  726        |
- * |  768 px | indexed counter   | 160  | 260   |  526       |  726        |
- * |  479 px | 3 profile icons   | 160  | 164   |  526       |  534        |
+ * | 1549 px | views + users     | 320  | 670   |  846       | 1546        |
+ * | 1179 px | heating           | 320  | 486   |  846       | 1178        |
+ * |  939 px | crypto price      | 320  | 366   |  846       |  938        |
+ * |  869 px | 5 artifact icons  | 320  | 270   |  846       |  746        |
+ * |  768 px | indexed counter   | 160  | 270   |  526       |  746        |
+ * |  479 px | 3 profile icons   | 160  | 174   |  526       |  554        |
  *
- * Read the table as: above each row's width, the zones on that row coexist. Every breakpoint sits
- * ~20 px above what the arithmetic demands, and below 769 px the countdown is hidden entirely, so
- * from there down the only requirement is that the two zones fit side by side — 372 px at 480 px
- * wide, 278 px once the profile icons go.
+ * Read the table as: above each row's width, the zones on that row coexist. Below 769 px the
+ * countdown is hidden entirely, so from there down the only requirement is that the two zones fit
+ * side by side — 372 px at 480 px wide, 278 px once the profile icons go.
+ *
+ * The breakpoints themselves are unchanged by the clock's 10 px: they used to clear the arithmetic
+ * by ~20 px and now clear it by 4, 2 and 2 px on the three rows that constrain them. That is thin
+ * but exact — the slots are fixed, so these are sums and not measurements, and nothing here rounds.
+ * Any further widening on the right has to move the ladder with it.
  *
  * `.navLinks a` sets `display: flex` and outranks a bare class on specificity, so each rule lists
  * both forms rather than reaching for `!important`.

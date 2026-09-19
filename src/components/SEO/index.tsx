@@ -7,6 +7,7 @@ import {
     articleTags,
     blogTags,
     imageTags,
+    jsonLdScript,
     ogLocaleTags,
     resolveSeoUrls,
     robotsTags,
@@ -14,10 +15,17 @@ import {
     type SeoMeta,
 } from './tags';
 
+export type JsonLdContext = { url: string; domain?: string; locale?: string; author: string };
+
 type Props = {
     isBlog?: boolean;
     noimage?: boolean;
     meta?: SeoMeta;
+    /**
+     * Structured data for a page that is not a blog post, which otherwise emits none. A builder rather
+     * than a value, so it is fed the same canonical URL the head tags use instead of recomputing it.
+     */
+    jsonLd?: (context: JsonLdContext) => unknown;
 };
 
 /**
@@ -29,7 +37,7 @@ type Props = {
  * @param {boolean} noimage - Whether to show the image in the SEO
  * @returns {JSX.Element}
  */
-const SEO = ({ meta, isBlog, noimage = true }: Props) => {
+const SEO = ({ meta, isBlog, noimage = true, jsonLd }: Props) => {
     const { locale, pathname } = useRouter();
     const urls = resolveSeoUrls({ meta, isBlog, locale, pathname });
     const author = meta?.author || auth;
@@ -54,6 +62,12 @@ const SEO = ({ meta, isBlog, noimage = true }: Props) => {
             {ogLocaleTags(locale)}
             <link rel="canonical" href={urls.url} title="Canonical url" />
             {alternateLinks(meta, urls.domain, urls.category)}
+            {jsonLd &&
+                jsonLdScript(
+                    'page-jsonld',
+                    'page-jsonld',
+                    jsonLd({ url: urls.url, domain: urls.domain, locale, author }),
+                )}
         </Head>
     );
 };

@@ -1,0 +1,663 @@
+/**
+ * /next-leak. Window geometry comes from Dialog's `.modalMode` + `.large`; these are the contents only.
+ * Colours are the site's theme tokens plus the three `--nl-*` verdict colours in globals.css.
+ */
+
+/* ---------- Title bar ---------- */
+
+.titlebar {
+    display: grid;
+    gap: 6px;
+    padding: 8px 10px;
+    background: rgba(var(--blog-header));
+    border-bottom: 1px solid rgba(108, 108, 112, 0.3);
+}
+
+.toolbar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.appName {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+}
+
+.appTitle {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.appVersion {
+    font-size: 11px;
+    white-space: nowrap;
+    color: rgba(var(--blog-font-description));
+}
+
+.install {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.command {
+    padding: 3px 8px;
+    border: 1px solid rgba(var(--blog-border), 0.5);
+    border-radius: 5px;
+    background: rgba(var(--blog-nav), 0.6);
+    font-family: var(--mono-family);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.copyButton {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border: 1px solid rgba(var(--blog-border), 0.5);
+    border-radius: 5px;
+    background: rgba(var(--blog-nav), 0.6);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    color: rgba(var(--blog-font));
+}
+
+.copyButton:hover {
+    background: rgba(var(--blog-nav));
+}
+
+.copyIcon {
+    width: 13px;
+    height: 13px;
+    color: rgba(var(--link-on-surface));
+}
+
+.pitch {
+    font-size: 11.5px;
+    line-height: 1.35;
+    text-wrap: pretty;
+    color: rgba(var(--blog-font-description));
+}
+
+/* ---------- Body: sidebar and panels ---------- */
+
+.body {
+    display: grid;
+    grid-template-columns: 168px minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+}
+
+.sidebar {
+    padding: 12px 8px;
+    background: rgba(var(--blog-nav));
+}
+
+.sidebarTitle {
+    padding-bottom: 5px;
+    text-indent: 3px;
+    font-size: 12px;
+    font-weight: 100;
+    color: rgba(var(--blog-font-description));
+}
+
+.tabs {
+    display: grid;
+    gap: 2px;
+}
+
+/* The same selected treatment as the blog's NavList. */
+.tab {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    padding: 5px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    color: rgba(var(--blog-font));
+}
+
+.tab:hover {
+    background: rgba(var(--blog-border), 0.25);
+}
+
+.tab.selected,
+.tab.selected:hover {
+    background: rgba(var(--blue-color));
+    color: rgba(var(--blog-font-selected));
+}
+
+.tabIcon {
+    width: 15px;
+    height: 15px;
+    opacity: 0.85;
+}
+
+.panel {
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+}
+
+.panel[hidden] {
+    display: none;
+}
+
+/* ---------- Text panels ---------- */
+
+.prose {
+    padding: 12px 16px 16px;
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+.prose h2 {
+    margin: 16px 0 6px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.prose h2:first-child {
+    margin-top: 0;
+}
+
+.prose p {
+    margin-bottom: 8px;
+    text-wrap: pretty;
+}
+
+.prose ol,
+.prose ul {
+    margin-bottom: 8px;
+    padding-left: 18px;
+}
+
+.prose li {
+    margin-bottom: 4px;
+}
+
+.code {
+    padding: 0 3px;
+    border-radius: 3px;
+    background: rgba(var(--blog-nav), 0.6);
+    font-family: var(--mono-family);
+    font-size: 0.92em;
+}
+
+.block {
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    border: 1px solid rgba(var(--blog-border), 0.5);
+    border-radius: 5px;
+    background: rgba(var(--blog-nav), 0.6);
+    font-family: var(--mono-family);
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.note {
+    color: rgba(var(--blog-font-description));
+}
+
+.mono {
+    font-family: var(--mono-family);
+    font-size: 11.5px;
+}
+
+.verdicts {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 6px 10px;
+    margin-bottom: 10px;
+}
+
+.verdicts dd {
+    margin: 0;
+}
+
+.tableScroll {
+    margin-bottom: 10px;
+    overflow-x: auto;
+}
+
+.issues,
+.buildTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.issues {
+    min-width: 560px;
+}
+
+.buildTable {
+    margin-bottom: 8px;
+}
+
+.issues th,
+.issues td,
+.buildTable th,
+.buildTable td {
+    padding: 5px 8px 5px 0;
+    border-bottom: 1px solid rgba(var(--blog-border), 0.3);
+    text-align: left;
+    vertical-align: top;
+}
+
+.issues thead th {
+    font-size: 10.5px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(var(--blog-font-description));
+}
+
+.buildTable th {
+    white-space: nowrap;
+}
+
+.buildTable caption {
+    padding-bottom: 4px;
+    text-align: left;
+}
+
+.prose .links {
+    list-style: none;
+    padding-left: 0;
+}
+
+.links li {
+    display: grid;
+    gap: 1px;
+    margin-bottom: 10px;
+}
+
+.links span {
+    color: rgba(var(--blog-font-description));
+}
+
+/* ---------- Example run ---------- */
+
+.run {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+    min-height: 0;
+}
+
+.routesHead,
+.routeRow {
+    display: grid;
+    grid-template-columns: 1.2fr 90px 1.15fr 1.15fr 1.2fr;
+    align-items: center;
+    gap: 8px;
+}
+
+.routesHead {
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(var(--blog-border), 0.45);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(var(--blog-font-description));
+}
+
+.routeRow {
+    width: 100%;
+    padding: 5px 12px;
+    border: 0;
+    border-bottom: 1px solid rgba(var(--blog-border), 0.2);
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    color: rgba(var(--blog-font));
+}
+
+.routeRow:hover {
+    background: rgba(var(--blue-color), 0.1);
+}
+
+/* 0.16, not the 0.22 the design used: at 0.22 the red slope text on this row is 4.50:1 in the light
+   theme, exactly on the line. At 0.16 it is 4.97:1 light and 4.89:1 dark. */
+.routeRow.selected,
+.routeRow.selected:hover {
+    background: rgba(var(--blue-color), 0.16);
+    box-shadow: inset 2px 0 0 rgba(var(--blue-color));
+}
+
+.alignRight {
+    text-align: right;
+}
+
+.route {
+    font-family: var(--mono-family);
+    font-size: 12.5px;
+}
+
+.slope,
+.heap {
+    font-family: var(--mono-family);
+    font-size: 12px;
+}
+
+.retainerCell {
+    overflow: hidden;
+    font-family: var(--mono-family);
+    font-size: 11.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.empty {
+    color: rgba(var(--blog-font-description));
+}
+
+/* ---------- Verdict chips ----------
+   Opaque fills: an alpha fill lets the selected row's blue through and drops the chip below 4.5:1. */
+
+.verdict {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.leak {
+    color: rgba(var(--nl-leak));
+    background: color-mix(in srgb, rgb(var(--nl-leak)) 12%, rgb(var(--blog-background)));
+    border: 1px solid rgba(var(--nl-leak), 0.45);
+}
+
+.stable {
+    color: rgba(var(--nl-stable));
+    background: color-mix(in srgb, rgb(var(--nl-stable)) 12%, rgb(var(--blog-background)));
+    border: 1px solid rgba(var(--nl-stable), 0.45);
+}
+
+.saturating {
+    color: rgba(var(--nl-sat));
+    background: color-mix(in srgb, rgb(var(--nl-sat)) 12%, rgb(var(--blog-background)));
+    border: 1px solid rgba(var(--nl-sat), 0.45);
+}
+
+.inconclusive {
+    color: rgba(var(--blog-font-description));
+    background: color-mix(in srgb, rgb(var(--blog-font-description)) 14%, rgb(var(--blog-background)));
+    border: 1px solid rgba(var(--blog-font-description), 0.45);
+}
+
+.failed {
+    color: rgba(var(--blog-font-description));
+    background: transparent;
+    border: 1px dashed rgba(var(--blog-font-description), 0.7);
+}
+
+.leakText {
+    font-weight: 700;
+    color: rgba(var(--nl-leak));
+}
+
+/* ---------- Detail pane ---------- */
+
+.detail {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-height: 0;
+    border-top: 1px solid rgba(var(--blog-border), 0.45);
+    background: rgba(var(--blog-nav), 0.35);
+}
+
+.detailTitle {
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(var(--blog-border), 0.3);
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(var(--blog-font-description));
+}
+
+.pane {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(210px, 1fr);
+    gap: 16px;
+    min-height: 0;
+    padding: 10px 12px;
+}
+
+.chartFigure {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+.chartCaption {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 3px;
+    font-size: 10.5px;
+    color: rgba(var(--blog-font-description));
+}
+
+.chart {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 96px;
+    border: 1px solid rgba(var(--blog-border), 0.35);
+    border-radius: 5px;
+    background: rgba(var(--blog-background));
+}
+
+.chartLeak {
+    --chart-color: var(--nl-leak);
+}
+
+.chartStable {
+    --chart-color: var(--nl-stable);
+}
+
+.gridline {
+    stroke: rgba(128, 128, 128, 0.25);
+    stroke-width: 1;
+}
+
+.chartArea {
+    fill: rgba(var(--chart-color), 0.14);
+}
+
+.chartLine {
+    fill: none;
+    stroke: rgba(var(--chart-color));
+    stroke-width: 2;
+    stroke-linejoin: miter;
+}
+
+.chartAxis {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 3px;
+    font-family: var(--mono-family);
+    font-size: 10.5px;
+    color: rgba(var(--blog-font-description));
+}
+
+.paneSide {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.paneLabel {
+    margin: 0 0 3px;
+    padding-bottom: 4px;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    text-align: left;
+    text-transform: uppercase;
+    color: rgba(var(--blog-font-description));
+}
+
+.cycles {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 11.5px;
+}
+
+.cycles th {
+    padding: 2px 0;
+    font-weight: 400;
+    text-align: left;
+    color: rgba(var(--blog-font-description));
+}
+
+.cycles td {
+    padding: 2px 0;
+    font-family: var(--mono-family);
+    text-align: right;
+}
+
+.retainerChain {
+    font-family: var(--mono-family);
+    font-size: 11px;
+    line-height: 1.55;
+    word-break: break-word;
+}
+
+.aside,
+.retainerNote {
+    font-size: 10.5px;
+    line-height: 1.45;
+    color: rgba(var(--blog-font-description));
+}
+
+/* ---------- Status bar ---------- */
+
+.statusbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    overflow: hidden;
+    padding: 4px 12px;
+    border-top: 1px solid rgba(108, 108, 112, 0.3);
+    background: rgba(var(--blog-header));
+    font-size: 10.5px;
+    white-space: nowrap;
+    color: rgba(var(--blog-font-description));
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 768px) {
+    .toolbar {
+        grid-template-columns: auto 1fr;
+        row-gap: 8px;
+    }
+
+    .install {
+        grid-column: 1 / -1;
+    }
+
+    .body {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    /* The sidebar becomes a scrolling row of pills. */
+    .sidebar {
+        padding: 0;
+        border-bottom: 1px solid rgba(108, 108, 112, 0.3);
+    }
+
+    .sidebarTitle,
+    .tabIcon {
+        display: none;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 6px;
+        padding: 8px 10px;
+        overflow-x: auto;
+    }
+
+    .tab {
+        display: block;
+        width: auto;
+        padding: 5px 11px;
+        border: 1px solid rgba(var(--blog-border), 0.5);
+        border-radius: 13px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .tab.selected {
+        border-color: rgba(var(--blue-color));
+    }
+
+    .run {
+        grid-template-rows: auto auto;
+        height: auto;
+    }
+
+    .routesHead,
+    .routeRow {
+        grid-template-columns: 1fr auto;
+        row-gap: 3px;
+    }
+
+    .routesHead > span:nth-child(n + 3) {
+        display: none;
+    }
+
+    .routeRow > span:nth-child(n + 3) {
+        grid-column: 1 / -1;
+        text-align: left;
+    }
+
+    .routeRow > .empty {
+        display: none;
+    }
+
+    .pane {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 12px;
+    }
+
+    .chart {
+        height: 76px;
+        min-height: 76px;
+    }
+
+    /* On a phone the retainer is the answer the reader came for, so it leads. */
+    .retainer {
+        order: -1;
+    }
+
+    .cycles,
+    .aside,
+    .statusbar > span + span {
+        display: none;
+    }
+}

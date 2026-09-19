@@ -97,3 +97,47 @@ export const faqJsonLd = (faq: FaqEntry[]) => ({
         },
     })),
 });
+
+type SoftwareApplicationInput = {
+    name: string;
+    description?: string;
+    url: string;
+    version: string;
+    operatingSystem: string;
+    requirements: string;
+    sameAs: string[];
+    author: string;
+    domain?: string;
+};
+
+/**
+ * A tool page, not an article. `author` points at the Person node _document.tsx defines, so the
+ * software joins the same graph as the blog posts; `sameAs` ties this page to the repository and the
+ * npm package, which is how a crawler learns that the three describe one thing.
+ */
+export const softwareApplicationJsonLd = ({
+    name,
+    description,
+    url,
+    version,
+    operatingSystem,
+    requirements,
+    sameAs,
+    author,
+    domain,
+}: SoftwareApplicationInput) => ({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    '@id': `${url}#software`,
+    name,
+    description,
+    url,
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem,
+    softwareVersion: version,
+    softwareRequirements: requirements,
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    author: { '@type': 'Person', '@id': `${domain}/#person`, name: author, url: domain },
+    sameAs,
+});
