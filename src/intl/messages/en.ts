@@ -127,6 +127,8 @@ const en = {
     'dock.terminal': 'Terminal',
     'dock.legal': 'Legal documents',
     'dock.settings': 'System Preferences',
+    'dock.legal.short': 'Legal',
+    'dock.settings.short': 'Settings',
     /*
      * The countdown's only explanation was a tooltip reading 'Important date'. This says at least
      * what the number is counting towards; what the date signifies is the owner's copy to write.

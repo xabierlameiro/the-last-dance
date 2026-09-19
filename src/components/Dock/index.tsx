@@ -22,7 +22,7 @@ const Dock = () => {
         <>
             <nav className={styles.dock} data-testid="dock" aria-label={f({ id: 'nav.applications' })}>
                 <ul>
-                    {menu.map(({ link, img, labelId, testId }, index) => {
+                    {menu.map(({ link, img, labelId, shortLabelId, testId }, index) => {
                         const label = f({ id: labelId });
                         // `?? ''` for the root path: `'/'.split('/')[1]` is `''` but the compiler
                         // cannot know the string starts with a slash.
@@ -48,7 +48,9 @@ const Dock = () => {
                                 <Link
                                     href={link?.[locale as keyof typeof link] ?? link}
                                     title={label}
+                                    aria-label={label}
                                     onClick={clickHandler}
+                                    className={shortLabelId ? styles.hasShortLabel : undefined}
                                 >
                                     {/*
                                      * SDD-L08: the icon's alt is empty and the label below carries
@@ -59,6 +61,11 @@ const Dock = () => {
                                      */}
                                     <Icon src={img} alt="" />
                                     <span className={styles.label}>{label}</span>
+                                    {shortLabelId && (
+                                        <span className={clx(styles.label, styles.shortLabel)} aria-hidden="true">
+                                            {f({ id: shortLabelId })}
+                                        </span>
+                                    )}
                                 </Link>
                             </li>
                         );

@@ -110,6 +110,8 @@ const gl = {
     'dock.terminal': 'Terminal',
     'dock.legal': 'Documentos legais',
     'dock.settings': 'Preferencias do sistema',
+    'dock.legal.short': 'Legal',
+    'dock.settings.short': 'Axustes',
     'countdown.label': 'Tempo restante ata o {date}',
 };
 

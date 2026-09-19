@@ -59,6 +59,26 @@
     pointer-events: none;
 }
 
+/* The full label is the one shown on hover; the short one exists only for touch, below. */
+.shortLabel {
+    display: none;
+}
+
+/*
+ * Without hover every label is on screen at once, and a slot is 60px wide. The full names of the
+ * legal and settings apps are 86px and 100px at this size, so they ran into their neighbours. Those
+ * two show a short name instead; the link's aria-label keeps the full one for assistive tech.
+ */
+@media (hover: none) {
+    .hasShortLabel .label:not(.shortLabel) {
+        display: none;
+    }
+
+    .hasShortLabel .shortLabel {
+        display: block;
+    }
+}
+
 @media (hover: hover) {
     .label {
         opacity: 0;

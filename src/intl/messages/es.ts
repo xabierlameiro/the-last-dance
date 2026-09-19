@@ -110,6 +110,8 @@ const es = {
     'dock.terminal': 'Terminal',
     'dock.legal': 'Documentos legales',
     'dock.settings': 'Preferencias del sistema',
+    'dock.legal.short': 'Legal',
+    'dock.settings.short': 'Ajustes',
     'countdown.label': 'Tiempo restante hasta el {date}',
 };
 
