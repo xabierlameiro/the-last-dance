@@ -8,6 +8,7 @@ import { serializePath } from '@/helpers/mdx';
 import SEO from '@/components/SEO';
 import Head from 'next/head';
 import path from 'path';
+import styles from './home.module.css';
 
 type Props = {
     content: {
@@ -64,25 +65,30 @@ const Home = ({ content }: Props) => {
             <Dialog
                 className="home"
                 modalMode
+                fitContent
                 open={open}
                 body={
                     <>
-                        <VisibilityManager hideOnDesktop hideOnTablet>
-                            <MDXRemote
-                                {...content.mobile}
-                                components={components as MDXComponents}
-                                frontmatter={undefined}
-                                scope={{}}
-                            />
-                        </VisibilityManager>
-                        <VisibilityManager hideOnMobile>
-                            <MDXRemote
-                                {...content.desktop}
-                                components={components as MDXComponents}
-                                frontmatter={undefined}
-                                scope={{}}
-                            />
-                        </VisibilityManager>
+                        <div className={styles.mobileEditor}>
+                            <VisibilityManager hideOnDesktop hideOnTablet>
+                                <MDXRemote
+                                    {...content.mobile}
+                                    components={components as MDXComponents}
+                                    frontmatter={undefined}
+                                    scope={{}}
+                                />
+                            </VisibilityManager>
+                        </div>
+                        <div className={styles.desktopEditor}>
+                            <VisibilityManager hideOnMobile>
+                                <MDXRemote
+                                    {...content.desktop}
+                                    components={components as MDXComponents}
+                                    frontmatter={undefined}
+                                    scope={{}}
+                                />
+                            </VisibilityManager>
+                        </div>
                     </>
                 }
             />

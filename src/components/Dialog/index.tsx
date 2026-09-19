@@ -12,6 +12,8 @@ type Props = {
     body?: ReactNode;
     footer?: ReactNode;
     large?: boolean;
+    /** Up to 768px wide, a `modalMode` window sizes to its content and centres, instead of filling the screen. */
+    fitContent?: boolean;
     /** Accessible name for the window. Falls back to labelling by the header's content. */
     label?: string;
     /** Called on Escape. Omit for a window that has no way to close. */
@@ -39,6 +41,7 @@ type Props = {
  * @param {ReactNode} body - The body of the dialog
  * @param {ReactNode} footer - The footer of the dialog
  * @param {boolean} large - If true, the dialog will be large
+ * @param {boolean} fitContent - If true, a small-screen modal sizes to its content
  * @param {string} label - Accessible name for the window
  * @param {Function} onClose - Invoked when Escape is pressed
  * @returns {JSX.Element}
@@ -50,6 +53,7 @@ const Dialog = (props: Props) => {
         className,
         open,
         large,
+        fitContent,
         withPadding,
         modalMode,
         header = <></>,
@@ -104,7 +108,8 @@ const Dialog = (props: Props) => {
                 open ? styles.open : '',
                 withPadding ? styles.padding : '',
                 modalMode ? styles.modalMode : '',
-                large ? styles.large : ''
+                large ? styles.large : '',
+                fitContent ? styles.fitContent : ''
             )}
         >
             <header data-testid="dialog-header" id={headerId}>

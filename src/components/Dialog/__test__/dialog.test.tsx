@@ -16,6 +16,13 @@ describe('Dialog component', () => {
         expect(screen.getByTestId('dialog')).toHaveClass('modalMode');
     });
 
+    it('Should only size to its content when asked', () => {
+        const { rerender } = render(<Dialog open modalMode />);
+        expect(screen.getByTestId('dialog')).not.toHaveClass('fitContent');
+        rerender(<Dialog open modalMode fitContent />);
+        expect(screen.getByTestId('dialog')).toHaveClass('fitContent');
+    });
+
     it('Should not visisble', () => {
         render(<Dialog />);
         expect(screen.getByTestId('dialog')).not.toHaveClass('open');

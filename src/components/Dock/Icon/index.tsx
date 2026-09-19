@@ -23,10 +23,14 @@ const Icon = ({ src, alt, testId }: Props) => {
              * SDD-L03: `priority` removed. It emits a high-priority `<link rel="preload">`, and with
              * five Dock icons that meant five preloads competing against the LCP image — which had
              * none. The Dock is `position: fixed; bottom: 1px`, so it is always inside the initial
-             * viewport and these load immediately regardless; at ~2-4 KB delivered per 60px icon there
-             * is nothing to gain from outranking the background.
+             * viewport; at ~2-4 KB delivered per 60px icon there is nothing to gain from outranking
+             * the background.
+             *
+             * They did not load immediately, though: without `priority` next/image defaults to
+             * `loading="lazy"`, and the browser only requests a lazy image after layout. On a cold
+             * cache the Dock showed empty until then. `eager` fixes that without the preloads.
              */}
-            <Image data-testid={testId} src={src} alt={alt} width={60} height={60} />
+            <Image data-testid={testId} src={src} alt={alt} width={60} height={60} loading="eager" />
         </>
     );
 };

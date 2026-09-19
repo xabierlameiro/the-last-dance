@@ -7,4 +7,9 @@ describe('Icon component', () => {
         render(<Icon src={menu[0].img} alt={menu[0].alt} testId="icon" />);
         expect(screen.getByTestId('icon')).toBeInTheDocument();
     });
+
+    it('should load eagerly, since the Dock is always on screen', () => {
+        render(<Icon src={menu[0].img} alt={menu[0].alt} testId="icon" />);
+        expect(screen.getByTestId('icon')).toHaveAttribute('loading', 'eager');
+    });
 });
