@@ -3,6 +3,7 @@ import fs from 'fs';
 import matter from 'gray-matter';
 import { defaultLocale } from '@/constants/site';
 import { isSafeSlug } from './slug';
+import { postPath } from './postPath';
 import { describeIssues } from '../types/schemas';
 import { postFrontmatterSchema } from '../types/upstream';
 
@@ -243,8 +244,9 @@ const toPost = ({ content, data }: ParsedPost) => {
             excerpt: data.excerpt,
             image: data.image,
             description: data.description,
-            alternate: data.alternate,
-            // null (not undefined) so the meta object survives getStaticProps serialization
+            // null (not undefined) so the meta object survives getStaticProps serialization;
+            // English-only posts have no alternate list
+            alternate: data.alternate ?? null,
             faq: data.faq ?? null,
         },
     };
@@ -439,7 +441,7 @@ const getAllTags = (locale: string) => {
                     {
                         tag,
                         total: tags.flat().filter((t) => t === tag).length,
-                        href: `/blog/${tag.toLowerCase()}/${firstPost.meta.slug}`,
+                        href: postPath(firstPost.meta, tag),
                     },
                 ];
             })

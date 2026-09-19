@@ -72,6 +72,8 @@ For _build-time_ issues (rather than runtime), the same guide adds `next build -
 
 The names that show up as retainers are the diagnosis: `LRUNode` points at leak 1, `reactServerStream` and Flight objects at leak 2, and the sandbox `TimeoutsManager` at leak 3.
 
+One pair of snapshots can still fool you: warm-up growth looks exactly like a leak until you force GC and measure in cycles. The protocol I used to tell them apart, with the before/after run that confirmed #95094, is in [how to prove a Next.js memory leak with heap snapshot diffs](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak).
+
 ## Leak 1: the router LRU cache doesn't count its keys
 
 The Next.js router keeps an LRU cache for route resolution (`getItemsLru`, in `packages/next/src/server/lib/router-utils/filesystem.ts`) with `maxSize = 1024 * 1024`. The problem, as #94890 documents: the size function only adds up the _value_ strings (`fsPath`, `itemPath`, `type`) and counts `1` for negative entries — **the URL used as the key is never accounted for**, even though it's usually the dominant cost per entry.
@@ -165,7 +167,7 @@ It boots your standalone build route by route in a fresh process, drives real lo
 
 That is the stepwise growth of leak 3 with the sandbox `TimeoutsManager` named in the retainer chain — the same diagnosis as above, in about three minutes.
 
-The full protocol, why each step exists, and the before/after pair that proves the diagnosis was right are in [how to measure a Next.js memory leak and prove the diagnosis](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak).
+The full protocol, why each step exists, and the before/after pair that proves the diagnosis was right are in [Heap snapshot diffs: how to prove a Next.js memory leak](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak).
 
 Two honest data points from measuring all three: #94890 reproduced with a tenth of the original load; #94919 did **not** reproduce on a standalone build even with 4,000 real mid-stream disconnections per cycle — the repro's pages answer in ~6 ms, so there is no stream left to abandon. That matches the reporter's own note that the magnitude scales with the RSC payload: if you suspect leak 2, measure your heaviest real pages, not a minimal repro. Every verdict ships with the raw snapshots and a machine-readable `run.json`, so you can verify every claim yourself in DevTools.
 

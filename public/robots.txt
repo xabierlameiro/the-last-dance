@@ -1,6 +1,9 @@
 # *
 User-agent: *
 Allow: /
+# tag-facets-as-query-param: `?tag=` only carries the tag being browsed; the post itself lives at
+# its parameter-free URL, which is what the sitemap lists and rel=canonical points at.
+Disallow: /*?tag=
 
 # AI / LLM crawlers — explicitly welcome (SDD-013). Training + search + on-demand
 # fetchers. The default * rule already allows them; these sections document intent

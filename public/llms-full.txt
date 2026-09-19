@@ -1227,14 +1227,14 @@ You can see the complete code in my repository if you need it, and if you find i
 
 ---
 
-# How to measure a Next.js memory leak and prove the diagnosis
+# Heap snapshot diffs: how to prove a Next.js memory leak
 
 - URL: https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak
 - Author: Xabier Lameiro
 - Category: Nextjs · Tags: memory-leak, heap-snapshot, node, debugging, performance
-- Summary: The measurement protocol behind a confirmed Next.js memory leak: forced GC with --expose-gc, heap snapshot diffs and retainer chains, and the before/after pair that proves the diagnosis. Automated in next-leak.
+- Summary: Forced GC, heap snapshot diffs and retainer chains: the protocol that proved a Next.js leak (28.7 → 138.9 MB) and the fix that flattened it.
 
-# How to measure a Next.js memory leak and prove the diagnosis
+# Heap snapshot diffs: how to prove a Next.js memory leak
 
 Published: 07-22-2026
 
@@ -1338,6 +1338,81 @@ npx next-leak .
 
 It needs App Router, `output: "standalone"` and Node ≥ 22. That's a narrow scope on purpose — it's why the false positive count is what it is. You get one of three answers, and all of them are useful: you don't have a leak (the common case, and the report proves it), the leak is yours or a dependency's (named down to the file when the sourcemaps allow it), or it's framework internals, with a draft issue and the snapshots to back it.
 
+## Without next-leak: the protocol in two files
+
+That narrow scope leaves a lot of servers out. This blog runs on the Pages Router, so `next-leak` can't measure it either. The protocol doesn't need the tool, though, and the core of it fits in two files you can drop next to any Node server.
+
+The first is a probe you preload into the server process. Every `SIGUSR2` runs three forced GC passes, logs `heapUsed`, and writes a snapshot. The baseline snapshot is kept; every later one overwrites `heap-latest`, so you end with exactly the pair you need to compare.
+
+```js
+// heap-probe.cjs
+// Load with: node --expose-gc --require ./heap-probe.cjs <your server entry>
+// Send SIGUSR2 to take one sample: three forced GC passes, then heapUsed.
+const path = require('node:path');
+const v8 = require('node:v8');
+
+if (typeof global.gc !== 'function') {
+    throw new Error('heap-probe: start node with --expose-gc');
+}
+
+// Captured before the server starts: Next's standalone server.js calls process.chdir(__dirname).
+const outDir = process.cwd();
+// Cycle 1 still carries warm-up that the GC gives back a cycle later, so the baseline is cycle 2.
+const BASELINE_CYCLE = 2;
+let cycle = 0;
+
+process.on('SIGUSR2', () => {
+    for (let pass = 0; pass < 3; pass++) global.gc();
+    const heapMb = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1);
+    if (cycle >= BASELINE_CYCLE) {
+        const name = cycle === BASELINE_CYCLE ? 'heap-baseline.heapsnapshot' : 'heap-latest.heapsnapshot';
+        v8.writeHeapSnapshot(path.join(outDir, name));
+    }
+    console.error(`[heap-probe] cycle ${cycle}: ${heapMb} MB after GC`);
+    cycle++;
+});
+```
+
+The second drives the cycles: one cold sample, then eight rounds of load followed by a sample.
+
+```bash
+#!/usr/bin/env bash
+# measure.sh — usage: ./measure.sh <server entry> <url>
+node --expose-gc --require ./heap-probe.cjs "$1" &
+PID=$!
+sleep 2
+for cycle in 0 1 2 3 4 5 6 7 8; do
+    if [ "$cycle" -gt 0 ]; then
+        npx autocannon -c 20 -a 3000 "$2" > /dev/null 2>&1
+    fi
+    kill -USR2 "$PID"
+    sleep 5 # raise it if your snapshots take longer to write
+done
+kill "$PID"
+```
+
+For a Next.js standalone build, point it at the generated server and one route:
+
+```bash
+./measure.sh .next/standalone/server.js http://localhost:3000/api/your-route
+```
+
+I checked it against a standalone Next.js 15.5 build with two API routes doing the same work, except that one also pushes each request into a global array:
+
+```
+heap after forced GC, per cycle (MB):
+/api/leak    24.8 → 28.6 → 26.4 → 27.5 → 28.5 → 29.5 → 30.6 → 31.6 → 32.6
+/api/clean   24.8 → 27.6 → 24.4 → 24.4 → 24.5 → 24.5 → 24.5 → 24.5 → 24.5
+```
+
+Same curve shape as #95094, at a smaller scale: about 1 MB per 3000 requests that never comes back, next to a route that goes flat.
+
+Two things I hit while testing changed the probe. Both routes are _higher_ after the first cycle than after the second — 28.6 then 26.4, 27.6 then 24.4. That's warm-up the GC gives back one cycle late, so my first version, which took its baseline after cycle 1, was diffing against an inflated heap. The baseline is cycle 2 now. The other one was quieter: the first run finished with no snapshots where I expected them, because the standalone `server.js` calls `process.chdir(__dirname)` on startup and they'd been written inside `.next/standalone`. The probe now records the directory it was started from before the server gets the chance to move.
+
+Then load `heap-baseline.heapsnapshot` and `heap-latest.heapsnapshot` into Chrome DevTools and read the retainers exactly as in the snapshot diff section above.
+
+What this doesn't do is what `next-leak` adds on top: a fresh process per route, an adaptive idle before each sample, the audit of whether the load actually landed, and a verdict. The script throws autocannon's output away to keep the log readable. Drop the `> /dev/null` on your first run and check that every round really sent its 3000 requests before you trust a flat line.
+
 If you're coming at this from the other end — a graph climbing in production and no idea why — start here instead: [How to find a Next.js memory leak in production](https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production).
 
 ---
@@ -1354,6 +1429,8 @@ If you're coming at this from the other end — a graph climbing in production a
 Published: 07-18-2026
 
 ## Quick answer
+
+**Update, September 2026.** All three issues below are closed and the fixes shipped in Next.js 16.3.0 (#95094 and #94919 landed in `16.3.0-canary.97` on 25 July, #94890 two days later). The measurements were taken while they were still open, against the versions cited in the reports (Next 15.5.11–16.3.0-canary.50, Node 20/22/24), and they stay here because the method outlives the bugs. If you're on 16.3.x and still growing, upgrade to 16.3.5 first — released on 11 September, it fixes the `use cache` retention tracked in [vercel/next.js#97938](https://github.com/vercel/next.js/issues/97938). Still growing after that? You're on a different one. To find out which route is growing and what holds the memory, run `npx next-leak .` ([source and limits](https://github.com/xabierlameiro/next-leak)).
 
 If your self-hosted Next.js server grows until it dies with `FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory` — or the container gets `OOMKilled` (exit code 137) — don't start by auditing your own code. **Check your Next.js version first.** Between 15.5 and 16.2 there were three documented memory leaks in the framework itself, and all three are fixed in **16.3.0**:
 
@@ -1389,6 +1466,8 @@ NODE_OPTIONS='--inspect' next start
 For _build-time_ issues (rather than runtime), the same guide adds `next build --experimental-debug-memory-usage`, which prints heap and GC statistics and dumps a snapshot when it receives the `SIGUSR2` signal.
 
 The names that show up as retainers are the diagnosis: `LRUNode` points at leak 1, `reactServerStream` and Flight objects at leak 2, and the sandbox `TimeoutsManager` at leak 3.
+
+One pair of snapshots can still fool you: warm-up growth looks exactly like a leak until you force GC and measure in cycles. The protocol I used to tell them apart, with the before/after run that confirmed #95094, is in [how to prove a Next.js memory leak with heap snapshot diffs](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak).
 
 ## Leak 1: the router LRU cache doesn't count its keys
 
@@ -1495,8 +1574,6 @@ My checklist after this trip:
 2. **Correlate before you blame.** Heap tracking unique URLs → leak 1. Heap tracking traffic and aborts → leak 2. Steps with middleware → leak 3. One specific route driving the curve → almost certainly your code.
 3. **`--max-old-space-size` fixes nothing** — size the heap to your container so you don't die early, but a monotonic slope will eventually hit any limit.
 4. **On serverless, profile time instead of memory.** If you're seeing 504s, hunt for quadratic or repeated per-request work; my whole case is in the previous section.
-
-**Update, August 2026.** All three issues are now closed and the fixes shipped in Next.js 16.3.0 — #95094 and #94919 landed in `16.3.0-canary.97` on 25 July, #94890 two days later. The measurements below were taken while they were still open, against the versions cited in the reports (Next 15.5.11–16.3.0-canary.50, Node 20/22/24). They stay here because the method outlives the bugs: the next leak will not have an issue number waiting for you, and the way you find it is the same.
 
 ---
 

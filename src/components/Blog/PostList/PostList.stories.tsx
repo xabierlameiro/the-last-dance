@@ -28,6 +28,7 @@ Primary.args = {
                 title: 'The first post',
                 excerpt: 'Resume of the first post',
                 slug: 'post-1',
+                category: 'Blog',
             },
         },
         {
@@ -35,6 +36,7 @@ Primary.args = {
                 title: 'The second post',
                 excerpt: 'Resume of the second post',
                 slug: 'post-2',
+                category: 'Blog',
             },
         },
     ],

@@ -8,11 +8,11 @@
         <lastBuildDate>Wed, 22 Jul 2026 00:00:00 +0000</lastBuildDate>
         <atom:link href="https://xabierlameiro.com/feed.xml" rel="self" type="application/rss+xml" />
         <item>
-            <title>How to measure a Next.js memory leak and prove the diagnosis</title>
+            <title>Heap snapshot diffs: how to prove a Next.js memory leak</title>
             <link>https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak</link>
             <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak</guid>
             <pubDate>Wed, 22 Jul 2026 00:00:00 +0000</pubDate>
-            <description>The measurement protocol behind a confirmed Next.js memory leak: forced GC with --expose-gc, heap snapshot diffs and retainer chains, and the before/after pair that proves the diagnosis. Automated in next-leak.</description>
+            <description>Forced GC, heap snapshot diffs and retainer chains: the protocol that proved a Next.js leak (28.7 → 138.9 MB) and the fix that flattened it.</description>
             <category>memory-leak</category>
             <category>heap-snapshot</category>
             <category>node</category>
