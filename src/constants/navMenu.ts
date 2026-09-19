@@ -47,4 +47,10 @@ export const menu: Array<Item> = [
         link: '/settings',
         testId: 'settings',
     },
+    {
+        img: '/menu/next-leak.png',
+        labelId: 'dock.nextLeak',
+        link: '/next-leak',
+        testId: 'next-leak',
+    },
 ];

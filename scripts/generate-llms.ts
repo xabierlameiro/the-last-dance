@@ -101,6 +101,7 @@ const llms = [
     // /about and /contact were folded into the home desktop in #137. The generated file was
     // hand-corrected there but this list was not, so prebuild kept regenerating dead URLs.
     `- [Home](${DOMAIN}): Who Xabier Lameiro is — bio, experience, stack and contact details`,
+    `- [next-leak](${DOMAIN}/next-leak): CLI that measures Next.js memory leaks per route — verdict, retainer chain and the real Next.js issues it was verified against`,
     '',
     ...[...byCategory.entries()].flatMap(([category, categoryPosts]) => [
         `## Blog: ${category}`,

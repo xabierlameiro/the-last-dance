@@ -127,6 +127,114 @@ const en = {
     'dock.terminal': 'Terminal',
     'dock.legal': 'Legal documents',
     'dock.settings': 'System Preferences',
+    'dock.nextLeak': 'next-leak',
+    /*
+     * /next-leak. Copy only: route names, figures, retainer chains, issue rows and the verdict words
+     * are CLI output and live untranslated in constants/nextLeak.ts.
+     */
+    'nextLeak.breadcrumb': 'next-leak',
+    'nextLeak.seo.title': 'next-leak: find out whether your Next.js app leaks memory',
+    'nextLeak.seo.description':
+        'A CLI that measures Next.js memory leaks route by route: a verdict from the heap after forced GC and the object that retains it.',
+    'nextLeak.pitch':
+        'Find out whether your Next.js app actually leaks memory: how much, on which route, and whose fault it is.',
+    'nextLeak.copy': 'Copy',
+    'nextLeak.copied': 'Copied',
+    'nextLeak.copyLabel': 'Copy the command {command}',
+    'nextLeak.sections': 'Sections',
+    'nextLeak.nav.overview': 'Overview',
+    'nextLeak.nav.run': 'Example run',
+    'nextLeak.nav.build': 'Build mode',
+    'nextLeak.nav.verified': 'Verified',
+    'nextLeak.nav.limits': 'Limits',
+    'nextLeak.nav.links': 'Links',
+    'nextLeak.overview.title': 'What it answers',
+    'nextLeak.overview.answer1':
+        "You don't have a leak: the spike is transient and drains while idle. The most common case.",
+    'nextLeak.overview.answer2': 'Something is filling up, not leaking: a bounded cache on its way to its ceiling.',
+    'nextLeak.overview.answer3':
+        'The leak is in your code or in a dependency, named down to the source file when possible.',
+    'nextLeak.overview.answer4': 'It looks like framework internals, with an issue draft ready to file.',
+    'nextLeak.overview.start': 'Start',
+    'nextLeak.overview.startText':
+        'Build your app with <code>output: "standalone"</code>, then run this from its directory:',
+    'nextLeak.overview.how': 'How it measures',
+    'nextLeak.overview.howText': 'Each route is measured in a fresh process:',
+    'nextLeak.overview.shape':
+        'The verdict comes from the shape of the curve after forced GC, not from where the heap sits: 40 MB and 400 MB say nothing on their own.',
+    'nextLeak.overview.verdicts': 'Verdicts',
+    'nextLeak.verdict.stable':
+        'No growth this run could detect. Not proof of absence: the verdict prefers missing a leak to inventing one.',
+    'nextLeak.verdict.leak':
+        'Retained heap keeps growing every cycle. It names the culprit when the source maps resolve it.',
+    'nextLeak.verdict.saturating':
+        'Every cycle grew, but by less than the one before: a bounded store running out of new keys.',
+    'nextLeak.verdict.inconclusive': 'The evidence does not decide. The route is measured again with twice the cycles.',
+    'nextLeak.verdict.failed': 'The route errored under load: more than 1% of non-2xx responses stops the measurement.',
+    'nextLeak.overview.falsePositives':
+        'Across ~{routes} healthy routes on production apps (PPR, MDX, Auth.js, Sentry, i18n) it reported zero false positives.',
+    'nextLeak.table.route': 'Route',
+    'nextLeak.table.verdict': 'Verdict',
+    'nextLeak.table.slope': 'Slope',
+    'nextLeak.table.heap': 'Heap',
+    'nextLeak.table.retainer': 'Retainer',
+    'nextLeak.run.detail': '{route} — reproduction for {issue}, fixed in Next {version}',
+    'nextLeak.run.chart': 'Heap after forced GC, per cycle',
+    'nextLeak.run.cycle': 'cycle {n} · {mb} MB',
+    'nextLeak.run.cycles': 'Heap per cycle',
+    'nextLeak.run.stableRetainer': 'Stable routes are not diffed unless you pass <code>--diff-all</code>.',
+    'nextLeak.run.leakAside':
+        'A healthy route gives back 20–30% of its growth. This one gives back nothing: that is the step shape.',
+    'nextLeak.run.stableAside': 'The first cycle is warm-up and stays out of the verdict. After it the curve is flat.',
+    'nextLeak.status':
+        '{routes, plural, one {# route} other {# routes}} · {leaks, plural, one {# leak} other {# leaks}} · heap after forced GC, per cycle',
+    'nextLeak.checked': 'README checked {date}',
+    'nextLeak.build.title': 'Measure the build, not the server',
+    'nextLeak.build.text':
+        'A large site can run out of heap while prerendering, before any server exists to measure. This command runs your build unmodified and samples the resident memory of each static-generation worker. It needs neither a previous build nor standalone output.',
+    'nextLeak.build.evidence': 'On the reproduction for {issue}, {pages, number} prerendered pages:',
+    'nextLeak.build.leaking':
+        'Out of heap after {first, number} and {second, number} of {pages, number} pages, in two runs.',
+    'nextLeak.build.healthy': 'Finishes at {perPage} per page.',
+    'nextLeak.build.fixed': 'Fixed in {version} by the same fix as {issue}. Not re-measured here yet.',
+    'nextLeak.build.parent':
+        "The build's own process is reported, not judged. On that reproduction it went from {from} down to {to} while the workers climbed, so adding the two would cancel the finding.",
+    'nextLeak.build.attribute':
+        '<code>--attribute</code> also names what the worker retains. It is opt-in and slow: the worker writes its whole heap to disk.',
+    'nextLeak.verified.title': 'Verified against real Next.js issues',
+    'nextLeak.verified.checked': 'Issue states checked {date}.',
+    'nextLeak.verified.issue': 'Issue',
+    'nextLeak.verified.what': 'What it is',
+    'nextLeak.verified.measured': 'Measured',
+    'nextLeak.verified.state': 'State',
+    'nextLeak.state.fixed': 'fixed in {version}',
+    'nextLeak.state.closed': 'closed',
+    'nextLeak.state.open': 'open',
+    'nextLeak.state.fixProposed': 'fix proposed in {link}',
+    'nextLeak.verified.proof':
+        'On {issue} it found the leak, {found} across {cycles} cycles. With the workaround from the thread applied ({workaround}), same app and same parameters: {after}, flat.',
+    'nextLeak.verified.kept':
+        'The fixed ones stay on the list on purpose: they show that the measurements matched what the fixes turned out to be.',
+    'nextLeak.verified.full': 'The full table is in the README',
+    'nextLeak.limits.title': 'Scope and limits',
+    'nextLeak.limits.supported':
+        'The default command needs the App Router, <code>output: "standalone"</code>, Node 22 or later, and Linux or macOS. Pages Router, non-standalone builds and Windows are rejected with a clear message.',
+    'nextLeak.limits.stable':
+        '<code>stable</code> is not proof of absence. Run <code>--self-check</code> first: it plants a leak of 8 KB per request and proves the harness sees it where you are running.',
+    'nextLeak.limits.heapCap':
+        'Each measured process runs under a 512 MB heap cap, so a leak reaches a ceiling in minutes. Apps with a larger working set need <code>--max-old-space</code>.',
+    'nextLeak.limits.duration':
+        'A 60-route app under defaults takes hours. Narrow it with <code>--routes</code> while you iterate.',
+    'nextLeak.limits.attribution':
+        'Naming the file needs a Turbopack build with server source maps, the Next 15+ default. On webpack builds findings stay unattributed; the measurement does not depend on it.',
+    'nextLeak.limits.flip':
+        'Borderline routes can flip between <code>stable</code> and <code>leak</code> across runs. More cycles resolve it.',
+    'nextLeak.limits.environment':
+        'The app runs with its real environment: routes that call external services will call them under load.',
+    'nextLeak.links.repository': 'Source code, README and issues',
+    'nextLeak.links.npm': 'The package on npm',
+    'nextLeak.links.post': 'The post that explains the method',
+    'nextLeak.links.report': 'Got a wrong verdict? Open an issue',
     /*
      * The countdown's only explanation was a tooltip reading 'Important date'. This says at least
      * what the number is counting towards; what the date signifies is the owner's copy to write.

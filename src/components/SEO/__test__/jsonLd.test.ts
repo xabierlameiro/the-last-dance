@@ -1,4 +1,4 @@
-import { articleJsonLd, breadcrumbJsonLd, faqJsonLd } from '../jsonLd';
+import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, softwareApplicationJsonLd } from '../jsonLd';
 
 const DOMAIN = 'https://xabierlameiro.com';
 
@@ -104,5 +104,39 @@ describe('faqJsonLd', () => {
 
     it('returns an empty entity list for an empty FAQ', () => {
         expect(faqJsonLd([]).mainEntity).toEqual([]);
+    });
+});
+
+describe('softwareApplicationJsonLd', () => {
+    const node = softwareApplicationJsonLd({
+        name: 'next-leak',
+        description: 'Measures memory leaks',
+        url: `${DOMAIN}/es/next-leak`,
+        version: '0.11.3',
+        operatingSystem: 'Linux, macOS',
+        requirements: 'Node.js 22 or later',
+        sameAs: ['https://github.com/xabierlameiro/next-leak', 'https://www.npmjs.com/package/next-leak'],
+        author: 'Xabier Lameiro',
+        domain: DOMAIN,
+    });
+
+    // The page is only citable as "the tool" if the node names it, versions it and says it is free.
+    it('describes a free developer tool at the page URL', () => {
+        expect(node).toMatchObject({
+            '@type': 'SoftwareApplication',
+            '@id': `${DOMAIN}/es/next-leak#software`,
+            url: `${DOMAIN}/es/next-leak`,
+            applicationCategory: 'DeveloperApplication',
+            softwareVersion: '0.11.3',
+            offers: { '@type': 'Offer', price: '0' },
+        });
+    });
+
+    it('joins the site graph through the existing Person node and links the repo and the package', () => {
+        expect(node.author['@id']).toBe(`${DOMAIN}/#person`);
+        expect(node.sameAs).toEqual([
+            'https://github.com/xabierlameiro/next-leak',
+            'https://www.npmjs.com/package/next-leak',
+        ]);
     });
 });

@@ -121,6 +121,9 @@ export const translateRoute = (pathname: string, f: IntlShape['formatMessage']) 
         case '/settings':
             route = f({ id: 'settings.breadcrumb' });
             break;
+        case '/next-leak':
+            route = f({ id: 'nextLeak.breadcrumb' });
+            break;
     }
     return route;
 };

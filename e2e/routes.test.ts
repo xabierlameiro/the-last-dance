@@ -83,6 +83,33 @@ test.describe('Static pages', () => {
         await expect(page.getByTestId('dialog')).toBeVisible();
     });
 
+    test('should render /next-leak with every section in the page', async ({ page }) => {
+        await page.goto('/next-leak');
+
+        await expect(page.getByRole('tab', { name: 'Example run' })).toHaveAttribute('aria-selected', 'true');
+        await expect(page.getByRole('button', { name: /\/api\/heap/ })).toHaveAttribute('aria-pressed', 'true');
+        await expect(page.getByTestId('next-leak')).toHaveClass(/selected/);
+
+        await page.getByRole('tab', { name: 'Build mode' }).click();
+        await expect(page.getByText('npx next-leak build .')).toBeVisible();
+    });
+
+    // Measured before the fix at 390x844: every modalMode window ended 20px below the Dock's top edge.
+    for (const path of ['/comments', '/settings', '/next-leak']) {
+        test(`${path} does not slide under the Dock on a phone`, async ({ page }) => {
+            await page.setViewportSize({ width: 390, height: 844 });
+            await page.goto(path);
+
+            const dock = await page.getByTestId('dock').boundingBox();
+            await expect
+                .poll(async () => {
+                    const dialog = await page.getByTestId('dialog').boundingBox();
+                    return dialog && dock ? dialog.y + dialog.height <= dock.y : false;
+                })
+                .toBe(true);
+        });
+    }
+
     test('should render a legal document and mark the current one', async ({ page }) => {
         await page.goto('/legal/privacy-policy');
 

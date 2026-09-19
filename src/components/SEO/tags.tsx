@@ -39,7 +39,7 @@ export const OG_LOCALES: Record<string, string> = {
     gl: 'gl_ES',
 };
 
-const jsonLdScript = (testId: string, key: string, payload: unknown) => (
+export const jsonLdScript = (testId: string, key: string, payload: unknown) => (
     <script
         data-testid={testId}
         type="application/ld+json"

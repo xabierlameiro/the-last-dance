@@ -12,4 +12,16 @@ describe('Dock component', () => {
         expect(screen.getByTestId('dock')).toBeInTheDocument();
         expect(screen.getByTestId('dock').querySelector('.selected')).toBeInTheDocument();
     });
+
+    it('lists next-leak as the sixth app', () => {
+        render(
+            <DialogProvider>
+                <Dock />
+            </DialogProvider>
+        );
+        const items = screen.getByTestId('dock').querySelectorAll('li');
+        expect(items).toHaveLength(6);
+        expect(items[5]).toHaveAttribute('data-testid', 'next-leak');
+        expect(screen.getByRole('link', { name: 'dock.nextLeak' })).toHaveAttribute('href', '/next-leak');
+    });
 });

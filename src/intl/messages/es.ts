@@ -110,6 +110,116 @@ const es = {
     'dock.terminal': 'Terminal',
     'dock.legal': 'Documentos legales',
     'dock.settings': 'Preferencias del sistema',
+    'dock.nextLeak': 'next-leak',
+    /*
+     * /next-leak. Copy only: route names, figures, retainer chains, issue rows and the verdict words
+     * are CLI output and live untranslated in constants/nextLeak.ts.
+     */
+    'nextLeak.breadcrumb': 'next-leak',
+    'nextLeak.seo.title': 'next-leak: ¿tiene tu app de Next.js una fuga de memoria?',
+    'nextLeak.seo.description':
+        'Un CLI que mide las fugas de memoria de Next.js ruta a ruta: un veredicto a partir del heap tras un GC forzado y el objeto que lo retiene.',
+    'nextLeak.pitch':
+        'Averigua si tu app de Next.js tiene de verdad una fuga de memoria: cuánta, en qué ruta y de quién es la culpa.',
+    'nextLeak.copy': 'Copiar',
+    'nextLeak.copied': 'Copiado',
+    'nextLeak.copyLabel': 'Copiar el comando {command}',
+    'nextLeak.sections': 'Secciones',
+    'nextLeak.nav.overview': 'Resumen',
+    'nextLeak.nav.run': 'Ejemplo real',
+    'nextLeak.nav.build': 'Modo build',
+    'nextLeak.nav.verified': 'Verificado',
+    'nextLeak.nav.limits': 'Límites',
+    'nextLeak.nav.links': 'Enlaces',
+    'nextLeak.overview.title': 'Qué responde',
+    'nextLeak.overview.answer1':
+        'No tienes una fuga: el pico es transitorio y se vacía en reposo. Es el caso más común.',
+    'nextLeak.overview.answer2': 'Algo se está llenando, no fugando: una caché acotada camino de su techo.',
+    'nextLeak.overview.answer3':
+        'La fuga está en tu código o en una dependencia, con el fichero fuente cuando es posible.',
+    'nextLeak.overview.answer4': 'Parece del propio framework, con un borrador de issue listo para abrir.',
+    'nextLeak.overview.start': 'Empezar',
+    'nextLeak.overview.startText':
+        'Compila tu app con <code>output: "standalone"</code> y ejecuta esto desde su directorio:',
+    'nextLeak.overview.how': 'Cómo mide',
+    'nextLeak.overview.howText': 'Cada ruta se mide en un proceso nuevo:',
+    'nextLeak.overview.shape':
+        'El veredicto sale de la forma de la curva tras el GC forzado, no de dónde está el heap: 40 MB y 400 MB no dicen nada por sí solos.',
+    'nextLeak.overview.verdicts': 'Veredictos',
+    'nextLeak.verdict.stable':
+        'Ningún crecimiento que esta ejecución pudiera detectar. No prueba que no haya fuga: el veredicto prefiere perder una fuga a inventarla.',
+    'nextLeak.verdict.leak':
+        'El heap retenido sigue creciendo en cada ciclo. Nombra al culpable cuando los source maps lo resuelven.',
+    'nextLeak.verdict.saturating':
+        'Cada ciclo creció, pero menos que el anterior: un almacén acotado que se queda sin claves nuevas.',
+    'nextLeak.verdict.inconclusive': 'La evidencia no decide. La ruta se vuelve a medir con el doble de ciclos.',
+    'nextLeak.verdict.failed':
+        'La ruta dio errores bajo carga: más de un 1% de respuestas que no son 2xx detiene la medición.',
+    'nextLeak.overview.falsePositives':
+        'En unas {routes} rutas sanas de apps en producción (PPR, MDX, Auth.js, Sentry, i18n) no dio ningún falso positivo.',
+    'nextLeak.table.route': 'Ruta',
+    'nextLeak.table.verdict': 'Veredicto',
+    'nextLeak.table.slope': 'Pendiente',
+    'nextLeak.table.heap': 'Heap',
+    'nextLeak.table.retainer': 'Retenedor',
+    'nextLeak.run.detail': '{route} — reproducción de {issue}, corregido en Next {version}',
+    'nextLeak.run.chart': 'Heap tras GC forzado, por ciclo',
+    'nextLeak.run.cycle': 'ciclo {n} · {mb} MB',
+    'nextLeak.run.cycles': 'Heap por ciclo',
+    'nextLeak.run.stableRetainer': 'Las rutas estables no se comparan salvo con <code>--diff-all</code>.',
+    'nextLeak.run.leakAside':
+        'Una ruta sana devuelve entre el 20 y el 30% de lo que crece. Esta no devuelve nada: esa es la forma de escalera.',
+    'nextLeak.run.stableAside':
+        'El primer ciclo es calentamiento y queda fuera del veredicto. Después, la curva es plana.',
+    'nextLeak.status':
+        '{routes, plural, one {# ruta} other {# rutas}} · {leaks, plural, one {# fuga} other {# fugas}} · heap tras GC forzado, por ciclo',
+    'nextLeak.checked': 'README revisado el {date}',
+    'nextLeak.build.title': 'Medir el build, no el servidor',
+    'nextLeak.build.text':
+        'Un sitio grande puede quedarse sin heap mientras prerenderiza, antes de que exista un servidor que medir. Este comando ejecuta tu build sin modificarlo y muestrea la memoria residente de cada worker de generación estática. No necesita un build previo ni salida standalone.',
+    'nextLeak.build.evidence': 'En la reproducción de {issue}, {pages, number} páginas prerenderizadas:',
+    'nextLeak.build.leaking':
+        'Sin heap tras {first, number} y {second, number} de {pages, number} páginas, en dos ejecuciones.',
+    'nextLeak.build.healthy': 'Termina con {perPage} por página.',
+    'nextLeak.build.fixed': 'Corregido en {version} con el mismo arreglo que {issue}. Aún sin volver a medir aquí.',
+    'nextLeak.build.parent':
+        'El proceso principal del build se informa, no se juzga. En esa reproducción bajó de {from} a {to} mientras los workers subían, así que sumarlos anularía el hallazgo.',
+    'nextLeak.build.attribute':
+        '<code>--attribute</code> además nombra qué retiene el worker. Es opcional y lento: el worker escribe todo su heap en disco.',
+    'nextLeak.verified.title': 'Verificado con issues reales de Next.js',
+    'nextLeak.verified.checked': 'Estado de las issues revisado el {date}.',
+    'nextLeak.verified.issue': 'Issue',
+    'nextLeak.verified.what': 'Qué es',
+    'nextLeak.verified.measured': 'Medido',
+    'nextLeak.verified.state': 'Estado',
+    'nextLeak.state.fixed': 'corregida en {version}',
+    'nextLeak.state.closed': 'cerrada',
+    'nextLeak.state.open': 'abierta',
+    'nextLeak.state.fixProposed': 'arreglo propuesto en {link}',
+    'nextLeak.verified.proof':
+        'En {issue} encontró la fuga, {found} en {cycles} ciclos. Con el workaround del hilo aplicado ({workaround}), misma app y mismos parámetros: {after}, plano.',
+    'nextLeak.verified.kept':
+        'Las corregidas siguen en la lista a propósito: muestran que las mediciones coincidieron con lo que resultaron ser los arreglos.',
+    'nextLeak.verified.full': 'La tabla completa está en el README',
+    'nextLeak.limits.title': 'Alcance y límites',
+    'nextLeak.limits.supported':
+        'El comando por defecto necesita App Router, <code>output: "standalone"</code>, Node 22 o posterior, y Linux o macOS. Pages Router, los builds sin standalone y Windows se rechazan con un mensaje claro.',
+    'nextLeak.limits.stable':
+        '<code>stable</code> no prueba que no haya fuga. Ejecuta antes <code>--self-check</code>: planta una fuga de 8 KB por petición y demuestra que el arnés la ve donde lo estás ejecutando.',
+    'nextLeak.limits.heapCap':
+        'Cada proceso medido corre con un límite de heap de 512 MB, para que una fuga llegue al techo en minutos. Las apps con más memoria de trabajo necesitan <code>--max-old-space</code>.',
+    'nextLeak.limits.duration':
+        'Una app de 60 rutas con los valores por defecto tarda horas. Acota con <code>--routes</code> mientras iteras.',
+    'nextLeak.limits.attribution':
+        'Nombrar el fichero requiere un build de Turbopack con source maps de servidor, lo normal desde Next 15. En builds de webpack los hallazgos quedan sin atribuir; la medición no depende de ello.',
+    'nextLeak.limits.flip':
+        'Las rutas al límite pueden alternar entre <code>stable</code> y <code>leak</code> de una ejecución a otra. Más ciclos lo resuelven.',
+    'nextLeak.limits.environment':
+        'La app se ejecuta con su entorno real: las rutas que llaman a servicios externos los llamarán bajo carga.',
+    'nextLeak.links.repository': 'Código fuente, README e issues',
+    'nextLeak.links.npm': 'El paquete en npm',
+    'nextLeak.links.post': 'El artículo que explica el método',
+    'nextLeak.links.report': '¿Un veredicto incorrecto? Abre una issue',
     'countdown.label': 'Tiempo restante hasta el {date}',
 };
 
