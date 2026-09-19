@@ -27,7 +27,7 @@ type Props = {
      * at all rather than to make the links disagree with the page you are on.
      *
      * That fix is `postPath`: the path is the post's own category and the segment travels as
-     * `?tag=`, which `next.config.ts` rewrites to the same tag render, so the selection survives.
+     * `?tag=`, which `src/middleware.ts` rewrites to the same tag render, so the selection survives.
      */
     category?: string | string[];
 };

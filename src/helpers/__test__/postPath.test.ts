@@ -1,5 +1,26 @@
-import { browsedSegment, postPath } from '../postPath';
+import { browsedSegment, postPath, tagRenderPath } from '../postPath';
 import { getAllCategories, getPostsByLocale } from '../fileReader';
+
+describe('tagRenderPath', () => {
+    it('serves a post browsed from a tag from the tag render', () => {
+        expect(tagRenderPath('/blog/error/solve-address-in-use-error', 'node')).toBe(
+            '/blog/node/solve-address-in-use-error'
+        );
+    });
+
+    it('leaves the request alone without a tag, or with one the client would ignore', () => {
+        expect(tagRenderPath('/blog/error/solve-address-in-use-error', null)).toBeUndefined();
+        expect(tagRenderPath('/blog/error/solve-address-in-use-error', 'Node')).toBeUndefined();
+        expect(tagRenderPath('/blog/error/solve-address-in-use-error', '../x')).toBeUndefined();
+    });
+
+    it('only touches post paths', () => {
+        expect(tagRenderPath('/blog', 'node')).toBeUndefined();
+        expect(tagRenderPath('/blog/error', 'node')).toBeUndefined();
+        expect(tagRenderPath('/about', 'node')).toBeUndefined();
+        expect(tagRenderPath('/blog/error/slug/extra', 'node')).toBeUndefined();
+    });
+});
 
 describe('postPath', () => {
     const post = { category: 'Error', slug: 'solve-address-in-use-error' };

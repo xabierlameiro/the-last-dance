@@ -44,7 +44,7 @@ describe('PostList', () => {
      * a post inside a tag listing jumped to /blog/<that post's category>/… and the sidebar deselected
      * the tag, which made walking a tag impossible. Since tag-facets-as-query-param the path is the
      * post's own category and the segment travels as `?tag=` (rewritten to the tag render in
-     * next.config.ts); what must never happen is a link that carries neither.
+     * src/middleware.ts); what must never happen is a link that carries neither.
      */
     it('should keep the browsed segment in every link so the tag stays selected', () => {
         const posts = [
