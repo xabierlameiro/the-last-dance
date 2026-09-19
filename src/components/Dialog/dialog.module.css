@@ -51,9 +51,14 @@
 }
 
 @media screen and (max-width: 768px) {
+    /**
+     * 120px, not 90px. `100%` resolves against <main>, which is already shorter than the viewport, and
+     * measured at 390x844 on /comments the 90px window ended at 789px while the Dock starts at 769px:
+     * 20px of every window sat under the Dock. 120px leaves a 10px gap above it.
+     */
     .dialog.modalMode {
         width: calc(100% - 20px);
-        height: calc(100% - 90px);
+        height: calc(100% - 120px);
     }
     .dialog.modalMode.open {
         top: 34.5px;
@@ -66,10 +71,10 @@
     }
 
     /**
-     * The home terminal is shorter than `100% - 90px` on most screens, and the rest of the window
+     * The home terminal is shorter than `100% - 120px` on most screens, and the rest of the window
      * showed as a white block under the code. Sized to its content instead, capped at that same box,
-     * and centred on the box's midpoint (34.5px + (100% - 90px) / 2), so a tall window lands exactly
-     * where it did before.
+     * and centred on the box's midpoint (34.5px + (100% - 120px) / 2), so a tall window lands exactly
+     * where it would without `fitContent`.
      *
      * `.body` has to go auto too. The terminal is `<CH.Code style={{ height: 'inherit' }}>`, which
      * inherits `.body`'s `100%`, and Code Hike freezes the editor at whatever height it measures on
@@ -77,13 +82,13 @@
      */
     .dialog.modalMode.fitContent {
         height: auto;
-        max-height: calc(100% - 90px);
+        max-height: calc(100% - 120px);
     }
     .dialog.modalMode.fitContent .body {
         height: auto;
     }
     .dialog.modalMode.fitContent.open {
-        top: calc(50% - 10.5px);
+        top: calc(50% - 25.5px);
         transform: translateY(-50%) scale(1);
     }
 }
