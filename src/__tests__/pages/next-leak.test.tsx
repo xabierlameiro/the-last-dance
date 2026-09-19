@@ -25,12 +25,15 @@ describe('/next-leak', () => {
         nextLeak.issues.forEach(({ issue }) => expect(text).toContain(`#${issue}`));
     });
 
-    it('emits the SoftwareApplication structured data', () => {
+    it('emits the SoftwareApplication structured data and a Home → next-leak breadcrumb', () => {
         render(<NextLeak />);
 
         const payload = JSON.parse(screen.getByTestId('page-jsonld').innerHTML);
-        expect(payload['@type']).toBe('SoftwareApplication');
-        expect(payload.softwareVersion).toBe(nextLeak.version);
+        const [software, breadcrumb] = payload;
+        expect(software['@type']).toBe('SoftwareApplication');
+        expect(software.softwareVersion).toBe(nextLeak.version);
+        expect(breadcrumb['@type']).toBe('BreadcrumbList');
+        expect(breadcrumb.itemListElement.map(({ name }: { name: string }) => name)).toEqual(['Home', 'next-leak']);
     });
 
     it('switches sections by click and by arrow key', () => {

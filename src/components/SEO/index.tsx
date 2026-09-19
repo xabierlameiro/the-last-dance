@@ -15,7 +15,14 @@ import {
     type SeoMeta,
 } from './tags';
 
-export type JsonLdContext = { url: string; domain?: string; locale?: string; author: string };
+export type JsonLdContext = {
+    url: string;
+    domain?: string;
+    locale?: string;
+    author: string;
+    /** '' for English, '/es' or '/gl' otherwise — a builder needs it to link the locale's own home. */
+    langPrefix: string;
+};
 
 type Props = {
     isBlog?: boolean;
@@ -66,7 +73,13 @@ const SEO = ({ meta, isBlog, noimage = true, jsonLd }: Props) => {
                 jsonLdScript(
                     'page-jsonld',
                     'page-jsonld',
-                    jsonLd({ url: urls.url, domain: urls.domain, locale, author }),
+                    jsonLd({
+                        url: urls.url,
+                        domain: urls.domain,
+                        locale,
+                        author,
+                        langPrefix: urls.langPrefix,
+                    }),
                 )}
         </Head>
     );

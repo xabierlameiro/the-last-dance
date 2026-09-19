@@ -217,6 +217,7 @@ const gl = {
         'A app execútase co seu contorno real: as rutas que chaman a servizos externos chamaranos baixo carga.',
     'nextLeak.links.repository': 'Código fonte, README e issues',
     'nextLeak.links.npm': 'O paquete en npm',
+    'nextLeak.links.npmx': 'Tamaño de instalación, dependencias e descargas',
     'nextLeak.links.post': 'O artigo que explica o método',
     'nextLeak.links.report': 'Un veredicto incorrecto? Abre unha issue',
     'countdown.label': 'Tempo restante ata o {date}',

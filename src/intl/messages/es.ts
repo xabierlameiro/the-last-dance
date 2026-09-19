@@ -95,7 +95,8 @@ const es = {
     'deploymentstatus.tooltip':
         'Estado : {status} El usuario {username} ha desplegado en el entorno de {environment} a fecha {createdAt}',
     'rendermanager.error': 'Ha ocurrido un error, estamos trabajando en ello',
-    'rendermanager.error.status': 'El servicio ha respondido con un error. Puede que funcione si lo intentas en un momento',
+    'rendermanager.error.status':
+        'El servicio ha respondido con un error. Puede que funcione si lo intentas en un momento',
     'rendermanager.error.shape': 'El servicio ha respondido algo inesperado, así que este dato no se muestra',
     'rendermanager.loading': 'Obteniendo los datos...',
     'error.404.title': 'Página no encontrada',
@@ -220,6 +221,7 @@ const es = {
         'La app se ejecuta con su entorno real: las rutas que llaman a servicios externos los llamarán bajo carga.',
     'nextLeak.links.repository': 'Código fuente, README e issues',
     'nextLeak.links.npm': 'El paquete en npm',
+    'nextLeak.links.npmx': 'Tamaño de instalación, dependencias y descargas',
     'nextLeak.links.post': 'El artículo que explica el método',
     'nextLeak.links.report': '¿Un veredicto incorrecto? Abre una issue',
     'countdown.label': 'Tiempo restante hasta el {date}',
