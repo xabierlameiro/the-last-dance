@@ -210,6 +210,15 @@ const posts: Poster[] = [
         ghost: 'N²',
     },
     {
+        file: 'tag-facet-urls-query-parameter.png',
+        eyebrow: 'NEXT.JS · SEO',
+        line1: '90 duplicate URLs,',
+        line2: 'one ',
+        accentWord: '?tag=',
+        subhead: 'Why 301, noindex and robots.txt all failed on tag paths',
+        ghost: '301',
+    },
+    {
         file: 'ga4-consent-mode-small-site.png',
         eyebrow: 'ANALYTICS · CONSENT MODE',
         line1: 'GA4 saw 12 of',
