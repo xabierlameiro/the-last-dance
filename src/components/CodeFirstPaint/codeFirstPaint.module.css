@@ -1,0 +1,16 @@
+.root {
+    position: relative;
+}
+
+/*
+ * Over Code Hike's code area: below its 30px title bar, clipped like the frame it covers. Line 1
+ * sits right under the bar and the text right after the line number, which is where Code Hike puts
+ * them once it has measured (checked against the hydrated layout at 375px and 1024px).
+ */
+.firstPaint {
+    position: absolute;
+    inset: var(--ch-title-bar-height, 30px) 0 0;
+    overflow: hidden;
+    pointer-events: none;
+    white-space: pre;
+}

@@ -9,6 +9,7 @@ import SEO from '@/components/SEO';
 import Head from 'next/head';
 import path from 'path';
 import styles from './home.module.css';
+import CodeFirstPaint from '@/components/CodeFirstPaint';
 
 type Props = {
     content: {
@@ -23,6 +24,9 @@ type Props = {
 
 // Tipo correcto para MDX components
 type MDXComponents = NonNullable<MDXRemoteProps['components']>;
+
+// The terminal is the first thing on screen, so its code is painted in the server HTML too.
+const homeComponents = { ...components, CH: { ...components.CH, Code: CodeFirstPaint } } as MDXComponents;
 
 const Home = ({ content }: Props) => {
     const { open } = useDialog();
@@ -73,7 +77,7 @@ const Home = ({ content }: Props) => {
                             <VisibilityManager hideOnDesktop hideOnTablet>
                                 <MDXRemote
                                     {...content.mobile}
-                                    components={components as MDXComponents}
+                                    components={homeComponents}
                                     frontmatter={undefined}
                                     scope={{}}
                                 />
@@ -83,7 +87,7 @@ const Home = ({ content }: Props) => {
                             <VisibilityManager hideOnMobile>
                                 <MDXRemote
                                     {...content.desktop}
-                                    components={components as MDXComponents}
+                                    components={homeComponents}
                                     frontmatter={undefined}
                                     scope={{}}
                                 />
