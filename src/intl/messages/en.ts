@@ -130,6 +130,9 @@ const en = {
     'dock.legal.short': 'Legal',
     'dock.settings.short': 'Settings',
     'dock.nextLeak': 'next-leak',
+    'dock.nextCoverage': 'next-coverage',
+    /* The folder is named after what it holds, and the two packages keep their names in every locale. */
+    'dock.tools': 'Tools',
     /*
      * /next-leak. Copy only: route names, figures, retainer chains, issue rows and the verdict words
      * are CLI output and live untranslated in constants/nextLeak.ts.
@@ -237,7 +240,88 @@ const en = {
     'nextLeak.links.npm': 'The package on npm',
     'nextLeak.links.npmx': 'Install size, dependency tree and downloads',
     'nextLeak.links.post': 'The post that explains the method',
+    'nextLeak.links.sibling': 'The other tool: which Next.js APIs does your app use?',
     'nextLeak.links.report': 'Got a wrong verdict? Open an issue',
+    /*
+     * next-coverage. Bucket names, finding text and file paths are data and stay in English in every
+     * locale, the way the CLI prints them: they live in `src/constants/nextCoverage.ts`, not here.
+     */
+    'nextCoverage.breadcrumb': 'next-coverage',
+    'nextCoverage.seo.title': 'next-coverage: which Next.js APIs your app uses',
+    'nextCoverage.seo.description':
+        'A CLI that reads a Next.js App Router project and says which framework APIs it uses, which ones would apply to it, and which it could not judge.',
+    'nextCoverage.pitch':
+        'See which Next.js APIs your project uses, which ones would apply to it, and why the rest were left alone.',
+    'nextCoverage.copy': 'Copy',
+    'nextCoverage.copied': 'Copied',
+    'nextCoverage.copyLabel': 'Copy the command {command}',
+    'nextCoverage.sections': 'Sections',
+    'nextCoverage.nav.overview': 'Overview',
+    'nextCoverage.nav.run': 'Example run',
+    'nextCoverage.nav.buckets': 'The four buckets',
+    'nextCoverage.nav.presets': 'Presets',
+    'nextCoverage.nav.limits': 'Scope and limits',
+    'nextCoverage.nav.links': 'Links',
+    'nextCoverage.bucket.used': 'Used',
+    'nextCoverage.bucket.used.what': 'the API is in the project',
+    'nextCoverage.bucket.wouldApply': 'Would apply',
+    'nextCoverage.bucket.wouldApply.what': 'the conditions for it are in the code and it is not there',
+    'nextCoverage.bucket.notApplicable': 'Not applicable',
+    'nextCoverage.bucket.notApplicable.what': 'ruled out, with the reason printed',
+    'nextCoverage.bucket.notEvaluated': 'Not evaluated',
+    'nextCoverage.bucket.notEvaluated.what': 'no judgement, broken down by why',
+    'nextCoverage.overview.lead':
+        'It reads an App Router project and sorts every framework API it knows into four buckets. There is no score and no percentage: <code>29 of 151</code> is not a grade, and the four counts are the answer.',
+    'nextCoverage.overview.note':
+        '<code>Would apply</code> is an opportunity, not a defect. This tool never says your code is wrong.',
+    'nextCoverage.overview.reads':
+        'It reads source files. It never builds your app, never runs it and never sends anything anywhere. If a production build happens to be sitting there, it reads that too and contrasts the two.',
+    'nextCoverage.run.meta': '{seconds}s · {entries, number} entries examined',
+    'nextCoverage.run.lead':
+        'Run against {project} at {commit}, on Next.js {version}. Everything below is copied from that run.',
+    'nextCoverage.run.findings': '{count, plural, one {The finding} other {The # findings}}',
+    'nextCoverage.run.andMore': 'and {count, number} more',
+    'nextCoverage.run.docs': 'Next.js documentation for this API',
+    'nextCoverage.run.checkTitle': 'Checked by hand',
+    'nextCoverage.run.checkMeaning':
+        'Set a featured product and the hero updates at once, while the listing can serve the previous one until the <code>minutes</code> profile expires.',
+    'nextCoverage.run.checkFair':
+        'With <code>cacheLife("minutes")</code> that may well be deliberate. The tool reports it as an observation and so does this page.',
+    'nextCoverage.run.weight': 'Client weight',
+    'nextCoverage.run.modules': '{count, plural, one {# module} other {# modules}}',
+    'nextCoverage.run.weightMore': 'And {count, number} more routes, all lighter than these.',
+    'nextCoverage.buckets.opportunity':
+        'Only one bucket asks anything of you. <code>Would apply</code> means the conditions the API needs are already in the code and the API is not: worth a look, never a bug. The palette keeps red for a genuine contradiction, and this run has none.',
+    'nextCoverage.buckets.silence': 'What it refuses to judge',
+    'nextCoverage.buckets.silenceLead':
+        'The interesting number is the largest one: {count, number} entries it did not evaluate, broken down rather than swallowed.',
+    'nextCoverage.buckets.silenceNote':
+        'Abstained means the evidence was not good enough to answer either way. A tool that never abstains is guessing.',
+    'nextCoverage.presets.default':
+        'The default run prints what it can argue for: {count, plural, one {# finding} other {# findings}} here. Run it with no flags.',
+    'nextCoverage.presets.strict':
+        '<code>--strict</code> lowers the bar and adds the opt-in suggestions: {count, number} findings on the same project, same second.',
+    'nextCoverage.presets.withheld':
+        '{count, number} opt-in suggestions withheld by default, and the report says so on every run rather than hiding them. <code>--findings</code> prints the list; <code>--json</code> gives the whole report.',
+    'nextCoverage.presets.constraints': '{count, number} documented constraints checked, none contradicted.',
+    'nextCoverage.presets.same':
+        'Both presets read exactly the same files. <code>--strict</code> changes what gets reported, never what gets analysed.',
+    'nextCoverage.limits.reads': 'It reads files. It does not build, run, install or send anything.',
+    'nextCoverage.limits.requirements': '{requirements}. Pages Router projects are out of scope.',
+    'nextCoverage.limits.build':
+        'Build contrast and client weight need a production build in <code>.next</code>. Without one it says so instead of guessing.',
+    'nextCoverage.limits.version':
+        'It is version {version}. In <code>0.x</code> the CLI output and the JSON shape can change between minors, so the run on this page carries its date.',
+    'nextCoverage.limits.notLinter':
+        'It is not a linter. It says nothing about whether your code is correct, only about which of the framework you are using.',
+    'nextCoverage.links.repository': 'Source code, README and issues',
+    'nextCoverage.links.npm': 'The package on npm',
+    'nextCoverage.links.npmx': 'Install size, dependency tree and downloads',
+    'nextCoverage.links.sibling': 'The other tool: does your app leak memory?',
+    'nextCoverage.links.report': 'A bucket you disagree with? Open an issue',
+    'nextCoverage.status':
+        '{used, number} of {evaluated, number} evaluated APIs in use · {findings, plural, one {# finding} other {# findings}}',
+    'nextCoverage.checked': 'Run {date}',
     /*
      * The countdown's only explanation was a tooltip reading 'Important date'. This says at least
      * what the number is counting towards; what the date signifies is the owner's copy to write.

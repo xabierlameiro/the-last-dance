@@ -113,6 +113,8 @@ const gl = {
     'dock.legal.short': 'Legal',
     'dock.settings.short': 'Axustes',
     'dock.nextLeak': 'next-leak',
+    'dock.nextCoverage': 'next-coverage',
+    'dock.tools': 'Tools',
     /*
      * /next-leak. Copy only: route names, figures, retainer chains, issue rows and the verdict words
      * are CLI output and live untranslated in constants/nextLeak.ts.
@@ -219,7 +221,84 @@ const gl = {
     'nextLeak.links.npm': 'O paquete en npm',
     'nextLeak.links.npmx': 'Tamaño de instalación, dependencias e descargas',
     'nextLeak.links.post': 'O artigo que explica o método',
+    'nextLeak.links.sibling': 'A outra ferramenta: que APIs de Next.js usa a túa app?',
     'nextLeak.links.report': 'Un veredicto incorrecto? Abre unha issue',
+    'nextCoverage.breadcrumb': 'next-coverage',
+    'nextCoverage.seo.title': 'next-coverage: que APIs de Next.js usa a túa app',
+    'nextCoverage.seo.description':
+        'Un CLI que le un proxecto con App Router de Next.js e di que APIs do framework usa, cales lle aplicarían e cales non puido xulgar.',
+    'nextCoverage.pitch':
+        'Mira que APIs de Next.js usa o teu proxecto, cales lle aplicarían e por que as demais quedan fóra.',
+    'nextCoverage.copy': 'Copiar',
+    'nextCoverage.copied': 'Copiado',
+    'nextCoverage.copyLabel': 'Copiar o comando {command}',
+    'nextCoverage.sections': 'Seccións',
+    'nextCoverage.nav.overview': 'Resumo',
+    'nextCoverage.nav.run': 'Corrida de exemplo',
+    'nextCoverage.nav.buckets': 'Os catro grupos',
+    'nextCoverage.nav.presets': 'Modos',
+    'nextCoverage.nav.limits': 'Alcance e límites',
+    'nextCoverage.nav.links': 'Ligazóns',
+    'nextCoverage.bucket.used': 'Úsase',
+    'nextCoverage.bucket.used.what': 'a API está no proxecto',
+    'nextCoverage.bucket.wouldApply': 'Aplicaría',
+    'nextCoverage.bucket.wouldApply.what': 'as condicións están no código e a API non',
+    'nextCoverage.bucket.notApplicable': 'Non aplica',
+    'nextCoverage.bucket.notApplicable.what': 'descartada, co motivo impreso',
+    'nextCoverage.bucket.notEvaluated': 'Sen avaliar',
+    'nextCoverage.bucket.notEvaluated.what': 'sen xuízo, desglosado por que',
+    'nextCoverage.overview.lead':
+        'Le un proxecto con App Router e reparte en catro grupos todas as APIs do framework que coñece. Non hai nota nin porcentaxe: <code>29 de 151</code> non é unha cualificación, e os catro recontos son a resposta.',
+    'nextCoverage.overview.note':
+        '<code>Aplicaría</code> é unha oportunidade, non un defecto. Esta ferramenta nunca di que o teu código estea mal.',
+    'nextCoverage.overview.reads':
+        'Le ficheiros fonte. Non constrúe a túa app, non a executa e non envía nada a ningures. Se atopa un build de produción, tamén o le e contrasta os dous.',
+    'nextCoverage.run.meta': '{seconds} s · {entries, number} entradas examinadas',
+    'nextCoverage.run.lead':
+        'Executado contra {project} en {commit}, sobre Next.js {version}. Todo o de abaixo está copiado desa corrida.',
+    'nextCoverage.run.findings': '{count, plural, one {O achado} other {Os # achados}}',
+    'nextCoverage.run.andMore': 'e {count, number} máis',
+    'nextCoverage.run.docs': 'Documentación de Next.js para esta API',
+    'nextCoverage.run.checkTitle': 'Comprobado a man',
+    'nextCoverage.run.checkMeaning':
+        'Cambia o produto destacado e a portada actualízase ao instante, mentres a listaxe pode seguir servindo o anterior ata que caduque o perfil <code>minutes</code>.',
+    'nextCoverage.run.checkFair':
+        'Con <code>cacheLife("minutes")</code> pode ser perfectamente deliberado. A ferramenta repórtao como unha observación e esta páxina tamén.',
+    'nextCoverage.run.weight': 'Peso en cliente',
+    'nextCoverage.run.modules': '{count, plural, one {# módulo} other {# módulos}}',
+    'nextCoverage.run.weightMore': 'E {count, number} rutas máis, todas máis lixeiras ca estas.',
+    'nextCoverage.buckets.opportunity':
+        'Só un grupo che pide algo. <code>Aplicaría</code> significa que as condicións que a API precisa xa están no código e a API non: merece unha ollada, nunca é un bug. O vermello da paleta resérvase para unha contradición de verdade, e esta corrida non ten ningunha.',
+    'nextCoverage.buckets.silence': 'O que se nega a xulgar',
+    'nextCoverage.buckets.silenceLead':
+        'O número interesante é o máis grande: {count, number} entradas que non avaliou, desglosadas en vez de tragadas.',
+    'nextCoverage.buckets.silenceNote':
+        'Absterse quere dicir que a evidencia non daba para responder nin unha cousa nin a outra. Unha ferramenta que nunca se abstén está adiviñando.',
+    'nextCoverage.presets.default':
+        'A corrida por defecto imprime o que pode argumentar: aquí {count, plural, one {# achado} other {# achados}}. Execútase sen flags.',
+    'nextCoverage.presets.strict':
+        '<code>--strict</code> baixa o listón e engade as suxestións opcionais: {count, number} achados sobre o mesmo proxecto, no mesmo segundo.',
+    'nextCoverage.presets.withheld':
+        '{count, number} suxestións opcionais retidas por defecto, e o informe dío en cada corrida en vez de escondelas. <code>--findings</code> imprime a lista; <code>--json</code> dá o informe enteiro.',
+    'nextCoverage.presets.constraints': '{count, number} restricións documentadas comprobadas, ningunha contradita.',
+    'nextCoverage.presets.same':
+        'Os dous modos len exactamente os mesmos ficheiros. <code>--strict</code> cambia o que se reporta, nunca o que se analiza.',
+    'nextCoverage.limits.reads': 'Le ficheiros. Non constrúe, non executa, non instala e non envía nada.',
+    'nextCoverage.limits.requirements': '{requirements}. Os proxectos con Pages Router quedan fóra.',
+    'nextCoverage.limits.build':
+        'O contraste co build e o peso en cliente precisan un build de produción en <code>.next</code>. Sen el dío, en vez de adiviñar.',
+    'nextCoverage.limits.version':
+        'Vai pola versión {version}. En <code>0.x</code> a saída do CLI e a forma do JSON poden cambiar entre menores, así que a corrida desta páxina leva a súa data.',
+    'nextCoverage.limits.notLinter':
+        'Non é un linter. Non di nada sobre se o teu código é correcto, só sobre que parte do framework estás a usar.',
+    'nextCoverage.links.repository': 'Código fonte, README e issues',
+    'nextCoverage.links.npm': 'O paquete en npm',
+    'nextCoverage.links.npmx': 'Tamaño de instalación, dependencias e descargas',
+    'nextCoverage.links.sibling': 'A outra ferramenta: a túa app ten fugas de memoria?',
+    'nextCoverage.links.report': 'Non estás de acordo cun grupo? Abre unha issue',
+    'nextCoverage.status':
+        '{used, number} de {evaluated, number} APIs avaliadas en uso · {findings, plural, one {# achado} other {# achados}}',
+    'nextCoverage.checked': 'Executado o {date}',
     'countdown.label': 'Tempo restante ata o {date}',
 };
 

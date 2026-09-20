@@ -102,6 +102,7 @@ const llms = [
     // hand-corrected there but this list was not, so prebuild kept regenerating dead URLs.
     `- [Home](${DOMAIN}): Who Xabier Lameiro is — bio, experience, stack and contact details`,
     `- [next-leak](${DOMAIN}/next-leak): CLI that measures Next.js memory leaks per route — verdict, retainer chain and the real Next.js issues it was verified against`,
+    `- [next-coverage](${DOMAIN}/next-coverage): CLI that reads a Next.js App Router project and sorts the framework's APIs into used, would apply, not applicable and not evaluated`,
     '',
     ...[...byCategory.entries()].flatMap(([category, categoryPosts]) => [
         `## Blog: ${category}`,
