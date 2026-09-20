@@ -45,8 +45,10 @@
     }
 }
 
+/* Above the icon on hover, for the reason spelled out in the Dock's own stylesheet. */
 @media (hover: hover) {
     .label {
+        bottom: calc(100% + 26px);
         opacity: 0;
         transition: opacity 0.2s ease;
     }
