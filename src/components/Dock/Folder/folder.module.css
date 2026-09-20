@@ -1,0 +1,139 @@
+/*
+ * The folder occupies one Dock slot and behaves like the other items: the icon magnifies on hover
+ * through the Dock's own rules, which target `img` inside the `li`, so nothing here repeats them.
+ */
+.folder {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* A button that has to look exactly like the anchors next to it. */
+.trigger {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+}
+
+/* Same treatment as the Dock's own label, which lives in the parent's stylesheet. */
+.label {
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    line-height: 1;
+    white-space: nowrap;
+    color: rgba(var(--blog-font));
+    pointer-events: none;
+}
+
+@media (max-width: 420px) {
+    .label {
+        font-size: 9px;
+    }
+}
+
+@media (hover: hover) {
+    .label {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .folder:hover .label,
+    .trigger:focus-visible .label {
+        opacity: 1;
+    }
+}
+
+/*
+ * The panel sits above the Dock. `bottom: 100%` plus the Dock's own 15px of bottom padding leaves it
+ * clear of the icons at their magnified size, and `min-width` keeps it wider than the 48px slot so
+ * the package names do not wrap.
+ */
+.panel {
+    position: absolute;
+    bottom: calc(100% + 18px);
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 160px;
+    background-color: rgba(var(--blog-background));
+    border: 1px solid rgba(var(--blog-border));
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgb(var(--grey-color) / 37%);
+    z-index: 2;
+}
+
+/*
+ * `hidden` is the state; this only stops the closed panel from being a hover target in browsers
+ * where an author stylesheet would otherwise override the attribute's `display: none`.
+ */
+.panel[hidden] {
+    display: none;
+}
+
+/*
+ * `width: 100%` because the panel's list items inherit `.dock li { display: flex }` from the Dock's
+ * own stylesheet. As a flex item the anchor was sized by its text, so each row's hover and current
+ * highlight stopped at the end of the package name instead of spanning the panel.
+ */
+.entry {
+    display: block;
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.3;
+    white-space: nowrap;
+    color: rgba(var(--blog-font));
+    text-decoration: none;
+}
+
+.entry:hover {
+    background-color: rgba(var(--grey-color), 0.2);
+}
+
+.entry.current {
+    background-color: rgba(var(--blue-color));
+    color: rgba(var(--blog-font-selected));
+}
+
+/*
+ * The Dock magnifies whatever is hovered. While the panel is open the icon should stay put, or the
+ * panel rides up with it and the pointer falls out of the list on the way there.
+ */
+.folder:has(.opened) .trigger img {
+    width: 60px;
+    height: 60px;
+    transform: none;
+}
+
+/*
+ * The folder is the last Dock slot. Measured at 320px the Dock is 310px wide and that slot's centre
+ * sits at ~286px, so a 160px panel centred on it would run 46px off the right edge. Below the same
+ * breakpoint the icons step down at, the panel hangs from its right edge instead.
+ */
+@media (max-width: 420px) {
+    .panel {
+        left: auto;
+        right: 0;
+        transform: none;
+    }
+
+    .folder:has(.opened) .trigger img {
+        width: 48px;
+        height: 48px;
+    }
+}

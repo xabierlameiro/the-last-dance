@@ -459,6 +459,10 @@ const Links = () => {
                     <span>{f({ id: 'nextLeak.links.post' })}</span>
                 </li>
                 <li>
+                    <Link href="/next-coverage">next-coverage</Link>
+                    <span>{f({ id: 'nextLeak.links.sibling' })}</span>
+                </li>
+                <li>
                     <a href={nextLeak.newIssue}>{f({ id: 'nextLeak.links.report' })}</a>
                 </li>
             </ul>

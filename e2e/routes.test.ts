@@ -88,14 +88,77 @@ test.describe('Static pages', () => {
 
         await expect(page.getByRole('tab', { name: 'Example run' })).toHaveAttribute('aria-selected', 'true');
         await expect(page.getByRole('button', { name: /\/api\/heap/ })).toHaveAttribute('aria-pressed', 'true');
-        await expect(page.getByTestId('next-leak')).toHaveClass(/selected/);
+        // SDD-015: the two tools share one Dock slot now, so the folder is what gets marked.
+        await expect(page.getByTestId('tools')).toHaveClass(/selected/);
 
         await page.getByRole('tab', { name: 'Build mode' }).click();
         await expect(page.getByText('npx next-leak build .')).toBeVisible();
     });
 
+    test('should render /next-coverage with the run and its findings', async ({ page }) => {
+        await page.goto('/next-coverage');
+
+        await expect(page.getByRole('tab', { name: 'Example run' })).toHaveAttribute('aria-selected', 'true');
+        await expect(page.getByTestId('tools')).toHaveClass(/selected/);
+        // The four bucket counts are the product; they come from the recorded run.
+        const run = page.getByRole('tabpanel', { name: 'Example run' });
+        await expect(run.getByText('cacheTag', { exact: true })).toBeVisible();
+        await expect(run.getByText('features/product/product-queries.ts', { exact: true })).toBeVisible();
+
+        await page.getByRole('tab', { name: 'Presets' }).click();
+        await expect(page.getByText('npx next-coverage --strict --findings')).toBeVisible();
+    });
+
+    /*
+     * SDD-015. The folder is the only Dock item that is not a link. Both anchors have to be in the
+     * server HTML — that is how a crawler reaches the pages — and the panel has to work by keyboard.
+     */
+    test('the Tools folder lists both tools and opens one', async ({ page }) => {
+        await page.goto('/');
+
+        const folder = page.getByRole('button', { name: 'Tools' });
+        await expect(folder).toHaveAttribute('aria-expanded', 'false');
+        // Present before any click: `hidden`, not absent. Located by tag rather than by role, since
+        // a closed panel exposes no roles at all — which is the whole point of the assertion.
+        await expect(page.getByTestId('tools-next-coverage').locator('a')).toHaveAttribute(
+            'href',
+            '/next-coverage'
+        );
+        await expect(page.getByTestId('tools-next-leak').locator('a')).toHaveAttribute('href', '/next-leak');
+
+        await folder.click();
+        await expect(folder).toHaveAttribute('aria-expanded', 'true');
+        await page.getByRole('link', { name: 'next-coverage' }).click();
+
+        await expect(page).toHaveURL(/\/next-coverage$/);
+    });
+
+    test('Escape closes the Tools folder and gives the focus back', async ({ page }) => {
+        await page.goto('/');
+
+        const folder = page.getByRole('button', { name: 'Tools' });
+        await folder.click();
+        await page.keyboard.press('Escape');
+
+        await expect(folder).toHaveAttribute('aria-expanded', 'false');
+        await expect(folder).toBeFocused();
+    });
+
+    // Measured at 320px: six slots are 310px wide. The folder is why a seventh app was not added.
+    for (const width of [320, 360, 390]) {
+        test(`the Dock fits at ${width}px with the Tools folder`, async ({ page }) => {
+            await page.setViewportSize({ width, height: 800 });
+            await page.goto('/');
+
+            const dock = await page.getByTestId('dock').boundingBox();
+            expect(dock).not.toBeNull();
+            expect(dock!.x).toBeGreaterThanOrEqual(0);
+            expect(dock!.x + dock!.width).toBeLessThanOrEqual(width);
+        });
+    }
+
     // Measured before the fix at 390x844: every modalMode window ended 20px below the Dock's top edge.
-    for (const path of ['/comments', '/settings', '/next-leak']) {
+    for (const path of ['/comments', '/settings', '/next-leak', '/next-coverage']) {
         test(`${path} does not slide under the Dock on a phone`, async ({ page }) => {
             await page.setViewportSize({ width: 390, height: 844 });
             await page.goto(path);

@@ -1,0 +1,550 @@
+/**
+ * /next-coverage. Window geometry comes from Dialog's `.modalMode` + `.large`; these are the contents.
+ *
+ * The window chrome — title bar, sidebar, tabs, panels, status bar — is deliberately a copy of
+ * `next-leak.module.css` rather than a shared module. The two pages have to look like the same app,
+ * and extracting a shell today means editing a page that is already in production for no behaviour
+ * change. When a THIRD tool page appears, extract it then: two copies is a pattern, one refactor of
+ * live code to save 200 lines is not.
+ *
+ * Colours are the site's theme tokens. The `--nl-*` verdict colours are reused for the buckets, with
+ * one rule this page must not break: nothing here is an error. "Would apply" is an opportunity and
+ * gets the neutral accent, never the red.
+ */
+
+/* ---------- Title bar ---------- */
+
+.titlebar {
+    display: grid;
+    gap: 6px;
+    padding: 8px 10px;
+    background: rgba(var(--blog-header));
+    border-bottom: 1px solid rgba(108, 108, 112, 0.3);
+}
+
+.toolbar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.appName {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+}
+
+.appTitle {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.appVersion {
+    font-size: 11px;
+    white-space: nowrap;
+    color: rgba(var(--blog-font-description));
+}
+
+.install {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.command {
+    padding: 3px 8px;
+    border: 1px solid rgba(var(--blog-border), 0.5);
+    border-radius: 5px;
+    background: rgba(var(--blog-nav), 0.6);
+    font-family: var(--mono-family);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.copyButton {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border: 1px solid rgba(var(--blog-border), 0.5);
+    border-radius: 5px;
+    background: rgba(var(--blog-nav), 0.6);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    color: rgba(var(--blog-font));
+}
+
+.copyButton:hover {
+    background: rgba(var(--blog-nav));
+}
+
+.copyIcon {
+    width: 13px;
+    height: 13px;
+    color: rgba(var(--link-on-surface));
+}
+
+.pitch {
+    font-size: 11.5px;
+    line-height: 1.35;
+    text-wrap: pretty;
+    color: rgba(var(--blog-font-description));
+}
+
+/* ---------- Body: sidebar and panels ---------- */
+
+.body {
+    display: grid;
+    grid-template-columns: 168px minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+}
+
+.sidebar {
+    padding: 12px 8px;
+    background: rgba(var(--blog-nav));
+}
+
+.sidebarTitle {
+    padding-bottom: 5px;
+    text-indent: 3px;
+    font-size: 12px;
+    font-weight: 100;
+    color: rgba(var(--blog-font-description));
+}
+
+.tabs {
+    display: grid;
+    gap: 2px;
+}
+
+.tab {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    padding: 5px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    color: rgba(var(--blog-font));
+}
+
+.tab:hover {
+    background: rgba(var(--blog-border), 0.25);
+}
+
+.tab.selected,
+.tab.selected:hover {
+    background: rgba(var(--blue-color));
+    color: rgba(var(--blog-font-selected));
+}
+
+.tabIcon {
+    width: 15px;
+    height: 15px;
+    opacity: 0.85;
+}
+
+.panel {
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+}
+
+.panel[hidden] {
+    display: none;
+}
+
+/* ---------- Text panels ---------- */
+
+.prose {
+    padding: 12px 16px 16px;
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+.prose h2 {
+    margin: 16px 0 6px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.prose h2:first-child {
+    margin-top: 0;
+}
+
+.prose p {
+    margin-bottom: 8px;
+    text-wrap: pretty;
+}
+
+.prose ol,
+.prose ul {
+    margin-bottom: 8px;
+    padding-left: 18px;
+}
+
+.prose li {
+    margin-bottom: 4px;
+}
+
+.code {
+    padding: 0 3px;
+    border-radius: 3px;
+    background: rgba(var(--blog-nav), 0.6);
+    font-family: var(--mono-family);
+    font-size: 0.92em;
+}
+
+.block {
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    border: 1px solid rgba(var(--blog-border), 0.5);
+    border-radius: 5px;
+    background: rgba(var(--blog-nav), 0.6);
+    font-family: var(--mono-family);
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.note {
+    color: rgba(var(--blog-font-description));
+}
+
+.mono {
+    font-family: var(--mono-family);
+    font-size: 11.5px;
+}
+
+.prose .links {
+    list-style: none;
+    padding-left: 0;
+}
+
+.links li {
+    display: grid;
+    gap: 1px;
+    margin-bottom: 10px;
+}
+
+.links span {
+    color: rgba(var(--blog-font-description));
+}
+
+/* ---------- The four buckets ---------- */
+
+/**
+ * `auto-fit` with a 150px floor rather than four fixed columns: in Spanish and Galician the bucket
+ * names run ~20% longer, and a fixed grid either clips them or forces a font size the rest of the
+ * window does not use.
+ */
+.buckets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.bucket {
+    display: grid;
+    gap: 2px;
+    padding: 9px 11px;
+    border: 1px solid rgba(var(--blog-border), 0.45);
+    border-left-width: 3px;
+    border-radius: 6px;
+    background: rgba(var(--blog-nav), 0.45);
+}
+
+.bucketCount {
+    font-family: var(--mono-family);
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.bucketName {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.bucketWhat {
+    font-size: 10.5px;
+    line-height: 1.4;
+    text-wrap: pretty;
+    color: rgba(var(--blog-font-description));
+}
+
+/* Green for what is in use, the neutral accent for the opportunity, grey for the rest. Never red:
+   a bucket count is not a defect, and the palette's red means a contradiction on this site. */
+.bucketUsed {
+    border-left-color: rgba(var(--nl-stable));
+}
+
+.bucketUsed .bucketCount {
+    color: rgba(var(--nl-stable));
+}
+
+.bucketWouldApply {
+    border-left-color: rgba(var(--link-on-surface));
+}
+
+.bucketWouldApply .bucketCount {
+    color: rgba(var(--link-on-surface));
+}
+
+.bucketNotApplicable,
+.bucketNotEvaluated {
+    border-left-color: rgba(var(--blog-border));
+}
+
+.bucketNotApplicable .bucketCount,
+.bucketNotEvaluated .bucketCount {
+    color: rgba(var(--blog-font-description));
+}
+
+/* ---------- Example run ---------- */
+
+.runHeader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    border: 1px solid rgba(var(--blog-border), 0.5);
+    border-radius: 5px;
+    background: rgba(var(--blog-nav), 0.6);
+    font-family: var(--mono-family);
+    font-size: 11.5px;
+}
+
+.runMeta {
+    font-family: var(--font-family);
+    font-size: 10.5px;
+    color: rgba(var(--blog-font-description));
+}
+
+/**
+ * A finding is a block and not a table row: its file list can be one path or eleven, and the reason
+ * line is a full sentence. A row would either truncate both or set the column width by the worst case.
+ */
+.finding {
+    margin-bottom: 10px;
+    padding: 9px 11px;
+    border: 1px solid rgba(var(--blog-border), 0.45);
+    border-radius: 6px;
+    background: rgba(var(--blog-nav), 0.35);
+}
+
+.findingHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 3px;
+}
+
+.findingApi {
+    font-family: var(--mono-family);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.findingGroup {
+    padding: 1px 6px;
+    border-radius: 9px;
+    background: rgba(var(--blog-border), 0.3);
+    font-size: 10px;
+    color: rgba(var(--blog-font-description));
+}
+
+.findingWhat {
+    font-size: 12px;
+    line-height: 1.45;
+    text-wrap: pretty;
+}
+
+.findingWhy {
+    margin-top: 3px;
+    font-size: 10.5px;
+    line-height: 1.45;
+    text-wrap: pretty;
+    color: rgba(var(--blog-font-description));
+}
+
+.findingFiles {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--mono-family);
+    font-size: 11px;
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+.findingMore {
+    color: rgba(var(--blog-font-description));
+}
+
+.findingTag {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 1px 7px;
+    border: 1px solid rgba(var(--link-on-surface), 0.5);
+    border-radius: 9px;
+    font-family: var(--mono-family);
+    font-size: 11px;
+    color: rgba(var(--link-on-surface));
+}
+
+/* ---------- Client weight ---------- */
+
+.weight {
+    display: grid;
+    gap: 4px;
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.weightRow {
+    display: grid;
+    grid-template-columns: minmax(0, 130px) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono-family);
+    font-size: 11px;
+}
+
+.weightRoute {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* A bar, not a chart: one number per route, and the reader only needs the ordering. */
+.weightBar {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(var(--link-on-surface), 0.55);
+}
+
+.weightCount {
+    color: rgba(var(--blog-font-description));
+}
+
+/* ---------- Disclosure ---------- */
+
+.disclosure {
+    margin: 0 0 10px;
+    padding: 8px 11px;
+    border: 1px dashed rgba(var(--blog-border), 0.7);
+    border-radius: 6px;
+    font-size: 11px;
+    line-height: 1.6;
+    color: rgba(var(--blog-font-description));
+}
+
+.disclosure ul {
+    margin: 4px 0 0;
+    padding-left: 16px;
+}
+
+.disclosure strong {
+    font-family: var(--mono-family);
+    color: rgba(var(--blog-font));
+}
+
+/* ---------- Status bar ---------- */
+
+.statusbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    overflow: hidden;
+    padding: 4px 12px;
+    border-top: 1px solid rgba(108, 108, 112, 0.3);
+    background: rgba(var(--blog-header));
+    font-size: 10.5px;
+    white-space: nowrap;
+    color: rgba(var(--blog-font-description));
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 768px) {
+    .toolbar {
+        grid-template-columns: auto 1fr;
+        row-gap: 8px;
+    }
+
+    .install {
+        grid-column: 1 / -1;
+    }
+
+    .body {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .sidebar {
+        padding: 0;
+        border-bottom: 1px solid rgba(108, 108, 112, 0.3);
+    }
+
+    .sidebarTitle,
+    .tabIcon {
+        display: none;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 6px;
+        padding: 8px 10px;
+        overflow-x: auto;
+    }
+
+    .tab {
+        display: block;
+        width: auto;
+        padding: 5px 11px;
+        border: 1px solid rgba(var(--blog-border), 0.5);
+        border-radius: 13px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .tab.selected {
+        border-color: rgba(var(--blue-color));
+    }
+
+    /* Two buckets per row rather than four columns squeezed to 95px each. */
+    .buckets {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bucketCount {
+        font-size: 18px;
+    }
+
+    .weightRow {
+        grid-template-columns: minmax(0, 96px) minmax(0, 1fr) auto;
+    }
+
+    .statusbar > span + span {
+        display: none;
+    }
+}

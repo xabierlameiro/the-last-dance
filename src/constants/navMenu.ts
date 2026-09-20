@@ -7,6 +7,32 @@
  * on a touch device. So on a phone the Dock is five unlabelled pictures and nothing else, which is
  * why `Dock` now renders the label as text under each icon.
  */
+/** An entry inside a Dock folder. Always a real route of its own, never a panel-only destination. */
+export type Tool = {
+    labelId: string;
+    link: string;
+    testId: string;
+};
+
+/**
+ * SDD-015: the two CLI pages live in a folder rather than in two Dock slots. Measured on production
+ * at 320px, the Dock is 310px wide with six apps at 48px; a seventh does not fit, and shrinking the
+ * icons below 44px would put them under the minimum touch target. macOS answers this with a folder,
+ * so this does too — and the next tool costs a line here instead of another slot.
+ */
+export const tools: Array<Tool> = [
+    {
+        labelId: 'dock.nextLeak',
+        link: '/next-leak',
+        testId: 'next-leak',
+    },
+    {
+        labelId: 'dock.nextCoverage',
+        link: '/next-coverage',
+        testId: 'next-coverage',
+    },
+];
+
 type Item = {
     img: string;
     labelId: string;
@@ -16,8 +42,11 @@ type Item = {
      * wide at 10px). The full label is still the link's accessible name and its hover label.
      */
     shortLabelId?: string;
-    link: { en: string; es: string; gl: string } | string;
+    /** Absent on a folder, which opens a panel instead of navigating anywhere itself. */
+    link?: { en: string; es: string; gl: string } | string;
     testId: string;
+    /** Present only on a folder. Its entries are rendered as anchors in the server HTML. */
+    tools?: Array<Tool>;
 };
 
 export const menu: Array<Item> = [
@@ -56,9 +85,9 @@ export const menu: Array<Item> = [
         testId: 'settings',
     },
     {
-        img: '/menu/next-leak.png',
-        labelId: 'dock.nextLeak',
-        link: '/next-leak',
-        testId: 'next-leak',
+        img: '/menu/tools.png',
+        labelId: 'dock.tools',
+        testId: 'tools',
+        tools,
     },
 ];
