@@ -22,6 +22,7 @@ import CountDown from '@/components/CountDown';
 import Heating from '@/components/Heating';
 import Tooltip from '@/components/Tooltip';
 import DeploymentStatus from '@/components/DeploymentStatus';
+import GithubStars from '@/components/GithubStars';
 import dynamic from 'next/dynamic';
 
 const Weather = dynamic(() => import('@/components/Weather'), {
@@ -206,6 +207,13 @@ const Header = ({ children }: { children?: ReactNode }) => {
                 </span>
                 <span className={`${styles.statusItem} ${styles.slotHeating} ${styles.shed2}`}>
                     <Heating />
+                </span>
+                {/**
+                 * Last before the clock, which is where macOS puts the extras a person added
+                 * themselves, and the only status item here that is also an invitation.
+                 */}
+                <span className={`${styles.slotStars} ${styles.shed7}`}>
+                    <GithubStars />
                 </span>
                 <DateAndHour>
                     <Weather cities={['limerick+ireland', 'moraña+galicia', 'vilagarcía+galicia']} />

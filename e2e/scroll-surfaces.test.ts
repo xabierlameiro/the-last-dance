@@ -18,8 +18,11 @@ import { expect, test } from './fixtures';
  *
  *    T9 is why the widths in `VIEWPORTS` all changed. With the icons on the left the left zone is
  *    320 px rather than 66 px, so it can now reach the centred countdown too — `W >= 2 * (zone +
- *    103)` has to hold for *both* sides, and every breakpoint was re-derived against the wider of
+ *    103.5)` has to hold for *both* sides, and every breakpoint was re-derived against the wider of
  *    the two. A ladder that watches one side is how the bar ended up drawn over itself at 1024 px.
+ *
+ *    The widths moved again when the star slot was added, and the half pixel above is why one of
+ *    them was off by one: the countdown is 171 px wide, not 170.
  *
  * 2. **`overflow: scroll` where `auto` was meant.** `scroll` paints a scrollbar unconditionally;
  *    `auto` paints one only when there is something to scroll. Chromium on macOS hides the
@@ -55,14 +58,14 @@ const VIEWPORTS = [
     { width: 769, height: 1024, name: 'tablet, countdown appears' },
     { width: 869, height: 800, name: 'below artifact icons' },
     { width: 870, height: 800, name: 'artifact icons appear' },
-    { width: 939, height: 800, name: 'below crypto' },
-    { width: 940, height: 800, name: 'crypto appears' },
     { width: 1024, height: 800, name: 'small laptop' },
-    { width: 1179, height: 800, name: 'below heating' },
-    { width: 1180, height: 800, name: 'heating appears' },
+    { width: 1058, height: 800, name: 'below crypto' },
+    { width: 1059, height: 800, name: 'crypto appears' },
     { width: 1280, height: 720, name: 'laptop' },
-    { width: 1549, height: 800, name: 'below views and users' },
-    { width: 1550, height: 800, name: 'views and users appear' },
+    { width: 1298, height: 800, name: 'below heating' },
+    { width: 1299, height: 800, name: 'heating appears' },
+    { width: 1666, height: 800, name: 'below views and users' },
+    { width: 1667, height: 800, name: 'views and users appear' },
     { width: 1920, height: 1080, name: 'desktop' },
     { width: 2000, height: 1080, name: 'wide desktop, the width the defect was reported at' },
 ];
@@ -78,7 +81,7 @@ const VIEWPORTS = [
  * Pinning the numbers means a future `auto`, a stray `gap`, or a widget growing a second value fails
  * as a test rather than as a screenshot a month later.
  */
-const SLOT_WIDTHS = { deploymentDot: 24, value: 96, views: 184, heating: 120, clock: 150 };
+const SLOT_WIDTHS = { deploymentDot: 24, value: 96, views: 184, heating: 120, stars: 60, clock: 150 };
 
 /**
  * Measures the *bar*, not the scroll box.
@@ -394,7 +397,7 @@ test.describe('Scroll surfaces', () => {
          */
         test.use({ bypassCSP: true });
 
-        for (const width of [1550, 2000]) {
+        for (const width of [1667, 2000]) {
             test(`no status widget is clipped by its slot at ${width}px`, async ({ page }) => {
                 /**
                  * The values are mocked, and that is not a convenience — it is what makes this a
@@ -411,6 +414,15 @@ test.describe('Scroll surfaces', () => {
 
                 await page.route('**/api/analytics*', mock({ pageViews: 999999, newUsers: 888888 }));
                 await page.route('**/api/heating*', mock({ outsideTemp: -12.5, zoneMeasuredTemp: 100.5 }));
+                /*
+                 * The star slot is 60px, sized for a four-figure count with its thousands
+                 * separator. Locally the route has no GitHub token and renders a ~15px error
+                 * glyph, which is exactly the failure state this block exists to avoid measuring.
+                 */
+                await page.route(
+                    '**/api/github-stars*',
+                    mock({ stars: 9999, forks: 999, watchers: 999, issues: 999, pushedAt: '2026-09-19T08:00:00Z' })
+                );
 
                 await page.setViewportSize({ width, height: 900 });
                 await page.goto('/');

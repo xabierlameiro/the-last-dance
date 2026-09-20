@@ -14,7 +14,7 @@ describe('StarCounter', () => {
 
     it('should render the success render', () => {
         mockUseGithubStars.mockReturnValue({
-            data: 22,
+            data: { stars: 22, forks: 7, watchers: 3, issues: 5, pushedAt: '2026-09-19T08:00:00Z' },
             error: false,
             loading: false,
         });

@@ -4,6 +4,7 @@ import { DialogProvider } from '@/context/dialog';
 import styles from './layout.module.css';
 import Footer from './Footer';
 import Header from './Header';
+import StarPrompt from '@/components/StarPrompt';
 
 type Props = {
     children: ReactElement;
@@ -29,6 +30,7 @@ const Layout = ({ className, children }: Props) => {
                 {children}
             </main>
             <Footer />
+            <StarPrompt />
         </div>
     );
 };

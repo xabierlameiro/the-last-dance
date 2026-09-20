@@ -2,6 +2,8 @@ import type { IntlShape } from 'react-intl';
 
 export const MAX_STEPS = 10;
 export const defaultLocale = 'en';
+/** The repository this site is built from — two components link to it, and `/api/github-stars` reads it. */
+export const REPOSITORY_URL = 'https://github.com/xabierlameiro/the-last-dance';
 // SDD-004 A1: one canonical name form everywhere; the full legal name stays as alternateName
 export const author = 'Xabier Lameiro';
 export const authorAlternateName = 'Xabier Lameiro Cardama';

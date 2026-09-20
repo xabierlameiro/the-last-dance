@@ -1,0 +1,195 @@
+/*
+ * A menu bar extra. The trigger has to read as part of the bar — same 12px, same colour, no chrome
+ * of its own until the pointer is on it — and the panel has to escape the bar entirely.
+ */
+.extra {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    padding: 0 2px;
+    height: 18px;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 12px;
+    line-height: 1;
+    color: rgba(var(--blog-icons));
+    cursor: pointer;
+}
+
+.trigger:hover,
+.trigger[aria-expanded='true'] {
+    background-color: rgba(var(--grey-color), 0.25);
+}
+
+/*
+ * `header svg` sizes every glyph in the bar at 18px, which is right beside 14px text and too big
+ * beside this 12px count: at 18 the trigger measured 63px inside a 60px slot. 14 is the size the
+ * number is set at, and it buys the slot back its headroom.
+ */
+.trigger .star {
+    width: 14px;
+    height: 14px;
+}
+
+/*
+ * Two classes deep on purpose. The bar sets `header svg { fill: rgba(var(--blog-icons)) }`, which
+ * is (0,1,1) and outranks a bare `.star` — the glyph came out the same grey as every other icon on
+ * the bar, which is the one thing a star must not be.
+ */
+.extra .star {
+    fill: rgba(var(--yellow-color));
+    flex-shrink: 0;
+}
+
+/*
+ * Hangs from the bar's bottom edge and from the slot's right edge, the way a menu bar extra drops
+ * its menu under itself. The header is `overflow: visible` precisely so this can leave the bar.
+ */
+.panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 232px;
+    padding: 12px;
+    background-color: rgba(var(--blog-background));
+    border: 1px solid rgba(var(--blog-border));
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgb(var(--grey-color) / 37%);
+    color: rgba(var(--blog-font));
+    text-align: left;
+    z-index: 3;
+}
+
+.panel[hidden] {
+    display: none;
+}
+
+/*
+ * macOS opens these with a short scale from the corner they hang off, not a fade from nowhere.
+ * `@starting-style` is what gives an element its pre-open state when it comes back from
+ * `display: none`; where it is not supported the panel simply appears, which is the correct
+ * degradation. Closing is instant, as it is in the real thing.
+ */
+.opened {
+    transform: none;
+    opacity: 1;
+    transform-origin: top right;
+    transition:
+        transform 0.16s cubic-bezier(0.2, 0.9, 0.3, 1.2),
+        opacity 0.12s ease-out;
+}
+
+@starting-style {
+    .opened {
+        transform: scale(0.94) translateY(-6px);
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .opened {
+        transition: none;
+    }
+
+    @starting-style {
+        .opened {
+            transform: none;
+            opacity: 1;
+        }
+    }
+}
+
+.repo {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.tagline {
+    margin: 2px 0 10px;
+    font-size: 11px;
+    line-height: 1.35;
+    color: rgba(var(--blog-icons));
+}
+
+/*
+ * Two by two rather than four across: at 232px a row of four gives each counter 52px, and a
+ * five-figure star count does not fit in that with its icon and its caption.
+ */
+.counters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.counters li {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 5px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background-color: rgba(var(--grey-color), 0.15);
+}
+
+.panel .counters svg {
+    grid-row: span 2;
+    width: 15px;
+    height: 15px;
+}
+
+.value {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.1;
+}
+
+.caption {
+    font-size: 10px;
+    line-height: 1.1;
+    color: rgba(var(--blog-icons));
+}
+
+.updated {
+    margin: 0 0 10px;
+    font-size: 11px;
+    color: rgba(var(--blog-icons));
+}
+
+.cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px;
+    border-radius: 8px;
+    background-color: rgba(var(--blue-color));
+    color: rgba(var(--blog-font-selected));
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.panel .cta svg {
+    width: 14px;
+    height: 14px;
+    fill: rgba(var(--yellow-color));
+}
+
+.cta:hover {
+    filter: brightness(1.08);
+}
