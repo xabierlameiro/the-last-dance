@@ -95,8 +95,18 @@
     }
 }
 
+/*
+ * Where there is hover, the label has to move above the icon. `bottom: -2px` works while the Dock is
+ * at rest, but hovering grows the `li` from 64px to 104px and the extra 40px are added downwards:
+ * measured on a 952px-tall window, the `li` ends at y=960 and the label at 962, off screen. So the
+ * name faded in and slid out of the viewport as the magnification finished.
+ *
+ * The icon goes the other way — `translateY(-20px)` — so 20px of lift plus a 6px gap put the label
+ * just above it, which is where macOS shows it.
+ */
 @media (hover: hover) {
     .label {
+        bottom: calc(100% + 26px);
         opacity: 0;
         transition: opacity 0.2s ease;
     }
