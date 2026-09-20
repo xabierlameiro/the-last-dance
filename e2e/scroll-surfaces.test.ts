@@ -416,6 +416,23 @@ test.describe('Scroll surfaces', () => {
                 await page.goto('/');
                 await expect(page.getByTestId('header')).toBeVisible();
                 await expect(page.getByTestId('views')).toContainText('999999');
+                /**
+                 * No widget may still be loading when the measurement runs, and this is the
+                 * assertion that was missing.
+                 *
+                 * `RenderManager`'s loading state is `FaSpinner` under `animation: spin 1s linear
+                 * infinite`. A rotated element's bounding box is not its size: a 16px square at 45°
+                 * measures 22.6, and sampled every 50ms this slot reported widths cycling through
+                 * 18, 20, 21, 22, 23, 24 and 25 — inside a 24px slot. So the check's verdict
+                 * depended on which frame it caught: a wide frame read as "loses 3px off its
+                 * right", a narrow one as healthy. Under four parallel workers the deployment fetch
+                 * is slow enough that the spinner is still turning here, which is why this failed on
+                 * a busy machine and never on an idle one.
+                 *
+                 * Nothing was ever clipped. Waiting for the spinners to go is also what the
+                 * describe block says it does: measure the widgets *serving values*.
+                 */
+                await expect(page.getByTestId('header').getByTestId('loading')).toHaveCount(0);
                 await waitForStableStatusContent(page);
 
                 const clipped = await page.evaluate(() => {
@@ -442,8 +459,22 @@ test.describe('Scroll surfaces', () => {
                                 return false;
                             };
 
+                            /**
+                             * A spinning element is excluded too, and for the same reason absolute
+                             * ones are: its box is not its size. `getBoundingClientRect` on a
+                             * rotated node returns the axis-aligned box *around* the rotation, so a
+                             * 16px glyph reports up to 22.6px at 45° and the reading changes every
+                             * frame. The test above waits for these to disappear; this is the belt
+                             * to that pair of braces, so a spinner that outlives its data can never
+                             * be reported as clipping.
+                             */
+                            const spins = (node: Element) =>
+                                node.closest('[data-testid="loading"]') !== null ||
+                                getComputedStyle(node).animationName !== 'none';
+
                             const laidOut = [...slot.querySelectorAll('*')].filter((node) => {
                                 if (getComputedStyle(node).display === 'none' || escapes(node)) return false;
+                                if (spins(node)) return false;
                                 const rect = node.getBoundingClientRect();
                                 return rect.width > 0 && rect.height > 0;
                             });
