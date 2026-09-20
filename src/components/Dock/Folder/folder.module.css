@@ -84,8 +84,14 @@
     display: none;
 }
 
+/*
+ * `width: 100%` because the panel's list items inherit `.dock li { display: flex }` from the Dock's
+ * own stylesheet. As a flex item the anchor was sized by its text, so each row's hover and current
+ * highlight stopped at the end of the package name instead of spanning the panel.
+ */
 .entry {
     display: block;
+    width: 100%;
     padding: 6px 10px;
     border-radius: 8px;
     font-size: 13px;
