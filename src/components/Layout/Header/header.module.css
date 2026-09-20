@@ -176,6 +176,21 @@
     width: 120px;
 }
 
+/**
+ * The repository's star count, and the only status item that opens a panel of its own.
+ *
+ * 60 px, not the standard 96: the content is one icon and one number, and the number is four
+ * figures away from a repository this size. It is also the one slot that must NOT clip — the panel
+ * hangs out of it — so it sets `overflow: visible` instead of inheriting `.statusItem`'s clip.
+ */
+.slotStars {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 60px;
+    overflow: visible;
+}
+
 /* The deployment indicator is a dot, not a value; a full slot for it would be a 96 px hole. */
 .statusDot {
     display: flex;
@@ -253,10 +268,16 @@
  * from the right, the clock never does.
  *
  * The breakpoints are **derived, not chosen**. A window-centred countdown occupies
- * `[W/2 - 85, W/2 + 85]`, and the right zone runs from `W - 18 - rightWidth` to `W - 18`, so they
- * stay clear of each other exactly while
+ * `[W/2 - 85.5, W/2 + 85.5]`, and the right zone runs from `W - 18 - rightWidth` to `W - 18`, so
+ * they stay clear of each other exactly while
  *
- *     W >= 2 * (rightWidth + 103)
+ *     W >= 2 * (rightWidth + 103.5)
+ *
+ * The half pixel is not pedantry. The countdown measures 171px, not the 170 this comment used to
+ * claim, and the ladder was re-derived with 103 — which put the first rung one pixel short. It did
+ * not bite while the rung sat at 1549 and the zone needed 1546, and it bit immediately when a new
+ * slot moved the rung onto its own boundary. Measured, not assumed: `center.right` is 919 against
+ * a `right.left` of 918 at 1666px.
  *
  * SDD-L12-T9 re-derived all of this, because T9 moved the navigation icons into the LEFT zone. That
  * changes the problem: under T8 the left zone was 66 px and could never reach the middle, so only
@@ -265,47 +286,55 @@
  * only watches one side is how the bar ended up drawn on top of itself at 1024 px the first time.
  *
  * Zone widths are arithmetic, not measurement, because the slots are fixed:
- * right = 24 (dot) + 96 (XRP) + 96 (indexed) + 184 (views) + 120 (heating) + 150 (clock);
+ * right = 24 (dot) + 96 (XRP) + 96 (indexed) + 184 (views) + 120 (heating) + 60 (stars) + 150 (clock);
  * left = 66 + 18 per icon + 14 per gap.
  *
  * Re-derived again once the views and heating slots were sized correctly — widening two slots by
  * 112 px in total moves every breakpoint that depends on the right zone, which is the whole reason
  * these are computed from the widths rather than picked.
  *
- * | Below   | What sheds        | Left | Right | Left needs | Right needs |
- * |---------|-------------------|------|-------|------------|-------------|
- * | 1549 px | views + users     | 320  | 670   |  846       | 1546        |
- * | 1179 px | heating           | 320  | 486   |  846       | 1178        |
- * |  939 px | crypto price      | 320  | 366   |  846       |  938        |
- * |  869 px | 5 artifact icons  | 320  | 270   |  846       |  746        |
- * |  768 px | indexed counter   | 160  | 270   |  526       |  746        |
- * |  479 px | 3 profile icons   | 160  | 174   |  526       |  554        |
+ * Re-derived once more for the 60 px star slot, which is why the first row is now 1666 and not
+ * 1549: everything above the row the stars shed on moves up by 2 x 60 px. Nothing was chosen; the
+ * sums below are the derivation.
+ *
+ * The stars shed with the artifact icons rather than later, and that rung is forced, not preferred.
+ * One row further down is 769 px — the narrowest window that still draws the countdown — and there
+ * the right zone would be 330 px against the 747 px it has room for. So 870 px is the floor for
+ * this slot. The prompt is what carries the same invitation below it.
+ *
+ * | Below   | What sheds               | Left | Right | Left needs | Right needs |
+ * |---------|--------------------------|------|-------|------------|-------------|
+ * | 1667 px | views + users            | 320  | 730   |  847       | 1667        |
+ * | 1299 px | heating                  | 320  | 546   |  847       | 1299        |
+ * | 1059 px | crypto price             | 320  | 426   |  847       | 1059        |
+ * |  869 px | 5 artifact icons + stars | 320  | 330   |  847       |  867        |
+ * |  768 px | indexed counter          | 160  | 270   |  527       |  747        |
+ * |  479 px | 3 profile icons          | 160  | 174   |  527       |  555        |
  *
  * Read the table as: above each row's width, the zones on that row coexist. Below 769 px the
  * countdown is hidden entirely, so from there down the only requirement is that the two zones fit
- * side by side — 372 px at 480 px wide, 278 px once the profile icons go.
+ * side by side — 334 px at 480 px wide, 274 px once the profile icons go.
  *
- * The breakpoints themselves are unchanged by the clock's 10 px: they used to clear the arithmetic
- * by ~20 px and now clear it by 4, 2 and 2 px on the three rows that constrain them. That is thin
- * but exact — the slots are fixed, so these are sums and not measurements, and nothing here rounds.
- * Any further widening on the right has to move the ladder with it.
+ * The rows that constrain the ladder clear their arithmetic exactly, by 0, 0, 0 and 2 px. That is
+ * as thin as it goes — the slots are fixed, so these are sums and not measurements, and nothing
+ * here rounds. Any further widening on the right has to move the ladder with it.
  *
  * `.navLinks a` sets `display: flex` and outranks a bare class on specificity, so each rule lists
  * both forms rather than reaching for `!important`.
  */
-@media screen and (max-width: 1549px) {
+@media screen and (max-width: 1666px) {
     .shed1 {
         display: none;
     }
 }
 
-@media screen and (max-width: 1179px) {
+@media screen and (max-width: 1298px) {
     .shed2 {
         display: none;
     }
 }
 
-@media screen and (max-width: 939px) {
+@media screen and (max-width: 1058px) {
     .shed3 {
         display: none;
     }
@@ -313,6 +342,7 @@
 
 @media screen and (max-width: 869px) {
     .shed5,
+    .shed7,
     .navLinks a.shed5 {
         display: none;
     }
@@ -338,7 +368,7 @@
 
 /**
  * The three profile icons survive further than the artifact ones because they are the only
- * navigation left. They go at 479 px, where the two zones would otherwise total 372 px in a 480 px
+ * navigation left. They go at 479 px, where the two zones would otherwise total 334 px in a 480 px
  * window — fitting, but with nothing between them.
  */
 @media screen and (max-width: 479px) {

@@ -11,24 +11,55 @@ jest.mock('octokit', () => ({
 import handler from '../../pages/api/github-stars';
 import { createMockResponse, createRequest } from '../../__test__/apiMocks';
 
+const repo = {
+    stargazers_count: 42,
+    forks_count: 7,
+    subscribers_count: 3,
+    open_issues_count: 5,
+    pushed_at: '2026-09-19T08:00:00Z',
+};
+
 describe('/api/github-stars', () => {
     beforeEach(() => {
         reposGet.mockReset();
     });
 
-    it('returns the raw stargazer count', async () => {
-        reposGet.mockResolvedValue({ data: { stargazers_count: 42 } });
+    it('returns the five repository counters the menu bar reads', async () => {
+        reposGet.mockResolvedValue({ data: repo });
         const res = createMockResponse();
 
         await handler(createRequest(), res);
 
         expect(reposGet).toHaveBeenCalledWith({ owner: 'xabierlameiro', repo: 'the-last-dance' });
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith(42);
+        expect(res.json).toHaveBeenCalledWith({
+            stars: 42,
+            forks: 7,
+            watchers: 3,
+            issues: 5,
+            pushedAt: '2026-09-19T08:00:00Z',
+        });
+    });
+
+    /**
+     * `repos.get` answers with the owner's account object, dozens of URL templates and the repo's
+     * visibility settings. Forwarding the payload wholesale would put all of it on every page.
+     */
+    it('forwards nothing else from the upstream payload', async () => {
+        reposGet.mockResolvedValue({
+            data: { ...repo, owner: { id: 12345, login: 'xabierlameiro' }, private: false },
+        });
+        const res = createMockResponse();
+
+        await handler(createRequest(), res);
+
+        const body = JSON.stringify(res.json.mock.calls);
+        expect(body).not.toContain('owner');
+        expect(body).not.toContain('12345');
     });
 
     it('sets a long cache header, so a visitor does not spend a token-quota request', async () => {
-        reposGet.mockResolvedValue({ data: { stargazers_count: 42 } });
+        reposGet.mockResolvedValue({ data: repo });
         const res = createMockResponse();
 
         await handler(createRequest(), res);

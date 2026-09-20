@@ -123,8 +123,20 @@ export const weatherItemSchema = z.object({
 
 export const weatherSchema = z.array(weatherItemSchema);
 
-export const githubStarsSchema = z.number();
+/**
+ * The route used to answer a bare `stargazers_count`, so four other fields the same `repos.get`
+ * call already returns were fetched and thrown away. The menu-bar popover shows them, which costs
+ * no extra request and no extra rate-limit budget.
+ */
+export const githubStarsSchema = z.object({
+    stars: z.number(),
+    forks: z.number(),
+    watchers: z.number(),
+    issues: z.number(),
+    pushedAt: z.string(),
+});
 
+export type GithubStarsData = z.infer<typeof githubStarsSchema>;
 export type DeploymentStatus = z.infer<typeof deploymentStatusSchema>;
 export type DeploymentEnvironment = z.infer<typeof deploymentEnvironmentSchema>;
 export type DeploymentData = z.infer<typeof deploymentSchema>;

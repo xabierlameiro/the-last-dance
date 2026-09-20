@@ -2,6 +2,7 @@ import React from 'react';
 import { AiOutlineStar } from 'react-icons/ai';
 import { useIntl } from 'react-intl';
 import useGithubStars from '@/hooks/useGithubStars';
+import { REPOSITORY_URL } from '@/constants/site';
 import RenderManager from '@/components/RenderManager';
 import Tooltip from '@/components/Tooltip';
 import styles from './starCounter.module.css';
@@ -26,7 +27,7 @@ const StarCounter = () => {
                   */}
                 <a
                     className={styles.stars}
-                    href="https://github.com/xabierlameiro/the-last-dance"
+                    href={REPOSITORY_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={f({ id: 'starCounter.label' })}
@@ -44,7 +45,7 @@ const StarCounter = () => {
                          * happened not to matter, because React renders numbers and strings the
                          * same way.
                          */}
-                        <span data-testid="star-counter">{data}</span>
+                        <span data-testid="star-counter">{data?.stars}</span>
                     </RenderManager>
                 </a>
             </Tooltip.Trigger>
