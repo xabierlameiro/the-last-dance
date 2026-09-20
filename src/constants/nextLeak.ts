@@ -124,6 +124,13 @@ export const nextLeak = {
     buildCommand: 'npx next-leak build .',
     repository: 'https://github.com/xabierlameiro/next-leak',
     npm: 'https://www.npmjs.com/package/next-leak',
+    /**
+     * A third-party reader for the npm registry. It is listed because it shows what npmjs.com does
+     * not put on one screen — install size, the dependency tree, the vulnerability count and the
+     * download history — and it needs no account. It is NOT in the JSON-LD `sameAs`: that field
+     * claims a profile belongs to the project, and this one belongs to whoever runs npmx.
+     */
+    npmx: 'https://npmx.dev/package/next-leak',
     readme: 'https://github.com/xabierlameiro/next-leak#readme',
     newIssue: 'https://github.com/xabierlameiro/next-leak/issues',
     /** Healthy routes on production apps (PPR, MDX, Auth.js, Sentry, i18n) with zero false positives. */

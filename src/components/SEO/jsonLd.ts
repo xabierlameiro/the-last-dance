@@ -141,3 +141,26 @@ export const softwareApplicationJsonLd = ({
     author: { '@type': 'Person', '@id': `${domain}/#person`, name: author, url: domain },
     sameAs,
 });
+
+type PageBreadcrumbInput = {
+    name: string;
+    url: string;
+    langPrefix: string;
+    domain?: string;
+};
+
+/**
+ * Home → this page, for a top-level page that is not a blog post.
+ *
+ * `breadcrumbJsonLd` above cannot serve this: it hardcodes the four blog levels. Two levels is a
+ * legitimate trail — it is what lets a result show `xabierlameiro.com › next-leak` instead of the
+ * bare URL — and the Home item points at the locale's own home, not at the English one.
+ */
+export const pageBreadcrumbJsonLd = ({ name, url, langPrefix, domain }: PageBreadcrumbInput) => ({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${domain}${langPrefix}` },
+        { '@type': 'ListItem', position: 2, name, item: url },
+    ],
+});

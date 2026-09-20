@@ -15,7 +15,7 @@ import {
 import SEO from '@/components/SEO';
 import Dialog from '@/components/Dialog';
 import ControlButtons from '@/components/ControlButtons';
-import { softwareApplicationJsonLd } from '@/components/SEO/jsonLd';
+import { pageBreadcrumbJsonLd, softwareApplicationJsonLd } from '@/components/SEO/jsonLd';
 import { clx } from '@/helpers';
 import { nextLeak, nextJsIssueUrl, VERDICTS, type IssueRow, type RouteResult } from '@/constants/nextLeak';
 import styles from '@/styles/next-leak.module.css';
@@ -451,6 +451,10 @@ const Links = () => {
                     <span>{f({ id: 'nextLeak.links.npm' })}</span>
                 </li>
                 <li>
+                    <a href={nextLeak.npmx}>npmx.dev/package/next-leak</a>
+                    <span>{f({ id: 'nextLeak.links.npmx' })}</span>
+                </li>
+                <li>
                     <Link href={post.href}>{post.title}</Link>
                     <span>{f({ id: 'nextLeak.links.post' })}</span>
                 </li>
@@ -509,8 +513,14 @@ const NextLeak = () => {
                 meta={{
                     title: f({ id: 'nextLeak.seo.title' }),
                     description: f({ id: 'nextLeak.seo.description' }),
+                    /**
+                     * Its own card. Without this the page shared as the generic `/og-home.jpg`, which
+                     * is the site's portrait — every blog post ships an image of its own, and this is
+                     * the page most likely to be pasted into a Next.js thread.
+                     */
+                    image: '/og-next-leak.png',
                 }}
-                jsonLd={({ url, domain, author }) =>
+                jsonLd={({ url, domain, author, langPrefix }) => [
                     softwareApplicationJsonLd({
                         name: 'next-leak',
                         description: f({ id: 'nextLeak.seo.description' }),
@@ -521,8 +531,9 @@ const NextLeak = () => {
                         sameAs: [nextLeak.repository, nextLeak.npm],
                         author,
                         domain,
-                    })
-                }
+                    }),
+                    pageBreadcrumbJsonLd({ name: 'next-leak', url, langPrefix, domain }),
+                ]}
             />
 
             {/* The window chrome is the visual title, as on /comments. */}

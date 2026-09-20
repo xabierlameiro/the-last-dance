@@ -1,4 +1,4 @@
-import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, softwareApplicationJsonLd } from '../jsonLd';
+import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, pageBreadcrumbJsonLd, softwareApplicationJsonLd } from '../jsonLd';
 
 const DOMAIN = 'https://xabierlameiro.com';
 
@@ -138,5 +138,37 @@ describe('softwareApplicationJsonLd', () => {
             'https://github.com/xabierlameiro/next-leak',
             'https://www.npmjs.com/package/next-leak',
         ]);
+    });
+});
+
+describe('pageBreadcrumbJsonLd', () => {
+    // Two levels, and the Home item has to follow the locale — a Galician result that breadcrumbs
+    // through the English home sends the reader to the wrong language.
+    it("trails Home → page in the page's own locale", () => {
+        expect(
+            pageBreadcrumbJsonLd({
+                name: 'next-leak',
+                url: `${DOMAIN}/gl/next-leak`,
+                langPrefix: '/gl',
+                domain: DOMAIN,
+            }),
+        ).toEqual({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: `${DOMAIN}/gl` },
+                { '@type': 'ListItem', position: 2, name: 'next-leak', item: `${DOMAIN}/gl/next-leak` },
+            ],
+        });
+    });
+
+    it('points at the bare domain for English, which has no prefix', () => {
+        const node = pageBreadcrumbJsonLd({
+            name: 'next-leak',
+            url: `${DOMAIN}/next-leak`,
+            langPrefix: '',
+            domain: DOMAIN,
+        });
+        expect(node.itemListElement[0].item).toBe(DOMAIN);
     });
 });

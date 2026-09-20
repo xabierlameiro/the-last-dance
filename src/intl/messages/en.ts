@@ -235,6 +235,7 @@ const en = {
         'The app runs with its real environment: routes that call external services will call them under load.',
     'nextLeak.links.repository': 'Source code, README and issues',
     'nextLeak.links.npm': 'The package on npm',
+    'nextLeak.links.npmx': 'Install size, dependency tree and downloads',
     'nextLeak.links.post': 'The post that explains the method',
     'nextLeak.links.report': 'Got a wrong verdict? Open an issue',
     /*
