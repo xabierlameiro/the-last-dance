@@ -8,14 +8,19 @@
     align-items: center;
 }
 
-/* A button that has to look exactly like the anchors next to it. */
+/*
+ * A button that has to look exactly like the anchors next to it — `display: block`, not flex, and
+ * that is the whole point. The Dock's anchors are blocks holding an inline image, so each one is
+ * 63.5px tall: 60 of image plus the line box's descender gap. As a flex container this button was
+ * exactly 60, and `.dock li { align-items: center }` centred the shorter box, leaving the folder
+ * sitting 1.75px below the other five.
+ */
 .trigger {
     background: none;
     border: none;
     padding: 0;
     margin: 0;
-    display: flex;
-    align-items: center;
+    display: block;
     cursor: pointer;
     font: inherit;
     color: inherit;
