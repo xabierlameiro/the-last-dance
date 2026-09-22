@@ -212,7 +212,7 @@ const posts: Poster[] = [
     {
         file: 'tag-facet-urls-query-parameter.png',
         eyebrow: 'NEXT.JS · SEO',
-        line1: '90 duplicate URLs,',
+        line1: '95 duplicate URLs,',
         line2: 'one ',
         accentWord: '?tag=',
         subhead: 'Why 301, noindex and robots.txt all failed on tag paths',
