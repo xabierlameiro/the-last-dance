@@ -1,0 +1,151 @@
+---
+title: "Why I couldn't 301, noindex or disallow my blog's tag URLs"
+slug: 'tag-facet-urls-query-parameter'
+author: 'Xabier Lameiro'
+category: 'Nextjs'
+tags: ['seo', 'debugging']
+locale: 'en'
+updated: '2026-09-23'
+excerpt: '95 duplicate URLs, 229 impressions, 1 click · three fixes that broke navigation or could not work · the ?tag= design that can'
+description: 'My blog served every post under each of its tags. A 301, noindex and robots.txt each failed for a different reason. What works: the tag as ?tag=.'
+image: '/posts/tag-facet-urls-query-parameter.png'
+faq:
+    - question: 'Why can robots.txt not block tag URLs like /blog/<tag>/<slug>?'
+      answer: 'Because robots.txt matches URL patterns, and a tag path has exactly the same shape as the real post path, /blog/<category>/<slug>. Any rule that matches one matches the other. Google also says not to use robots.txt for canonicalization. A query parameter such as ?tag= has a shape of its own, so Disallow: /*?tag= blocks the facets and nothing else.'
+    - question: 'Should I noindex duplicate tag pages that have a rel=canonical?'
+      answer: 'Not to pick a canonical. Google does not recommend noindex for choosing a canonical within one site, because it blocks the page from Search completely. A noindex on a page whose canonical points elsewhere also sends two conflicting signals. If the duplicates exist because of your URL design, change the design instead.'
+    - question: 'Is rel=canonical enough to handle faceted URLs?'
+      answer: 'Google treats it as a hint. On this blog Google accepted the declared canonical for the facet URLs I inspected, but the facets still showed up in Search Console with impressions of their own, and still had to be crawled. Google describes rel=canonical for facets as generally less effective in the long term than the other methods it lists, such as keeping crawlers off facet URLs with robots.txt rules on query parameters.'
+    - question: 'Why not redirect tag URLs to the canonical post URL?'
+      answer: 'A redirect only works when nothing depends on the old URL. Here the tag sidebar kept its selection through the path segment, so every redirect I tried broke tag navigation: open a post from a tag listing and the tag deselected. The redirect is only safe after the tag state has moved to a query parameter, which is why it ships last.'
+---
+
+# Why I couldn't 301, noindex or disallow my blog's tag URLs
+
+<Date date="09-23-2026" />
+
+<GoogleAdsense />
+
+## Quick answer
+
+This blog served every post at `/blog/<category>/<slug>` and also at `/blog/<tag>/<slug>`, once for each of its tags. That is 95 extra URLs for the same content: 35 in English and 30 in each of Spanish and Galician. Over 90 days, 10 of them showed up in Google Search Console with 229 impressions and 1 click between them.
+
+I shipped two of the standard fixes, a 301 redirect and linking to the canonical URL, and ruled out two more, `noindex` and `robots.txt`. Each one either broke tag navigation or could not work on this URL shape. The reason is the same in every case. The tag lived in the path, and a path segment can't be told apart from the real category.
+
+The fix is to stop creating the URLs. The post stays at its category URL, the tag travels as `?tag=`, and a query parameter can be blocked, redirected and ignored cleanly. It shipped in three steps and it is live. The last section has the measurement, and it is not the one I planned to take: the metric I had chosen to prove the fix had gone to zero on its own two months earlier.
+
+## How a sidebar creates 95 duplicate URLs
+
+The blog is a single full-screen layout. On the left there's a list of categories and tags, in the middle a list of posts, and on the right the article. When you click a tag, the middle list filters to that tag and the tag stays highlighted while you open posts from it.
+
+The highlight needs to know which tag you are browsing. The simplest place to keep it was the URL, so the post list linked to `/blog/node/solve-address-in-use-error` when you browsed `node`, even though the post's category is `error`. With `getStaticPaths` listing only the category URLs and `fallback: 'blocking'`, Next.js rendered any tag URL on first request.
+
+Each tag URL declared `rel=canonical` pointing at the category URL, which is the textbook answer. Here is what Search Console had for one post over the same 90 days (2026-06-20 to 2026-09-18):
+
+| URL                                                           | Impressions | Clicks | Avg. position |
+| ------------------------------------------------------------- | ----------- | ------ | ------------- |
+| `/blog/error/uncaught-error-minified-react-error` (canonical) | 1,570       | 2      | 9.4           |
+| `/blog/hydration/uncaught-error-minified-react-error` (tag)   | 107         | 0      | 10.2          |
+| `/blog/ssr/uncaught-error-minified-react-error` (tag)         | 6           | 0      | 5.3           |
+
+Today the URL Inspection tool reports the `hydration` URL as "Alternate page with proper canonical tag", and Google's chosen canonical matches mine. So the canonical is being respected. But the tag URLs are still crawled, still collect impressions, and still split what Search Console reports for one article. Earlier this year it went the other way: one post was indexed under its `testing` tag URL instead of its `react` category URL.
+
+At this scale it's not a disaster: 229 impressions and 1 click in 90 days. What made it interesting is that every obvious fix failed.
+
+## Attempt 1: redirect the tag URL to the canonical
+
+The first fix was a 301 from `/blog/<tag>/<slug>` to `/blog/<category>/<slug>`. Google calls a redirect a strong signal that its target should become canonical, so on paper this is the cleanest option.
+
+It broke the blog. Clicking a tag listed its posts, but opening any of them redirected to the category URL, and the sidebar followed the URL. The tag deselected, the category lit up, and there was no way to walk through a tag's posts any more. The redirect came out in July.
+
+## Attempt 2: link to the canonical URL instead
+
+If redirects break navigation, maybe the tag URLs just shouldn't be linked. [PR #186](https://github.com/xabierlameiro/the-last-dance/pull/186) changed the post list to build every link from the post's own category. No internal link would point at a tag URL, so crawlers would stop finding them.
+
+It shipped on 8 August and broke the same thing in a different way. The links no longer carried the tag, so opening a post from a tag listing deselected the tag again. [PR #189](https://github.com/xabierlameiro/the-last-dance/pull/189) reverted it ten hours later.
+
+That one is the most useful mistake in this post, because it was not an accident. The deselected tag was predicted before the change shipped, and judged an acceptable price for a small SEO gain. It came back as a bug report the same morning, and that was the right call. A feature that works is worth more than a marginal ranking signal, and a fix that degrades behaviour is a decision to surface, not to make quietly.
+
+## Attempts 3 and 4: noindex and robots.txt
+
+I never shipped these two, because checking them against Google's documentation was enough.
+
+**`noindex` on the tag URLs.** Google's page on [consolidating duplicate URLs](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls) says "We don't recommend using noindex to prevent selection of a canonical page" within one site. The page would be blocked from Search entirely. A `noindex` alongside a `rel=canonical` that points elsewhere also sends two signals that disagree.
+
+**`robots.txt`.** The same page says not to use `robots.txt` for canonicalization. Even ignoring that, it can't express the rule. `robots.txt` matches URL patterns, and `/blog/node/solve-address-in-use-error` has exactly the shape of `/blog/error/solve-address-in-use-error`. Any pattern that blocks the first blocks the second, so there is no rule to write.
+
+## The insight: Google's facet advice assumes query parameters
+
+Google's [faceted navigation guide](https://developers.google.com/crawling/docs/faceted-navigation) is written for online shops, where facets like colour and size are query parameters. Its main recommendation is to keep crawlers off facet URLs with rules like `disallow: /*?*color=`. It describes `rel=canonical` for facets as generally less effective in the long term.
+
+That advice only works because a parameter has a shape of its own. My tags were facets too, but I had put them in the path, where nothing can target them.
+
+So the fix is not a better redirect or a better tag. The fix is to stop creating the URLs:
+
+- The post lives only at `/blog/<category>/<slug>`.
+- The tag you are browsing travels as `?tag=node`.
+- `robots.txt` gets `Disallow: /*?tag=`, which now matches only facets.
+- Only after that ships do the old tag paths get a 301 to the new shape. Nothing depends on them any more, so the redirect is finally safe.
+
+## Keeping navigation identical
+
+The hard requirement was that a reader must not notice. Before touching any code I wrote a Playwright suite that only asserts what a reader sees. It selects a tag, checks the filtered list, opens a post, checks the tag is still highlighted, goes back and checks the list again. It also loads a tagged URL directly and visits a post's canonical URL. The suite never looks at the URL shape. It has 3 tests, each run in English and Spanish, and all 6 passed on the old code.
+
+A naive version reads `?tag=` on the client, and it fails that suite on the first full page load. The post list next to the article is built in `getStaticProps` from the path, so a client-side tag would show the category's list first and then swap it. Instead, a rewrite in `next.config.ts` serves the new URL from the render the site already had:
+
+```ts
+{
+    source: '/blog/:postCategory/:slug',
+    has: [{ type: 'query', key: 'tag', value: `(?<tag>${TAG_VALUE_PATTERN})` }],
+    destination: '/blog/:tag/:slug',
+},
+```
+
+The server-rendered list and highlight are exactly what they were. One more trap showed up in the suite. After hydration, Next.js re-reads `router.query` from the visible URL, so the page saw the category again and dropped the highlight. The page now reads `?tag=` first and the path second. The tag pattern `[a-z0-9-]+` is one constant shared by the rewrite and the page, so a value one side rejects is rejected by both.
+
+Links are built in one place:
+
+```ts
+export const postPath = (post: { category: string; slug: string }, browsedSegment?: string): string => {
+    const category = post.category.toLowerCase();
+    const path = `/blog/${category}/${post.slug}`;
+    const segment = browsedSegment?.toLowerCase();
+    return segment && segment !== category ? `${path}?tag=${encodeURIComponent(segment)}` : path;
+};
+```
+
+After the change the same suite, unchanged, passed 6 of 6 three runs in a row. Every internal blog link on the built pages now uses a category segment. The old tag paths still render, because their redirect is the last step.
+
+## Results: the number I picked to prove it was already dead
+
+The three steps went live between 18 and 19 September 2026. On 23 September I checked production directly:
+
+- `/blog/hydration/uncaught-error-minified-react-error` returns `308` to `/blog/error/uncaught-error-minified-react-error?tag=hydration`, which returns `200`. Same for the other legacy paths I sampled, in English and Spanish.
+- `robots.txt` carries `Disallow: /*?tag=` in its `User-agent: *` group.
+- Every internal blog link on the built pages uses a category segment.
+
+So the mechanism is gone. Then I went to measure the effect, and the measurement fell apart.
+
+My plan was to compare impressions for the tag URLs before and after. After the change they are zero. That sounds like a result and it is worth nothing, because I pulled the daily numbers instead of the totals:
+
+| Period                      | Impressions on `/blog/hydration/…` |
+| --------------------------- | ---------------------------------- |
+| 19–24 July 2026             | 107                                |
+| 25 July – 22 September 2026 | 0                                  |
+
+The 107 impressions in the 90-day baseline are one six-day burst in July. That URL had not been shown in Search for **two months before I shipped anything**. Had I reported "facet impressions went from 107 to 0", every part of that sentence would have been true and the conclusion would have been false.
+
+The index state says the same thing from the other side. Both facet URLs I inspected are still "Alternate page with proper canonical tag", with Google's canonical matching mine. Their last crawl dates are 5 September and 18 July, both before the change. Google has not fetched them since the redirect existed, so there is nothing for it to have noticed yet. A redirect is not a broadcast. It only counts the next time the crawler comes back, and on a blog this size that can be months.
+
+**What the change actually bought, stated at its real size:** 90 URLs that no longer exist. That is crawl surface and reporting noise, not ranking. The one thing it does fix for certain is the failure mode from earlier this year, when a post got indexed under its `testing` tag URL instead of its `react` category URL. That URL cannot be minted any more.
+
+**What it did not buy:** anything visible in clicks. Site impressions and average position both moved in the same window, and I am not attributing either to this. The honest summary is that a duplicate-URL problem worth 229 impressions and 1 click in 90 days got fixed properly and produced no measurable traffic change, which is exactly what a problem that size should produce.
+
+I will re-read the index state once Google has recrawled the facet paths and expect them to become "Page with redirect". If they don't, that will be the more interesting post.
+
+## What I'd check on your own site
+
+- **List every URL shape that renders the same content.** Look for a path segment carrying UI state, such as a tag, a filter or a sort order. Those can't be excluded later.
+- **Put UI state in query parameters from day one.** A parameter can be blocked in `robots.txt`, dropped from the sitemap and redirected without touching the real URL.
+- **Write the navigation test before the SEO fix.** Two of my three attempts broke the same feature. A test that pins what the reader sees, not the URL, would have caught both before they shipped.
+- **Check that your baseline is still alive before you use it.** A 90-day total hid the fact that my metric had been flat at zero for two months. Plot it by day first, or you will credit your fix with something that happened without you.
