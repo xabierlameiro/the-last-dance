@@ -307,15 +307,54 @@
  * than every neighbour. The link points at `coverage.xabierlameiro.com`, a report of this repo's
  * own, so there was no brand to honour — the glyph was replaced rather than the residual documented.
  *
- * All nine now land in 49.2%-59.0%, a 1.20x spread. Before this block it was 28.0%-74.4%, a 2.66x
- * spread, which is the defect that was reported.
+ * All nine landed in 49.2%-59.0%, a 1.20x spread, against 28.0%-74.4% before it.
+ *
+ * ---
+ *
+ * **Superseded 2026-09-23: the measure is the drawing's box, not its ink.**
+ *
+ * The table above equalises how *heavy* each glyph reads. The owner checked the result with a ruler
+ * and reported the glyphs as still different sizes, which they were — equal ink coverage says
+ * nothing about the drawn box, and the two come apart badly on a set this varied. Measured with
+ * `getBBox()` on the rendered glyphs under the sizes above:
+ *
+ * | Icon        | Ink w x h     | Largest side |
+ * |-------------|---------------|--------------|
+ * | LinkedIn    | 16.00 x 16.00 |  16.00       |
+ * | Bitcoin     | 17.00 x 17.00 |  17.00       |
+ * | Reddit      | 18.00 x 18.00 |  18.00       |
+ * | Storybook   | 14.44 x 18.00 |  18.00       |
+ * | Readthedocs | 13.87 x 18.00 |  18.00       |
+ * | Pie chart   | 18.00 x 16.94 |  18.00       |
+ * | GitHub      | 20.00 x 19.50 |  20.00       |
+ * | Playwright  | 20.00 x 14.64 |  20.00       |
+ * | Lighthouse  | 13.33 x 20.00 |  20.00       |
+ *
+ * A ruler laid across that row reads 16, 17, 18, 18, 18, 18, 20, 20, 20 — which is the report.
+ *
+ * So the rule is now a CAP BOX: every glyph is scaled until its largest side is exactly 18px, which
+ * for a Simple Icons glyph means `--icon-size: 18px` flat, because each one inks the full 24 units
+ * on one axis. The letterboxed pie chart inks the full width of its box, so 18 there too. The cap
+ * is 18 and not 20 because the bar is 24px tall and 20 leaves nothing above or below.
+ *
+ * What this costs, stated rather than discovered later: ink coverage goes back to a 1.9x spread, so
+ * a sparse glyph reads lighter than a dense one at the same box. That is the trade the ruler asks
+ * for, and it is the honest one — a drawing cannot be both the same size and the same weight as a
+ * drawing of a different shape.
+ *
+ * What it cannot fix is aspect ratio, which is the glyph and not the scaling. After the cap the
+ * widths run 12.00-18.00 and the heights 13.17-18.00, and both extremes are one icon each:
+ * Playwright's masks are 1.37:1 and the lighthouse is 0.67:1. Everything else sits in 0.77-1.06.
+ * Squarer glyphs for those two links are the only remaining move, and there is no brand to honour
+ * — both point at this repo's own reports, which is the same reasoning that replaced the Codecov
+ * umbrella above.
  *
  * Sizes are whole pixels so nothing renders on a half-pixel at 1x.
  */
 .header .left > svg {
-    /* Bitcoin, the identity glyph. */
-    width: 17px;
-    height: 17px;
+    /* Bitcoin, the identity glyph. Inks its full viewBox, so the cap box is the box. */
+    width: 18px;
+    height: 18px;
 }
 
 /**
@@ -328,16 +367,18 @@
  * symmetrically. The overflow is at most 3.35px per side and always lands inside the 14px gap, so
  * two glyphs never touch.
  *
- * | Icon        | Ink width at 18px | Size | Box width |
- * |-------------|-------------------|------|-----------|
- * | LinkedIn    |       18.0        | 16px |  16px     |
- * | GitHub      |       18.0        | 20px |  20px     |
- * | Reddit      |       18.0        | 18px |  18px     |
- * | Storybook   |       14.4        | 18px |  14.4px   |
- * | Readthedocs |       13.9        | 18px |  13.9px   |
- * | Pie chart   |       18.0        | 18px |  18px     |
- * | Playwright  |       18.0        | 20px |  20px     |
- * | Lighthouse  |       12.0        | 20px |  13.3px   |
+ * Every glyph is at the 18px cap box now, so the box is simply its own ink width at 18px:
+ *
+ * | Icon        | Size | Ink width | Box width |
+ * |-------------|------|-----------|-----------|
+ * | LinkedIn    | 18px |   18.00   |  18px     |
+ * | GitHub      | 18px |   18.00   |  18px     |
+ * | Reddit      | 18px |   18.00   |  18px     |
+ * | Storybook   | 18px |   14.44   |  14.44px  |
+ * | Readthedocs | 18px |   13.87   |  13.87px  |
+ * | Pie chart   | 18px |   18.00   |  18px     |
+ * | Playwright  | 18px |   18.00   |  18px     |
+ * | Lighthouse  | 18px |   12.00   |  12px     |
  *
  * The pie chart is the one glyph whose viewBox is not square (544x512). `preserveAspectRatio`
  * letterboxes it in the square box, so it inks the full 18px of width and 16.9px of height. Only the
@@ -357,13 +398,13 @@
 }
 
 .navLinks a[data-icon='linkedin-link'] {
-    --icon-size: 16px;
-    --ink-width: 16px;
+    --icon-size: 18px;
+    --ink-width: 18px;
 }
 
 .navLinks a[data-icon='github-link'] {
-    --icon-size: 20px;
-    --ink-width: 20px;
+    --icon-size: 18px;
+    --ink-width: 18px;
 }
 
 .navLinks a[data-icon='reddit-link'] {
@@ -373,12 +414,12 @@
 
 .navLinks a[data-icon='storybook-link'] {
     --icon-size: 18px;
-    --ink-width: 14.4px;
+    --ink-width: 14.44px;
 }
 
 .navLinks a[data-icon='docs-link'] {
     --icon-size: 18px;
-    --ink-width: 13.9px;
+    --ink-width: 13.87px;
 }
 
 .navLinks a[data-icon='coverage-link'] {
@@ -387,13 +428,13 @@
 }
 
 .navLinks a[data-icon='e2e-link'] {
-    --icon-size: 20px;
-    --ink-width: 20px;
+    --icon-size: 18px;
+    --ink-width: 18px;
 }
 
 .navLinks a[data-icon='lighthouse-link'] {
-    --icon-size: 20px;
-    --ink-width: 13.3px;
+    --icon-size: 18px;
+    --ink-width: 12px;
 }
 
 .route {
