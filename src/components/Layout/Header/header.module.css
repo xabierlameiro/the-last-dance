@@ -73,6 +73,12 @@
     transform: translateX(-50%);
     display: flex;
     align-items: center;
+    /**
+     * The ladder below is derived from this element's width, so that width has to be a constant.
+     * With proportional digits it is not: the countdown re-measures every second as its digits
+     * change, and the whole ladder is computed from half of it.
+     */
+    font-variant-numeric: tabular-nums;
 }
 
 /**
@@ -134,14 +140,59 @@
  * Content is still clipped rather than allowed to widen the zone — a slot that grows moves
  * everything beside it, which is the jitter these rules exist to remove. The difference is that each
  * slot is now sized for what its own widget can actually produce.
+ *
+ * ---
+ *
+ * **The fixed slots are gone, and the reason they existed is gone with them.**
+ *
+ * The owner reported the spacing as uneven on 2026-09-23. It was: measured on production at
+ * 1728px, the visible gap between one item's content and the next ran 16.0, 49.7, 49.7, 67.5, 27.1
+ * and 22.4px, against a constant 14px between the icons on the left.
+ *
+ * Fixed slots cannot fix that, and resizing them to `worst case + 14` was tried first and measured:
+ * 14, 41.7, 57.1, 34.9, 17.6, 34.4. With a fixed slot and right-aligned content the gap before item
+ * *i* is `slot_i - content_i`, so it is 14px only while the widget is at its widest. The indexed
+ * counter shows `52` against a six-figure worst case, so 40px of its slot is empty — and that is
+ * the normal state, not an edge case. Even spacing and fixed slots are incompatible by
+ * construction.
+ *
+ * What made the slots necessary was proportional digits: a `1` is narrower than an `8`, so under
+ * `auto` tracks the zone re-laid out on every value change, not just when a counter gained a digit.
+ * `font-variant-numeric: tabular-nums` removes exactly that — every digit takes the same advance —
+ * so a widget's width now changes only when it gains or loses a digit, which is rare. The zone is
+ * anchored right, so when one does grow, only the items to ITS LEFT move; the clock never does.
+ *
+ * Measured on production with this layout, 2026-09-23: 14, 14, 14, 14, 14 — the left zone's rhythm,
+ * exactly. The zone is 526px wide in its current state against 730 before.
+ *
+ * The widths are no longer constants, so the shedding ladder is derived from each widget's WORST
+ * CASE instead, which is a safe upper bound: if the zone clears the countdown at its widest it
+ * clears it always. Re-measured on production with one digit added to every number (2026-09-23):
+ *
+ * | Item           | Now   | Worst case | Was (fixed slot) |
+ * |----------------|-------|------------|------------------|
+ * | deployment dot |  15   |    15      |   24             |
+ * | XRP price      |  57.7 |    75      |   96             |
+ * | indexed pages  |  36.3 |    45      |   96             |
+ * | views + users  | 150.7 |   168      |  184             |
+ * | heating        |  79.8 |   106      |  120             |
+ * | stars          |  35.3 |    44      |   60             |
+ * | clock          | 147.2 |   147      |  150             |
+ *
+ * The clock's worst case is the 147 derived field by field above, not the 173 the probe produced:
+ * the probe adds a digit to every number, and a three-digit day of the month does not exist.
  */
 .right {
     display: grid;
     grid-auto-flow: column;
     align-items: center;
     justify-content: end;
-    gap: 0;
-    --status-slot: 96px;
+    gap: 14px;
+    /**
+     * The whole reason the slots could stop being fixed. Without it every value change re-lays the
+     * zone out, because a proportional `1` and `8` have different advances.
+     */
+    font-variant-numeric: tabular-nums;
 }
 
 /**
@@ -158,60 +209,185 @@
  * inline-END edge. So a clipped slot reports `scrollWidth === clientWidth` and looks healthy. The
  * e2e check compares the content's bounding box against the slot's on both sides instead.
  */
+/**
+ * Every status item is set at 14px, which is what four of the seven already used. Views drops from
+ * 15 and the star count rises from 12, so the zone reads as one row of text rather than four sizes.
+ * The icons inside them converge on 14px too, in each widget's own stylesheet — they were 23px
+ * (indexed), 19px (views) and the bar's generic 18px (XRP).
+ *
+ * `max-content` and nothing else: an item is exactly as wide as what it draws, so the 14px `gap`
+ * above is the space a reader sees. Each widget also dropped the `min-width` SDD-L03 gave it — a
+ * reserved width is empty space inside the item, which is the uneven gap in another form. What
+ * those min-widths prevented was a one-off shift when a widget resolves from spinner to value;
+ * that is a single event per load inside a fixed-height bar, not the continuous jitter the fixed
+ * slots were for.
+ */
 .statusItem {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    width: var(--status-slot);
-    overflow: hidden;
-}
-
-/* Two counters with two icons — page views and new users. Wants 166px, grows to 174px. */
-.slotViews {
-    width: 184px;
-}
-
-/* Two temperatures, outside and measured. 85px today, 105px once either gains a digit. */
-.slotHeating {
-    width: 120px;
+    font-size: 14px;
+    width: max-content;
 }
 
 /**
  * The repository's star count, and the only status item that opens a panel of its own.
  *
- * 60 px, not the standard 96: the content is one icon and one number, and the number is four
- * figures away from a repository this size. It is also the one slot that must NOT clip — the panel
- * hangs out of it — so it sets `overflow: visible` instead of inheriting `.statusItem`'s clip.
+ * The one item whose panel hangs out of the bar, so it must not clip. Its trigger carries 2px of
+ * side padding for the hover background, which would read as 2px of extra gap on each side; the
+ * widget cancels it with a matching negative margin so its text edge is its box edge.
  */
 .slotStars {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    width: 60px;
+    width: max-content;
     overflow: visible;
 }
 
-/* The deployment indicator is a dot, not a value; a full slot for it would be a 96 px hole. */
+/* The deployment indicator is a dot, not a value: 15px is the dot itself. */
 .statusDot {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    width: 24px;
+    width: 15px;
 }
 
-/* Four fields and a locale-dependent short weekday — the one slot that legitimately differs. */
+/* Four fields and a locale-dependent short weekday. 147px in English, the widest of the three. */
 .clock {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    width: 150px;
+    width: max-content;
 }
 
+/**
+ * The fallback size for any glyph in the bar. The left zone overrides it per icon (see the optical
+ * block below) and the right-zone widgets set their own 14px, so what is left under this rule is
+ * whatever a widget does not size for itself.
+ */
 .header svg {
     height: 18px;
     width: 18px;
     fill: rgba(var(--blog-icons));
     stroke: rgba(var(--blog-icons));
+}
+
+/**
+ * Optical sizing for the left zone. The owner reported the icons as visibly different sizes; the
+ * boxes were already identical, so the box was never the problem.
+ *
+ * All nine are Simple Icons glyphs on `viewBox="0 0 24 24"`, all drawn in an 18x18 box, and the ink
+ * is centred in the viewBox on all nine (`getBBox` centre is 12,12 for every one). What differs is
+ * how much of the box each glyph inks, and the eye reads ink, not boxes. Measured by rendering each
+ * glyph solid-filled to a 96x96 canvas and summing alpha (Chromium, 2026-09-23):
+ *
+ * | Icon        | Coverage | k = sqrt(0.560/cov) | Size | Resulting coverage |
+ * |-------------|----------|---------------------|------|--------------------|
+ * | LinkedIn    |   74.4%  |  0.867              | 16px |  58.8%             |
+ * | Bitcoin     |   65.2%  |  0.927              | 17px |  58.1%             |
+ * | Reddit      |   59.0%  |  0.974              | 18px |  59.0%             |
+ * | Storybook   |   56.0%  |  1.000              | 18px |  56.0%             |
+ * | Readthedocs |   56.0%  |  1.000              | 18px |  56.0%             |
+ * | GitHub      |   42.8%  |  1.143              | 20px |  52.9%             |
+ * | Lighthouse  |   41.9%  |  1.157              | 20px |  51.7%             |
+ * | Playwright  |   39.9%  |  1.185              | 20px |  49.2%             |
+ * | Codecov     |   28.0%  |  1.413              | 20px |  34.6%             |
+ *
+ * The square root is not decoration: coverage is an area and the factor is a length. 56.0% is the
+ * set's median (Storybook / Readthedocs), so half the set moves up and half moves down.
+ *
+ * **20px is a cap, not a choice.** The bar is 24px tall, so an icon cannot pass 20 without touching
+ * both edges. Four icons want more than the cap allows and get 20.
+ *
+ * **Codecov cannot reach the band, and this is the honest statement of it.** Equalising it needs
+ * 25.4px. Its glyph is an umbrella — a thin canopy over a large empty area — so its bounding box is
+ * full-size while its ink is not. At the cap it sits at 34.6% and reads lighter than its
+ * neighbours. That is a property of the glyph, not of the rule above; the alternatives are dropping
+ * the icon or growing the bar.
+ *
+ * Eight of the nine now land in 49.2%-59.0%, a 1.20x spread. Before this block it was 28.0%-74.4%,
+ * a 2.66x spread, which is the defect that was reported.
+ *
+ * Sizes are whole pixels so nothing renders on a half-pixel at 1x.
+ */
+.header .left > svg {
+    /* Bitcoin, the identity glyph. */
+    width: 17px;
+    height: 17px;
+}
+
+/**
+ * The 14px rhythm is measured GLYPH TO GLYPH, not box to box.
+ *
+ * `gap: 14px` between equal boxes does not produce equal space between glyphs when the glyphs ink
+ * different widths: Lighthouse inks 12 of its 18 units, so a 14px box gap reads ~3px wider on each
+ * side of it than between two full-width icons. Each link is therefore as wide as its own scaled
+ * ink, and the glyph — centred in its viewBox — is centred in that box and overflows it
+ * symmetrically. The overflow is at most 3.35px per side and always lands inside the 14px gap, so
+ * two glyphs never touch.
+ *
+ * | Icon        | Ink width at 18px | Size | Box width |
+ * |-------------|-------------------|------|-----------|
+ * | LinkedIn    |       18.0        | 16px |  16px     |
+ * | GitHub      |       18.0        | 20px |  20px     |
+ * | Reddit      |       18.0        | 18px |  18px     |
+ * | Storybook   |       14.4        | 18px |  14.4px   |
+ * | Readthedocs |       13.9        | 18px |  13.9px   |
+ * | Codecov     |       18.0        | 20px |  20px     |
+ * | Playwright  |       18.0        | 20px |  20px     |
+ * | Lighthouse  |       12.0        | 20px |  13.3px   |
+ */
+.navLinks a[data-icon] {
+    justify-content: center;
+    width: var(--ink-width);
+    overflow: visible;
+}
+
+.navLinks a[data-icon] svg {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    flex-shrink: 0;
+}
+
+.navLinks a[data-icon='linkedin-link'] {
+    --icon-size: 16px;
+    --ink-width: 16px;
+}
+
+.navLinks a[data-icon='github-link'] {
+    --icon-size: 20px;
+    --ink-width: 20px;
+}
+
+.navLinks a[data-icon='reddit-link'] {
+    --icon-size: 18px;
+    --ink-width: 18px;
+}
+
+.navLinks a[data-icon='storybook-link'] {
+    --icon-size: 18px;
+    --ink-width: 14.4px;
+}
+
+.navLinks a[data-icon='docs-link'] {
+    --icon-size: 18px;
+    --ink-width: 13.9px;
+}
+
+.navLinks a[data-icon='coverage-link'] {
+    --icon-size: 20px;
+    --ink-width: 20px;
+}
+
+.navLinks a[data-icon='e2e-link'] {
+    --icon-size: 20px;
+    --ink-width: 20px;
+}
+
+.navLinks a[data-icon='lighthouse-link'] {
+    --icon-size: 20px;
+    --ink-width: 13.3px;
 }
 
 .route {
@@ -268,16 +444,17 @@
  * from the right, the clock never does.
  *
  * The breakpoints are **derived, not chosen**. A window-centred countdown occupies
- * `[W/2 - 85.5, W/2 + 85.5]`, and the right zone runs from `W - 18 - rightWidth` to `W - 18`, so
+ * `[W/2 - 85.74, W/2 + 85.74]`, and the right zone runs from `W - 18 - rightWidth` to `W - 18`, so
  * they stay clear of each other exactly while
  *
- *     W >= 2 * (rightWidth + 103.5)
+ *     W >= 2 * (rightWidth + 103.74)
  *
- * The half pixel is not pedantry. The countdown measures 171px, not the 170 this comment used to
- * claim, and the ladder was re-derived with 103 — which put the first rung one pixel short. It did
- * not bite while the rung sat at 1549 and the zone needed 1546, and it bit immediately when a new
- * slot moved the rung onto its own boundary. Measured, not assumed: `center.right` is 919 against
- * a `right.left` of 918 at 1666px.
+ * The fraction is not pedantry, and it has bitten twice. The countdown measures 171.48px — not the
+ * 170 an earlier version of this comment claimed, and not the 171 the one after it did — and each
+ * time the constant was rounded down the first rung came out a pixel short. Measured with the
+ * ladder at 1575 and the zone at its 684px worst case: `center.right` was 873.2 against a
+ * `right.left` of 873.0, a 0.2px overlap. Hence 1576, and `.center` now sets `tabular-nums` so the
+ * number this is all derived from stops changing every second.
  *
  * SDD-L12-T9 re-derived all of this, because T9 moved the navigation icons into the LEFT zone. That
  * changes the problem: under T8 the left zone was 66 px and could never reach the middle, so only
@@ -285,9 +462,10 @@
  * `W >= 2 * (leftWidth + 103)` is a real constraint that T8's ladder did not contain. A ladder that
  * only watches one side is how the bar ended up drawn on top of itself at 1024 px the first time.
  *
- * Zone widths are arithmetic, not measurement, because the slots are fixed:
- * right = 24 (dot) + 96 (XRP) + 96 (indexed) + 184 (views) + 120 (heating) + 60 (stars) + 150 (clock);
- * left = 66 + 18 per icon + 14 per gap.
+ * Zone widths are now each item's WORST CASE plus the 14px gaps, which is a safe upper bound: a zone
+ * that clears the countdown at its widest clears it always.
+ * right = 15 + 75 + 45 + 168 + 106 + 44 + 147, plus 6 x 14 of gap = 684;
+ * left = 17 (logo) + 12 + 36 (route) + 12 + the navigation icons at their own widths + 14 per gap.
  *
  * Re-derived again once the views and heating slots were sized correctly — widening two slots by
  * 112 px in total moves every breakpoint that depends on the right zone, which is the whole reason
@@ -302,14 +480,28 @@
  * the right zone would be 330 px against the 747 px it has room for. So 870 px is the floor for
  * this slot. The prompt is what carries the same invitation below it.
  *
- * | Below   | What sheds               | Left | Right | Left needs | Right needs |
- * |---------|--------------------------|------|-------|------------|-------------|
- * | 1667 px | views + users            | 320  | 730   |  847       | 1667        |
- * | 1299 px | heating                  | 320  | 546   |  847       | 1299        |
- * | 1059 px | crypto price             | 320  | 426   |  847       | 1059        |
- * |  869 px | 5 artifact icons + stars | 320  | 330   |  847       |  867        |
- * |  768 px | indexed counter          | 160  | 270   |  527       |  747        |
- * |  479 px | 3 profile icons          | 160  | 174   |  527       |  555        |
+ * Re-derived once more when the fixed slots gave way to `max-content` + `gap: 14px` and the icons
+ * took their optical sizes. Both zones got narrower at their worst case — right 730 -> 684, left
+ * 320 -> 310.6 — so every rung moves DOWN, which is the safe direction: each item now survives to a
+ * narrower window than before. Shedding an item also removes its gap, which is why each row drops
+ * by the item's width PLUS 14.
+ *
+ * | Below   | What sheds               | Left  | Right | Left needs | Right needs |
+ * |---------|--------------------------|-------|-------|------------|-------------|
+ * | 1576 px | views + users            | 310.6 | 684   |  828.7     | 1575.5      |
+ * | 1212 px | heating                  | 310.6 | 502   |  828.7     | 1211.5      |
+ * |  972 px | crypto price             | 310.6 | 382   |  828.7     |  971.5      |
+ * |  829 px | 5 artifact icons + stars | 310.6 | 293   |  828.7     |  793.5      |
+ * |  769 px | indexed counter          | 159   | 235   |  525.5     |  677.5      |
+ * |  479 px | 3 profile icons          | 159   | 176   |  525.5     |  559.5      |
+ *
+ * The 829 rung is the first one the LEFT zone sets rather than the right: with the status zone down
+ * to 293px it would fit in 793.5, and the navigation icons are what still needs 828.7. A ladder
+ * that only watched the right zone would draw the bar on top of itself between those two numbers.
+ *
+ * The navigation icons no longer contribute a flat 18px each: the left zone is
+ * 16 + 20 + 18 + 14.4 + 13.9 + 20 + 20 + 13.3 = 135.6 of icon plus 7 x 14 of gap, and 159 once the
+ * five artifact icons shed.
  *
  * Read the table as: above each row's width, the zones on that row coexist. Below 769 px the
  * countdown is hidden entirely, so from there down the only requirement is that the two zones fit
@@ -322,25 +514,25 @@
  * `.navLinks a` sets `display: flex` and outranks a bare class on specificity, so each rule lists
  * both forms rather than reaching for `!important`.
  */
-@media screen and (max-width: 1666px) {
+@media screen and (max-width: 1575px) {
     .shed1 {
         display: none;
     }
 }
 
-@media screen and (max-width: 1298px) {
+@media screen and (max-width: 1211px) {
     .shed2 {
         display: none;
     }
 }
 
-@media screen and (max-width: 1058px) {
+@media screen and (max-width: 971px) {
     .shed3 {
         display: none;
     }
 }
 
-@media screen and (max-width: 869px) {
+@media screen and (max-width: 828px) {
     .shed5,
     .shed7,
     .navLinks a.shed5 {
@@ -368,7 +560,7 @@
 
 /**
  * The three profile icons survive further than the artifact ones because they are the only
- * navigation left. They go at 479 px, where the two zones would otherwise total 334 px in a 480 px
+ * navigation left. They go at 479 px, where the two zones would otherwise total 335 px in a 480 px
  * window — fitting, but with nothing between them.
  */
 @media screen and (max-width: 479px) {

@@ -1,5 +1,5 @@
 /*
- * A menu bar extra. The trigger has to read as part of the bar — same 12px, same colour, no chrome
+ * A menu bar extra. The trigger has to read as part of the bar — same 14px, same colour, no chrome
  * of its own until the pointer is on it — and the panel has to escape the bar entirely.
  */
 .extra {
@@ -16,11 +16,15 @@
     gap: 4px;
     background: none;
     border: none;
+    /* The 2px keeps the hover background off the text; the negative margin keeps it out of the
+       bar's 14px gap, so this item's text edge is its box edge like every other one. */
     padding: 0 2px;
+    margin: 0 -2px;
     height: 18px;
     border-radius: 4px;
     font: inherit;
-    font-size: 12px;
+    /* 14px, the one size every status item is set at. It was the only one at 12. */
+    font-size: 14px;
     line-height: 1;
     color: rgba(var(--blog-icons));
     cursor: pointer;
@@ -32,9 +36,9 @@
 }
 
 /*
- * `header svg` sizes every glyph in the bar at 18px, which is right beside 14px text and too big
- * beside this 12px count: at 18 the trigger measured 63px inside a 60px slot. 14 is the size the
- * number is set at, and it buys the slot back its headroom.
+ * `header svg` sizes every glyph in the bar at 18px, which is too big beside a 14px count: at 18
+ * the trigger measured 63px inside a 60px slot. 14 is the size the number is set at, and the size
+ * every other icon in the status zone is drawn at.
  */
 .trigger .star {
     width: 14px;
