@@ -102,12 +102,12 @@ const STATUS_ICONS: Record<string, IconType> = {
      * median, which no size inside a 24px bar could correct.
      *
      * A double check and a gauge, not Playwright's masks and Lighthouse's tower. The bar sizes every
-     * glyph so its largest side is exactly 18px (`header.module.css`), which leaves the shorter side
+     * glyph so its largest side is exactly 16px (`header.module.css`), which leaves the shorter side
      * to the glyph's own proportions — and those two were the extremes of the set, the masks at
      * 1.37:1 and the tower at 0.67:1 against 0.77-1.06 for everything else. Measured on the
-     * candidates, both replacements are 1.000:1 and ink the full 18x18, so a ruler laid across the
-     * row now reads 18 on either axis. A double check is what a green e2e run reports, and a gauge
-     * is the dial Lighthouse draws its score on.
+     * candidates, both replacements are 1.000:1 and ink their box on both axes, so a ruler laid
+     * across the row reads the same on either one. A double check is what a green e2e run reports,
+     * and a gauge is the dial Lighthouse draws its score on.
      */
     'coverage-link': FaChartPie,
     'e2e-link': FaCheckDouble,

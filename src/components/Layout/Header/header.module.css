@@ -267,8 +267,8 @@
  * whatever a widget does not size for itself.
  */
 .header svg {
-    height: 18px;
-    width: 18px;
+    height: 16px;
+    width: 16px;
     fill: rgba(var(--blog-icons));
     stroke: rgba(var(--blog-icons));
 }
@@ -332,10 +332,25 @@
  *
  * A ruler laid across that row reads 16, 17, 18, 18, 18, 18, 20, 20, 20 — which is the report.
  *
- * So the rule is now a CAP BOX: every glyph is scaled until its largest side is exactly 18px, which
- * for a Simple Icons glyph means `--icon-size: 18px` flat, because each one inks the full 24 units
- * on one axis. The letterboxed pie chart inks the full width of its box, so 18 there too. The cap
- * is 18 and not 20 because the bar is 24px tall and 20 leaves nothing above or below.
+ * So the rule is now a CAP BOX: every glyph is scaled until its largest side is exactly 16px, which
+ * for a Simple Icons glyph means `--icon-size: 16px` flat, because each one inks the full 24 units
+ * on one axis. The letterboxed pie chart inks the full width of its box, so 16 there too.
+ *
+ * **The cap is 16 because of what is left over, not because of the glyph.** It was 18 first, on the
+ * reasoning that 20 in a 24px bar leaves nothing above or below. 18 leaves 3px, and the owner
+ * reported that as still touching the edges. Measured against the rest of the bar, 18 was the
+ * largest thing in it and the tightest:
+ *
+ * | Element                       | Ink       | Clearance |
+ * |-------------------------------|-----------|-----------|
+ * | Nav links + Bitcoin, at 18    |   18.00   |  3 / 3    |
+ * | Deployment dot (16px box)     |    9.49   |  4 / 4    |
+ * | Crypto / indexed / stars      | 14px box  |  5 / 5    |
+ * | Status text at 14px           | 16.50 box |  3.75     |
+ *
+ * 16 puts the clearance at 4 on both sides, which is the deployment dot's box exactly, and leaves
+ * the nav links above the 14px status widgets — they are navigation, not status, and were never
+ * meant to read at the same size. 16 in a 24px bar is also what macOS gives its own menu bar glyphs.
  *
  * What this costs, stated rather than discovered later: ink coverage goes back to a 1.9x spread, so
  * a sparse glyph reads lighter than a dense one at the same box. That is the trade the ruler asks
@@ -350,7 +365,7 @@
  * before them: all three link to a report this repository generates about itself, so there is no
  * brand to honour. See the note beside `STATUS_ICONS` in `index.tsx`.
  *
- * The set now runs 0.77-1.06, and a ruler across the row reads 18 on the long side of every glyph.
+ * The set now runs 0.77-1.06, and a ruler across the row reads 16 on the long side of every glyph.
  * Storybook at 0.80 and Readthedocs at 0.77 are the narrow pair left, and they stay: those are the
  * brands, the links point at their sites, and a letter and a book are legitimately taller than wide.
  *
@@ -358,35 +373,38 @@
  */
 .header .left > svg {
     /* Bitcoin, the identity glyph. Inks its full viewBox, so the cap box is the box. */
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
 }
 
 /**
  * The 14px rhythm is measured GLYPH TO GLYPH, not box to box.
  *
  * `gap: 14px` between equal boxes does not produce equal space between glyphs when the glyphs ink
- * different widths: Lighthouse inks 12 of its 18 units, so a 14px box gap reads ~3px wider on each
- * side of it than between two full-width icons. Each link is therefore as wide as its own scaled
- * ink, and the glyph — centred in its viewBox — is centred in that box and overflows it
- * symmetrically. The overflow is at most 3.35px per side and always lands inside the 14px gap, so
+ * different widths: Readthedocs inks 12.33 of its 16px box, so a 14px box gap reads ~1.8px wider on
+ * each side of it than between two full-width icons. Each link is therefore as wide as its own
+ * scaled ink, and the glyph — centred in its viewBox — is centred in that box and overflows it
+ * symmetrically. The overflow is at most 1.84px per side and always lands inside the 14px gap, so
  * two glyphs never touch.
  *
- * Every glyph is at the 18px cap box now, so the box is simply its own ink width at 18px:
+ * Every glyph is at the 16px cap box now, so the box is simply its own ink width at 16px:
  *
  * | Icon        | Size | Ink width | Box width |
  * |-------------|------|-----------|-----------|
- * | LinkedIn    | 18px |   18.00   |  18px     |
- * | GitHub      | 18px |   18.00   |  18px     |
- * | Reddit      | 18px |   18.00   |  18px     |
- * | Storybook   | 18px |   14.44   |  14.44px  |
- * | Readthedocs | 18px |   13.87   |  13.87px  |
- * | Pie chart   | 18px |   18.00   |  18px     |
- * | Check       | 18px |   18.00   |  18px     |
- * | Gauge       | 18px |   18.00   |  18px     |
+ * | LinkedIn    | 16px |   16.00   |  16px     |
+ * | GitHub      | 16px |   16.00   |  16px     |
+ * | Reddit      | 16px |   16.00   |  16px     |
+ * | Storybook   | 16px |   12.84   |  12.84px  |
+ * | Readthedocs | 16px |   12.33   |  12.33px  |
+ * | Pie chart   | 16px |   16.00   |  16px     |
+ * | Check       | 16px |   16.00   |  16px     |
+ * | Gauge       | 16px |   16.00   |  16px     |
+ *
+ * The two narrow boxes are the 18px figures scaled by 16/18, not new measurements: the ink is a
+ * fixed fraction of the viewBox, so it tracks the cap exactly.
  *
  * The pie chart is the one glyph whose viewBox is not square (544x512). `preserveAspectRatio`
- * letterboxes it in the square box, so it inks the full 18px of width and 16.9px of height. Only the
+ * letterboxes it in the square box, so it inks the full 16px of width and 15.1px of height. Only the
  * width matters to the rhythm, and the coverage figure above is measured on the letterboxed raster,
  * so both numbers are already the rendered ones.
  */
@@ -403,43 +421,43 @@
 }
 
 .navLinks a[data-icon='linkedin-link'] {
-    --icon-size: 18px;
-    --ink-width: 18px;
+    --icon-size: 16px;
+    --ink-width: 16px;
 }
 
 .navLinks a[data-icon='github-link'] {
-    --icon-size: 18px;
-    --ink-width: 18px;
+    --icon-size: 16px;
+    --ink-width: 16px;
 }
 
 .navLinks a[data-icon='reddit-link'] {
-    --icon-size: 18px;
-    --ink-width: 18px;
+    --icon-size: 16px;
+    --ink-width: 16px;
 }
 
 .navLinks a[data-icon='storybook-link'] {
-    --icon-size: 18px;
-    --ink-width: 14.44px;
+    --icon-size: 16px;
+    --ink-width: 12.84px;
 }
 
 .navLinks a[data-icon='docs-link'] {
-    --icon-size: 18px;
-    --ink-width: 13.87px;
+    --icon-size: 16px;
+    --ink-width: 12.33px;
 }
 
 .navLinks a[data-icon='coverage-link'] {
-    --icon-size: 18px;
-    --ink-width: 18px;
+    --icon-size: 16px;
+    --ink-width: 16px;
 }
 
 .navLinks a[data-icon='e2e-link'] {
-    --icon-size: 18px;
-    --ink-width: 18px;
+    --icon-size: 16px;
+    --ink-width: 16px;
 }
 
 .navLinks a[data-icon='lighthouse-link'] {
-    --icon-size: 18px;
-    --ink-width: 18px;
+    --icon-size: 16px;
+    --ink-width: 16px;
 }
 
 .route {
