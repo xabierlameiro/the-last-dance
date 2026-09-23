@@ -81,7 +81,24 @@ const VIEWPORTS = [
  * Pinning the numbers means a future `auto`, a stray `gap`, or a widget growing a second value fails
  * as a test rather than as a screenshot a month later.
  */
-const SLOT_WIDTHS = { deploymentDot: 24, value: 96, views: 184, heating: 120, stars: 60, clock: 150 };
+/**
+ * The gap between status items, which is the `gap` on `.right` and the same number the identity
+ * side uses between its icons.
+ *
+ * This used to be `SLOT_WIDTHS = { deploymentDot: 24, value: 96, views: 184, heating: 120, stars:
+ * 60, clock: 150 }`, one fixed width per widget, and the check below asserted every slot matched
+ * one of them. Those slots are gone: `header.module.css` documents the measurement that killed
+ * them — with a fixed slot and right-aligned content the visible gap before item *i* is
+ * `slot_i - content_i`, so it is even only while every widget is at its widest, and the indexed
+ * counter showing `52` against a six-figure worst case leaves 40px of its slot empty. Even spacing
+ * and fixed slots are incompatible by construction, so the slots became `max-content` and
+ * `font-variant-numeric: tabular-nums` took over the job of stopping the zone re-laying out on
+ * every value change.
+ *
+ * So the pitch is no longer a property of the widths and cannot be asserted through them. It is
+ * the gap, measured between one item's box and the next.
+ */
+const SLOT_GAP = 14;
 
 /**
  * Measures the *bar*, not the scroll box.
@@ -305,13 +322,13 @@ test.describe('Scroll surfaces', () => {
     /**
      * L12-T9. The owner's report was "each one takes a random amount of space, and they should be
      * stuck to the right". Both halves are asserted, because they have different causes: the pitch
-     * comes from the fixed slot widths, and the flush edge from the zone's own alignment.
+     * comes from the `gap` on the zone, and the flush edge from the zone's own alignment.
      *
      * Measured at two widths so the claim is not an artefact of one: at 1280 the crypto slot is shed
      * and at 1920 it is not, so the check sees a different number of slots each time.
      */
     for (const width of [1280, 1920]) {
-        test(`the status items keep a fixed pitch, flush to the bar edge at ${width}px`, async ({ page }) => {
+        test(`the status items keep an even pitch, flush to the bar edge at ${width}px`, async ({ page }) => {
             await page.setViewportSize({ width, height: 800 });
             await page.goto('/');
             await expect(page.getByTestId('header')).toBeVisible();
@@ -329,6 +346,7 @@ test.describe('Scroll surfaces', () => {
                     .filter((child) => getComputedStyle(child).display !== 'none')
                     .map((child) => ({
                         width: Math.round(child.getBoundingClientRect().width),
+                        left: Math.round(child.getBoundingClientRect().left),
                         right: Math.round(child.getBoundingClientRect().right),
                     }));
 
@@ -342,15 +360,17 @@ test.describe('Scroll surfaces', () => {
             });
 
             const describe = JSON.stringify(layout);
-            const allowed = Object.values(SLOT_WIDTHS);
 
             expect(layout.slots.length, `no status items at ${width}px: ${describe}`).toBeGreaterThan(1);
 
-            for (const slot of layout.slots) {
-                expect(allowed, `a status slot is ${slot.width}px, which is not a fixed slot: ${describe}`).toContain(
-                    slot.width,
-                );
-            }
+            // The pitch: one number between every pair of neighbours, whatever each widget is
+            // currently showing. A widget in an error state draws a ~12px glyph and one serving a
+            // six-figure count draws 150px; the gap between them is the same either way.
+            const gaps = layout.slots.slice(1).map((slot, index) => slot.left - layout.slots[index].right);
+
+            expect(gaps, `the status items are not evenly spaced at ${width}px: ${describe}`).toEqual(
+                gaps.map(() => SLOT_GAP),
+            );
 
             // Flush right: the gap left after the last slot is the bar's own padding, the same
             // number as on the identity side. Anything else is the zone drifting off the edge.
@@ -484,9 +504,30 @@ test.describe('Scroll surfaces', () => {
                                 node.closest('[data-testid="loading"]') !== null ||
                                 getComputedStyle(node).animationName !== 'none';
 
+                            /**
+                             * A node pulled outside the slot by its own negative margin is not
+                             * clipped, and this is the third box that is not its size.
+                             *
+                             * The stars trigger carries `padding: 0 2px` for its hover background
+                             * and `margin: 0 -2px` to cancel it, so its border box sits 2px outside
+                             * the slot on each side while its text and glyph land exactly on the
+                             * slot's edges — measured 2026-09-23: slot 1708.3–1744.3, button
+                             * 1706.3–1746.3, svg starting at 1708.3 and the count ending at 1744.3.
+                             * The margin exists precisely so the item's *ink* edge is its box edge
+                             * and the 14px gap above stays 14px of visible space.
+                             *
+                             * The slot is `overflow: visible`, so nothing is cut off either way.
+                             * Counting that padding as clipping failed the check on the one item it
+                             * was written to protect.
+                             */
+                            const bleeds = (node: Element) => {
+                                const style = getComputedStyle(node);
+                                return parseFloat(style.marginLeft) < 0 || parseFloat(style.marginRight) < 0;
+                            };
+
                             const laidOut = [...slot.querySelectorAll('*')].filter((node) => {
                                 if (getComputedStyle(node).display === 'none' || escapes(node)) return false;
-                                if (spins(node)) return false;
+                                if (spins(node) || bleeds(node)) return false;
                                 const rect = node.getBoundingClientRect();
                                 return rect.width > 0 && rect.height > 0;
                             });
