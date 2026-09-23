@@ -1,17 +1,9 @@
 import React, { ReactNode } from 'react';
 import styles from './header.module.css';
 import type { IconType } from 'react-icons';
-import {
-    SiBitcoincash,
-    SiGithub,
-    SiLighthouse,
-    SiLinkedin,
-    SiPlaywright,
-    SiReadthedocs,
-    SiReddit,
-    SiStorybook,
-} from 'react-icons/si';
-import { FaChartPie } from 'react-icons/fa';
+import { SiBitcoincash, SiGithub, SiLinkedin, SiReadthedocs, SiReddit, SiStorybook } from 'react-icons/si';
+import { FaChartPie, FaCheckDouble } from 'react-icons/fa';
+import { FaGaugeHigh } from 'react-icons/fa6';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import { socialLinks, translateRoute } from '@/constants/site';
@@ -102,13 +94,24 @@ const STATUS_ICONS: Record<string, IconType> = {
     'storybook-link': SiStorybook,
     'docs-link': SiReadthedocs,
     /**
-     * A pie chart, not Codecov's umbrella. The link goes to `coverage.xabierlameiro.com`, a report
-     * of this repo's own, so there is no brand to honour here — and the umbrella inks 28% of its
-     * box against the bar's 56% median, which no size inside a 24px bar could correct.
+     * The last three are generic glyphs rather than the brands they link to, for the same reason in
+     * each case: all three point at a report this repository generates about itself, so there is no
+     * brand to honour, and all three brand marks fail the bar's sizing rule.
+     *
+     * A pie chart, not Codecov's umbrella: the umbrella inks 28% of its box against the bar's 56%
+     * median, which no size inside a 24px bar could correct.
+     *
+     * A double check and a gauge, not Playwright's masks and Lighthouse's tower. The bar sizes every
+     * glyph so its largest side is exactly 18px (`header.module.css`), which leaves the shorter side
+     * to the glyph's own proportions — and those two were the extremes of the set, the masks at
+     * 1.37:1 and the tower at 0.67:1 against 0.77-1.06 for everything else. Measured on the
+     * candidates, both replacements are 1.000:1 and ink the full 18x18, so a ruler laid across the
+     * row now reads 18 on either axis. A double check is what a green e2e run reports, and a gauge
+     * is the dial Lighthouse draws its score on.
      */
     'coverage-link': FaChartPie,
-    'e2e-link': SiPlaywright,
-    'lighthouse-link': SiLighthouse,
+    'e2e-link': FaCheckDouble,
+    'lighthouse-link': FaGaugeHigh,
 };
 
 /**

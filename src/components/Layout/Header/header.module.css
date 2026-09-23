@@ -342,12 +342,17 @@
  * for, and it is the honest one — a drawing cannot be both the same size and the same weight as a
  * drawing of a different shape.
  *
- * What it cannot fix is aspect ratio, which is the glyph and not the scaling. After the cap the
- * widths run 12.00-18.00 and the heights 13.17-18.00, and both extremes are one icon each:
- * Playwright's masks are 1.37:1 and the lighthouse is 0.67:1. Everything else sits in 0.77-1.06.
- * Squarer glyphs for those two links are the only remaining move, and there is no brand to honour
- * — both point at this repo's own reports, which is the same reasoning that replaced the Codecov
- * umbrella above.
+ * What the cap cannot fix is aspect ratio, which belongs to the glyph and not to the scaling. It
+ * left the widths at 12.00-18.00 and the heights at 13.17-18.00, and both extremes were one icon
+ * each: Playwright's masks at 1.37:1 and Lighthouse's tower at 0.67:1, against 0.77-1.06 for
+ * everything else. Both were replaced rather than documented as residuals — a double check and a
+ * gauge, each 1.000:1 and inking the full 18x18 — on the same grounds as the Codecov umbrella
+ * before them: all three link to a report this repository generates about itself, so there is no
+ * brand to honour. See the note beside `STATUS_ICONS` in `index.tsx`.
+ *
+ * The set now runs 0.77-1.06, and a ruler across the row reads 18 on the long side of every glyph.
+ * Storybook at 0.80 and Readthedocs at 0.77 are the narrow pair left, and they stay: those are the
+ * brands, the links point at their sites, and a letter and a book are legitimately taller than wide.
  *
  * Sizes are whole pixels so nothing renders on a half-pixel at 1x.
  */
@@ -377,8 +382,8 @@
  * | Storybook   | 18px |   14.44   |  14.44px  |
  * | Readthedocs | 18px |   13.87   |  13.87px  |
  * | Pie chart   | 18px |   18.00   |  18px     |
- * | Playwright  | 18px |   18.00   |  18px     |
- * | Lighthouse  | 18px |   12.00   |  12px     |
+ * | Check       | 18px |   18.00   |  18px     |
+ * | Gauge       | 18px |   18.00   |  18px     |
  *
  * The pie chart is the one glyph whose viewBox is not square (544x512). `preserveAspectRatio`
  * letterboxes it in the square box, so it inks the full 18px of width and 16.9px of height. Only the
@@ -434,7 +439,7 @@
 
 .navLinks a[data-icon='lighthouse-link'] {
     --icon-size: 18px;
-    --ink-width: 12px;
+    --ink-width: 18px;
 }
 
 .route {
