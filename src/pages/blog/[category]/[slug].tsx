@@ -240,6 +240,30 @@ export const getStaticProps = async (data: {
     // The SEO <link rel="canonical"> (built from the post's primary category) consolidates
     // these duplicates for search engines, per Google's faceted-navigation guidance. A 301
     // here used to bounce tag clicks out of the blog, which broke tag navigation (SDD-009).
+    //
+    // gsc-indexing-hygiene D3: that reasoning covers the post's OWN facets, and nothing else.
+    // Because `getPostBySlug` resolves on slug and locale alone, every other segment served 200 too
+    // — /blog/javascript/npm-token-solution-error and /blog/react/npm-token-solution-error both
+    // answered 200 with a canonical under /blog/error/, verified on production 2026-09-23. The
+    // duplicate surface was every (segment, slug, locale) triple, not the handful Search Console
+    // happened to list. A segment outside the post's own facets now redirects to the canonical.
+    //
+    // Tag renders survive because the middleware rewrite targets /blog/<tag>/<slug> with a tag the
+    // post carries: tag listings only ever link posts holding that tag, so the rewritten segment is
+    // always inside this set. A hand-typed `?tag=` naming a foreign tag falls outside it and lands
+    // on the canonical, which is the right answer and cannot loop — the canonical's own segment is
+    // the post's category.
+    const facets = new Set([post.meta.category.toLowerCase(), ...post.meta.tags.map((tag: string) => tag.toLowerCase())]);
+    if (!facets.has(category.toLowerCase())) {
+        return {
+            redirect: {
+                destination: `${getLang(post.meta.locale)}/blog/${post.meta.category.toLowerCase()}/${post.meta.slug}`,
+                permanent: true,
+            },
+            revalidate: 86400,
+        } as const;
+    }
+
     const mdxSource = await serialize(post.content);
     const { categories, tags } = getAllCategories(locale);
 

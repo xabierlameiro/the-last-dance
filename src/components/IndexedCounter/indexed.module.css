@@ -1,8 +1,6 @@
 .container {
-    /* SDD-L03: reserve the settled width so the header does not reflow when this resolves.
-       Measured on the built site: spinner 46px -> value 63px, +17px shift. `min-width` covers the wider of the
-       spinner and the value, so neither state moves its siblings. */
-    min-width: 70px;
+    /* The 70px SDD-L03 reserved here is gone for the reason given in `crypto.module.css`: it was
+       40px of empty space beside a two-figure count, which is what the uneven spacing was made of. */
     display: flex;
     align-items: center;
     gap: 5px;
@@ -10,6 +8,8 @@
     user-select: none;
 }
 
+/* 14px, the size every icon in the status zone is drawn at. It was the largest one at 23. */
 .container svg.xrp {
-    width: 23px;
+    width: 14px;
+    height: 14px;
 }

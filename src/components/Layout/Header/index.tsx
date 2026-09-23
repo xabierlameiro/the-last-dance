@@ -3,7 +3,6 @@ import styles from './header.module.css';
 import type { IconType } from 'react-icons';
 import {
     SiBitcoincash,
-    SiCodecov,
     SiGithub,
     SiLighthouse,
     SiLinkedin,
@@ -12,6 +11,7 @@ import {
     SiReddit,
     SiStorybook,
 } from 'react-icons/si';
+import { FaChartPie } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import { socialLinks, translateRoute } from '@/constants/site';
@@ -101,7 +101,12 @@ const STATUS_ICONS: Record<string, IconType> = {
     'reddit-link': SiReddit,
     'storybook-link': SiStorybook,
     'docs-link': SiReadthedocs,
-    'coverage-link': SiCodecov,
+    /**
+     * A pie chart, not Codecov's umbrella. The link goes to `coverage.xabierlameiro.com`, a report
+     * of this repo's own, so there is no brand to honour here — and the umbrella inks 28% of its
+     * box against the bar's 56% median, which no size inside a 24px bar could correct.
+     */
+    'coverage-link': FaChartPie,
     'e2e-link': SiPlaywright,
     'lighthouse-link': SiLighthouse,
 };
@@ -136,6 +141,9 @@ const NavLinks = () => {
                         // to come from here. Without it these read as "link, link, link" — the
                         // exact defect L05/L06 spent two phases removing from the rest of the page.
                         aria-label={item.title}
+                        // Carries the optical size and box width the icon is drawn at — one rule per
+                        // icon in the stylesheet rather than nine classes threaded through here.
+                        data-icon={item.testId}
                         className={styles[`shed${item.shed}`]}
                     >
                         {Icon ? <Icon aria-hidden="true" /> : item.name}
@@ -197,15 +205,15 @@ const Header = ({ children }: { children?: ReactNode }) => {
                     <IndexedCounter />
                 </span>
                 {/**
-                 * SDD-L12-T10. These two carry a wider slot because they render TWO values each:
-                 * `ViewCounter all` is page views AND new users, with an icon on each, and `Heating`
-                 * is the outside and measured temperatures. Sized on the default 96px slot, the view
-                 * counter lost 69px off its left edge in production — the defect the owner reported.
+                 * These two render TWO values each — `ViewCounter all` is page views AND new users,
+                 * `Heating` is the outside and measured temperatures — so they are the widest items
+                 * in the row and the first to shed. They used to carry a per-widget slot width;
+                 * every item is now `max-content` and the ladder is derived from their worst case.
                  */}
-                <span className={`${styles.statusItem} ${styles.slotViews} ${styles.shed1}`}>
+                <span className={`${styles.statusItem} ${styles.shed1}`}>
                     <ViewCounter all />
                 </span>
-                <span className={`${styles.statusItem} ${styles.slotHeating} ${styles.shed2}`}>
+                <span className={`${styles.statusItem} ${styles.shed2}`}>
                     <Heating />
                 </span>
                 {/**

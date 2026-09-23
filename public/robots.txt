@@ -1,9 +1,11 @@
 # *
 User-agent: *
 Allow: /
-# tag-facets-as-query-param: `?tag=` only carries the tag being browsed; the post itself lives at
-# its parameter-free URL, which is what the sitemap lists and rel=canonical points at.
-Disallow: /*?tag=
+# gsc-indexing-hygiene D1: `?tag=` used to be disallowed here. Every tag listing links its posts at
+# /blog/<category>/<slug>?tag=<tag> (see src/helpers/postPath.ts), and each of those pages already
+# declares rel=canonical to the parameter-free URL the sitemap lists — but a page Googlebot may not
+# fetch is a page whose canonical it can never read, so the rule turned a solved duplicate into an
+# opaque one. robots.txt is not a canonicalization tool; rel=canonical and 308s are.
 
 # AI / LLM crawlers — explicitly welcome (SDD-013). Training + search + on-demand
 # fetchers. The default * rule already allows them; these sections document intent

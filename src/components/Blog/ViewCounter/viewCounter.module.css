@@ -1,8 +1,10 @@
 /**
  * SDD-L03. `.views` used to style both the outer wrapper and the inner value slot, so reserving a
  * width on it applied at two nesting levels at once and inflated the header row from 87px to 141px.
- * The wrapper is now `.counters`; `.views` and `.users` are the two independent value slots, and each
- * reserves the wider of its spinner and its settled value so neither shifts its siblings on resolve.
+ * The wrapper is now `.counters`; `.views` and `.users` are the two independent value slots.
+ *
+ * The widths they reserved (82px and 70px) are gone: the bar spaces its items with a real 14px gap,
+ * and a reserved width is empty space inside the item. See `crypto.module.css` for the full reason.
  */
 .counters {
     display: flex;
@@ -15,16 +17,17 @@
     display: flex;
     align-items: center;
     justify-self: center;
-    font-size: 15px;
+    /* 14px, the one size every status item is set at. It was the only one at 15. */
+    font-size: 14px;
     user-select: none;
     gap: 8px;
     color: rgba(var(--blog-icons));
-    /* 79px measured with a 6-digit count; 82 leaves a little headroom without widening the row. */
-    min-width: 82px;
 }
 
+/* 14px, the size every icon in the status zone is drawn at. It was the widest one at 19. */
 .views svg {
-    width: 19px;
+    width: 14px;
+    height: 14px;
 }
 
 /* Only rendered by `<ViewCounter all />`, so it is absent on post pages. */
@@ -34,6 +37,4 @@
     font-size: 14px;
     user-select: none;
     gap: 8px;
-    /* 66px measured with a 4-digit count. */
-    min-width: 70px;
 }

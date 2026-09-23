@@ -7,18 +7,24 @@ const redirects = legacyFacetRedirects(path.join(process.cwd(), 'data/blog'));
 const posts = ['en', 'es', 'gl'].flatMap((locale) => getPostsByLocale(locale));
 
 describe('legacyFacetRedirects', () => {
-    it('redirects every tag URL of every post to its category URL with the tag carried', () => {
+    // gsc-indexing-hygiene D1: the destination used to carry `?tag=<tag>`, which robots.txt then
+    // forbade Googlebot to fetch. A permanent redirect has to name the canonical URL itself.
+    it('redirects every tag URL of every post to its canonical category URL', () => {
         for (const { meta } of posts) {
             const category = meta.category.toLowerCase();
             for (const tag of meta.tags.map((value: string) => value.toLowerCase())) {
                 if (tag === category) continue;
                 expect(redirects).toContainEqual({
                     source: `/blog/${tag}/${encodeURIComponent(meta.slug)}`,
-                    destination: `/blog/${category}/${meta.slug}?tag=${tag}`,
+                    destination: `/blog/${category}/${meta.slug}`,
                     permanent: true,
                 });
             }
         }
+    });
+
+    it('never targets a URL carrying a query parameter', () => {
+        expect(redirects.filter(({ destination }) => destination.includes('?'))).toEqual([]);
     });
 
     it('never redirects a real post URL, in any locale', () => {
