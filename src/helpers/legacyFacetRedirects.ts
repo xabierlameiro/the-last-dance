@@ -7,8 +7,17 @@ import { postPath } from './postPath.ts';
 /**
  * tag-facets-as-query-param, step 3. Before `?tag=`, every post was also reachable at
  * /blog/<tag>/<slug> for each of its tags. Those URLs are still crawled and linked from outside, so
- * each one gets a permanent redirect to the post's own category path, carrying the tag as `?tag=` so a
- * reader who follows an old link lands with the same tag selected.
+ * each one gets a permanent redirect to the post's own category path.
+ *
+ * gsc-indexing-hygiene D1: the destination used to carry the tag as `?tag=<tag>`, so a reader
+ * following an old link landed with the same tag selected. That was the wrong trade. `robots.txt`
+ * disallowed `/*?tag=`, so every one of these permanent redirects pointed at a URL Googlebot was
+ * forbidden to fetch — confirmed by URL Inspection on 2026-09-23, which reported
+ * /blog/error/npm-token-solution-error?tag=ci as "URL is unknown to Google", crawled Never, while
+ * its legacy source had been crawled on 2026-09-15. A 308 whose target cannot be read consolidates
+ * nothing. The destination is now the canonical URL itself, which is also the shortest possible
+ * chain; the `Disallow` came out of robots.txt in the same change, because the `?tag=` URLs the tag
+ * listings link internally carry a rel=canonical that a blocked crawler can never read.
  *
  * Sources carry no locale prefix on purpose: with i18n, Next prefixes `source` and `destination` for
  * every locale, which is what makes the default locale match (see the note on `redirects` in
@@ -40,7 +49,7 @@ export type FacetRedirect = { source: string; destination: string; permanent: tr
 /**
  * @description One permanent redirect per legacy tag URL in the corpus.
  * @param postsDir - The directory holding the `.mdx` posts (`data/blog`).
- * @returns Redirects from /blog/<tag>/<slug> to /blog/<category>/<slug>?tag=<tag>.
+ * @returns Redirects from /blog/<tag>/<slug> to /blog/<category>/<slug>.
  */
 export const legacyFacetRedirects = (postsDir: string): FacetRedirect[] => {
     const destinationBySource = new Map<string, string>();
@@ -56,7 +65,7 @@ export const legacyFacetRedirects = (postsDir: string): FacetRedirect[] => {
             const segment = tag.toLowerCase();
             if (segment === category) continue;
             const source = `/blog/${segment}/${encodeURIComponent(frontmatter.slug)}`;
-            const destination = postPath(frontmatter, segment);
+            const destination = postPath(frontmatter);
             const existing = destinationBySource.get(source);
             if (existing && existing !== destination) {
                 throw new Error(
