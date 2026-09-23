@@ -277,8 +277,9 @@
  * Optical sizing for the left zone. The owner reported the icons as visibly different sizes; the
  * boxes were already identical, so the box was never the problem.
  *
- * All nine are Simple Icons glyphs on `viewBox="0 0 24 24"`, all drawn in an 18x18 box, and the ink
- * is centred in the viewBox on all nine (`getBBox` centre is 12,12 for every one). What differs is
+ * Eight of the nine are Simple Icons glyphs on `viewBox="0 0 24 24"`, all drawn in an 18x18 box, and
+ * the ink is centred in the viewBox on all of them (`getBBox` centre is 12,12 for every one). The
+ * ninth is a Font Awesome pie chart, on a 544x512 viewBox — see the note under it. What differs is
  * how much of the box each glyph inks, and the eye reads ink, not boxes. Measured by rendering each
  * glyph solid-filled to a 96x96 canvas and summing alpha (Chromium, 2026-09-23):
  *
@@ -287,27 +288,27 @@
  * | LinkedIn    |   74.4%  |  0.867              | 16px |  58.8%             |
  * | Bitcoin     |   65.2%  |  0.927              | 17px |  58.1%             |
  * | Reddit      |   59.0%  |  0.974              | 18px |  59.0%             |
+ * | Pie chart   |   58.0%  |  0.983              | 18px |  58.0%             |
  * | Storybook   |   56.0%  |  1.000              | 18px |  56.0%             |
  * | Readthedocs |   56.0%  |  1.000              | 18px |  56.0%             |
  * | GitHub      |   42.8%  |  1.143              | 20px |  52.9%             |
  * | Lighthouse  |   41.9%  |  1.157              | 20px |  51.7%             |
  * | Playwright  |   39.9%  |  1.185              | 20px |  49.2%             |
- * | Codecov     |   28.0%  |  1.413              | 20px |  34.6%             |
  *
  * The square root is not decoration: coverage is an area and the factor is a length. 56.0% is the
  * set's median (Storybook / Readthedocs), so half the set moves up and half moves down.
  *
  * **20px is a cap, not a choice.** The bar is 24px tall, so an icon cannot pass 20 without touching
- * both edges. Four icons want more than the cap allows and get 20.
+ * both edges. Three icons want more than the cap allows and get 20.
  *
- * **Codecov cannot reach the band, and this is the honest statement of it.** Equalising it needs
- * 25.4px. Its glyph is an umbrella — a thin canopy over a large empty area — so its bounding box is
- * full-size while its ink is not. At the cap it sits at 34.6% and reads lighter than its
- * neighbours. That is a property of the glyph, not of the rule above; the alternatives are dropping
- * the icon or growing the bar.
+ * **The coverage link used to be Codecov's umbrella, and it could not reach the band.** A thin
+ * canopy over a large empty area inks 28.0% of a full-size bounding box; equalising that needs
+ * 25.4px, which does not exist in a 24px bar, so at the cap it sat at 34.6% and read visibly lighter
+ * than every neighbour. The link points at `coverage.xabierlameiro.com`, a report of this repo's
+ * own, so there was no brand to honour — the glyph was replaced rather than the residual documented.
  *
- * Eight of the nine now land in 49.2%-59.0%, a 1.20x spread. Before this block it was 28.0%-74.4%,
- * a 2.66x spread, which is the defect that was reported.
+ * All nine now land in 49.2%-59.0%, a 1.20x spread. Before this block it was 28.0%-74.4%, a 2.66x
+ * spread, which is the defect that was reported.
  *
  * Sizes are whole pixels so nothing renders on a half-pixel at 1x.
  */
@@ -334,9 +335,14 @@
  * | Reddit      |       18.0        | 18px |  18px     |
  * | Storybook   |       14.4        | 18px |  14.4px   |
  * | Readthedocs |       13.9        | 18px |  13.9px   |
- * | Codecov     |       18.0        | 20px |  20px     |
+ * | Pie chart   |       18.0        | 18px |  18px     |
  * | Playwright  |       18.0        | 20px |  20px     |
  * | Lighthouse  |       12.0        | 20px |  13.3px   |
+ *
+ * The pie chart is the one glyph whose viewBox is not square (544x512). `preserveAspectRatio`
+ * letterboxes it in the square box, so it inks the full 18px of width and 16.9px of height. Only the
+ * width matters to the rhythm, and the coverage figure above is measured on the letterboxed raster,
+ * so both numbers are already the rendered ones.
  */
 .navLinks a[data-icon] {
     justify-content: center;
@@ -376,8 +382,8 @@
 }
 
 .navLinks a[data-icon='coverage-link'] {
-    --icon-size: 20px;
-    --ink-width: 20px;
+    --icon-size: 18px;
+    --ink-width: 18px;
 }
 
 .navLinks a[data-icon='e2e-link'] {
@@ -482,25 +488,27 @@
  *
  * Re-derived once more when the fixed slots gave way to `max-content` + `gap: 14px` and the icons
  * took their optical sizes. Both zones got narrower at their worst case — right 730 -> 684, left
- * 320 -> 310.6 — so every rung moves DOWN, which is the safe direction: each item now survives to a
+ * 320 -> 308.6 — so every rung moves DOWN, which is the safe direction: each item now survives to a
  * narrower window than before. Shedding an item also removes its gap, which is why each row drops
  * by the item's width PLUS 14.
  *
  * | Below   | What sheds               | Left  | Right | Left needs | Right needs |
  * |---------|--------------------------|-------|-------|------------|-------------|
- * | 1576 px | views + users            | 310.6 | 684   |  828.7     | 1575.5      |
- * | 1212 px | heating                  | 310.6 | 502   |  828.7     | 1211.5      |
- * |  972 px | crypto price             | 310.6 | 382   |  828.7     |  971.5      |
- * |  829 px | 5 artifact icons + stars | 310.6 | 293   |  828.7     |  793.5      |
+ * | 1576 px | views + users            | 308.6 | 684   |  824.7     | 1575.5      |
+ * | 1212 px | heating                  | 308.6 | 502   |  824.7     | 1211.5      |
+ * |  972 px | crypto price             | 308.6 | 382   |  824.7     |  971.5      |
+ * |  825 px | 5 artifact icons + stars | 308.6 | 293   |  824.7     |  793.5      |
  * |  769 px | indexed counter          | 159   | 235   |  525.5     |  677.5      |
  * |  479 px | 3 profile icons          | 159   | 176   |  525.5     |  559.5      |
  *
- * The 829 rung is the first one the LEFT zone sets rather than the right: with the status zone down
- * to 293px it would fit in 793.5, and the navigation icons are what still needs 828.7. A ladder
+ * The 825 rung is the first one the LEFT zone sets rather than the right: with the status zone down
+ * to 293px it would fit in 793.5, and the navigation icons are what still needs 824.7. A ladder
  * that only watched the right zone would draw the bar on top of itself between those two numbers.
+ * It was 829 while the coverage icon was Codecov at the 20px cap; the pie chart replacing it at 18px
+ * took 2px off the zone and 4px off this rung, which is the derivation doing its job.
  *
  * The navigation icons no longer contribute a flat 18px each: the left zone is
- * 16 + 20 + 18 + 14.4 + 13.9 + 20 + 20 + 13.3 = 135.6 of icon plus 7 x 14 of gap, and 159 once the
+ * 16 + 20 + 18 + 14.4 + 13.9 + 18 + 20 + 13.3 = 133.6 of icon plus 7 x 14 of gap, and 159 once the
  * five artifact icons shed.
  *
  * Read the table as: above each row's width, the zones on that row coexist. Below 769 px the
@@ -532,7 +540,7 @@
     }
 }
 
-@media screen and (max-width: 828px) {
+@media screen and (max-width: 824px) {
     .shed5,
     .shed7,
     .navLinks a.shed5 {

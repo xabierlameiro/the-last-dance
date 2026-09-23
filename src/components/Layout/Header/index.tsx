@@ -3,7 +3,6 @@ import styles from './header.module.css';
 import type { IconType } from 'react-icons';
 import {
     SiBitcoincash,
-    SiCodecov,
     SiGithub,
     SiLighthouse,
     SiLinkedin,
@@ -12,6 +11,7 @@ import {
     SiReddit,
     SiStorybook,
 } from 'react-icons/si';
+import { FaChartPie } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import { socialLinks, translateRoute } from '@/constants/site';
@@ -101,7 +101,12 @@ const STATUS_ICONS: Record<string, IconType> = {
     'reddit-link': SiReddit,
     'storybook-link': SiStorybook,
     'docs-link': SiReadthedocs,
-    'coverage-link': SiCodecov,
+    /**
+     * A pie chart, not Codecov's umbrella. The link goes to `coverage.xabierlameiro.com`, a report
+     * of this repo's own, so there is no brand to honour here — and the umbrella inks 28% of its
+     * box against the bar's 56% median, which no size inside a 24px bar could correct.
+     */
+    'coverage-link': FaChartPie,
     'e2e-link': SiPlaywright,
     'lighthouse-link': SiLighthouse,
 };
