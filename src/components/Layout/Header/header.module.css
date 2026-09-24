@@ -327,6 +327,26 @@
 }
 
 /**
+ * The error glyph needs its own rule, and the rule above is why it does not.
+ *
+ * `Loading` sizes its spinner as `.spinner` — (0,1,0), so the zone rule outranks it and the spinner
+ * is 11px. `Error` sizes its glyph as `svg.error` — (0,1,1), which *ties* the zone rule, and the tie
+ * breaks on the order the two CSS modules are injected in, not on anything either file controls. It
+ * broke the wrong way: the glyph stayed 16px, and inside the 13px `.statusDot`, which is
+ * `justify-content: flex-end`, all 3px of the overflow hung off the item's left. The e2e clipping
+ * check reports exactly that, and only since the disc went from 15 to 13 — at 15 the overhang was
+ * 1px and sat under the check's tolerance.
+ *
+ * `[data-testid='error']` is (0,2,0) and beats (0,1,1) outright, so the zone wins by specificity
+ * rather than by injection order. The attribute is the stable name here: the class is hashed and the
+ * element is an `svg` only because `RxCross2` happens to be one.
+ */
+.right [data-testid='error'] {
+    width: 11px;
+    height: 11px;
+}
+
+/**
  * Optical sizing for the left zone. The owner reported the icons as visibly different sizes; the
  * boxes were already identical, so the box was never the problem.
  *
