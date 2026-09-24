@@ -212,8 +212,41 @@
 /**
  * Every status item is set at 14px, which is what four of the seven already used. Views drops from
  * 15 and the star count rises from 12, so the zone reads as one row of text rather than four sizes.
- * The icons inside them converge on 14px too, in each widget's own stylesheet — they were 23px
- * (indexed), 19px (views) and the bar's generic 18px (XRP).
+ *
+ * **The icons are cut to their INK, not to their box.** They used to converge on a 14px box in each
+ * widget's own stylesheet, which is the same mistake the left zone made and the left zone's comment
+ * block below records in full: a box says nothing about how much of it a glyph fills. Measured with
+ * `getBBox()` on the rendered glyphs at the 14px box:
+ *
+ * | Icon                  | Widget          | Ink at a 14px box |
+ * |-----------------------|-----------------|-------------------|
+ * | TbCurrencyRipple      | CryptoPrice     | 14.00 x 14.00     |
+ * | FaTemperatureHigh     | Heating         | 14.00 x 14.00     |
+ * | BsEye                 | ViewCounter     | 14.00 x  9.63     |
+ * | FiUsers               | ViewCounter     | 12.83 x 10.50     |
+ * | GiCheckboxTree        | IndexedCounter  | 12.76 x  8.50     |
+ * | AiFillStar            | GithubStars     | 11.58 x 11.06     |
+ *
+ * A 1.21x spread on the long side, and the owner reported it the same way they reported the left
+ * zone's. Each widget now sets whatever box puts its ink at 11px: 11 for the three that fill their
+ * viewBox, 12 for FiUsers (22 of 24 units) and GiCheckboxTree (466.81 of 512), 13 for AiFillStar
+ * (846.95 of 1024). The boxes stay whole pixels, so the ink lands at 10.75-11.00 — a 1.02x spread.
+ *
+ * **11 comes from the text, not from the bar.** The left zone caps at 16 because its icons stand
+ * alone and the only constraint is the 24px bar. Here every icon is glued to a number, and the
+ * capital height of a 14px numeral measures 10.03. 11 is that plus a tenth, so the glyph reads the
+ * same size as the value beside it. It also leaves 6.5px of clearance top and bottom.
+ *
+ * **What was deliberately left alone: the text sits 0.57px low.** It is centred on its line box,
+ * which reserves room for a descender, and every value in this zone is digits and capitals
+ * (`€1.34`, `48`, `21`, `Thu`, `9:39 PM`) — so the ink lands at 7.47 above and 6.34 below instead of
+ * 6.9 / 6.9. Correcting it means a hand-tuned translate in seven widgets that re-breaks on any font
+ * change, for half a pixel. The one string with a descender, `Sep`, sits at 7.40 / 4.04, which is
+ * the same rule doing the right thing.
+ *
+ * The font size is not part of this and was not touched: all seven items are already at 14px, and
+ * the shed ladder's breakpoints below are DERIVED from their measured widths, so changing the size
+ * would invalidate every rung.
  *
  * `max-content` and nothing else: an item is exactly as wide as what it draws, so the 14px `gap`
  * above is the space a reader sees. Each widget also dropped the `min-width` SDD-L03 gave it — a
@@ -245,12 +278,12 @@
     overflow: visible;
 }
 
-/* The deployment indicator is a dot, not a value: 15px is the dot itself. */
+/* The deployment indicator is a dot, not a value: 13px is the dot itself. */
 .statusDot {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    width: 15px;
+    width: 13px;
 }
 
 /* Four fields and a locale-dependent short weekday. 147px in English, the widest of the three. */
@@ -271,6 +304,26 @@
     width: 16px;
     fill: rgba(var(--blog-icons));
     stroke: rgba(var(--blog-icons));
+}
+
+/**
+ * The status zone's own icon size, and the only rule that reaches the RenderManager's loading
+ * spinner and error glyph. Those two are sized 16px in their own modules, which is right everywhere
+ * else they appear — News, Weather, the star counter, a post body — but here it made the spinner the
+ * largest thing in the bar and, inside the 13px `.statusDot`, wider than its own slot.
+ *
+ * Their class names are hashed, so this rule cannot name them; it names the zone instead. That
+ * leaves it tied at (0,1,1) with the fallback directly above, which is why it sits AFTER it and not
+ * beside `.right` where the zone's other rules live — written there first, it lost the tie on
+ * source order and the spinner stayed at 16.
+ *
+ * The widget rules all outrank it at (0,2,x), so each one still chooses its own box. Three of them
+ * carry a wrapper for exactly that reason: `.container svg.icon`, `.counters .views svg` and
+ * `.counters .users svg` would have tied here too.
+ */
+.right svg {
+    width: 11px;
+    height: 11px;
 }
 
 /**
@@ -534,8 +587,8 @@
  *
  * Zone widths are now each item's WORST CASE plus the 14px gaps, which is a safe upper bound: a zone
  * that clears the countdown at its widest clears it always.
- * right = 15 + 75 + 45 + 168 + 106 + 44 + 147, plus 6 x 14 of gap = 684;
- * left = 17 (logo) + 12 + 36 (route) + 12 + the navigation icons at their own widths + 14 per gap.
+ * right = 13 + 72 + 43 + 163 + 103 + 43 + 147, plus 6 x 14 of gap = 668;
+ * left = 16 (logo) + 12 + 36 (route) + 12 + the navigation icons at their own widths + 14 per gap.
  *
  * Re-derived again once the views and heating slots were sized correctly — widening two slots by
  * 112 px in total moves every breakpoint that depends on the right zone, which is the whole reason
@@ -556,55 +609,67 @@
  * narrower window than before. Shedding an item also removes its gap, which is why each row drops
  * by the item's width PLUS 14.
  *
- * | Below   | What sheds               | Left  | Right | Left needs | Right needs |
- * |---------|--------------------------|-------|-------|------------|-------------|
- * | 1576 px | views + users            | 308.6 | 684   |  824.7     | 1575.5      |
- * | 1212 px | heating                  | 308.6 | 502   |  824.7     | 1211.5      |
- * |  972 px | crypto price             | 308.6 | 382   |  824.7     |  971.5      |
- * |  825 px | 5 artifact icons + stars | 308.6 | 293   |  824.7     |  793.5      |
- * |  769 px | indexed counter          | 159   | 235   |  525.5     |  677.5      |
- * |  479 px | 3 profile icons          | 159   | 176   |  525.5     |  559.5      |
+ * Re-derived once more when both zones went to a cap on the ICON'S INK rather than on its box — the
+ * left zone to 16px, the right to 11 — which is the change the two blocks above this one describe.
+ * Every item lost exactly the width its icon lost and nothing else, so the arithmetic is a
+ * subtraction rather than a re-measurement:
  *
- * The 825 rung is the first one the LEFT zone sets rather than the right: with the status zone down
- * to 293px it would fit in 793.5, and the navigation icons are what still needs 824.7. A ladder
+ *   right: dot 15->13, crypto 75->72, indexed 45->43, views+users 168->163, heating 106->103,
+ *          stars 44->43, clock 147 unchanged. 684 -> 668.
+ *   left:  logo 17->16, and the eight navigation icons from 133.6 of ink to
+ *          16 + 16 + 16 + 12.84 + 12.33 + 16 + 16 + 16 = 121.17. 308.6 -> 295.17.
+ *
+ * | Below   | What sheds               | Left   | Right | Left needs | Right needs |
+ * |---------|--------------------------|--------|-------|------------|-------------|
+ * | 1544 px | views + users            | 295.17 | 668   |  797.8     | 1543.5      |
+ * | 1190 px | heating                  | 295.17 | 491   |  797.8     | 1189.5      |
+ * |  956 px | crypto price             | 295.17 | 374   |  797.8     |  955.5      |
+ * |  798 px | 5 artifact icons + stars | 295.17 | 288   |  797.8     |  783.5      |
+ * |  769 px | indexed counter          | 152    | 231   |  511.5     |  669.5      |
+ * |  479 px | 3 profile icons          | 152    | 174   |  511.5     |  555.5      |
+ *
+ * The 798 rung is the first one the LEFT zone sets rather than the right: with the status zone down
+ * to 288px it would fit in 783.5, and the navigation icons are what still needs 797.8. A ladder
  * that only watched the right zone would draw the bar on top of itself between those two numbers.
- * It was 829 while the coverage icon was Codecov at the 20px cap; the pie chart replacing it at 18px
- * took 2px off the zone and 4px off this rung, which is the derivation doing its job.
+ * It was 829 while the coverage icon was Codecov at the 20px cap, then 825 once the pie chart
+ * replaced it at 18, and 798 now the cap is on the ink at 16 — the derivation doing its job three
+ * times over.
  *
  * The navigation icons no longer contribute a flat 18px each: the left zone is
- * 16 + 20 + 18 + 14.4 + 13.9 + 18 + 20 + 13.3 = 133.6 of icon plus 7 x 14 of gap, and 159 once the
- * five artifact icons shed.
+ * 16 + 16 + 16 + 12.84 + 12.33 + 16 + 16 + 16 = 121.17 of ink plus 7 x 14 of gap, and 152 once the
+ * five artifact icons shed. The two narrow ones are Storybook and Readthedocs, whose glyphs are
+ * taller than wide, so the 16px cap lands on their height and leaves the width short.
  *
  * Read the table as: above each row's width, the zones on that row coexist. Below 769 px the
  * countdown is hidden entirely, so from there down the only requirement is that the two zones fit
- * side by side — 334 px at 480 px wide, 274 px once the profile icons go.
+ * side by side — 383 px at 480 px wide, 326 px once the profile icons go.
  *
- * The rows that constrain the ladder clear their arithmetic exactly, by 0, 0, 0 and 2 px. That is
+ * The rows that constrain the ladder clear their arithmetic exactly, by 0, 0, 0 and 0.2 px. That is
  * as thin as it goes — the slots are fixed, so these are sums and not measurements, and nothing
  * here rounds. Any further widening on the right has to move the ladder with it.
  *
  * `.navLinks a` sets `display: flex` and outranks a bare class on specificity, so each rule lists
  * both forms rather than reaching for `!important`.
  */
-@media screen and (max-width: 1575px) {
+@media screen and (max-width: 1543px) {
     .shed1 {
         display: none;
     }
 }
 
-@media screen and (max-width: 1211px) {
+@media screen and (max-width: 1189px) {
     .shed2 {
         display: none;
     }
 }
 
-@media screen and (max-width: 971px) {
+@media screen and (max-width: 955px) {
     .shed3 {
         display: none;
     }
 }
 
-@media screen and (max-width: 824px) {
+@media screen and (max-width: 797px) {
     .shed5,
     .shed7,
     .navLinks a.shed5 {

@@ -36,13 +36,14 @@
 }
 
 /*
- * `header svg` sizes every glyph in the bar at 18px, which is too big beside a 14px count: at 18
- * the trigger measured 63px inside a 60px slot. 14 is the size the number is set at, and the size
- * every other icon in the status zone is drawn at.
+ * 13 and not 11: the star inks 846.95 of its 1024 units across, so 13 is what puts its ink at the
+ * 10.75 the status zone cuts every icon to. This rule predates the zone's ink rule — it was added
+ * because the bar's generic `svg` fallback drew the star at 18px and the trigger then measured 63px
+ * inside a 60px slot. See `header.module.css`, beside `.statusItem`.
  */
 .trigger .star {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
 }
 
 /*

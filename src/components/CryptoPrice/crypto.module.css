@@ -14,8 +14,13 @@
  * Sized explicitly rather than by `font-size`, which never reached it: `header svg` sets an 18px
  * box and outranks a font size, so the glyph drew at 18 beside 14px text.
  */
+/*
+ * The glyph inks its full 24-unit viewBox, so the box is the ink: 11px of box is 11px of drawing,
+ * which is the ink height every icon in the status zone is cut to. See `header.module.css`, beside
+ * `.statusItem`, for why the measure is the ink and not the box.
+ */
 .container svg.xrp {
     fill: none;
-    width: 14px;
-    height: 14px;
+    width: 11px;
+    height: 11px;
 }

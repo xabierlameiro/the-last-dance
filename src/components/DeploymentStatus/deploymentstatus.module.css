@@ -1,7 +1,14 @@
+/*
+ * 13, down from 15. The status zone cuts every icon's ink to ~11px, and this is the one element
+ * there that is solid fill rather than a drawing: at 15 it was the largest thing in the bar and read
+ * as a blob beside numbers whose capitals measure 10. It does not go to 11 with the glyphs because
+ * it is not only a dot — it carries a character (see below), which is the zone's non-colour signal,
+ * and that character needs a disc to sit in.
+ */
 .status {
     background-color: transparent;
-    width: 15px;
-    height: 15px;
+    width: 13px;
+    height: 13px;
     border-radius: 100%;
     border: 0.1px solid rgba(var(--grey-color));
 }
@@ -52,7 +59,8 @@
 .status {
     display: grid;
     place-content: center;
-    font-size: 9px;
+    /* 8, tracking the disc down from 15 to 13 so the glyph keeps the same room inside it. */
+    font-size: 8px;
     line-height: 1;
     color: rgba(var(--blog-background));
     font-weight: 700;

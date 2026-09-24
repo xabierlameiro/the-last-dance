@@ -9,7 +9,12 @@
     user-select: none;
 }
 
-svg.icon {
-    width: 14px;
-    height: 14px;
+/*
+ * The thermometer inks its full 512-unit viewBox, so the box is the ink: 11px of box is 11px of
+ * drawing, the ink height every icon in the status zone is cut to. See `header.module.css`, beside
+ * `.statusItem`, for why the measure is the ink and not the box.
+ */
+.container svg.icon {
+    width: 11px;
+    height: 11px;
 }
