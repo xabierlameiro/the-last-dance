@@ -47,12 +47,15 @@ const ViewCounter = ({ all }: { all?: boolean }) => {
                 <Tooltip>
                     <Tooltip.Trigger>
                         <span className={styles.users} data-testid="new-users">
-                            <FiUsers
-                                style={{
-                                    fill: 'transparent',
-                                    width: '14px',
-                                }}
-                            />
+                            {/*
+                             * The width used to be inline here with no height beside it, so the box
+                             * was 14 wide and however tall the bar's generic `.header svg` fallback
+                             * happened to be — it was never square, and its height moved whenever
+                             * that fallback did. Sizing belongs in the stylesheet with every other
+                             * icon in the zone; only the fill, which is a property of this glyph,
+                             * stays here.
+                             */}
+                            <FiUsers style={{ fill: 'transparent' }} />
                             <RenderManager
                                 loading={!data}
                                 error={error}

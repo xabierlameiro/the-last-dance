@@ -8,8 +8,11 @@
     user-select: none;
 }
 
-/* 14px, the size every icon in the status zone is drawn at. It was the largest one at 23. */
+/*
+ * 12 and not 11: this glyph inks 466.81 of its 512 units across, so 12 is what puts its ink at the
+ * 10.94 the status zone cuts every icon to. See `header.module.css`, beside `.statusItem`.
+ */
 .container svg.xrp {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
 }

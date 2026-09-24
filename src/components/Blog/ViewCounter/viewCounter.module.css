@@ -24,10 +24,14 @@
     color: rgba(var(--blog-icons));
 }
 
-/* 14px, the size every icon in the status zone is drawn at. It was the widest one at 19. */
-.views svg {
-    width: 14px;
-    height: 14px;
+/*
+ * The eye inks its full 16-unit width, so an 11px box draws 11px of glyph — the ink height every
+ * icon in the status zone is cut to. See `header.module.css`, beside `.statusItem`, for why the
+ * measure is the ink and not the box.
+ */
+.counters .views svg {
+    width: 11px;
+    height: 11px;
 }
 
 /* Only rendered by `<ViewCounter all />`, so it is absent on post pages. */
@@ -37,4 +41,13 @@
     font-size: 14px;
     user-select: none;
     gap: 8px;
+}
+
+/*
+ * 12 and not 11: this glyph inks 22 of its 24 units, so 12 is what puts its ink at 11. The rule
+ * exists at all because the width used to be inline in the JSX with no height next to it.
+ */
+.counters .users svg {
+    width: 12px;
+    height: 12px;
 }
