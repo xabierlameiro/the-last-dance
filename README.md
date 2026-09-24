@@ -1,3 +1,5 @@
+
+
 # the-last-dance — Personal Website
 
 My personal website and blog, built with Next.js, MDX, TypeScript, Storybook and Jest. Deployed on Vercel.
@@ -88,7 +90,7 @@ same way.
 | `npm run build`             | Production build (runs `prebuild` → `llms.txt`)  |
 | `npm start`                 | Start production server                          |
 | `npm run lint`              | ESLint                                           |
-| `npm run typecheck`         | `tsc --noEmit`                                   |
+| `npm run typecheck`         | `tsc --noEmit && tsc -p tsconfig.tooling.json --noEmit` |
 | `npm test`                  | Jest unit tests                                  |
 | `npm run coverage`          | Jest with coverage, written to `public/coverage` |
 | `npm run test:e2e`          | Playwright end-to-end tests                      |
