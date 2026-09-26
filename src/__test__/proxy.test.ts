@@ -12,13 +12,13 @@ const createEvent = () => {
 const request = (path: string, userAgent: string) =>
     new NextRequest(`https://xabierlameiro.com${path}`, { headers: { 'user-agent': userAgent } });
 
-// The module keeps a once-per-isolate warning flag, so each test loads a fresh copy.
-const loadMiddleware = async () => {
+// The module keeps a once-per-instance warning flag, so each test loads a fresh copy.
+const loadProxy = async () => {
     jest.resetModules();
-    return (await import('../middleware')).middleware;
+    return (await import('../proxy')).proxy;
 };
 
-describe('middleware', () => {
+describe('proxy', () => {
     const ORIGINAL_ENV = { ...process.env };
     let fetchSpy: jest.SpyInstance;
     let warn: jest.SpyInstance;
@@ -37,10 +37,10 @@ describe('middleware', () => {
     });
 
     it('lets a browser through without sending anything', async () => {
-        const middleware = await loadMiddleware();
+        const proxy = await loadProxy();
         const { event, waitUntil } = createEvent();
 
-        const response = middleware(request('/blog/nextjs/nextjs-memory-leak-in-production', CHROME), event);
+        const response = proxy(request('/blog/nextjs/nextjs-memory-leak-in-production', CHROME), event);
 
         expect(response.headers.get('x-middleware-next')).toBe('1');
         expect(waitUntil).not.toHaveBeenCalled();
@@ -48,10 +48,10 @@ describe('middleware', () => {
     });
 
     it('records a crawler hit after the response, with bot and path', async () => {
-        const middleware = await loadMiddleware();
+        const proxy = await loadProxy();
         const { event, pending } = createEvent();
 
-        const response = middleware(request('/llms.txt', GPTBOT), event);
+        const response = proxy(request('/llms.txt', GPTBOT), event);
         await Promise.all(pending);
 
         expect(response.headers.get('x-middleware-next')).toBe('1');
@@ -62,10 +62,10 @@ describe('middleware', () => {
 
     it('serves the crawler normally when GA4 is unreachable', async () => {
         fetchSpy.mockRejectedValue(new Error('network down'));
-        const middleware = await loadMiddleware();
+        const proxy = await loadProxy();
         const { event, pending } = createEvent();
 
-        const response = middleware(request('/', GPTBOT), event);
+        const response = proxy(request('/', GPTBOT), event);
 
         await expect(Promise.all(pending)).resolves.toEqual([false]);
         expect(response.headers.get('x-middleware-next')).toBe('1');
@@ -73,11 +73,11 @@ describe('middleware', () => {
 
     it('skips sending and warns once when the stream is not configured', async () => {
         delete process.env.GA_CRAWLER_MEASUREMENT_ID;
-        const middleware = await loadMiddleware();
+        const proxy = await loadProxy();
         const { event, waitUntil } = createEvent();
 
-        middleware(request('/', GPTBOT), event);
-        middleware(request('/about', GPTBOT), event);
+        proxy(request('/', GPTBOT), event);
+        proxy(request('/about', GPTBOT), event);
 
         expect(waitUntil).not.toHaveBeenCalled();
         expect(fetchSpy).not.toHaveBeenCalled();
@@ -86,7 +86,7 @@ describe('middleware', () => {
 
     it('excludes API routes, Next internals and static assets from the matcher', async () => {
         jest.resetModules();
-        const { config } = await import('../middleware');
+        const { config } = await import('../proxy');
         const matcher = new RegExp(`^${config.matcher[0]}$`);
 
         ['/', '/about', '/es/blog', '/robots.txt', '/sitemap.xml', '/llms.txt', '/llms-full.txt', '/feed.xml'].forEach(
@@ -98,10 +98,10 @@ describe('middleware', () => {
     });
 
     it('serves a post browsed from a tag from the tag render, keeping the query', async () => {
-        const middleware = await loadMiddleware();
+        const proxy = await loadProxy();
         const { event } = createEvent();
 
-        const response = middleware(request('/blog/error/solve-address-in-use-error?tag=node', CHROME), event);
+        const response = proxy(request('/blog/error/solve-address-in-use-error?tag=node', CHROME), event);
 
         const rewrite = new URL(String(response.headers.get('x-middleware-rewrite')));
         expect(rewrite.pathname).toBe('/blog/node/solve-address-in-use-error');
@@ -109,21 +109,21 @@ describe('middleware', () => {
     });
 
     it('does not rewrite a post without a valid tag', async () => {
-        const middleware = await loadMiddleware();
+        const proxy = await loadProxy();
         const { event } = createEvent();
 
         ['/blog/error/solve-address-in-use-error', '/blog/error/solve-address-in-use-error?tag=Node'].forEach((path) => {
-            const response = middleware(request(path, CHROME), event);
+            const response = proxy(request(path, CHROME), event);
             expect(response.headers.get('x-middleware-rewrite')).toBeNull();
             expect(response.headers.get('x-middleware-next')).toBe('1');
         });
     });
 
     it('rewrites and records a crawler that follows a tag link', async () => {
-        const middleware = await loadMiddleware();
+        const proxy = await loadProxy();
         const { event, pending } = createEvent();
 
-        const response = middleware(request('/blog/error/solve-address-in-use-error?tag=node', GPTBOT), event);
+        const response = proxy(request('/blog/error/solve-address-in-use-error?tag=node', GPTBOT), event);
         await Promise.all(pending);
 
         expect(new URL(String(response.headers.get('x-middleware-rewrite'))).pathname).toBe(
@@ -135,10 +135,10 @@ describe('middleware', () => {
     it('matches the data request of a client-side navigation, as Next compiles the matcher', async () => {
         // The raw-regex check above cannot see this: Next prefixes every matcher with an optional
         // `/_next/data/<build>` and a `.json` suffix, and an excluded `.json` extension in the pattern
-        // silently kept every data request away from the middleware. Compiled by Next itself so an
+        // silently kept every data request away from the proxy. Compiled by Next itself so an
         // upgrade that changes the compilation shows up here.
         jest.resetModules();
-        const { config } = await import('../middleware');
+        const { config } = await import('../proxy');
         const { getMiddlewareMatchers } = await import('next/dist/build/analysis/get-page-static-info');
         const [compiled] = getMiddlewareMatchers(config.matcher, {
             i18n: { locales: ['en', 'es', 'gl'], defaultLocale: 'en' },

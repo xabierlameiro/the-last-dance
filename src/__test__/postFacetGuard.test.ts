@@ -8,7 +8,7 @@ import { getStaticProps } from '../pages/blog/[category]/[slug]';
  *
  * These run against the real corpus rather than a fixture, because the invariant being pinned is
  * about the post's own facets: the segments that must keep rendering are exactly the ones the
- * middleware's `?tag=` rewrite produces, and a fixture whose only tag equals its category cannot
+ * proxy's `?tag=` rewrite produces, and a fixture whose only tag equals its category cannot
  * tell the two cases apart.
  */
 // next-mdx-remote ships ESM that Jest's CJS runtime cannot parse; the route imports it at module
@@ -46,7 +46,7 @@ describe('a post requested under a segment it does not carry', () => {
 });
 
 describe('a post requested under one of its own facets', () => {
-    // `ci` is a tag of this post, not its category: this is the path the middleware rewrite takes
+    // `ci` is a tag of this post, not its category: this is the path the proxy rewrite takes
     // for /blog/error/<slug>?tag=ci, and a redirect here would bounce every tag click out of the
     // blog — the SDD-009 regression.
     it.each(['error', 'npm', 'yarn', 'ci'])('renders /blog/%s/<slug>', async (category) => {

@@ -16,7 +16,7 @@ export type AiCrawler = {
 };
 
 /**
- * AI crawlers recognised by the middleware, from each operator's own documentation (read
+ * AI crawlers recognised by the proxy, from each operator's own documentation (read
  * 2026-09-18): developers.openai.com/api/docs/bots, support.claude.com/en/articles/8896518,
  * docs.perplexity.ai/guides/bots, commoncrawl.org/ccbot and
  * developers.facebook.com/docs/sharing/webmasters/web-crawlers.

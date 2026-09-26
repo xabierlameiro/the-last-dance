@@ -109,6 +109,6 @@ export const formatTrafficReport = (options: ReportOptions, byBot: CountRow[], b
         ...table('Path', byPath, 'no crawler hits recorded'),
         '',
         '> Crawler counts cover declared user agents only. Pages served from the CDN cache may skip the',
-        '> middleware; see measure-real-traffic tasks 5.1 for whether that happens on this deployment.',
+        '> proxy; see measure-real-traffic tasks 5.1 for whether that happens on this deployment.',
     ].join('\n');
 };
