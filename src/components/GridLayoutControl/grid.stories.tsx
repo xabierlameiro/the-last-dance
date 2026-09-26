@@ -1,7 +1,7 @@
 // Button.stories.js|jsx
 
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import GridLayoutControl from '.';
 
 export default {
@@ -11,10 +11,10 @@ export default {
      */
     title: 'Settings / GridLayoutControl',
     component: GridLayoutControl,
-} as ComponentMeta<typeof GridLayoutControl>;
+} as Meta<typeof GridLayoutControl>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof GridLayoutControl> = (args) => <GridLayoutControl {...args} />;
+const Template: StoryFn<typeof GridLayoutControl> = (args) => <GridLayoutControl {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

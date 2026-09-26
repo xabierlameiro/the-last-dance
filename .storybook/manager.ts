@@ -1,25 +1,27 @@
-import { addons } from '@storybook/manager-api';
-// `storybook/internal/…` rather than `@storybook/theming/create`, and the reason is not style:
-// the installed `@storybook/theming` is **6.5.16**, whose `create.js` ships no declarations, so
-// that import resolved to `any` — and it paired a v6 theme with the v8 `addons` above. This path
-// is Storybook 8's own, typed, and matches the manager it configures. It is marked internal, so
-// the real fix is bumping `@storybook/theming` to 8.x once an install is possible here; see the
-// note below on why the v6 packages cannot simply be dropped.
-import { create } from 'storybook/internal/theming/create';
+import { addons } from 'storybook/manager-api';
+// `storybook/theming/create` is the public entry point from Storybook 9 onwards. This used to be
+// `storybook/internal/theming/create` — an internal path, taken because the installed
+// `@storybook/theming` was 6.5.16 and shipped no declarations for `create`, so the published
+// import resolved to `any`. That workaround ends with the v6 packages: the fix its comment
+// predicted (bump, then use the supported path) is what this is.
+import { create } from 'storybook/theming/create';
 
 /**
  * SDD-L11-T7. `YourTheme.js` folded in — a nine-line theme literal in its own file, imported once.
  *
- * `addons` now comes from `@storybook/manager-api`. It used to come from `@storybook/addons`, a
- * Storybook **6** package sitting in the dependency tree next to 8.6.18 everywhere else; that
- * package is the v6 name for this API and has no business in an 8.x manager.
+ * `addons` came from `@storybook/addons` (a Storybook **6** package), then from
+ * `@storybook/manager-api`, and now from `storybook/manager-api` — the same API following the
+ * packaging as Storybook consolidated it into one module.
  *
- * The two v6 packages stay installed, and deliberately so rather than by neglect: `npm ls` shows
- * `@storybook/addons@6.5.16` is also required by `storybook-react-intl` (an addon this project
- * loads) and by `@storybook/testing-library`, and both drag `@storybook/theming@6.5.16` with them.
- * Dropping our direct devDependencies would not remove either package — it would only hide that
- * they are still there. Getting rid of them means replacing `storybook-react-intl`, which is a
- * dependency decision, not a migration step.
+ * T7 recorded that the two v6 packages could not simply be dropped: `@storybook/addons@6.5.16` was
+ * also required by `storybook-react-intl@1.1.3` and by `@storybook/testing-library@0.0.13`, and
+ * both dragged `@storybook/theming@6.5.16` along, so removing the direct devDependencies would
+ * only have hidden them. The Storybook 10 upgrade removes the packages that held them: the addon
+ * is now `storybook-react-intl@10.2.2`, which depends on `storybook-i18n@^10` and not on
+ * `@storybook/addons` at all, and `@storybook/testing-library` is deleted outright (last release
+ * October 2023, superseded by `storybook/test`, imported nowhere here).
+ * `npm ls @storybook/addons @storybook/theming @storybook/testing-library` now prints `(empty)`,
+ * which is the check worth repeating — a missing devDependency line proves nothing on its own.
  */
 const theme = create({
     base: 'light',

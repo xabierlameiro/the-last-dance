@@ -1,7 +1,7 @@
 // Button.stories.js|jsx
 
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import LangeSelect from '.';
 
 export default {
@@ -11,10 +11,10 @@ export default {
      */
     title: 'Form / LangeSelect',
     component: LangeSelect,
-} as ComponentMeta<typeof LangeSelect>;
+} as Meta<typeof LangeSelect>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof LangeSelect> = (args) => <LangeSelect />;
+const Template: StoryFn<typeof LangeSelect> = (args) => <LangeSelect />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});
