@@ -1,6 +1,6 @@
 // Traffic report runner (measure-real-traffic). Usage:
 //   npm run traffic-report -- --from 2026-09-01 --to 2026-09-28 [--human 412] [--ai-referrals chatgpt.com=3]
-// Reads AI-crawler hits from the dedicated GA4 property the middleware writes to, and prints them
+// Reads AI-crawler hits from the dedicated GA4 property the proxy writes to, and prints them
 // next to the human figures copied from Vercel Web Analytics. Runs under Node's type stripping.
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import * as z from 'zod';

@@ -65,7 +65,7 @@ const nextConfig: NextConfig = {
     //    a public/docs directory that does not exist (it is generated on demand by `npm run jsdoc`
     //    and excluded by .vercelignore).
     // tag-facets-as-query-param: the `?tag=` rewrite that used to live here, a `has` query rule from
-    // /blog/:postCategory/:slug to /blog/:tag/:slug, moved to src/middleware.ts. On Vercel it served
+    // /blog/:postCategory/:slug to /blog/:tag/:slug, moved to src/proxy.ts. On Vercel it served
     // full page loads but not the `/_next/data` request of a client-side navigation, so the tag
     // stayed highlighted over the category's listing (see `tagRenderPath` in src/helpers/postPath.ts).
     // Append the default value with md extensions
