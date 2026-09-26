@@ -1,0 +1,58 @@
+# Captures the visual baseline. Manual only.
+#
+# Baselines are platform-specific — font rasterisation differs between macOS and the Linux runner —
+# so they are captured on the same image that compares them in `pre-deploy.yml`, never on a laptop.
+# The result is uploaded as an artifact rather than committed from CI: a workflow that pushes
+# screenshots is a workflow that can quietly refresh a failing baseline, which is the one thing the
+# gate must not be able to do. Download it and commit it deliberately.
+name: Visual baseline
+
+on:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    capture:
+        name: Capture baseline
+        runs-on: ubuntu-22.04
+        timeout-minutes: 30
+        env:
+            # Same fallback as pre-deploy.yml: without a domain the build fails prerendering /404
+            # with `TypeError: Invalid URL` (#208, #210), and the build is served on localhost here
+            # either way.
+            NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000' }}
+            NEXT_PUBLIC_ENV: 'preview'
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 22
+                  cache: npm
+            - name: Install dependencies
+              run: |
+                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+                  echo "@xabierlameiro:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+                  npm ci --legacy-peer-deps --include=optional
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps chromium chromium-headless-shell
+              env:
+                  DEBIAN_FRONTEND: noninteractive
+            # `--update-snapshots` belongs here and nowhere else. The gate in pre-deploy.yml runs
+            # the same projects in comparison mode; if it ever carried this flag it would rewrite
+            # the baseline it is supposed to be checking against.
+            - name: Capture screenshots
+              run: >-
+                  npx playwright test
+                  --project=visual-locale
+                  --project=visual-dark
+                  --project=visual-mobile
+                  --update-snapshots
+            - name: Upload baseline
+              uses: actions/upload-artifact@v7
+              with:
+                  name: visual-baseline
+                  path: e2e/visual/__screenshots__
+                  if-no-files-found: error
+                  retention-days: 7

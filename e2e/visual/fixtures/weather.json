@@ -1,0 +1,29 @@
+[
+    {
+        "city": "limerick+ireland",
+        "name": "Partly cloudy",
+        "precipitation": "0 mm",
+        "humidity": "65%",
+        "windSpeed": "12 km/h",
+        "grades": "15",
+        "imageUrl": "/weather/partly-cloudy.svg"
+    },
+    {
+        "city": "moraña+galicia",
+        "name": "Clear sky",
+        "precipitation": "0 mm",
+        "humidity": "52%",
+        "windSpeed": "8 km/h",
+        "grades": "21",
+        "imageUrl": "/weather/clear-sky.svg"
+    },
+    {
+        "city": "vilagarcía+galicia",
+        "name": "Light rain",
+        "precipitation": "2 mm",
+        "humidity": "78%",
+        "windSpeed": "17 km/h",
+        "grades": "18",
+        "imageUrl": "/weather/light-rain.svg"
+    }
+]

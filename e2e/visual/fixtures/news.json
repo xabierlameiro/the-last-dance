@@ -1,0 +1,23 @@
+{
+    "city": "limerick+ireland",
+    "news": [
+        {
+            "title": "Fixture headline one, pinned so the ticker never changes",
+            "description": "Fixture Source",
+            "link": "https://example.invalid/news/one",
+            "published": "2026-01-15"
+        },
+        {
+            "title": "Fixture headline two, pinned so the ticker never changes",
+            "description": "Fixture Source",
+            "link": "https://example.invalid/news/two",
+            "published": "2026-01-15"
+        },
+        {
+            "title": "Fixture headline three, pinned so the ticker never changes",
+            "description": "Fixture Source",
+            "link": "https://example.invalid/news/three",
+            "published": "2026-01-15"
+        }
+    ]
+}

@@ -20,6 +20,21 @@
     // `**/*.ts` never matched `.storybook/`. Migrating those files to TypeScript in T7 therefore
     // typechecked nothing until they were named here — found by injecting a deliberate error and
     // watching `npm run typecheck` stay green.
-    "include": ["jest.config.js", ".storybook/**/*.ts", ".storybook/**/*.tsx"],
+    // Third blind spot, found while adding the visual suite: the root config excludes `e2e/**/*`
+    // and `playwright.config.ts` outright, so the whole end-to-end layer was never typechecked.
+    // The visual suite is several hundred lines of TypeScript whose job is to be trusted, so it is
+    // checked here with the same options as the app.
+    //
+    // Only `e2e/visual/**` is listed, not `e2e/**`. Widening it to the whole directory surfaces
+    // four pre-existing `noUncheckedIndexedAccess` errors in `fixtures.ts`, `routes.test.ts` and
+    // `scroll-surfaces.test.ts` that have nothing to do with this suite; fixing them is its own
+    // change, and holding the visual baseline hostage to it would be the wrong trade.
+    "include": [
+        "jest.config.js",
+        ".storybook/**/*.ts",
+        ".storybook/**/*.tsx",
+        "playwright.config.ts",
+        "e2e/visual/**/*.ts"
+    ],
     "exclude": ["node_modules"]
 }
