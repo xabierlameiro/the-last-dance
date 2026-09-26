@@ -1,7 +1,7 @@
 // Button.stories.js|jsx
 
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import AsidePanel from '.';
 
 export default {
@@ -11,10 +11,10 @@ export default {
      */
     title: 'Blog / AsidePanel',
     component: AsidePanel,
-} as ComponentMeta<typeof AsidePanel>;
+} as Meta<typeof AsidePanel>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof AsidePanel> = (args) => <AsidePanel />;
+const Template: StoryFn<typeof AsidePanel> = (args) => <AsidePanel />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

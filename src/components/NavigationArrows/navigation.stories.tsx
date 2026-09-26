@@ -1,7 +1,7 @@
 // Button.stories.js|jsx
 
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import NavigarionArrows from '.';
 
 export default {
@@ -16,10 +16,10 @@ export default {
     },
 
     component: NavigarionArrows,
-} as ComponentMeta<typeof NavigarionArrows>;
+} as Meta<typeof NavigarionArrows>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof NavigarionArrows> = (args) => <NavigarionArrows {...args} />;
+const Template: StoryFn<typeof NavigarionArrows> = (args) => <NavigarionArrows {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

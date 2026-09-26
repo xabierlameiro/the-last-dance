@@ -1,7 +1,7 @@
 // Button.stories.js|jsx
 
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import ControlButtons from '.';
 
 export default {
@@ -16,10 +16,10 @@ export default {
         onClickMaximise: { action: 'onClickMaximise' },
     },
     component: ControlButtons,
-} as ComponentMeta<typeof ControlButtons>;
+} as Meta<typeof ControlButtons>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof ControlButtons> = (args) => <ControlButtons {...args} />;
+const Template: StoryFn<typeof ControlButtons> = (args) => <ControlButtons {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

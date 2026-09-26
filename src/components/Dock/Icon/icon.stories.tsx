@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { menu } from '@/constants/navMenu';
-import { ComponentStory } from '@storybook/react';
+import type { StoryFn } from '@storybook/react';
 import Icon from './';
 
 export default {
@@ -21,7 +21,7 @@ export default {
     },
 };
 
-const Template: ComponentStory<typeof Icon> = (args) => <Icon {...args} />;
+const Template: StoryFn<typeof Icon> = (args) => <Icon {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

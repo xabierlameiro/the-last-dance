@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Dialog from '.';
-import { ComponentStory } from '@storybook/react';
+import type { StoryFn } from '@storybook/react';
 import ControlButtons from '@/components/ControlButtons';
 
 export default {
@@ -14,7 +14,7 @@ export default {
     component: Dialog,
 };
 
-const Template: ComponentStory<typeof Dialog> = (args) => <Dialog {...args} />;
+const Template: StoryFn<typeof Dialog> = (args) => <Dialog {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

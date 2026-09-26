@@ -1,5 +1,8 @@
 import type { Preview } from '@storybook/react';
-import { themes } from '@storybook/theming';
+// `storybook/theming`, not `@storybook/theming`: the standalone package stopped at 6.5.16 and the
+// theming API lives inside `storybook` itself from 9 onwards. While the old package was installed
+// this import silently resolved to the v6 copy and paired a v6 theme object with a v8 manager.
+import { themes } from 'storybook/theming';
 import { messages } from '../src/intl/translations';
 import '../styles/globals.css';
 

@@ -1,7 +1,7 @@
 // Button.stories.js|jsx
 
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import NavList from '.';
 
 export default {
@@ -11,10 +11,10 @@ export default {
      */
     title: 'Blog / NavList',
     component: NavList,
-} as ComponentMeta<typeof NavList>;
+} as Meta<typeof NavList>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof NavList> = (args) => <NavList {...args} />;
+const Template: StoryFn<typeof NavList> = (args) => <NavList {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

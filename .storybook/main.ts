@@ -15,23 +15,32 @@ import type { StorybookConfig } from '@storybook/nextjs';
  * userland plugins to attach to the same webpack instance" — but it patches CommonJS resolution
  * only, so Storybook's ESM import walks straight past it.
  *
- * The scripts therefore run Storybook with `NEXT_PRIVATE_LOCAL_WEBPACK=1`, which is Next's own
- * switch for using the installed webpack instead of its bundled one. That leaves a single instance,
- * the project's, which is the one `@storybook/nextjs` asked for in its peer dependency. It is a
- * `NEXT_PRIVATE_*` flag, so treat it as version-sensitive: if a Next upgrade brings the error back,
- * this is the first place to look. `next build` is deliberately left alone and keeps using the
- * bundled copy.
+ * The scripts therefore ran Storybook with `NEXT_PRIVATE_LOCAL_WEBPACK=1`, Next's own switch for
+ * using the installed webpack instead of its bundled one, which left a single instance — the
+ * project's, the one `@storybook/nextjs` asked for in its peer dependency.
+ *
+ * **That flag is gone as of Storybook 10.6.0 on Next 16.3.6, and its removal was measured rather
+ * than assumed.** `storybook build` with no `NEXT_PRIVATE_*` variable set finishes with "Storybook
+ * build completed successfully", exit 0; the `Compilation` error does not come back. `cross-env`
+ * left both scripts with it, since it was there only to set that variable.
+ *
+ * The history above stays because the failure mode can return: it is a private flag reacting to
+ * how two packages happen to resolve webpack. If `TypeError: The 'compilation' argument must be an
+ * instance of Compilation` ever reappears after a Next or Storybook bump, this is the first place
+ * to look and `NEXT_PRIVATE_LOCAL_WEBPACK=1` is the first thing to try. `next build` is
+ * deliberately left alone and keeps using the bundled copy.
  */
 const config: StorybookConfig = {
-    // 'button--primary' is a story id, not a glob, and matches nothing. Kept because removing it is
-    // a behaviour change and this phase is a migration; it belongs in a tidy-up commit.
-    stories: ['button--primary', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
-    addons: [
-        '@storybook/addon-links',
-        '@storybook/addon-essentials',
-        '@storybook/addon-interactions',
-        'storybook-react-intl',
-    ],
+    // 'button--primary' was here: a story id, not a glob, matching nothing. SDD-L11-T7 left it for
+    // the tidy-up commit it deferred to, and this is that commit.
+    stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
+    // `@storybook/addon-essentials` and `@storybook/addon-interactions` are gone, and not by
+    // choice: both stopped at 8.6.14 (May 2025) because Storybook folded them into core across
+    // 8 → 10. Everything they provided — controls, actions, viewport, backgrounds, docs, the
+    // interactions panel — ships with `storybook` itself now, so listing them would load nothing.
+    // Their absence is why `slides.stories.tsx` imports `INITIAL_VIEWPORTS` from
+    // `storybook/viewport`: the viewport addon used to arrive transitively through essentials.
+    addons: ['@storybook/addon-links', 'storybook-react-intl'],
     framework: {
         name: '@storybook/nextjs',
         options: {},
