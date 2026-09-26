@@ -21,7 +21,10 @@
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "jsx": "preserve",
+        // Next 16 rewrites this to `react-jsx` on every build: 16 compiles JSX with the React
+        // automatic runtime and reconfigures the file if it disagrees. Setting it here is what
+        // stops `next build` from producing an unrequested diff on a clean tree.
+        "jsx": "react-jsx",
         "incremental": true,
         "baseUrl": ".",
         "paths": {

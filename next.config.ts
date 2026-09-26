@@ -4,6 +4,20 @@ import { remarkPlugins } from './mdx.plugins.ts';
 import { legacyFacetRedirects } from './src/helpers/legacyFacetRedirects.ts';
 import nextMDX from '@next/mdx';
 
+/**
+ * This is why `build` runs `next build --webpack`.
+ *
+ * Next 16 makes Turbopack the default bundler, and Turbopack serialises a loader's options to pass
+ * them to Rust. The options below are not serialisable: `remarkPlugins` is an array of JavaScript
+ * functions. Measured on 16.3.6, the build stops with
+ *
+ *   Error: loader .../@next/mdx/mdx-js-loader.js for match "{*,next-mdx-rule}" does not have
+ *   serializable options. Ensure that options passed are plain JavaScript objects and values.
+ *
+ * `--webpack` is the destination, not a fallback to remove later: it is how this MDX pipeline is
+ * supported while the plugins are functions. Turbopack becomes possible only when every plugin can
+ * be named by string, which Code Hike's remark plugin cannot be today. See design.md §D4.
+ */
 const withMDX = nextMDX({
     extension: /\.mdx?$/,
     options: {
