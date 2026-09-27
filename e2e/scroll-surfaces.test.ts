@@ -350,12 +350,15 @@ test.describe('Scroll surfaces', () => {
                         right: Math.round(child.getBoundingClientRect().right),
                     }));
 
+                // `at(-1)` bound to a name: `slots.length ? slots[slots.length - 1] : …` reads as
+                // safe to a person and not to the compiler, which cannot tie the length check to
+                // the index. The binding carries the narrowing that the ternary only implied.
+                const lastSlot = slots.at(-1);
+
                 return {
                     slots,
                     paddingLeft: Math.round(parseFloat(style.paddingLeft)),
-                    trailingGap: slots.length
-                        ? Math.round(bounds.right - slots[slots.length - 1].right)
-                        : Number.NaN,
+                    trailingGap: lastSlot ? Math.round(bounds.right - lastSlot.right) : Number.NaN,
                 };
             });
 
@@ -366,7 +369,15 @@ test.describe('Scroll surfaces', () => {
             // The pitch: one number between every pair of neighbours, whatever each widget is
             // currently showing. A widget in an error state draws a ~12px glyph and one serving a
             // six-figure count draws 150px; the gap between them is the same either way.
-            const gaps = layout.slots.slice(1).map((slot, index) => slot.left - layout.slots[index].right);
+            // `slice(1)` shifts the indices by one, so `layout.slots[index]` is the neighbour to
+            // the left of `slot` — correct, and unprovable to the compiler. The throw matches how
+            // the missing right zone is handled inside the evaluate above: if the pairing is ever
+            // wrong the suite says so, instead of subtracting from an undefined box.
+            const gaps = layout.slots.slice(1).map((slot, index) => {
+                const previous = layout.slots[index];
+                if (!previous) throw new Error(`no slot to the left of index ${index + 1} at ${width}px`);
+                return slot.left - previous.right;
+            });
 
             expect(gaps, `the status items are not evenly spaced at ${width}px: ${describe}`).toEqual(
                 gaps.map(() => SLOT_GAP),
