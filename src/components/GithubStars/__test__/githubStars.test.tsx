@@ -87,6 +87,14 @@ describe('GithubStars', () => {
         expect(screen.getByTestId('error')).toBeInTheDocument();
     });
 
+    it('says when the last push was', () => {
+        render(<GithubStars />);
+        fireEvent.click(screen.getByRole('button'));
+
+        // The mock returns the message id, so this is the line being there, not its wording.
+        expect(screen.getByTestId('github-stars-panel')).toHaveTextContent('githubStars.updated');
+    });
+
     it('does not print an invalid date when the route has not answered yet', () => {
         mockUseGithubStars.mockReturnValue({
             data: { ...repo, pushedAt: '' },

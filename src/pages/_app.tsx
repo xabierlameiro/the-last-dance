@@ -1,9 +1,10 @@
 import '../../styles/globals.css';
 import '@code-hike/mdx/dist/index.css';
 import Script from 'next/script';
-import { IntlProvider, type IntlConfig } from 'react-intl';
+import { RawIntlProvider, createIntl, createIntlCache, type IntlConfig } from 'react-intl';
 import { useRouter } from 'next/router';
 import { messages } from '../intl/translations';
+import { createGalicianIntl } from '../intl/galician';
 import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import CookieConsent, { CONSENT_STORAGE_KEY } from '@/components/CookieConsent';
 import Layout from '@/components/Layout';
@@ -11,6 +12,8 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import VercelAnalytics from '@/components/VercelAnalytics';
 
 type locales = 'en' | 'es' | 'gl';
+
+const intlCache = createIntlCache();
 declare global {
     interface Window {
         gtag: (event: string, name: string, obj: object) => void;
@@ -123,6 +126,16 @@ const App = ({ Component, pageProps }: AppProps) => {
         console.error(`[intl:${err.code}] ${err.message}`);
     };
 
+    // Built here rather than by `IntlProvider`, which can only hand the locale to the native `Intl`.
+    // Chromium has no Galician data, so on /gl that meant the browser's language: see
+    // `src/intl/galician.ts`. One provider for the three locales, so switching language does not
+    // remount the page under it.
+    const intlConfig = { messages: messages[locale as locales], onError: handleIntlError };
+    const intl =
+        locale === 'gl'
+            ? createGalicianIntl(intlConfig, intlCache)
+            : createIntl({ ...intlConfig, locale }, intlCache);
+
     return (
         <>
             {isProduction && measurementId && (
@@ -132,14 +145,14 @@ const App = ({ Component, pageProps }: AppProps) => {
             )}
             {isProduction && <VercelAnalytics />}
 
-            <IntlProvider locale={locale} messages={messages[locale as locales]} onError={handleIntlError}>
+            <RawIntlProvider value={intl}>
                 <ErrorBoundary>
                     <CookieConsent />
                     <Layout>
                         <Component {...pageProps} />
                     </Layout>
                 </ErrorBoundary>
-            </IntlProvider>
+            </RawIntlProvider>
         </>
     );
 };
