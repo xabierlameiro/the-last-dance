@@ -30,18 +30,36 @@ const Weather = dynamic(() => import('@/components/Weather'), {
 const DateAndHour = ({ children, minutes = 1 }: { children?: ReactNode; minutes?: number }) => {
     const { locale } = useRouter();
     const { formatMessage: f } = useIntl();
-    const [date, setDate] = React.useState(new Date());
+    /**
+     * `null` until the component mounts, so the server and the first client render agree and no
+     * field needs `suppressHydrationWarning`.
+     *
+     * This used to be `useState(new Date())` with all four spans marked `suppressHydrationWarning`,
+     * and it showed the wrong date on the live site. That attribute tells React to keep the
+     * server's text and skip the DOM patch; afterwards React only rewrites a node whose value
+     * differs from the previous CLIENT render. The weekday, day and month are the same from one
+     * render to the next, so the DOM kept the text from **the moment the page was built** — and
+     * these pages are statically generated, so that could be weeks old. Only the time recovered,
+     * because the interval below changes it every minute.
+     *
+     * Measured on a production build with the clock pinned to 2026-01-15: `new Date()` in the page
+     * returned that instant while the header read `Sat 26 Sep 10:41 PM`, the build's own timestamp.
+     */
+    const [date, setDate] = React.useState<Date | null>(null);
     const [openWeatherWidget, setOpenWeatherWidget] = React.useState<boolean>(false);
-    const day = date.toLocaleDateString(locale, { weekday: 'short' });
-    const dayNumber = date.toLocaleDateString(locale, { day: 'numeric' });
-    const month = date.toLocaleDateString(locale, { month: 'short' });
-    const hour = date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' });
+    const day = date?.toLocaleDateString(locale, { weekday: 'short' }) ?? '';
+    const dayNumber = date?.toLocaleDateString(locale, { day: 'numeric' }) ?? '';
+    const month = date?.toLocaleDateString(locale, { month: 'short' }) ?? '';
+    const hour = date?.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' }) ?? '';
 
     const handleWeatherClick = React.useCallback(() => {
         setOpenWeatherWidget(true);
     }, []);
 
     React.useEffect(() => {
+        // The first call is what puts a date on screen at all; the interval only keeps it current.
+        setDate(new Date());
+
         const interval = setInterval(() => {
             setDate(new Date());
         }, 60000 * minutes);
@@ -52,11 +70,23 @@ const DateAndHour = ({ children, minutes = 1 }: { children?: ReactNode; minutes?
         <div className={styles.clock}>
             <Tooltip>
                 <Tooltip.Trigger>
-                    <button type="button" className={styles.dateAndHour} onClick={handleWeatherClick}>
-                        <span suppressHydrationWarning>{day}</span>
-                        <span suppressHydrationWarning>{dayNumber}</span>
-                        <span suppressHydrationWarning>{month}</span>
-                        <span suppressHydrationWarning>{hour}</span>
+                    <button
+                        type="button"
+                        className={styles.dateAndHour}
+                        onClick={handleWeatherClick}
+                        // Marks the pre-mount state so the stylesheet can hold the slot open. The
+                        // clock is `width: max-content` at the right end of a row that is anchored
+                        // right, so an empty one drags every status item 118px across (measured on
+                        // a production build at 1280px: `en` 130.2px filled against 12.0px empty).
+                        // The browser scores that at 0.00038 CLS because the bar is 24px tall, but
+                        // it is plainly visible, and it is new — the old markup always rendered
+                        // text, wrong text.
+                        data-pending={date === null ? '' : undefined}
+                    >
+                        <span>{day}</span>
+                        <span>{dayNumber}</span>
+                        <span>{month}</span>
+                        <span>{hour}</span>
                     </button>
                 </Tooltip.Trigger>
                 <Tooltip.Content>{f({ id: 'weather.tooltip' })}</Tooltip.Content>

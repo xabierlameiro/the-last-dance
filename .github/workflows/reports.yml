@@ -72,8 +72,12 @@ jobs:
               run: npx playwright install --with-deps chromium chromium-headless-shell
               env:
                   DEBIAN_FRONTEND: noninteractive
+            # Scoped for the same reason as the gate in pre-deploy.yml, which carries the full
+            # explanation: the `visual-*` projects have no committed Linux baseline yet. This job
+            # publishes the e2e report and never wanted the captures, so the flag stays after the
+            # gate drops it.
             - name: Run end-to-end tests
-              run: npm run test:e2e:report
+              run: npx playwright test --project=e2e && node custom-report.ts
             - name: Checkout e2e-report repository
               uses: actions/checkout@v7
               with:
