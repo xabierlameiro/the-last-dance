@@ -96,15 +96,27 @@ jobs:
             # never a declared dependency, so npx fetched it from the network mid-run. The
             # `webServer` block in playwright.config.ts now owns startup, with its own readiness
             # probe and timeout — and it builds, so e2e runs against production output.
-            # This also runs the visual baseline. `playwright test` with no `--project` runs every
-            # project in the config, so the four of them — `e2e` plus the three `visual-*` axes —
-            # share one `webServer`, and therefore one `next build`. Splitting the visual run into
-            # its own job would pay for that build a second time.
+            # Scoped to `--project=e2e` on purpose, and only until the Linux baseline is committed.
+            # The three `visual-*` projects compare against `e2e/visual/__screenshots__/*/linux/`,
+            # which only `visual-baseline.yml` may write — and `workflow_dispatch` refuses to run a
+            # workflow that is not on the default branch, so that file has to reach master before any
+            # baseline can exist. Running the visual projects here first fails all 55 captures with
+            # `A snapshot doesn't exist`, which is the suite reporting a missing baseline rather than
+            # a regression.
+            #
+            # The follow-up drops the flag in the same commit that adds the PNGs, and not before: a
+            # gate with nothing to compare against is a green light wired to nothing just as surely
+            # as one that refreshes its own baseline.
+            #
+            # Unscoped is the goal. `playwright test` with no `--project` runs every project in the
+            # config, so the four of them — `e2e` plus the three `visual-*` axes — share one
+            # `webServer`, and therefore one `next build`. Splitting the visual run into its own job
+            # would pay for that build a second time.
             #
             # In comparison mode: `--update-snapshots` appears only in visual-baseline.yml. A gate
             # that refreshes its own baseline is a green light wired to nothing.
-            - name: Run end-to-end and visual tests
-              run: npm run test:e2e:report
+            - name: Run end-to-end tests
+              run: npx playwright test --project=e2e && node custom-report.ts
     version:
         name: Versioning
         if: github.event_name == 'push'
