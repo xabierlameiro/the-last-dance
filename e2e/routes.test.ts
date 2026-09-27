@@ -266,8 +266,13 @@ test.describe('RSS feeds', () => {
 
     test('should only link post URLs that actually resolve', async ({ request }) => {
         const body = await (await request.get('/feed.xml')).text();
-        const links = [...body.matchAll(/<link>(https:\/\/xabierlameiro\.com\/blog\/[^<]+)<\/link>/g)].map(
-            ([, url]) => new URL(url).pathname
+        // `flatMap` rather than `map`: a match's capture group is `string | undefined` to the
+        // compiler, and dropping the impossible `undefined` here keeps the count assertion below
+        // honest. If a group ever did come back empty the link would vanish from the list and the
+        // length check would fail, which is the right failure — better than a non-null assertion
+        // that would let a malformed feed through as a valid URL.
+        const links = [...body.matchAll(/<link>(https:\/\/xabierlameiro\.com\/blog\/[^<]+)<\/link>/g)].flatMap(
+            ([, url]) => (url === undefined ? [] : [new URL(url).pathname])
         );
 
         expect(links.length).toBe(postsInLocale('en'));

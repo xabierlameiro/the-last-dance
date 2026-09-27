@@ -10,7 +10,13 @@ import { useIntl } from 'react-intl';
 
 const Container = ({ children, open }: { children: React.ReactNode; open?: boolean }) => {
     return (
-        <div className={clx(styles.container, open ? styles.open : styles.close)} data-testid="weather">
+        // `inert` while closed: `.close` parks the panel off-screen with a transform, which hides
+        // it from the eye only. Its news links stayed focusable and in the accessibility tree.
+        <div
+            className={clx(styles.container, open ? styles.open : styles.close)}
+            data-testid="weather"
+            inert={!open}
+        >
             <div className={styles.cities}>{children}</div>
         </div>
     );
