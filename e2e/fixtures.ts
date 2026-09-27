@@ -23,9 +23,15 @@ const CONSENT_DENIED = 'denied';
 export const test = base.extend({
     page: async ({ page }, use) => {
         // 'denied' so the suite never opts itself into analytics.
+        //
+        // The argument is an object rather than the `[key, choice]` array this used to be. An array
+        // literal infers as `string[]`, so under `noUncheckedIndexedAccess` both destructured names
+        // arrive as `string | undefined` and `setItem` rejects them — a complaint with no defect
+        // behind it, since the array is written right here. Naming the fields removes the indexing
+        // instead of asserting it away, and reads better at the call site besides.
         await page.addInitScript(
-            ([key, choice]) => window.localStorage.setItem(key, choice),
-            [CONSENT_STORAGE_KEY, CONSENT_DENIED]
+            ({ key, choice }) => window.localStorage.setItem(key, choice),
+            { key: CONSENT_STORAGE_KEY, choice: CONSENT_DENIED }
         );
         await use(page);
     },
