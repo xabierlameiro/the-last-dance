@@ -1,0 +1,8 @@
+{
+    "status": "READY",
+    "environment": "production",
+    "createdAt": "2026-01-14T08:00:00.000Z",
+    "buildingAt": "2026-01-14T08:05:00.000Z",
+    "ready": "2026-01-14T08:10:00.000Z",
+    "username": "xabierlameiro"
+}

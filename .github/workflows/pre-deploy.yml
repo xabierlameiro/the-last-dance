@@ -11,9 +11,13 @@
 # the git integration deploys every push — keeping the hook would have produced two deployments per
 # merge.
 name: Quality Gate
+# `integration/next-16` is a long-lived branch that the Next 16 migration lands on in phases,
+# without deploying: `vercel.json` only gives `master` a production deploy. Without it listed here
+# no phase PR would run a gate at all, and the per-phase split — whose whole point is that a
+# regression names the phase that caused it — would prove nothing until the final merge.
 on:
     pull_request:
-        branches: [master]
+        branches: [master, integration/next-16]
     push:
         branches: [master]
 
@@ -32,6 +36,8 @@ jobs:
     code_checking:
         name: Linting
         runs-on: ubuntu-22.04
+        # No job here had a timeout, so a hung run held a runner for GitHub's 6-hour default.
+        timeout-minutes: 15
         steps:
             - uses: actions/checkout@v7
             - uses: actions/setup-node@v7
@@ -55,6 +61,9 @@ jobs:
     testing:
         name: Testing
         runs-on: ubuntu-22.04
+        # Unit tests, a production build, the e2e suite and 55 full-page captures. Generous, but
+        # bounded: the point is that a hang fails rather than idles.
+        timeout-minutes: 45
         env:
             # Pull requests opened by Dependabot get no repository secrets, so this was empty on every
             # one of them and the build failed prerendering /404 with `TypeError: Invalid URL` (#208,
@@ -87,12 +96,32 @@ jobs:
             # never a declared dependency, so npx fetched it from the network mid-run. The
             # `webServer` block in playwright.config.ts now owns startup, with its own readiness
             # probe and timeout — and it builds, so e2e runs against production output.
+            # Scoped to `--project=e2e` on purpose, and only until the Linux baseline is committed.
+            # The three `visual-*` projects compare against `e2e/visual/__screenshots__/*/linux/`,
+            # which only `visual-baseline.yml` may write — and `workflow_dispatch` refuses to run a
+            # workflow that is not on the default branch, so that file has to reach master before any
+            # baseline can exist. Running the visual projects here first fails all 55 captures with
+            # `A snapshot doesn't exist`, which is the suite reporting a missing baseline rather than
+            # a regression.
+            #
+            # The follow-up drops the flag in the same commit that adds the PNGs, and not before: a
+            # gate with nothing to compare against is a green light wired to nothing just as surely
+            # as one that refreshes its own baseline.
+            #
+            # Unscoped is the goal. `playwright test` with no `--project` runs every project in the
+            # config, so the four of them — `e2e` plus the three `visual-*` axes — share one
+            # `webServer`, and therefore one `next build`. Splitting the visual run into its own job
+            # would pay for that build a second time.
+            #
+            # In comparison mode: `--update-snapshots` appears only in visual-baseline.yml. A gate
+            # that refreshes its own baseline is a green light wired to nothing.
             - name: Run end-to-end tests
-              run: npm run test:e2e:report
+              run: npx playwright test --project=e2e && node custom-report.ts
     version:
         name: Versioning
         if: github.event_name == 'push'
         runs-on: ubuntu-22.04
+        timeout-minutes: 10
         needs: [code_checking, testing]
         # The only job that writes to this repository, so the only one that needs the scope.
         permissions:

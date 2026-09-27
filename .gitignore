@@ -56,3 +56,10 @@ migration/.next
 # Playwright artifacts (written into the repo root by `npm run test:e2e`)
 /playwright-report
 /test-results
+
+# Visual baselines taken on a developer machine. The committed baseline is the Linux one, captured
+# by .github/workflows/visual-baseline.yml on the same image that compares it; font rasterisation
+# differs enough between platforms that a macOS capture can never match in CI. Running the suite
+# locally is useful and writes here — it just must not reach a commit.
+/e2e/visual/__screenshots__/*/darwin/
+/e2e/visual/__screenshots__/*/win32/

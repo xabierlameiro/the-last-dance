@@ -557,6 +557,24 @@
 }
 
 /**
+ * Holds the clock's width open between the server render and the mount.
+ *
+ * The clock reads `new Date()`, which only exists on the client, so the four fields are empty until
+ * the mount effect runs. Without this the button collapses from ~130px to 12px and every status
+ * item to its left slides across, because the zone is anchored right — measured on a production
+ * build at 1280px: 118.2px in `en`, 112.5px in `es` and `gl`.
+ *
+ * 130px is the `en` rendering of a mid-morning weekday, the widest of the three locales and the
+ * default one. It is a floor, not a slot: `min-width` yields to `max-content` the moment there is
+ * text, so a wider date still lays out at its natural size and the steady state is untouched. That
+ * matters — the fixed slots this bar used to have were removed deliberately (see the widths block
+ * above), and this does not bring them back.
+ */
+.dateAndHour[data-pending] {
+    min-width: 130px;
+}
+
+/**
  * SDD-L12-T8. The status items, as icons. They were text labels — eight of them, 358 px — which is
  * most of why the bar did not fit. macOS puts text menus on the left and icons on the right, so
  * this is both the cheaper and the more faithful arrangement.
