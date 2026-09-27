@@ -1,7 +1,13 @@
 import { MessageChannel as NodeMessageChannel } from 'node:worker_threads';
 import { act } from 'react';
+import { IntlProvider } from 'react-intl';
 import { DialogProvider } from '@/context/dialog';
+import { messages } from '../../../../intl/translations';
 import Header from '..';
+
+// The suite-wide mock echoes its input, and these tests read the weekday, the day and the month the
+// clock wrote. Only the real formatter writes them.
+jest.mock('react-intl', () => jest.requireActual('react-intl'));
 
 // `react-dom/server` resolves to its browser build under jsdom, and that build schedules through
 // `MessageChannel`, which jsdom does not implement. Assigned here rather than in `jest.env.setup.js`
@@ -65,9 +71,11 @@ async function renderAtBuildThenHydrateAtVisit(): Promise<string[]> {
     const { hydrateRoot } = await import('react-dom/client');
 
     const tree = (
-        <DialogProvider>
-            <Header />
-        </DialogProvider>
+        <IntlProvider locale="en" messages={messages.en}>
+            <DialogProvider>
+                <Header />
+            </DialogProvider>
+        </IntlProvider>
     );
 
     jest.setSystemTime(BUILD_TIME);
@@ -143,9 +151,11 @@ describe('Header clock', () => {
         jest.setSystemTime(BUILD_TIME);
         const container = document.createElement('div');
         container.innerHTML = renderToString(
-            <DialogProvider>
-                <Header />
-            </DialogProvider>
+            <IntlProvider locale="en" messages={messages.en}>
+                <DialogProvider>
+                    <Header />
+                </DialogProvider>
+            </IntlProvider>
         );
 
         // The mechanism the fix rests on: an empty clock server-side means the first client render

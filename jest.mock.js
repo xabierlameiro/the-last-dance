@@ -1,17 +1,24 @@
 // Mock environment variables
 process.env.NEXT_PUBLIC_DOMAIN = 'https://xabierlameiro.com';
 
-jest.mock('react-intl', () => ({
-    useIntl: () => ({
-        formatMessage: (object) => object.id,
-        formatDate: (date) => date,
-        formatNumber: (number) => number,
-    }),
-    // SDD-L08: `ErrorBoundary` is a class component, so it cannot call `useIntl` and reads the same
-    // context through `FormattedMessage` instead. Returning the id matches what `formatMessage`
-    // does above, so assertions read the same way whichever API a component uses.
-    FormattedMessage: ({ id }) => id,
-}));
+jest.mock('react-intl', () => {
+    // The header clock formats a `Date`, and a `Date` cannot be a React child.
+    const echoDate = (date) => (date instanceof Date ? date.toISOString() : date);
+
+    return {
+        useIntl: () => ({
+            formatMessage: (object) => object.id,
+            formatDate: echoDate,
+            formatTime: echoDate,
+            formatRelativeTime: (value, unit) => `${value} ${unit}`,
+            formatNumber: (number) => number,
+        }),
+        // SDD-L08: `ErrorBoundary` is a class component, so it cannot call `useIntl` and reads the
+        // same context through `FormattedMessage` instead. Returning the id matches what `formatMessage`
+        // does above, so assertions read the same way whichever API a component uses.
+        FormattedMessage: ({ id }) => id,
+    };
+});
 
 /*
  * SDD-L10-T17. Two defects in this mock.

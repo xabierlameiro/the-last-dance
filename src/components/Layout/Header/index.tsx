@@ -28,8 +28,7 @@ const Weather = dynamic(() => import('@/components/Weather'), {
  * @returns {JSX.Element}
  */
 const DateAndHour = ({ children, minutes = 1 }: { children?: ReactNode; minutes?: number }) => {
-    const { locale } = useRouter();
-    const { formatMessage: f } = useIntl();
+    const { formatMessage: f, formatDate, formatTime } = useIntl();
     /**
      * `null` until the component mounts, so the server and the first client render agree and no
      * field needs `suppressHydrationWarning`.
@@ -47,10 +46,12 @@ const DateAndHour = ({ children, minutes = 1 }: { children?: ReactNode; minutes?
      */
     const [date, setDate] = React.useState<Date | null>(null);
     const [openWeatherWidget, setOpenWeatherWidget] = React.useState<boolean>(false);
-    const day = date?.toLocaleDateString(locale, { weekday: 'short' }) ?? '';
-    const dayNumber = date?.toLocaleDateString(locale, { day: 'numeric' }) ?? '';
-    const month = date?.toLocaleDateString(locale, { month: 'short' }) ?? '';
-    const hour = date?.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' }) ?? '';
+    // Through react-intl rather than `toLocaleDateString(locale)`: Chromium has no Galician data, so
+    // on /gl the native call wrote the clock in the browser's language (`src/intl/galician.ts`).
+    const day = date ? formatDate(date, { weekday: 'short' }) : '';
+    const dayNumber = date ? formatDate(date, { day: 'numeric' }) : '';
+    const month = date ? formatDate(date, { month: 'short' }) : '';
+    const hour = date ? formatTime(date, { hour: 'numeric', minute: 'numeric' }) : '';
 
     const handleWeatherClick = React.useCallback(() => {
         setOpenWeatherWidget(true);

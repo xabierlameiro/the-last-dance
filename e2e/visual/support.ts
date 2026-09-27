@@ -78,17 +78,22 @@ function readFixture(name: string): string {
 /**
  * The text the header's clock shows once its interval has repainted it.
  *
- * Evaluated **in the page**, with the same call the component makes
- * (`src/components/Layout/Header/index.tsx`), because Node and Chromium do not agree. Node's full
- * ICU formats `gl` as `10:30`; the Chromium build used here has no `gl` data and falls back to
- * English, `10:30 AM`. Computing the expected value in Node therefore failed all 11 Galician
- * captures while the page itself was perfectly correct.
+ * English and Spanish are evaluated **in the page**, with the options the component passes
+ * (`src/components/Layout/Header/index.tsx`), because Node and Chromium do not agree on every
+ * locale. Asking the browser removes the disagreement by construction, on any platform and any ICU
+ * build, and stays deterministic because the clock is pinned. A change in how Chromium formats the
+ * string then shows up where it belongs — as a pixel diff against the baseline, not as a timeout
+ * here.
  *
- * Asking the browser removes the disagreement by construction, on any platform and any ICU build,
- * and stays deterministic because the clock is pinned. A change in how Chromium formats the string
- * then shows up where it belongs — as a pixel diff against the baseline, not as a timeout here.
+ * Galician is the exception, because the browser is no longer who writes it. Chromium has no `gl`
+ * data and answered in its own language, `10:30 AM`, which this function used to wait for and the
+ * baseline used to photograph. The site now formats Galician itself (`src/intl/galician.ts`): two
+ * digits and 24 hours, the same on the server and in any browser.
  */
 export async function expectedClockText(page: Page, locale: Locale): Promise<string> {
+    // The context is UTC, so the ISO string already holds the hour the page will show.
+    if (locale === 'gl') return FIXED_TIME.toISOString().slice(11, 16);
+
     return page.evaluate(
         ({ iso, tag }) =>
             // No `timeZone`: the component does not pass one either, and the context is UTC.

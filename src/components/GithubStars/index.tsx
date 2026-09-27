@@ -1,8 +1,7 @@
 import React from 'react';
 import { AiFillStar } from 'react-icons/ai';
 import { GoRepoForked, GoEye, GoIssueOpened } from 'react-icons/go';
-import { useIntl } from 'react-intl';
-import { useRouter } from 'next/router';
+import { useIntl, type IntlShape } from 'react-intl';
 import useGithubStars from '@/hooks/useGithubStars';
 import RenderManager from '@/components/RenderManager';
 import { REPOSITORY_URL } from '@/constants/site';
@@ -12,10 +11,11 @@ import styles from './githubStars.module.css';
 const PANEL_ID = 'github-stars-panel';
 
 /**
- * How long ago the last push was, in the coarsest unit that is still true. `Intl.RelativeTimeFormat`
- * does the wording per locale, so this never assembles a sentence by hand.
+ * How long ago the last push was, in the coarsest unit that is still true. react-intl does the
+ * wording per locale, so this never assembles a sentence by hand. Its formatter rather than a bare
+ * `Intl.RelativeTimeFormat`, which has no Galician data in Chromium (`src/intl/galician.ts`).
  */
-const sincePush = (pushedAt: string, locale: string): string | null => {
+const sincePush = (pushedAt: string, format: IntlShape['formatRelativeTime']): string | null => {
     const at = Date.parse(pushedAt);
     if (Number.isNaN(at)) return null;
 
@@ -25,11 +25,10 @@ const sincePush = (pushedAt: string, locale: string): string | null => {
         ['hour', 3600],
         ['minute', 60],
     ];
-    const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
     for (const [unit, size] of units) {
-        if (Math.abs(seconds) >= size) return format.format(Math.round(seconds / size), unit);
+        if (Math.abs(seconds) >= size) return format(Math.round(seconds / size), unit, { numeric: 'auto' });
     }
-    return format.format(0, 'minute');
+    return format(0, 'minute', { numeric: 'auto' });
 };
 
 /**
@@ -43,8 +42,7 @@ const sincePush = (pushedAt: string, locale: string): string | null => {
  */
 const GithubStars = () => {
     const { data, error, loading } = useGithubStars();
-    const { formatMessage: f, formatNumber } = useIntl();
-    const { locale = 'en' } = useRouter();
+    const { formatMessage: f, formatNumber, formatRelativeTime } = useIntl();
     const [open, setOpen] = React.useState(false);
     const triggerRef = React.useRef<HTMLButtonElement>(null);
     const panelRef = React.useRef<HTMLDivElement>(null);
@@ -78,7 +76,7 @@ const GithubStars = () => {
         };
     }, [open, close]);
 
-    const updated = data?.pushedAt ? sincePush(data.pushedAt, locale) : null;
+    const updated = data?.pushedAt ? sincePush(data.pushedAt, formatRelativeTime) : null;
 
     return (
         <div className={styles.extra}>
