@@ -17,25 +17,21 @@ import { type Locale, localisedPath } from './targets';
  */
 export const FIXED_TIME = new Date('2026-01-15T10:30:00.000Z');
 
-/**
- * The instant the page is *hydrated* at, which is deliberately not `FIXED_TIME`.
+/*
+ * A second instant, `HYDRATION_TIME`, used to live here, and the suite hydrated at it before
+ * jumping the clock one interval tick to `FIXED_TIME`.
  *
- * The header clock renders `new Date()` into four `suppressHydrationWarning` spans. That attribute
- * tells React to accept the server's text and leave the DOM alone, so after hydration each span
- * still shows the time the page was **built**. React only rewrites a span when its value differs
- * from the previous client render — which means a field whose value is the same at hydration and at
- * capture keeps the build's text forever, and the capture records whatever hour the build happened
- * to run at.
+ * That was a workaround for a defect in the header, not a property of the capture. The clock
+ * rendered `new Date()` into four `suppressHydrationWarning` spans; React keeps the server's text
+ * for those and afterwards only rewrites a node whose value differs from the previous CLIENT
+ * render, so a field that read the same at hydration and at capture kept the text from the moment
+ * the page was BUILT. Hydrating at a deliberately different instant forced all four to change.
  *
- * Measured, not reasoned about: hydrating and capturing both at 10:30 UTC left the hour reading
- * `10:41 PM` (the build's) while the date corrected itself. So this instant differs from
- * `FIXED_TIME` in weekday, day-of-month, month *and* time-of-day, and every span is forced to
- * change. Any other pair with all four different would do.
+ * The header now renders nothing until it mounts and reads the clock in an effect, so hydrating and
+ * capturing at the same pinned instant produces the pinned instant. The workaround is gone with the
+ * defect it worked around, and the captures are unchanged: recorded against the old arrangement and
+ * replayed against this one, all 71 match.
  */
-export const HYDRATION_TIME = new Date('2025-12-14T21:07:00.000Z');
-
-/** One clock tick of the header's `setInterval(…, 60000)`, which is what repaints it. */
-const CLOCK_TICK_MS = 60_000;
 
 /** `src/components/CookieConsent/index.tsx`. `denied` also keeps GA from loading at all. */
 const CONSENT_STORAGE_KEY = 'cookie-consent';
@@ -106,12 +102,14 @@ export async function expectedClockText(page: Page, locale: Locale): Promise<str
  * navigation has already let the page read the real one.
  */
 export async function prepareDeterministicPage(page: Page): Promise<void> {
-    // `install` rather than `setFixedTime`, because the clock has to be *moved* later: the header
-    // only repaints when its interval fires, and a fixed clock never fires one. `pauseAt` then
-    // stops it from drifting while the page loads, which is what makes the tick land on exactly
-    // `FIXED_TIME` instead of a second or two past it.
-    await page.clock.install({ time: HYDRATION_TIME });
-    await page.clock.pauseAt(HYDRATION_TIME);
+    // `setFixedTime`, not `install`: it pins `Date.now()` and `new Date()` to the capture instant
+    // and leaves every timer running. The header reads the clock once on mount, so that is all it
+    // needs — but the status widgets beside it do not fetch until a timer fires, and an installed
+    // clock does not advance on its own. Capturing under `install`/`pauseAt` photographed six
+    // widgets stuck on their loading spinner and moved every item left of the clock, which failed
+    // 46 of the 71 captures. Pinning without freezing keeps the clock deterministic and leaves the
+    // rest of the bar to settle on its own.
+    await page.clock.setFixedTime(FIXED_TIME);
 
     await page.addInitScript(
         ({ key, value }: { key: string; value: string }) => {
@@ -170,14 +168,9 @@ export async function gotoAndSettle(
 
     await page.locator(`html[data-theme="${theme}"]`).waitFor({ state: 'attached' });
 
-    // Hydration has run against `HYDRATION_TIME` by now, so the clock's interval is registered.
-    // Moving the clock to one tick before `FIXED_TIME` and running exactly that tick fires the
-    // interval with `new Date()` at `FIXED_TIME` to the millisecond.
-    await page.clock.setSystemTime(new Date(FIXED_TIME.getTime() - CLOCK_TICK_MS));
-    await page.clock.runFor(CLOCK_TICK_MS);
-
     // Waiting for the pinned value is what makes the capture reproducible; a fixed delay here would
-    // pass or fail on machine speed instead.
+    // pass or fail on machine speed instead. It is also the signal that the clock has mounted —
+    // before that the fields are empty and the bar is still holding their width open.
     await page
         .getByTestId('header')
         .getByText(await expectedClockText(page, locale), { exact: true })
