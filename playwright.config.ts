@@ -111,6 +111,14 @@ export default defineConfig({
     webServer: {
         command: `npm run build && npm start -- -p ${port}`,
         url: baseUrl,
+        // The build under test always points at the origin that serves it. `NEXT_PUBLIC_DOMAIN` is
+        // inlined at build time and the header widgets fetch `${NEXT_PUBLIC_DOMAIN}/api/...`, while
+        // the CSP in `next.config.ts` allows `connect-src 'self'` and not the production domain by
+        // name. CI inherits the production domain from its secrets, so there the browser refused
+        // every one of those requests before sending it — nothing reached `page.route`, the
+        // fixtures were never served, and the first Linux baseline was captured with six error
+        // glyphs in every header. A laptop run passed the local origin by hand and never saw it.
+        env: { NEXT_PUBLIC_DOMAIN: baseUrl },
         reuseExistingServer: !process.env.CI,
         timeout: 300_000,
     },
