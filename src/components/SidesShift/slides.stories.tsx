@@ -1,8 +1,8 @@
 // Button.stories.js|jsx
 
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
+import type { Meta, StoryFn } from '@storybook/react';
+import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import SidesShift from '.';
 
 export default {
@@ -21,10 +21,10 @@ export default {
             defaultViewport: 'iphone6',
         },
     },
-} as ComponentMeta<typeof SidesShift>;
+} as Meta<typeof SidesShift>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof SidesShift> = (args) => <SidesShift {...args} />;
+const Template: StoryFn<typeof SidesShift> = (args) => <SidesShift {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

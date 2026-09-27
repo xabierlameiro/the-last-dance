@@ -2,7 +2,7 @@ import { AI_CRAWLER_HIT_EVENT } from '@/helpers/aiCrawler';
 import { CRAWLER_EVENT_NAME, formatTrafficReport, parseReportArgs, parseReportRows } from '../lib';
 
 describe('CRAWLER_EVENT_NAME', () => {
-    it('is the event the middleware sends', () => {
+    it('is the event the proxy sends', () => {
         expect(CRAWLER_EVENT_NAME).toBe(AI_CRAWLER_HIT_EVENT);
     });
 });

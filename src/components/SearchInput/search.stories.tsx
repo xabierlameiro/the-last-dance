@@ -2,7 +2,7 @@
 
 import React from 'react';
 import SearchInput from '.';
-import { ComponentStory } from '@storybook/react';
+import type { StoryFn } from '@storybook/react';
 
 export default {
     /* 👇 The title prop is optional.
@@ -17,7 +17,7 @@ export default {
     },
 };
 
-const Template: ComponentStory<typeof SearchInput> = (args) => <SearchInput {...args} />;
+const Template: StoryFn<typeof SearchInput> = (args) => <SearchInput {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

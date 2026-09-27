@@ -1,7 +1,7 @@
 // Button.stories.js|jsx
 
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import IconWithName from '.';
 
 export default {
@@ -17,10 +17,10 @@ export default {
         name: { control: 'text' },
         horizontal: { control: 'boolean' },
     },
-} as ComponentMeta<typeof IconWithName>;
+} as Meta<typeof IconWithName>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof IconWithName> = (args) => <IconWithName {...args} />;
+const Template: StoryFn<typeof IconWithName> = (args) => <IconWithName {...args} />;
 
 // 👇 Each story then reuses that template
 export const Primary = Template.bind({});

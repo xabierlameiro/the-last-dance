@@ -7,8 +7,9 @@ import {
 } from '@/helpers/aiCrawler';
 import { tagRenderPath } from '@/helpers/postPath';
 
-// Once per isolate, not once per request: a missing secret on a preview would otherwise print a
-// line for every crawler hit.
+// Once per module instance, not once per request: a missing secret on a preview would otherwise
+// print a line for every crawler hit. It said "isolate" while this was edge middleware; on the Node
+// runtime the lifetime is the serverless instance, which is longer, so the flag silences more.
 let hasWarnedMissingConfig = false;
 
 /**
@@ -47,7 +48,13 @@ const recordCrawlerHit = (request: NextRequest, event: NextFetchEvent): void => 
     const crawler = findAiCrawler(request.headers.get('user-agent'));
     if (!crawler) return;
 
-    // Named one by one: the edge runtime exposes env vars as individual `process.env.X` reads.
+    // Named one by one. On `middleware.ts` this was forced — the edge runtime exposed env vars only
+    // as individual `process.env.X` reads, never as an enumerable object. `proxy.ts` runs on the
+    // Node runtime (`functions-config-manifest.json` declares `"runtime": "nodejs"` for
+    // `/_middleware`), so `process.env` is now an ordinary object and passing it whole would work.
+    // The enumeration stays anyway: `readCrawlerAnalyticsConfig` takes an explicit
+    // `Record<string, string | undefined>` and validates it with Zod, and handing it exactly the two
+    // keys it declares is what lets the test drive it without reaching into the global environment.
     const config = readCrawlerAnalyticsConfig({
         GA_CRAWLER_MEASUREMENT_ID: process.env.GA_CRAWLER_MEASUREMENT_ID,
         GA_CRAWLER_API_SECRET: process.env.GA_CRAWLER_API_SECRET,
@@ -64,7 +71,7 @@ const recordCrawlerHit = (request: NextRequest, event: NextFetchEvent): void => 
     event.waitUntil(sendCrawlerHit(buildCrawlerHitPayload(crawler, requestedPath(request)), config));
 };
 
-export function middleware(request: NextRequest, event: NextFetchEvent): NextResponse {
+export function proxy(request: NextRequest, event: NextFetchEvent): NextResponse {
     recordCrawlerHit(request, event);
     return tagFacetResponse(request);
 }
