@@ -5,7 +5,18 @@
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(9.4px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    position: absolute;
+    /*
+     * `fixed`, not `absolute`. Closed, this panel is parked off-screen by `.close`, and a
+     * transformed box still counts towards the scrollable overflow of every ancestor it is
+     * positioned against: as `absolute` it made `body.scrollWidth` 440px wider than the window on
+     * every page (1720 at 1280). `overflow-x: hidden` hid the scrollbar, not the width — the body
+     * could still be scrolled sideways by script or by focus, and a full-page screenshot came out
+     * with a white band down its right side. A fixed box answers to the viewport and widens nothing.
+     *
+     * It lands in the same place: the header is at the top of a document that never scrolls, so
+     * `right` and `top` measure from the same corner either way.
+     */
+    position: fixed;
     width: 400px;
     min-height: auto;
     right: 10px;

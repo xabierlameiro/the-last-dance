@@ -612,4 +612,67 @@ test.describe('Scroll surfaces', () => {
         expect(scrolled.overflows, 'a full post should be taller than its pinned container').toBe(true);
         expect(scrolled.scrollTop, 'setting scrollTop must actually move the body').toBeGreaterThan(0);
     });
+
+    /**
+     * The closed weather popover used to widen the document by 440px.
+     *
+     * It was `position: absolute` and parked off-screen with `translateX(450px)`. A transformed box
+     * still counts towards its ancestors' scrollable overflow, so `body.scrollWidth` read 1720 in a
+     * 1280px window on every page. `overflow-x: hidden` kept a scrollbar from appearing, which is
+     * why nobody saw it — but hidden is not the same as absent: the body could still be scrolled
+     * sideways by script or by focus, and a full-page screenshot is as wide as the document, so
+     * every desktop capture in the visual baseline carried a 440px white band down its right side.
+     *
+     * Only widths above 900px, where the popover is rendered at all. It has to be attached before
+     * measuring: it is loaded with `ssr: false`, and a document without it is trivially narrow.
+     */
+    for (const width of [1024, 1280, 1920]) {
+        test(`nothing widens the document at ${width}px`, async ({ page }) => {
+            await page.setViewportSize({ width, height: 800 });
+            await page.goto('/');
+            await page.getByTestId('weather').waitFor({ state: 'attached' });
+
+            const widths = await page.evaluate(() => ({
+                viewport: document.documentElement.clientWidth,
+                body: document.body.scrollWidth,
+                document: document.documentElement.scrollWidth,
+            }));
+
+            expect(widths.body, 'body.scrollWidth must not exceed the viewport').toBe(widths.viewport);
+            expect(widths.document, 'the document must not exceed the viewport').toBe(widths.viewport);
+        });
+    }
+
+    /**
+     * The menu bar used to widen `/settings` on a phone, and only `/settings`.
+     *
+     * The bar is `white-space: nowrap`, so its minimum width is the sum of what it holds, and the
+     * route name is the one item whose width is not a constant. `Code` and `Terminal` fit;
+     * `System Preferences` is 139px and put the bar at 384px in a 375px window. The bar is a grid
+     * item of the page layout, so the layout's only column grew to match and took `main` and the
+     * dock with it.
+     *
+     * All three locales, because the name is longer still in Spanish and Galician. The clock has to
+     * be mounted and the fonts loaded before measuring: both set the width being measured.
+     */
+    for (const locale of ['', '/es', '/gl']) {
+        test(`nothing widens the document at 375px on ${locale}/settings`, async ({ page }) => {
+            await page.setViewportSize({ width: 375, height: 812 });
+            await page.goto(`${locale}/settings`);
+            await page.getByTestId('weather').waitFor({ state: 'attached' });
+            await expect(page.locator('[class*="dateAndHour"]')).not.toHaveAttribute('data-pending');
+            await page.evaluate(() => document.fonts.ready);
+
+            const widths = await page.evaluate(() => ({
+                viewport: document.documentElement.clientWidth,
+                header: document.querySelector('[data-testid="header"]')?.getBoundingClientRect().right,
+                body: document.body.scrollWidth,
+                document: document.documentElement.scrollWidth,
+            }));
+
+            expect(widths.header, 'the menu bar must end inside the viewport').toBeLessThanOrEqual(widths.viewport);
+            expect(widths.body, 'body.scrollWidth must not exceed the viewport').toBe(widths.viewport);
+            expect(widths.document, 'the document must not exceed the viewport').toBe(widths.viewport);
+        });
+    }
 });

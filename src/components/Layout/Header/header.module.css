@@ -23,8 +23,13 @@
      * in the middle of the space the sides leave, and with a 66 px left zone and an 867 px right one
      * that is visibly off-centre. So the middle is positioned, and the collision it can cause is
      * prevented arithmetically instead — see the shedding block at the bottom of this file.
+     *
+     * `minmax(0, auto)`, not `auto`: a bare `auto` track cannot be narrower than its content, and
+     * the bar is `nowrap`, so a long route name made the whole bar wider than a phone — see
+     * `.route`. The maximum is still `auto`, so wherever the zone fits it is laid out at its
+     * content's width, exactly as before.
      */
-    grid-template-columns: auto 1fr;
+    grid-template-columns: minmax(0, auto) 1fr;
     gap: 20px;
     align-items: center;
     padding: 0 18px;
@@ -533,11 +538,29 @@
     --ink-width: 16px;
 }
 
+/**
+ * The one item in the bar whose width is a sentence rather than a constant, so the one that yields.
+ *
+ * The shedding ladder below budgets 36px for it, which is `Code`. `System Preferences` is 139px,
+ * `Preferencias del sistema` 166px, and below 480px there is nothing left to shed: the bar's
+ * minimum width was 384px in English and 411px in Spanish, in a 375px window. The bar is a grid
+ * item of the page layout, so the layout's column grew with it and `/settings` scrolled sideways.
+ *
+ * Shrinking a gap or the padding would fix one locale at one moment: the English overflow alone
+ * measured 7, 9 and 15px across platforms and times of day, because the fonts and the clock's text
+ * both move it. Truncating the name holds at any width and in any language, and it is what a menu
+ * bar does with a title it has no room for.
+ *
+ * `overflow: hidden` is what lets the item go below its content's width; the track it sits in is
+ * the `minmax(0, auto)` on `.header`. Wherever the name fits, neither does anything.
+ */
 .route {
     font-size: 14px;
     font-weight: 700;
     user-select: none;
     color: rgba(var(--blog-icons));
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .dateAndHour {
