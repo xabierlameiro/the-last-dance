@@ -642,4 +642,37 @@ test.describe('Scroll surfaces', () => {
             expect(widths.document, 'the document must not exceed the viewport').toBe(widths.viewport);
         });
     }
+
+    /**
+     * The menu bar used to widen `/settings` on a phone, and only `/settings`.
+     *
+     * The bar is `white-space: nowrap`, so its minimum width is the sum of what it holds, and the
+     * route name is the one item whose width is not a constant. `Code` and `Terminal` fit;
+     * `System Preferences` is 139px and put the bar at 384px in a 375px window. The bar is a grid
+     * item of the page layout, so the layout's only column grew to match and took `main` and the
+     * dock with it.
+     *
+     * All three locales, because the name is longer still in Spanish and Galician. The clock has to
+     * be mounted and the fonts loaded before measuring: both set the width being measured.
+     */
+    for (const locale of ['', '/es', '/gl']) {
+        test(`nothing widens the document at 375px on ${locale}/settings`, async ({ page }) => {
+            await page.setViewportSize({ width: 375, height: 812 });
+            await page.goto(`${locale}/settings`);
+            await page.getByTestId('weather').waitFor({ state: 'attached' });
+            await expect(page.locator('[class*="dateAndHour"]')).not.toHaveAttribute('data-pending');
+            await page.evaluate(() => document.fonts.ready);
+
+            const widths = await page.evaluate(() => ({
+                viewport: document.documentElement.clientWidth,
+                header: document.querySelector('[data-testid="header"]')?.getBoundingClientRect().right,
+                body: document.body.scrollWidth,
+                document: document.documentElement.scrollWidth,
+            }));
+
+            expect(widths.header, 'the menu bar must end inside the viewport').toBeLessThanOrEqual(widths.viewport);
+            expect(widths.body, 'body.scrollWidth must not exceed the viewport').toBe(widths.viewport);
+            expect(widths.document, 'the document must not exceed the viewport').toBe(widths.viewport);
+        });
+    }
 });
