@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 import { codeHikeOptions, gfmOptions } from './mdx.plugins.ts';
 import { legacyFacetRedirects } from './src/helpers/legacyFacetRedirects.ts';
 import nextMDX from '@next/mdx';
+import remarkGfm from 'remark-gfm';
 
 /**
  * Why `dev` runs Turbopack and `build` runs `next build --webpack`.
@@ -34,7 +35,7 @@ const withMDX = nextMDX({
         // The loader resolves a string from the directory of the .mdx file, not the project root, so
         // the Code Hike wrapper is named by absolute path. See mdx.code-hike.mjs for why it exists.
         remarkPlugins: [
-            ['remark-gfm', gfmOptions],
+            [remarkGfm, gfmOptions],
             [path.join(process.cwd(), 'mdx.code-hike.mjs'), codeHikeOptions({ autoImport: true })],
         ],
         rehypePlugins: [],
