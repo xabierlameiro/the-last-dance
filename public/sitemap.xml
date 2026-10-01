@@ -5,11 +5,35 @@
   </url>
 
   <url>
+    <loc>https://xabierlameiro.com/next-coverage</loc>
+  </url>
+
+  <url>
+    <loc>https://xabierlameiro.com/next-leak</loc>
+  </url>
+
+  <url>
     <loc>https://xabierlameiro.com/es</loc>
   </url>
 
   <url>
+    <loc>https://xabierlameiro.com/es/next-coverage</loc>
+  </url>
+
+  <url>
+    <loc>https://xabierlameiro.com/es/next-leak</loc>
+  </url>
+
+  <url>
     <loc>https://xabierlameiro.com/gl</loc>
+  </url>
+
+  <url>
+    <loc>https://xabierlameiro.com/gl/next-coverage</loc>
+  </url>
+
+  <url>
+    <loc>https://xabierlameiro.com/gl/next-leak</loc>
   </url>
 
   <url>
@@ -85,6 +109,11 @@
   <url>
     <loc>https://xabierlameiro.com/gl/blog/react/filtro-para-posicions</loc>
     <lastmod>2026-08-06</lastmod>
+  </url>
+
+  <url>
+    <loc>https://xabierlameiro.com/blog/nextjs/ga4-consent-mode-small-site</loc>
+    <lastmod>2026-09-18</lastmod>
   </url>
 
   <url>
@@ -205,6 +234,16 @@
   <url>
     <loc>https://xabierlameiro.com/gl/blog/react/despregar-storybook-facilmente</loc>
     <lastmod>2026-08-06</lastmod>
+  </url>
+
+  <url>
+    <loc>https://xabierlameiro.com/blog/nextjs/quadratic-mdx-loader-vercel-504</loc>
+    <lastmod>2026-09-18</lastmod>
+  </url>
+
+  <url>
+    <loc>https://xabierlameiro.com/blog/nextjs/tag-facet-urls-query-parameter</loc>
+    <lastmod>2026-09-23</lastmod>
   </url>
 
   <url>

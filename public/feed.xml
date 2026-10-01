@@ -5,8 +5,36 @@
         <link>https://xabierlameiro.com</link>
         <description>Practical, first-hand notes on React, Next.js and TypeScript: production errors, testing, CI/CD and web tooling.</description>
         <language>en</language>
-        <lastBuildDate>Wed, 22 Jul 2026 00:00:00 +0000</lastBuildDate>
+        <lastBuildDate>Wed, 23 Sep 2026 00:00:00 +0000</lastBuildDate>
         <atom:link href="https://xabierlameiro.com/feed.xml" rel="self" type="application/rss+xml" />
+        <item>
+            <title>Why I couldn&apos;t 301, noindex or disallow my blog&apos;s tag URLs</title>
+            <link>https://xabierlameiro.com/blog/nextjs/tag-facet-urls-query-parameter</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/tag-facet-urls-query-parameter</guid>
+            <pubDate>Wed, 23 Sep 2026 00:00:00 +0000</pubDate>
+            <description>My blog served every post under each of its tags. A 301, noindex and robots.txt each failed for a different reason. What works: the tag as ?tag=.</description>
+            <category>seo</category>
+            <category>debugging</category>
+        </item>
+        <item>
+            <title>GA4 saw 12 of my 23 Google clicks. Where did the rest go?</title>
+            <link>https://xabierlameiro.com/blog/nextjs/ga4-consent-mode-small-site</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/ga4-consent-mode-small-site</guid>
+            <pubDate>Fri, 18 Sep 2026 00:00:00 +0000</pubDate>
+            <description>Same 28 days: Search Console counted 23 Google clicks, GA4 counted 12 sessions. Why Consent Mode v2 hides half the visits on a small site.</description>
+            <category>analytics</category>
+            <category>seo</category>
+        </item>
+        <item>
+            <title>One page, 32,800 file reads: the O(N²) behind a Vercel 504</title>
+            <link>https://xabierlameiro.com/blog/nextjs/quadratic-mdx-loader-vercel-504</link>
+            <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/quadratic-mdx-loader-vercel-504</guid>
+            <pubDate>Fri, 18 Sep 2026 00:00:00 +0000</pubDate>
+            <description>A tag page on my Next.js blog read its 39 MDX files 32,800 times per render and hit a Vercel 504. How I counted the reads, and the fix.</description>
+            <category>performance</category>
+            <category>node</category>
+            <category>debugging</category>
+        </item>
         <item>
             <title>Heap snapshot diffs: how to prove a Next.js memory leak</title>
             <link>https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak</link>
