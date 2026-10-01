@@ -1,22 +1,26 @@
 import path from 'path';
 import type { NextConfig } from 'next';
-import { remarkPlugins } from './mdx.plugins.ts';
+import { codeHikeOptions, gfmOptions } from './mdx.plugins.ts';
 import { legacyFacetRedirects } from './src/helpers/legacyFacetRedirects.ts';
 import nextMDX from '@next/mdx';
 
 /**
- * This is why `build` runs `next build --webpack`.
+ * Why `dev` runs Turbopack and `build` runs `next build --webpack`.
  *
  * Next 16 makes Turbopack the default bundler, and Turbopack serialises a loader's options to pass
- * them to Rust. The options below are not serialisable: `remarkPlugins` is an array of JavaScript
- * functions. Measured on 16.3.6, the build stops with
+ * them to Rust. Passing the plugins as imported functions, which the Next 16 migration did, stops
+ * both `next dev` and a Turbopack build on 16.3.6 with
  *
  *   Error: loader .../@next/mdx/mdx-js-loader.js for match "{*,next-mdx-rule}" does not have
  *   serializable options. Ensure that options passed are plain JavaScript objects and values.
  *
- * `--webpack` is the destination, not a fallback to remove later: it is how this MDX pipeline is
- * supported while the plugins are functions. Turbopack becomes possible only when every plugin can
- * be named by string, which Code Hike's remark plugin cannot be today. See design.md §D4.
+ * So the plugins below are named by string, which `@next/mdx` resolves and imports itself, and both
+ * bundlers compile this config. On 2026-09-27 the two builds served the same 96 routes and the same
+ * 55 visual captures.
+ *
+ * `build` stays on webpack for a measured reason: the same five pages transferred 13% to 31% more
+ * JavaScript from the Turbopack build (cold load, gzip, prefetches included). Production moves when
+ * Turbopack is within 5% on every one of them, measured with `scripts/measure-transfer/`.
  */
 const withMDX = nextMDX({
     extension: /\.mdx?$/,
@@ -27,7 +31,12 @@ const withMDX = nextMDX({
          * given .mdx file happened to be loaded. Both import `mdx.plugins.ts` now.
          */
         // @next/mdx compiles a real module, so Code Hike can inject the `CH` import itself.
-        remarkPlugins: remarkPlugins({ autoImport: true }),
+        // The loader resolves a string from the directory of the .mdx file, not the project root, so
+        // the Code Hike wrapper is named by absolute path. See mdx.code-hike.mjs for why it exists.
+        remarkPlugins: [
+            ['remark-gfm', gfmOptions],
+            [path.join(process.cwd(), 'mdx.code-hike.mjs'), codeHikeOptions({ autoImport: true })],
+        ],
         rehypePlugins: [],
         // If you use `MDXProvider`, uncomment the following line.
         // providerImportSource: "@mdx-js/react",
