@@ -1065,6 +1065,104 @@ The second one is the check that caught the bug in this site: `data-theme` said 
 
 ---
 
+# GA4 saw 12 of my 23 Google clicks. Where did the rest go?
+
+- URL: https://xabierlameiro.com/blog/nextjs/ga4-consent-mode-small-site
+- Author: Xabier Lameiro
+- Category: Nextjs · Tags: analytics, seo
+- Summary: Same 28 days: Search Console counted 23 Google clicks, GA4 counted 12 sessions. Why Consent Mode v2 hides half the visits on a small site.
+
+# GA4 saw 12 of my 23 Google clicks. Where did the rest go?
+
+Published: 09-18-2026
+
+## Quick answer
+
+From 19 August to 15 September 2026, Google Search Console counted **23 clicks** from Google search to this blog. Google Analytics 4, for the same 28 days, reported **12 sessions** from `google / organic`. So GA4 showed about half of the visits that Google itself says it sent.
+
+Most of that gap is by design. The site uses Consent Mode v2 with analytics denied until the visitor accepts. Google can fill the gap with behavioral modeling, but only above thresholds that a small site does not come close to. Below them, GA4 simply doesn't report visitors who decline. My property's settings say so directly: modeling isn't available for it.
+
+The rest of this post is the two numbers, the configuration behind them, and what I now trust each tool for.
+
+## The two numbers
+
+Both reports cover the same days. The Search Console number is filtered to the main domain, with final data only. The GA4 number is the Traffic acquisition report by session source and medium, with no filters.
+
+| Source                                   | 19 Aug – 15 Sep 2026 |
+| ---------------------------------------- | -------------------- |
+| Search Console, clicks from Google search | 23                   |
+| GA4, `google / organic` sessions          | 12                   |
+| GA4, all Organic Search sessions (Google, Bing and others) | 15 |
+| GA4, all sessions from every source      | 229                  |
+
+Twelve out of 23 is 52%. The numbers are small, and on a small site they always will be, so I don't read anything into the decimals. But half is not a rounding error. Only 3 of those 12 GA4 sessions counted as engaged, so the visible part is thin as well as small.
+
+A click and a session are not the same thing. Search Console counts clicks on a Google result. GA4 counts a session when the Google tag runs on the page and is allowed to report it. Everything between those two events is where the other 11 visits went.
+
+## What the consent setup does
+
+This is the start of the analytics bootstrap in the site's `_app.tsx`. Every storage type that can identify a visitor starts denied:
+
+```js
+gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied',
+    functionality_storage: 'granted',
+    security_storage: 'granted',
+    wait_for_update: 500
+});
+```
+
+The Google tag then loads for everyone, whether or not they have answered the banner. That's what Google calls the advanced implementation. While `analytics_storage` is denied, the tag sends cookieless pings instead of normal hits, with no client ID that would tie two page views to the same person. When a visitor accepts, the banner calls `gtag('consent', 'update', …)`, and the answer is stored and replayed on their later visits.
+
+So the site does send something to Google for every visitor that runs the tag. The question is what GA4 does with the pings from people who never accepted.
+
+## Why GA4 doesn't fill the gap
+
+Google's answer is [behavioral modeling for consent mode](https://support.google.com/analytics/answer/11161109). It trains a model on the visitors who accepted and uses it to estimate the ones who didn't. The help page lists the prerequisites, and two of them are about volume:
+
+- at least 1,000 events per day with `analytics_storage` denied, for at least 7 days;
+- at least 1,000 daily users with `analytics_storage` granted, for at least 7 of the previous 28 days.
+
+It also says what happens below that line: "events triggered by users who decline consent aren't reported."
+
+This blog had 229 sessions in 28 days across every source, which is about 8 a day. The threshold is 1,000 consenting users a day. It will not get there, and I checked instead of assuming. In GA4, under Admin, Data display, Reporting identity, the property is set to Blended. The line for modeled data says modeling is not available for this property, and that it will turn on by default if that changes.
+
+That leaves the reports with observed data only, which means visitors who accepted. The cookieless pings from everyone else are collected and never shown.
+
+## What else is in the gap
+
+Consent is the biggest documented cause, but it isn't the only one, and GA4 can't tell them apart. Every one of them looks the same from inside GA4, a visit that isn't there:
+
+- **Ad and tracker blockers** stop `gtag.js` from loading at all. Consent never comes into it.
+- **Quick exits.** The tag is injected after hydration, so someone who hits back within a second or two can count as a click and never become a session.
+- **Clicks that aren't unique people.** A visitor who clicks the same result twice is two clicks in Search Console and may be one session in GA4.
+
+The honest conclusion is an upper bound. At most about half of the visitors Google sent were visible to GA4, and I can't split the missing half between consent and blockers with the tools I have. Separating them needs a count that sees every request whatever the browser allows, which is the next thing I'm setting up on this site. I'll report it when there are 28 days of it.
+
+## What this changes on this blog
+
+**The view counter was reading the smaller number.** Each post shows a view count that comes from the GA4 Data API. It only ever counted page views from visitors who accepted cookies. It counts the readers who consented, and for Google traffic that was about half.
+
+**Search questions go to Search Console.** When I decided which kind of post to write next, I used Search Console clicks, not GA4 sessions: one investigation post was taking most of the blog's clicks while the error-fix posts took none. Had I used GA4, I'd have been deciding on about half the visits, from samples already too small to lose half of.
+
+**GA4 keeps one job.** For the people who accepted, it still shows what they read and how long they stayed. That's useful, as long as I remember it describes a subset that chose to be counted.
+
+## Check your own site
+
+This takes ten minutes and needs no code:
+
+1. Pick a 28-day window that ended at least three days ago, so Search Console's data is final.
+2. In Search Console, Performance, filter to your own hostname and write down the clicks.
+3. In GA4, Reports, Acquisition, Traffic acquisition, switch the dimension to session source / medium, set the same dates, and write down the sessions for `google / organic`.
+4. In GA4, Admin, Data display, Reporting identity, expand Blended and read whether modeling is available.
+
+If the GA4 number is well under the Search Console one and modeling is not available, your reports are showing the visitors who said yes, and nobody else. That's fine if you know it. It's a problem if you're making decisions as if it were everyone.
+
+---
+
 # Make a views counter with google analytics
 
 - URL: https://xabierlameiro.com/blog/nextjs/make-a-views-counter-with-google-analytics
@@ -1562,7 +1660,7 @@ It boots your standalone build route by route in a fresh process, drives real lo
 
 That is the stepwise growth of leak 3 with the sandbox `TimeoutsManager` named in the retainer chain — the same diagnosis as above, in about three minutes.
 
-The full protocol, why each step exists, and the before/after pair that proves the diagnosis was right are in [how to measure a Next.js memory leak and prove the diagnosis](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak).
+The full protocol, why each step exists, and the before/after pair that proves the diagnosis was right are in [Heap snapshot diffs: how to prove a Next.js memory leak](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak).
 
 Two honest data points from measuring all three: #94890 reproduced with a tenth of the original load; #94919 did **not** reproduce on a standalone build even with 4,000 real mid-stream disconnections per cycle — the repro's pages answer in ~6 ms, so there is no stream left to abandon. That matches the reporter's own note that the magnitude scales with the RSC payload: if you suspect leak 2, measure your heaviest real pages, not a minimal repro. Every verdict ships with the raw snapshots and a machine-readable `run.json`, so you can verify every claim yourself in DevTools.
 
@@ -1574,6 +1672,356 @@ My checklist after this trip:
 2. **Correlate before you blame.** Heap tracking unique URLs → leak 1. Heap tracking traffic and aborts → leak 2. Steps with middleware → leak 3. One specific route driving the curve → almost certainly your code.
 3. **`--max-old-space-size` fixes nothing** — size the heap to your container so you don't die early, but a monotonic slope will eventually hit any limit.
 4. **On serverless, profile time instead of memory.** If you're seeing 504s, hunt for quadratic or repeated per-request work; my whole case is in the previous section.
+
+---
+
+# One page, 32,800 file reads: the O(N²) behind a Vercel 504
+
+- URL: https://xabierlameiro.com/blog/nextjs/quadratic-mdx-loader-vercel-504
+- Author: Xabier Lameiro
+- Category: Nextjs · Tags: performance, node, debugging
+- Summary: A tag page on my Next.js blog read its 39 MDX files 32,800 times per render and hit a Vercel 504. How I counted the reads, and the fix.
+
+# One page, 32,800 file reads: the O(N²) behind a Vercel 504
+
+Published: 09-18-2026
+
+## Quick answer
+
+In July some pages of this blog started answering with `504 FUNCTION_INVOCATION_TIMEOUT` on Vercel. The broken pages were not slow because of React, serialization or the network. To render one tag page, the MDX loader read the blog's 39 files **32,800 times**. The count grows with the square of the number of posts. Doubling the corpus made it 129,481 reads, and tripling it made it 290,044.
+
+The fix was to read the corpus once per process. After that one render made 39 reads the first time and zero after, at 32 ms. In the build, the per-page prerender went from about 32 s to about 1.6 s.
+
+This post is mostly about how I found it. I counted file reads instead of timing renders. The repository is public, so every number below can be reproduced from two commits.
+
+## The symptom: only some URLs timed out
+
+Each post on this blog lives at `/blog/<category>/<slug>`. At the time the sidebar also linked every post under each of its tags, as `/blog/<tag>/<slug>`. `getStaticPaths` only listed the category paths, and `fallback: 'blocking'` rendered the tag ones the first time someone asked for them.
+
+That detail decided which pages broke. For a path that was not prerendered, the [Next.js docs](https://nextjs.org/docs/pages/building-your-application/data-fetching/get-static-props) say `getStaticProps` is "called before the initial render". The visitor waits for it inside a serverless function. Category URLs came from the build cache and loaded fine. Tag URLs ran the whole loader at request time, and some of them ran out of time.
+
+I don't have the timing of a single failing request in production. I have two things: instrumentation of `getStaticProps` during a `next build` in July, and a benchmark I ran again today to write this post. I label each number with where it came from.
+
+## Four helpers that each looked fine
+
+This is the loader before the fix, at commit [`99ea971`](https://github.com/xabierlameiro/the-last-dance/blob/99ea97154bd33ea6838903959f030c8a87ef1a29/src/helpers/fileReader.ts), trimmed to the lines that matter. Resolving one slug read and parsed every file:
+
+```ts
+const findPostBySlug = (slug) => {
+    const paths = findMdxFiles(POST_PATH);
+    // ...
+    const [route] = paths.filter((filePath) => {
+        const document = fs.readFileSync(filePath, 'utf8');
+        const { data } = matter(document);
+        // ...
+        return data.slug?.normalize('NFC') === normalizedSlug /* ... */;
+    });
+    // ...
+    return matter(fs.readFileSync(route, 'utf8'));
+};
+```
+
+Loading all posts resolved every slug that way:
+
+```ts
+export const getAllPosts = () => {
+    const slugs = getPostSlugs();
+    return slugs.map((slug) => getPostBySlug(slug));
+};
+```
+
+And the sidebar called `getAllPosts` (through `getPostsByLocale`) once for the post list, once for the tag list, and once more for each category and each tag:
+
+```ts
+const getAllTags = (locale) => {
+    const posts = getPostsByLocale(locale);
+    const tags = posts.map((post) => post.meta.tags);
+    return [...new Set(tags.flat())].map((tag) => {
+        const postsBytag = getPostsByTag(tag, locale);
+        // ...
+    });
+};
+```
+
+Read one at a time, none of these looks dangerous. `findPostBySlug` is a linear scan over a few dozen files. `getAllPosts` is a `map`. `getAllTags` wants the first post of each tag. The cost only shows up when you multiply them, and nobody reviews the product of four functions.
+
+## Count the reads, don't time the render
+
+Timings on a laptop are noisy, and I didn't want to argue with noise. So I counted how many times the loader opened an `.mdx` file during one render. I patched `fs.readFileSync` before importing the loader, and called the same three functions that `getStaticProps` of the post page called:
+
+```js
+// Counts the .mdx reads behind one render of /blog/<tag>/<slug>.
+// Usage: NODE_ENV=production node count.mjs ./before.ts
+import fs from 'node:fs';
+import { performance } from 'node:perf_hooks';
+
+let reads = 0;
+const readFileSync = fs.readFileSync;
+fs.readFileSync = (file, ...rest) => {
+    if (String(file).endsWith('.mdx')) reads += 1;
+    return readFileSync(file, ...rest);
+};
+
+const loader = await import(process.argv[2]);
+
+// The three calls getStaticProps made for a tag-faceted post page.
+const render = () => {
+    loader.getPostBySlug({ params: { slug: 'solve-address-in-use-error' } });
+    loader.getAllCategories('en');
+    loader.getPostsByLocaleAndCategory('en', 'node');
+};
+
+for (let run = 1; run <= 3; run += 1) {
+    reads = 0;
+    const start = performance.now();
+    render();
+    console.log(`render ${run}: ${(performance.now() - start).toFixed(0)} ms, ${reads} .mdx reads`);
+}
+```
+
+To run it against the code as it was, I took the loader from the commit before the fix and from the fix, plus the posts as they were then. Save the script above as `repro/count.mjs`. Node 24 runs the `.ts` files directly because it strips the types:
+
+```bash
+git clone https://github.com/xabierlameiro/the-last-dance.git
+mkdir repro && cd repro
+git -C ../the-last-dance show 99ea971:src/helpers/fileReader.ts > before.ts
+git -C ../the-last-dance show 7f9519a:src/helpers/fileReader.ts > after.ts
+git -C ../the-last-dance archive 99ea971 data/blog | tar -x
+npm init -y && npm pkg set type=module && npm i gray-matter
+NODE_ENV=production node count.mjs ./before.ts
+NODE_ENV=production node count.mjs ./after.ts
+```
+
+On an Apple M2 Pro with Node 24.18.0:
+
+```
+render 1: 1827 ms, 32800 .mdx reads
+render 2: 1739 ms, 32800 .mdx reads
+render 3: 1713 ms, 32800 .mdx reads
+```
+
+```
+render 1: 41 ms, 39 .mdx reads
+render 2: 32 ms, 0 .mdx reads
+render 3: 32 ms, 0 .mdx reads
+```
+
+Earlier the same day, the same three renders of the old loader took 2,798, 2,629 and 2,730 ms. The time moved by about a second. The read count didn't: 32,800 both times.
+
+## Where 32,800 comes from
+
+The number can be derived exactly, which is a good sign the model is right. With N = 39 files:
+
+- One `findPostBySlug` reads all N files plus the matching one again: **40 reads**.
+- One `getAllPosts` does that for every post: 39 × 40 = **1,560 reads**.
+- One render calls `getAllPosts` **21 times**. That's three plain calls (the post list, the tag list, the listing next to the article), plus one per category (4 in English then) and one per tag (14).
+
+21 × 1,560 = 32,760, plus the 40 reads of the post itself: 32,800. That's the whole number, with nothing left over.
+
+## What quadratic looks like as the blog grows
+
+To see the growth rather than infer it, I duplicated every post with a suffixed slug to build corpora of 78 and 117 files. Then I ran the same script, three renders each:
+
+| MDX files | Reads per render, before | Render time, before | Reads, after (first / next) | Render time, after |
+| --------- | ------------------------ | ------------------- | --------------------------- | ------------------ |
+| 39        | 32,800                   | 2.6–2.8 s           | 39 / 0                      | 34–48 ms           |
+| 78        | 129,481                  | 13.0–13.5 s         | 78 / 0                      | 66–88 ms           |
+| 117       | 290,044                  | 17.4–31.4 s         | 117 / 0                     | 95–115 ms          |
+
+Twice the posts, 3.95 times the reads. Three times the posts, 8.84 times the reads. The same formula, 21 × N × (N + 1) + (N + 1), predicts all three counts exactly. After the fix the reads grow with N, and only on the first render of a process.
+
+The time column is the one to read with care. At 117 files the three renders ranged from 17 s to 31 s on the same idle machine. A regression test built on that number would be flaky. One built on the read count would not.
+
+This is the part that matters for a blog: **every new post made every page slower**, including pages that had nothing to do with it. Nothing changed in the code between the day it was fine and the day it wasn't. The corpus just grew.
+
+## The fix: read the corpus once
+
+The fix in [PR #132](https://github.com/xabierlameiro/the-last-dance/pull/132) reads and parses every file once and keeps the result in a module-level variable. Every helper then filters that array instead of going to disk:
+
+```ts
+let corpusCache: ParsedPost[] | null = null;
+
+const loadCorpus = (): ParsedPost[] => {
+    if (corpusCache && process.env.NODE_ENV === 'production') {
+        return corpusCache;
+    }
+    corpusCache = findMdxFiles(POST_PATH).map(buildPost);
+    return corpusCache;
+};
+```
+
+The cache is production-only so that `next dev` still shows content edits without a restart. A later change swapped that for a cache keyed on file modification times, so development got fast too.
+
+Measured during the build in July, before and after the change:
+
+| What                                                 | Before              | After               |
+| ---------------------------------------------------- | ------------------- | ------------------- |
+| `next build`, blog route                             | ~17.5 min           | 34 s                |
+| Prerender of one `/blog/[category]/[slug]` page      | ~32,000 ms          | ~1,600 ms           |
+| Tag URL rendered on demand (`next start`, warm)      | would time out      | ~134 ms             |
+
+The build numbers are higher than my isolated benchmark. The build prerenders many pages at once on the same machine, and I didn't measure how much they slowed each other down. So I treat 32 s as the build's number and 1.7–2.8 s as the cost of the loader alone.
+
+## Two suspects that were not the cause
+
+**Serialization.** Large props are a common reason for slow `getStaticProps`, and the rendered post content is not small. The instrumentation put it at about 94 ms, so it wasn't the problem.
+
+**`revalidate: 10`.** The page regenerated every 10 seconds, which looked guilty. But ISR regeneration is stale-while-revalidate: the visitor gets the last good page while the new one renders in the background. It could not cause a 504 on its own. What it did do was re-run a 32-second function in the background, up to every 10 seconds per page. I raised it to one day as a cost fix, not as the 504 fix.
+
+## Why I didn't raise the timeout
+
+Vercel's [page for this error](https://vercel.com/docs/errors/FUNCTION_INVOCATION_TIMEOUT) suggests making the function fit its maximum duration first, and raising the duration as another option. The project had no `maxDuration` configured, so it ran on whatever the plan's default was at the time. I didn't record that value, and Vercel's defaults have changed since with Fluid compute.
+
+A longer limit would have worked for a while. But the cost was quadratic in the number of posts, so a timeout four times longer only buys about twice as many posts. Then the same 504 comes back on a day when nothing in the code changed. Making the render fast was the only fix that didn't depend on how much I write.
+
+## Check your own loader
+
+If your site reads Markdown or MDX from disk in `getStaticProps`, a route handler or a build script, this takes a few minutes:
+
+1. Wrap `fs.readFileSync` (or `fs.promises.readFile`) to count reads of your content files, as in `count.mjs` above.
+2. Run one render and write the count down. If it is larger than your number of files, something reads the same file twice.
+3. Copy your content directory so it has twice the files, and run it again. If the count doubles, it's linear. If it roughly quadruples, look for a helper that loads everything, called inside a loop over everything.
+
+The count is more useful than the timing for a second reason: you can put it in a test. A test that asserts one render reads each file at most once will catch the next quadratic helper before the corpus grows into it. A timing assertion will fail on a busy CI runner for reasons that have nothing to do with the loader.
+
+The same idea runs through [how I prove a Next.js memory leak](https://xabierlameiro.com/blog/nextjs/measure-nextjs-memory-leak). Measure something that doesn't depend on how busy the machine is. Then remove the suspected cause and check that the effect goes away with it.
+
+---
+
+# Why I couldn't 301, noindex or disallow my blog's tag URLs
+
+- URL: https://xabierlameiro.com/blog/nextjs/tag-facet-urls-query-parameter
+- Author: Xabier Lameiro
+- Category: Nextjs · Tags: seo, debugging
+- Summary: My blog served every post under each of its tags. A 301, noindex and robots.txt each failed for a different reason. What works: the tag as ?tag=.
+
+# Why I couldn't 301, noindex or disallow my blog's tag URLs
+
+Published: 09-23-2026
+
+## Quick answer
+
+This blog served every post at `/blog/<category>/<slug>` and also at `/blog/<tag>/<slug>`, once for each of its tags. That is 95 extra URLs for the same content: 35 in English and 30 in each of Spanish and Galician. Over 90 days, 10 of them showed up in Google Search Console with 229 impressions and 1 click between them.
+
+I shipped two of the standard fixes, a 301 redirect and linking to the canonical URL, and ruled out two more, `noindex` and `robots.txt`. Each one either broke tag navigation or could not work on this URL shape. The reason is the same in every case. The tag lived in the path, and a path segment can't be told apart from the real category.
+
+The fix is to stop creating the URLs. The post stays at its category URL, the tag travels as `?tag=`, and a query parameter can be blocked, redirected and ignored cleanly. It shipped in three steps and it is live. The last section has the measurement, and it is not the one I planned to take: the metric I had chosen to prove the fix had gone to zero on its own two months earlier.
+
+## How a sidebar creates 95 duplicate URLs
+
+The blog is a single full-screen layout. On the left there's a list of categories and tags, in the middle a list of posts, and on the right the article. When you click a tag, the middle list filters to that tag and the tag stays highlighted while you open posts from it.
+
+The highlight needs to know which tag you are browsing. The simplest place to keep it was the URL, so the post list linked to `/blog/node/solve-address-in-use-error` when you browsed `node`, even though the post's category is `error`. With `getStaticPaths` listing only the category URLs and `fallback: 'blocking'`, Next.js rendered any tag URL on first request.
+
+Each tag URL declared `rel=canonical` pointing at the category URL, which is the textbook answer. Here is what Search Console had for one post over the same 90 days (2026-06-20 to 2026-09-18):
+
+| URL                                                           | Impressions | Clicks | Avg. position |
+| ------------------------------------------------------------- | ----------- | ------ | ------------- |
+| `/blog/error/uncaught-error-minified-react-error` (canonical) | 1,570       | 2      | 9.4           |
+| `/blog/hydration/uncaught-error-minified-react-error` (tag)   | 107         | 0      | 10.2          |
+| `/blog/ssr/uncaught-error-minified-react-error` (tag)         | 6           | 0      | 5.3           |
+
+Today the URL Inspection tool reports the `hydration` URL as "Alternate page with proper canonical tag", and Google's chosen canonical matches mine. So the canonical is being respected. But the tag URLs are still crawled, still collect impressions, and still split what Search Console reports for one article. Earlier this year it went the other way: one post was indexed under its `testing` tag URL instead of its `react` category URL.
+
+At this scale it's not a disaster: 229 impressions and 1 click in 90 days. What made it interesting is that every obvious fix failed.
+
+## Attempt 1: redirect the tag URL to the canonical
+
+The first fix was a 301 from `/blog/<tag>/<slug>` to `/blog/<category>/<slug>`. Google calls a redirect a strong signal that its target should become canonical, so on paper this is the cleanest option.
+
+It broke the blog. Clicking a tag listed its posts, but opening any of them redirected to the category URL, and the sidebar followed the URL. The tag deselected, the category lit up, and there was no way to walk through a tag's posts any more. The redirect came out in July.
+
+## Attempt 2: link to the canonical URL instead
+
+If redirects break navigation, maybe the tag URLs just shouldn't be linked. [PR #186](https://github.com/xabierlameiro/the-last-dance/pull/186) changed the post list to build every link from the post's own category. No internal link would point at a tag URL, so crawlers would stop finding them.
+
+It shipped on 8 August and broke the same thing in a different way. The links no longer carried the tag, so opening a post from a tag listing deselected the tag again. [PR #189](https://github.com/xabierlameiro/the-last-dance/pull/189) reverted it ten hours later.
+
+That one is the most useful mistake in this post, because it was not an accident. The deselected tag was predicted before the change shipped, and judged an acceptable price for a small SEO gain. It came back as a bug report the same morning, and that was the right call. A feature that works is worth more than a marginal ranking signal, and a fix that degrades behaviour is a decision to surface, not to make quietly.
+
+## Attempts 3 and 4: noindex and robots.txt
+
+I never shipped these two, because checking them against Google's documentation was enough.
+
+**`noindex` on the tag URLs.** Google's page on [consolidating duplicate URLs](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls) says "We don't recommend using noindex to prevent selection of a canonical page" within one site. The page would be blocked from Search entirely. A `noindex` alongside a `rel=canonical` that points elsewhere also sends two signals that disagree.
+
+**`robots.txt`.** The same page says not to use `robots.txt` for canonicalization. Even ignoring that, it can't express the rule. `robots.txt` matches URL patterns, and `/blog/node/solve-address-in-use-error` has exactly the shape of `/blog/error/solve-address-in-use-error`. Any pattern that blocks the first blocks the second, so there is no rule to write.
+
+## The insight: Google's facet advice assumes query parameters
+
+Google's [faceted navigation guide](https://developers.google.com/crawling/docs/faceted-navigation) is written for online shops, where facets like colour and size are query parameters. Its main recommendation is to keep crawlers off facet URLs with rules like `disallow: /*?*color=`. It describes `rel=canonical` for facets as generally less effective in the long term.
+
+That advice only works because a parameter has a shape of its own. My tags were facets too, but I had put them in the path, where nothing can target them.
+
+So the fix is not a better redirect or a better tag. The fix is to stop creating the URLs:
+
+- The post lives only at `/blog/<category>/<slug>`.
+- The tag you are browsing travels as `?tag=node`.
+- `robots.txt` gets `Disallow: /*?tag=`, which now matches only facets.
+- Only after that ships do the old tag paths get a 301 to the new shape. Nothing depends on them any more, so the redirect is finally safe.
+
+## Keeping navigation identical
+
+The hard requirement was that a reader must not notice. Before touching any code I wrote a Playwright suite that only asserts what a reader sees. It selects a tag, checks the filtered list, opens a post, checks the tag is still highlighted, goes back and checks the list again. It also loads a tagged URL directly and visits a post's canonical URL. The suite never looks at the URL shape. It has 3 tests, each run in English and Spanish, and all 6 passed on the old code.
+
+A naive version reads `?tag=` on the client, and it fails that suite on the first full page load. The post list next to the article is built in `getStaticProps` from the path, so a client-side tag would show the category's list first and then swap it. Instead, a rewrite in `next.config.ts` serves the new URL from the render the site already had:
+
+```ts
+{
+    source: '/blog/:postCategory/:slug',
+    has: [{ type: 'query', key: 'tag', value: `(?<tag>${TAG_VALUE_PATTERN})` }],
+    destination: '/blog/:tag/:slug',
+},
+```
+
+The server-rendered list and highlight are exactly what they were. One more trap showed up in the suite. After hydration, Next.js re-reads `router.query` from the visible URL, so the page saw the category again and dropped the highlight. The page now reads `?tag=` first and the path second. The tag pattern `[a-z0-9-]+` is one constant shared by the rewrite and the page, so a value one side rejects is rejected by both.
+
+Links are built in one place:
+
+```ts
+export const postPath = (post: { category: string; slug: string }, browsedSegment?: string): string => {
+    const category = post.category.toLowerCase();
+    const path = `/blog/${category}/${post.slug}`;
+    const segment = browsedSegment?.toLowerCase();
+    return segment && segment !== category ? `${path}?tag=${encodeURIComponent(segment)}` : path;
+};
+```
+
+After the change the same suite, unchanged, passed 6 of 6 three runs in a row. Every internal blog link on the built pages now uses a category segment. The old tag paths still render, because their redirect is the last step.
+
+## Results: the number I picked to prove it was already dead
+
+The three steps went live between 18 and 19 September 2026. On 23 September I checked production directly:
+
+- `/blog/hydration/uncaught-error-minified-react-error` returns `308` to `/blog/error/uncaught-error-minified-react-error?tag=hydration`, which returns `200`. Same for the other legacy paths I sampled, in English and Spanish.
+- `robots.txt` carries `Disallow: /*?tag=` in its `User-agent: *` group.
+- Every internal blog link on the built pages uses a category segment.
+
+So the mechanism is gone. Then I went to measure the effect, and the measurement fell apart.
+
+My plan was to compare impressions for the tag URLs before and after. After the change they are zero. That sounds like a result and it is worth nothing, because I pulled the daily numbers instead of the totals:
+
+| Period                      | Impressions on `/blog/hydration/…` |
+| --------------------------- | ---------------------------------- |
+| 19–24 July 2026             | 107                                |
+| 25 July – 22 September 2026 | 0                                  |
+
+The 107 impressions in the 90-day baseline are one six-day burst in July. That URL had not been shown in Search for **two months before I shipped anything**. Had I reported "facet impressions went from 107 to 0", every part of that sentence would have been true and the conclusion would have been false.
+
+The index state says the same thing from the other side. Both facet URLs I inspected are still "Alternate page with proper canonical tag", with Google's canonical matching mine. Their last crawl dates are 5 September and 18 July, both before the change. Google has not fetched them since the redirect existed, so there is nothing for it to have noticed yet. A redirect is not a broadcast. It only counts the next time the crawler comes back, and on a blog this size that can be months.
+
+**What the change actually bought, stated at its real size:** 90 URLs that no longer exist. That is crawl surface and reporting noise, not ranking. The one thing it does fix for certain is the failure mode from earlier this year, when a post got indexed under its `testing` tag URL instead of its `react` category URL. That URL cannot be minted any more.
+
+**What it did not buy:** anything visible in clicks. Site impressions and average position both moved in the same window, and I am not attributing either to this. The honest summary is that a duplicate-URL problem worth 229 impressions and 1 click in 90 days got fixed properly and produced no measurable traffic change, which is exactly what a problem that size should produce.
+
+I will re-read the index state once Google has recrawled the facet paths and expect them to become "Page with redirect". If they don't, that will be the more interesting post.
+
+## What I'd check on your own site
+
+- **List every URL shape that renders the same content.** Look for a path segment carrying UI state, such as a tag, a filter or a sort order. Those can't be excluded later.
+- **Put UI state in query parameters from day one.** A parameter can be blocked in `robots.txt`, dropped from the sitemap and redirected without touching the real URL.
+- **Write the navigation test before the SEO fix.** Two of my three attempts broke the same feature. A test that pins what the reader sees, not the URL, would have caught both before they shipped.
+- **Check that your baseline is still alive before you use it.** A 90-day total hid the fact that my metric had been flat at zero for two months. Plot it by day first, or you will credit your fix with something that happened without you.
 
 ---
 

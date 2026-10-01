@@ -53,6 +53,20 @@ jobs:
               run: npm run lint
             - name: Type check
               run: npx tsc --noEmit
+            # The feeds and llms files are generated at prebuild but also committed, because
+            # scripts/indexnow-ping.ts and api/indexed-pages.ts read files from disk (#187). Nothing
+            # forced a regeneration, so three posts went missing from the committed copies between
+            # e0c2162 and 2026-10-01. Both generators are deterministic and read no environment.
+            # The sitemap is left out: it is written during `next build` with NEXT_PUBLIC_DOMAIN,
+            # which is localhost on Dependabot PRs.
+            - name: Generated feeds and llms files match data/blog
+              run: |
+                  node scripts/generate-llms.ts > /dev/null
+                  node scripts/generate-feeds.ts > /dev/null
+                  if ! git diff --exit-code --stat -- public/feed.xml public/feed.es.xml public/feed.gl.xml public/llms.txt public/llms-full.txt; then
+                      echo "::error::Stale generated files. Run: node scripts/generate-llms.ts && node scripts/generate-feeds.ts, then commit public/."
+                      exit 1
+                  fi
             # Wraps `npm audit --omit=dev` with a dated allowlist, because one advisory
             # (GHSA-mh99-v99m-4gvg) has no upstream fix and is unreachable here. A stale or expired
             # allowlist entry fails the gate, so the exception cannot rot. See scripts/audit-gate.mjs.
