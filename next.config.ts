@@ -44,6 +44,14 @@ const withMDX = nextMDX({
 });
 
 const nextConfig: NextConfig = {
+    // react-compiler-adoption. Memoises client components at build time. Measured against the
+    // same commit without it: session script time −23%, JS transfer +5.6% to +7.7% per page. It
+    // stays on while scripts/measure-script-time/ shows at least −15% and scripts/measure-transfer/
+    // at most +8%. The react-hooks lint rules in eslint.config.mjs report components it would
+    // skip, with the caveat noted there. The plugin is pinned exactly: a new compiler version
+    // changes the output of every component, so it should arrive as its own reviewed bump.
+    // Rollback: `reactCompiler: false`.
+    reactCompiler: true,
     // /about and /contact were standalone pages rendering a plain white panel, which broke the
     // macOS-desktop premise: the only "apps" this site has are the Dock items. Both were already
     // duplicating the home page, where the VS Code window shows the bio (index.tsx), the

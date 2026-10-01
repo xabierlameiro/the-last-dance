@@ -43,14 +43,16 @@ type Props = {
 const PostList = ({ posts, slug, category }: Props) => {
     if (!posts) return null;
 
-    if (slug && typeof slug == 'object') slug = slug[0];
-    if (category && typeof category == 'object') category = category[0];
+    // New locals rather than reassigning the props: React Compiler treats props as immutable and
+    // skips a component that writes to one.
+    const selectedSlug = slug && typeof slug == 'object' ? slug[0] : slug;
+    const segment = category && typeof category == 'object' ? category[0] : category;
 
     return (
         <ul data-testid="post-list" className={styles.list}>
             {posts.map((item: PostListItem, index: number) => (
-                <li key={index} className={slug == item.meta.slug ? styles.selected : ''}>
-                    <Link href={postPath(item.meta, category)} title={item.meta.title}>
+                <li key={index} className={selectedSlug == item.meta.slug ? styles.selected : ''}>
+                    <Link href={postPath(item.meta, segment)} title={item.meta.title}>
                         <div className={styles.title}>{item.meta.title}</div>
                         <div className={styles.excerpt}>{item.meta.excerpt}</div>
                     </Link>

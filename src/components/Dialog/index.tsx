@@ -56,12 +56,14 @@ const Dialog = (props: Props) => {
         fitContent,
         withPadding,
         modalMode,
-        header = <></>,
-        body = <></>,
-        footer = <></>,
         label,
         onClose,
     } = props;
+    // Defaults resolved after the destructuring: React Compiler does not yet support JSX as a
+    // destructuring default and skips the component.
+    const header = props.header ?? <></>;
+    const body = props.body ?? <></>;
+    const footer = props.footer ?? <></>;
 
     const headerId = React.useId();
 

@@ -4,6 +4,7 @@ import tseslint from 'typescript-eslint';
 import sonarjs from 'eslint-plugin-sonarjs';
 import nextPlugin from '@next/eslint-plugin-next';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import reactHooks from 'eslint-plugin-react-hooks';
 
 export default tseslint.config(
     {
@@ -56,6 +57,38 @@ export default tseslint.config(
         rules: {
             ...nextPlugin.configs.recommended.rules,
             ...nextPlugin.configs['core-web-vitals'].rules,
+        },
+    },
+    /**
+     * React Compiler adoption. The compiler skips a component it cannot compile without saying so;
+     * these rules are where "this component gets no benefit, and why" becomes visible. Scoped to
+     * `src/`, the code the compiler builds; Playwright's `use` fixture callback in `e2e/` would read
+     * as a hook to `rules-of-hooks`.
+     *
+     * The three compiler rules raised to errors below are what made the compiler skip NavList,
+     * PostList, Dialog and Tooltip; the first three were rewritten and TooltipTrigger opts out with
+     * `use no memo`. A new hit means a component silently loses compilation. The first of them is
+     * not in the recommended set at all.
+     *
+     * The plugin bundles its own, newer copy of the compiler, so it can accept code that
+     * babel-plugin-react-compiler, which builds the site, still skips. A clean lint is not proof
+     * that a component compiles.
+     *
+     * `set-state-in-effect` stays a warning: six known sites, one of them the header clock whose
+     * hydration #239 fixed, deliberately left alone by this change.
+     */
+    {
+        files: ['src/**/*.{ts,tsx}'],
+        plugins: {
+            'react-hooks': reactHooks,
+        },
+        rules: {
+            ...reactHooks.configs.flat['recommended-latest'].rules,
+            'react-hooks/exhaustive-deps': 'error',
+            'react-hooks/todo': 'error',
+            'react-hooks/immutability': 'error',
+            'react-hooks/refs': 'error',
+            'react-hooks/set-state-in-effect': 'warn',
         },
     },
     {

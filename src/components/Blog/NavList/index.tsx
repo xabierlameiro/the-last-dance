@@ -27,8 +27,10 @@ type Props = {
 const NavList = ({ title, list, category, isCategory }: Props) => {
     if (!list) return null;
 
-    if (category && typeof category == 'object') category = category[0];
-    if (isCategory && typeof isCategory == 'object') isCategory = isCategory[0];
+    // New locals rather than reassigning the props: React Compiler treats props as immutable and
+    // skips a component that writes to one.
+    const selectedCategory = category && typeof category == 'object' ? category[0] : category;
+    const isCategoryList = isCategory && typeof isCategory == 'object' ? isCategory[0] : isCategory;
 
     return (
         <>
@@ -49,18 +51,18 @@ const NavList = ({ title, list, category, isCategory }: Props) => {
                         },
                         index: number
                     ) => {
-                        const isSelected = isCategory
-                            ? category === item.category.toLowerCase()
-                            : category === item.tag.toLowerCase();
+                        const isSelected = isCategoryList
+                            ? selectedCategory === item.category.toLowerCase()
+                            : selectedCategory === item.tag.toLowerCase();
                         return (
                             <li key={index}>
                                 <Link
                                     href={item.href}
-                                    title={isCategory ? item.category : item.tag}
+                                    title={isCategoryList ? item.category : item.tag}
                                     className={isSelected ? styles.selected : ''}
                                 >
-                                    {isCategory ? <BsFolder2 /> : <BsTag />}
-                                    <div className={styles.tag}>{isCategory ? item.category : item.tag}</div>
+                                    {isCategoryList ? <BsFolder2 /> : <BsTag />}
+                                    <div className={styles.tag}>{isCategoryList ? item.category : item.tag}</div>
                                     <div className={styles.number}>{item.total}</div>
                                 </Link>
                             </li>
