@@ -29,7 +29,20 @@ import path from 'path';
  * The same technique, and the same reasoning, as the DeploymentStatus stylesheet test in SDD-L07.
  */
 const source = fs.readFileSync(path.join(__dirname, '..', 'mdx.ts'), 'utf8');
-const plugins = fs.readFileSync(path.join(__dirname, '..', '..', '..', 'mdx.plugins.ts'), 'utf8');
+const root = path.join(__dirname, '..', '..', '..');
+const plugins = fs.readFileSync(path.join(root, 'mdx.plugins.ts'), 'utf8');
+const config = fs.readFileSync(path.join(root, 'next.config.ts'), 'utf8');
+const codeHikeWrapper = fs.readFileSync(path.join(root, 'mdx.code-hike.mjs'), 'utf8');
+
+/** One string per entry of the `remarkPlugins` list that `next.config.ts` hands to `@next/mdx`. */
+const configLines = config.split('\n').map((line) => line.trim());
+const pluginListStart = configLines.indexOf('remarkPlugins: [');
+const nextMdxPluginEntries =
+    pluginListStart === -1
+        ? []
+        : configLines
+              .slice(pluginListStart + 1, configLines.indexOf('],', pluginListStart))
+              .filter((line) => line.startsWith('['));
 
 describe('MDX serialize options', () => {
     it('should keep the dangerous-globals guard on', () => {
@@ -60,6 +73,45 @@ describe('MDX serialize options', () => {
 
     // "~1M requests" in prose must never pair up into strikethrough.
     it('should disable single-tilde strikethrough', () => {
-        expect(plugins).toMatch(/remarkGfm,\s*\{\s*singleTilde:\s*false\s*\}/);
+        expect(plugins).toMatch(/export const gfmOptions = \{\s*singleTilde:\s*false\s*\}/);
+        expect(plugins).toMatch(/\[remarkGfm, gfmOptions\]/);
+    });
+});
+
+/**
+ * Turbopack serialises the `@next/mdx` loader options. A plugin passed as an imported function
+ * breaks `next dev` with "does not have serializable options", while `next build --webpack` keeps
+ * passing, so no build step would notice. Same source-level technique as above, for the same reason:
+ * importing `next.config.ts` here pulls in the ESM-only remark chain.
+ */
+describe('@next/mdx options in next.config.ts', () => {
+    it.each(nextMdxPluginEntries)('should name the plugin by string: %s', (entry) => {
+        expect(entry).toMatch(/^\[\s*('[^']+'|path\.join\(process\.cwd\(\), '[^']+'\))\s*,/);
+    });
+
+    /**
+     * Exact text on purpose: an entry wrapped over two lines, a dropped options element or an
+     * options object written into the config all fail here instead of slipping past a looser match.
+     * `autoImport` is the one option allowed to differ between the pipelines.
+     */
+    it('should pass the two plugins with the options from mdx.plugins.ts', () => {
+        expect(nextMdxPluginEntries).toEqual([
+            "['remark-gfm', gfmOptions],",
+            "[path.join(process.cwd(), 'mdx.code-hike.mjs'), codeHikeOptions({ autoImport: true })],",
+        ]);
+    });
+
+    // The loader resolves each name from the directory of the .mdx file it compiles.
+    it('should name plugins the loader can resolve', () => {
+        expect(() => require.resolve('remark-gfm', { paths: [path.join(root, 'data', 'comments')] })).not.toThrow();
+    });
+
+    it('should import those options from mdx.plugins.ts', () => {
+        expect(config).toContain("import { codeHikeOptions, gfmOptions } from './mdx.plugins.ts';");
+    });
+
+    // The loader takes `module.default || module`, and @code-hike/mdx only has named exports.
+    it('should reach Code Hike through a default export', () => {
+        expect(codeHikeWrapper).toContain("export { remarkCodeHike as default } from '@code-hike/mdx';");
     });
 });

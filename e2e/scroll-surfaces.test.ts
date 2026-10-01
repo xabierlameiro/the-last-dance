@@ -610,7 +610,9 @@ test.describe('Scroll surfaces', () => {
         await page.goto('/blog');
         await expect(page.getByTestId('header')).toBeVisible();
 
-        const body = page.locator('[class*="blog_body"]').first();
+        // Two attribute matches, not `blog_body`: webpack names this CSS-module class
+        // `blog_body__<hash>` and Turbopack, which serves `next dev`, `blog-module__<hash>__body`.
+        const body = page.locator('[class*="blog"][class*="body"]').first();
         await expect(body).toBeVisible();
 
         const scrolled = await body.evaluate((element) => {

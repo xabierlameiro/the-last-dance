@@ -81,10 +81,22 @@ export const theme = {
 };
 
 /**
- * The plugin array, for a given pipeline.
- *
  * `singleTilde: false` so "~1M"-style approximations in prose can never pair up into accidental
  * strikethrough.
+ */
+export const gfmOptions = { singleTilde: false };
+
+export type CodeHikeOptions = { autoImport: boolean; theme: typeof theme };
+
+export const codeHikeOptions = ({ autoImport }: { autoImport: boolean }): CodeHikeOptions => ({ autoImport, theme });
+
+/**
+ * The plugin array, for a given pipeline.
+ *
+ * The options are exported on their own because `next.config.ts` cannot use this array: Turbopack
+ * serialises the `@next/mdx` loader options, so the config names each plugin by string and takes
+ * only the options from here. Both forms read the same two constants, which is what keeps them from
+ * drifting again.
  *
  * `autoImport` is the one option that legitimately differs, and it took a broken build to establish
  * that rather than an argument: unifying it to `false` made `@next/mdx` compile
@@ -108,6 +120,6 @@ export const theme = {
  * the conflict existed and was simply unseen.
  */
 export const remarkPlugins = ({ autoImport }: { autoImport: boolean }) => [
-    [remarkGfm, { singleTilde: false }] as [typeof remarkGfm, { singleTilde: boolean }],
-    [remarkCodeHike, { autoImport, theme }] as [typeof remarkCodeHike, { autoImport: boolean; theme: typeof theme }],
+    [remarkGfm, gfmOptions] as [typeof remarkGfm, typeof gfmOptions],
+    [remarkCodeHike, codeHikeOptions({ autoImport })] as [typeof remarkCodeHike, CodeHikeOptions],
 ];

@@ -87,6 +87,34 @@ jobs:
             # Coverage thresholds live in jest.config.js and fail this step when breached.
             - name: Run unit tests
               run: npm run coverage
+            # Every other gate serves `next build`, which runs webpack, while `npm run dev` runs
+            # Turbopack. #237 broke the dev server that way and nothing noticed: Turbopack refused
+            # the @next/mdx loader options. /comments is the one page that loader compiles, and
+            # `ch-codeblock` is the Code Hike block it renders. `setsid` puts the server in its own
+            # process group so `kill` stops next as well as npm.
+            - name: Dev server starts and serves pages
+              run: |
+                  setsid npm run dev -- --port 3100 > "$RUNNER_TEMP/next-dev.log" 2>&1 &
+                  dev_pid=$!
+                  failed=0
+                  for route in /comments /blog/nextjs/dark-theme; do
+                      status=$(curl -s -o "$RUNNER_TEMP/page.html" -w '%{http_code}' \
+                          --retry 30 --retry-delay 2 --retry-connrefused --retry-max-time 120 --max-time 120 \
+                          "http://localhost:3100$route") || status=000
+                      echo "$route → $status"
+                      [ "$status" = 200 ] || failed=1
+                      if [ "$route" = /comments ] && ! grep -q 'ch-codeblock' "$RUNNER_TEMP/page.html"; then
+                          echo "/comments has no Code Hike block"
+                          failed=1
+                      fi
+                  done
+                  kill -- -"$dev_pid" || true
+                  # Backstop in case setsid forked and the group above was not next's.
+                  pkill -f 'next dev --port 3100' || true
+                  if [ "$failed" = 1 ]; then
+                      cat "$RUNNER_TEMP/next-dev.log"
+                      exit 1
+                  fi
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps chromium chromium-headless-shell
               env:
