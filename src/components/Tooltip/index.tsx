@@ -97,6 +97,13 @@ function Tooltip({ children, ...options }: { children: React.ReactNode } & Toolt
 
 const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement> & { asChild?: boolean }>(
     function TooltipTrigger({ children, asChild = false, ...props }, propRef) {
+        // React Compiler 1.0.0 cannot compile this component: the `asChild` branch passes the
+        // merged ref to a function during render, which it treats as reading the ref. That branch
+        // is the pattern Floating UI documents. Passing the ref to `cloneElement` directly instead
+        // of through `getReferenceProps` was tried: the compiler in eslint-plugin-react-hooks
+        // 7.1.1 accepts it, but 1.0.0, the one that builds the site, still skips the component.
+        // So the opt-out is explicit here, and `refs` is disabled on the one line it reports.
+        'use no memo';
         const context = useTooltipContext();
         // SDD-L11-T10. This line used to cast `children` to bypass the type system and read
         // `.ref` off it — the last such cast in src/ — and it was hiding a real deprecation rather
@@ -116,6 +123,7 @@ const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement
         if (asChild && React.isValidElement(children)) {
             return React.cloneElement(
                 children,
+                // eslint-disable-next-line react-hooks/refs -- compiler opt-out above, `use no memo`
                 context.getReferenceProps({
                     ref,
                     ...props,
