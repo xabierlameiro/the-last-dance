@@ -21,6 +21,13 @@ updates:
       schedule:
           interval: 'weekly'
       open-pull-requests-limit: 3
+      ignore:
+          # 0.9 replaces `CodeConfig.theme` (an IRawTheme) with `themeName?: string`, which breaks
+          # CodeFirstPaint (it reads `codeConfig.theme.colors`) and fails `tsc` and the Playwright
+          # webServer on #249. Stays on 0.8.x until that component is migrated. Patches of 0.8 still flow.
+          - dependency-name: '@code-hike/mdx'
+            versions:
+                - '>=0.9.0'
       groups:
           # Patch and minor bumps are the ones that are usually safe to take together and rarely
           # worth reading individually.
