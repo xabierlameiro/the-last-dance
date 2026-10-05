@@ -68,10 +68,25 @@ const CODE_HIKE_UI_COLOUR_KEYS = [
 
 const themeColours: Record<string, string> = fullTheme.colors;
 
+/**
+ * One Dark Pro's red (`#e06c75`) on its own background (`#282c34`) is 4.38:1, under the 4.5:1 that
+ * WCAG 1.4.3 asks of 12px text. axe-core 4.12 measured it above the line; 4.13 does not (13 tokens
+ * on the home page). `#e5787f` keeps the hue and reaches 4.9:1. Only this one foreground is
+ * replaced; every other token keeps the theme's colour.
+ */
+const ONE_DARK_RED = '#e06c75';
+const ONE_DARK_RED_ACCESSIBLE = '#e5787f';
+
+const tokenColors = fullTheme.tokenColors.map((rule) =>
+    rule.settings.foreground?.toLowerCase() === ONE_DARK_RED
+        ? { ...rule, settings: { ...rule.settings, foreground: ONE_DARK_RED_ACCESSIBLE } }
+        : rule,
+);
+
 export const theme = {
     name: fullTheme.name,
     type: fullTheme.type,
-    tokenColors: fullTheme.tokenColors,
+    tokenColors,
     colors: Object.fromEntries(
         CODE_HIKE_UI_COLOUR_KEYS.filter((key) => themeColours[key] !== undefined).map((key) => [
             key,

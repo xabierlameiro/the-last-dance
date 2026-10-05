@@ -172,10 +172,12 @@
     display: grid;
 }
 
-/* Sits directly under the centered post h1, so it follows the heading's alignment */
+/* Sits directly under the centered post h1, so it follows the heading's alignment.
+   Opacity is on the whole line, so it dilutes the link too: 0.75 took --link-on-surface from 7.2:1
+   to 4.0:1 on white (axe-core 4.13, WCAG 1.4.3). 0.85 keeps the dimmed look at 5.1:1. */
 .byline {
     font-size: 13px;
     margin: -10px 0 24px;
-    opacity: 0.75;
+    opacity: 0.85;
     text-align: center;
 }
