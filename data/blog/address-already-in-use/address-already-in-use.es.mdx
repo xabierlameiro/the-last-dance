@@ -23,7 +23,7 @@ faq:
       answer: 'Es el puerto por defecto del servidor del informe HTML. No rompe la ejecución: Playwright trata el 9323 como puerto preferido, captura EADDRINUSE y cae a un puerto libre elegido por el sistema, así que el informe simplemente sale en otro sitio. Lo que sí tumba una ejecución es el bloque webServer, que dice "http://localhost:3000 is already used" — pon reuseExistingServer: true si el proceso de ese puerto es tu propio servidor de desarrollo.'
 ---
 
-# EADDRINUSE: address already in use — cómo liberar el puerto
+# Address already in use: solución para liberar el puerto
 
 <Date date="01-02-2023" />
 

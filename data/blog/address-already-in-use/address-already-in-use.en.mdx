@@ -24,7 +24,7 @@ faq:
       answer: 'It is the default port of the HTML report server. It does not break a run: Playwright treats 9323 as a preferred port, catches EADDRINUSE and falls back to a free port chosen by the OS, so you just get the report somewhere else. What does fail a run is the webServer block, which reports "http://localhost:3000 is already used" — set reuseExistingServer: true if the process on that port is your own dev server.'
 ---
 
-# EADDRINUSE: address already in use — how to free the port
+# Address already in use fix: free the port (EADDRINUSE)
 
 <Date date="01-02-2023" />
 
