@@ -48,11 +48,11 @@
             <category>performance</category>
         </item>
         <item>
-            <title>How to find a Next.js memory leak in production</title>
+            <title>3 Next.js memory leaks measured in production: yours?</title>
             <link>https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production</link>
             <guid isPermaLink="true">https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production</guid>
             <pubDate>Sat, 18 Jul 2026 00:00:00 +0000</pubDate>
-            <description>The three Next.js memory leaks I measured and helped confirm, all fixed in 16.3.0: which one you have, how to prove it, and why serverless hides them as 504s.</description>
+            <description>Next.js leaking memory? Upgrade to 16.3.5 first. Otherwise heap snapshots show which of the 3 leaks you have, and why serverless hides them as 504s.</description>
             <category>memory-leak</category>
             <category>node</category>
             <category>performance</category>
@@ -152,11 +152,11 @@
             <category>ci</category>
         </item>
         <item>
-            <title>EADDRINUSE: address already in use — how to free the port</title>
+            <title>Address already in use fix: free the port (EADDRINUSE)</title>
             <link>https://xabierlameiro.com/blog/error/solve-address-in-use-error</link>
             <guid isPermaLink="true">https://xabierlameiro.com/blog/error/solve-address-in-use-error</guid>
             <pubDate>Mon, 02 Jan 2023 00:00:00 +0000</pubDate>
-            <description>Fix &quot;address already in use&quot; in Node.js, Python, Docker, netcat and Playwright: find and kill the process holding the port on macOS, Linux and Windows, or run on another port.</description>
+            <description>Address already in use fix for Node.js, Python, Docker, netcat and Playwright: find and kill the process holding the port on macOS, Linux and Windows.</description>
             <category>node</category>
             <category>cli</category>
         </item>

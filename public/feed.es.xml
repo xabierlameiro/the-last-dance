@@ -20,11 +20,11 @@
             <category>performance</category>
         </item>
         <item>
-            <title>Cómo encontrar una fuga de memoria de Next.js en producción</title>
+            <title>3 fugas de memoria de Next.js medidas en producción: ¿cuál?</title>
             <link>https://xabierlameiro.com/es/blog/nextjs/fuga-de-memoria-nextjs-en-produccion</link>
             <guid isPermaLink="true">https://xabierlameiro.com/es/blog/nextjs/fuga-de-memoria-nextjs-en-produccion</guid>
             <pubDate>Sat, 18 Jul 2026 00:00:00 +0000</pubDate>
-            <description>Las tres fugas de memoria de Next.js que medí y ayudé a confirmar, ya corregidas en 16.3.0: cuál tienes, cómo demostrarlo y por qué en serverless se disfrazan de 504.</description>
+            <description>¿Next.js pierde memoria? Actualiza a 16.3.5 primero. Si no, los heap snapshots dicen cuál de las 3 fugas tienes y por qué serverless las disfraza de 504.</description>
             <category>memory-leak</category>
             <category>node</category>
             <category>performance</category>
@@ -124,11 +124,11 @@
             <category>ci</category>
         </item>
         <item>
-            <title>EADDRINUSE: address already in use — cómo liberar el puerto</title>
+            <title>Address already in use: solución para liberar el puerto</title>
             <link>https://xabierlameiro.com/es/blog/error/resolver-direccion-en-uso-error</link>
             <guid isPermaLink="true">https://xabierlameiro.com/es/blog/error/resolver-direccion-en-uso-error</guid>
             <pubDate>Mon, 02 Jan 2023 00:00:00 +0000</pubDate>
-            <description>Arregla &quot;address already in use&quot; en Node.js, Python, Docker, netcat y Playwright: encuentra y mata el proceso que ocupa el puerto en macOS, Linux y Windows, o arranca en otro puerto.</description>
+            <description>Solución a &quot;address already in use&quot; en Node.js, Python, Docker, netcat y Playwright: encuentra y mata el proceso que ocupa el puerto en macOS y Linux.</description>
             <category>node</category>
             <category>cli</category>
         </item>

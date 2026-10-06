@@ -97,14 +97,14 @@ One last thing, because it is a mistake I see often. The `.npmrc` that reference
 
 ---
 
-# EADDRINUSE: address already in use — how to free the port
+# Address already in use fix: free the port (EADDRINUSE)
 
 - URL: https://xabierlameiro.com/blog/error/solve-address-in-use-error
 - Author: Xabier Lameiro
 - Category: Error · Tags: node, cli
-- Summary: Fix "address already in use" in Node.js, Python, Docker, netcat and Playwright: find and kill the process holding the port on macOS, Linux and Windows, or run on another port.
+- Summary: Address already in use fix for Node.js, Python, Docker, netcat and Playwright: find and kill the process holding the port on macOS, Linux and Windows.
 
-# EADDRINUSE: address already in use — how to free the port
+# Address already in use fix: free the port (EADDRINUSE)
 
 Published: 01-02-2023
 
@@ -1515,14 +1515,14 @@ If you're coming at this from the other end — a graph climbing in production a
 
 ---
 
-# How to find a Next.js memory leak in production
+# 3 Next.js memory leaks measured in production: yours?
 
 - URL: https://xabierlameiro.com/blog/nextjs/nextjs-memory-leak-in-production
 - Author: Xabier Lameiro
 - Category: Nextjs · Tags: memory-leak, node, performance
-- Summary: The three Next.js memory leaks I measured and helped confirm, all fixed in 16.3.0: which one you have, how to prove it, and why serverless hides them as 504s.
+- Summary: Next.js leaking memory? Upgrade to 16.3.5 first. Otherwise heap snapshots show which of the 3 leaks you have, and why serverless hides them as 504s.
 
-# How to find a Next.js memory leak in production
+# 3 Next.js memory leaks measured in production: yours?
 
 Published: 07-18-2026
 
