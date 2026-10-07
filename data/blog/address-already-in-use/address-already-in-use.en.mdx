@@ -1,13 +1,13 @@
 ---
-title: 'EADDRINUSE: address already in use — how to free the port'
+title: 'Address already in use fix: free the port (EADDRINUSE)'
 slug: 'solve-address-in-use-error'
 author: 'Xabier Lameiro'
 category: 'Error'
 tags: ['node', 'cli']
 locale: 'en'
-updated: '2026-08-06'
+updated: '2026-10-06'
 excerpt: 'Means that the network address and port combination specified in the error message is already in use by another process running on your computer. This can occur when you try to start a server on a port that is already being used by another program.'
-description: 'Fix "address already in use" in Node.js, Python, Docker, netcat and Playwright: find and kill the process holding the port on macOS, Linux and Windows, or run on another port.'
+description: 'Address already in use fix for Node.js, Python, Docker, netcat and Playwright: find and kill the process holding the port on macOS, Linux and Windows.'
 image: '/posts/address-in-use.png'
 alternate:
     [{ lang: 'es', url: 'resolver-direccion-en-uso-error' }, { lang: 'gl', url: 'arranxar-direccion-en-uso-erro' }]
@@ -24,7 +24,7 @@ faq:
       answer: 'It is the default port of the HTML report server. It does not break a run: Playwright treats 9323 as a preferred port, catches EADDRINUSE and falls back to a free port chosen by the OS, so you just get the report somewhere else. What does fail a run is the webServer block, which reports "http://localhost:3000 is already used" — set reuseExistingServer: true if the process on that port is your own dev server.'
 ---
 
-# EADDRINUSE: address already in use — how to free the port
+# Address already in use fix: free the port (EADDRINUSE)
 
 <Date date="01-02-2023" />
 

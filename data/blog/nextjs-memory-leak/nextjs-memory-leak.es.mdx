@@ -1,13 +1,13 @@
 ---
-title: 'Cómo encontrar una fuga de memoria de Next.js en producción'
+title: '3 fugas de memoria de Next.js medidas en producción: ¿cuál?'
 slug: 'fuga-de-memoria-nextjs-en-produccion'
 author: 'Xabier Lameiro'
 category: 'Nextjs'
 tags: ['memory-leak', 'node', 'performance']
 locale: 'es'
-updated: '2026-09-14'
+updated: '2026-10-06'
 excerpt: 'FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory · OOMKilled (exit code 137) · 504 FUNCTION_INVOCATION_TIMEOUT'
-description: 'Las tres fugas de memoria de Next.js que medí y ayudé a confirmar, ya corregidas en 16.3.0: cuál tienes, cómo demostrarlo y por qué en serverless se disfrazan de 504.'
+description: '¿Next.js pierde memoria? Actualiza a 16.3.5 primero. Si no, los heap snapshots dicen cuál de las 3 fugas tienes y por qué serverless las disfraza de 504.'
 image: '/posts/nextjs-memory-leak.png'
 alternate:
     [
@@ -27,7 +27,7 @@ faq:
       answer: 'Compila con output standalone y ejecuta npx next-leak sobre el directorio de la app. Mide cada ruta en un proceso limpio con GC forzado antes de cada muestra, clasifica la curva post-GC como leak, stable o inconclusive y nombra los objetos que retienen memoria — con los snapshots crudos y un run.json para verificar el veredicto en Chrome DevTools.'
 ---
 
-# Cómo encontrar una fuga de memoria de Next.js en producción
+# 3 fugas de memoria de Next.js medidas en producción: ¿cuál?
 
 <Date date="07-18-2026" />
 

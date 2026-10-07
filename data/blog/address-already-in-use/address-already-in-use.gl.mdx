@@ -1,13 +1,13 @@
 ---
-title: 'EADDRINUSE: address already in use — como liberar o porto'
+title: 'Address already in use: solución para liberar o porto'
 slug: 'arranxar-direccion-en-uso-erro'
 author: 'Xabier Lameiro'
 category: 'Error'
 tags: ['node', 'cli']
 locale: 'gl'
-updated: '2026-08-06'
+updated: '2026-10-06'
 excerpt: 'Significa que a combinación de dirección de rede e porto especificada na mensaxe de erro xa está a ser utilizada por outro proceso que se está executando no seu computador. Isto pode ocorrer cando se tenta iniciar un servidor nun porto que xa está a ser utilizado por outro programa.'
-description: 'Arranxa "address already in use" en Node.js, Python, Docker, netcat e Playwright: atopa e mata o proceso que ocupa o porto en macOS, Linux e Windows, ou arrinca noutro porto.'
+description: 'Solución a "address already in use" en Node.js, Python, Docker, netcat e Playwright: atopa e mata o proceso que ocupa o porto en macOS, Linux e Windows.'
 image: '/posts/address-in-use.png'
 alternate: [{ lang: 'en', url: 'solve-address-in-use-error' }, { lang: 'es', url: 'resolver-direccion-en-uso-error' }]
 faq:
@@ -23,7 +23,7 @@ faq:
       answer: 'É o porto por defecto do servidor do informe HTML. Non rompe a execución: Playwright trata o 9323 como porto preferido, captura EADDRINUSE e cae a un porto libre escollido polo sistema, así que o informe simplemente sae noutro sitio. O que si tumba unha execución é o bloque webServer, que di "http://localhost:3000 is already used" — pon reuseExistingServer: true se o proceso dese porto é o teu propio servidor de desenvolvemento.'
 ---
 
-# EADDRINUSE: address already in use — como liberar o porto
+# Address already in use: solución para liberar o porto
 
 <Date date="01-02-2023" />
 

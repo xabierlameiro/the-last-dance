@@ -20,11 +20,11 @@
             <category>performance</category>
         </item>
         <item>
-            <title>Como atopar unha fuga de memoria de Next.js en produción</title>
+            <title>3 fugas de memoria de Next.js medidas en produción: a túa?</title>
             <link>https://xabierlameiro.com/gl/blog/nextjs/fuga-de-memoria-nextjs-en-producion</link>
             <guid isPermaLink="true">https://xabierlameiro.com/gl/blog/nextjs/fuga-de-memoria-nextjs-en-producion</guid>
             <pubDate>Sat, 18 Jul 2026 00:00:00 +0000</pubDate>
-            <description>As tres fugas de memoria de Next.js que medín e axudei a confirmar, xa corrixidas na 16.3.0: cal tes, como demostralo e por que en serverless se disfrazan dun 504.</description>
+            <description>Next.js perde memoria? Actualiza á 16.3.5 primeiro. Se non, os heap snapshots din cal das 3 fugas tes e por que serverless as disfraza de 504.</description>
             <category>memory-leak</category>
             <category>node</category>
             <category>performance</category>
@@ -124,11 +124,11 @@
             <category>ci</category>
         </item>
         <item>
-            <title>EADDRINUSE: address already in use — como liberar o porto</title>
+            <title>Address already in use: solución para liberar o porto</title>
             <link>https://xabierlameiro.com/gl/blog/error/arranxar-direccion-en-uso-erro</link>
             <guid isPermaLink="true">https://xabierlameiro.com/gl/blog/error/arranxar-direccion-en-uso-erro</guid>
             <pubDate>Mon, 02 Jan 2023 00:00:00 +0000</pubDate>
-            <description>Arranxa &quot;address already in use&quot; en Node.js, Python, Docker, netcat e Playwright: atopa e mata o proceso que ocupa o porto en macOS, Linux e Windows, ou arrinca noutro porto.</description>
+            <description>Solución a &quot;address already in use&quot; en Node.js, Python, Docker, netcat e Playwright: atopa e mata o proceso que ocupa o porto en macOS, Linux e Windows.</description>
             <category>node</category>
             <category>cli</category>
         </item>
