@@ -28,6 +28,17 @@ updates:
           - dependency-name: '@code-hike/mdx'
             versions:
                 - '>=0.9.0'
+          # Code Hike 0.8 depends on shiki ^0.10 and `mdx.plugins.ts` imports its theme JSON from the
+          # same copy. shiki 4 dropped `shiki/themes/*.json`, so `next.config.ts` fails to load and the
+          # production build dies (#250, 2026-10-07). Moves together with Code Hike.
+          - dependency-name: 'shiki'
+            update-types:
+                - 'version-update:semver-major'
+          # TypeScript 7 removes `compilerOptions.baseUrl` (TS5102) and typescript-eslint does not support
+          # it yet (#10940), so `tsc`, `next build` and `eslint .` all fail on #250. Stays on 5.x.
+          - dependency-name: 'typescript'
+            update-types:
+                - 'version-update:semver-major'
       groups:
           # Patch and minor bumps are the ones that are usually safe to take together and rarely
           # worth reading individually.
