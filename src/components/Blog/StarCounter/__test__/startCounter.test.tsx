@@ -22,6 +22,8 @@ describe('StarCounter', () => {
         render(<StarCounter />);
         expect(screen.getByTestId('star-counter')).toBeInTheDocument();
         expect(screen.getByText('22')).toBeInTheDocument();
+        // WCAG 2.5.3: the visible count has to be part of the link's name, next to the label.
+        expect(screen.getByRole('link', { name: 'starCounter.label 22' })).toBeInTheDocument();
     });
 
     it('should render the error render', () => {

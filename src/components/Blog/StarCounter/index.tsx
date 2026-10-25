@@ -30,8 +30,16 @@ const StarCounter = () => {
                     href={REPOSITORY_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={f({ id: 'starCounter.label' })}
                 >
+                    {/*
+                     * Text, not an `aria-label`. WCAG 2.5.3 (axe `label-content-name-mismatch`,
+                     * enforced since axe-core 4.14) wants the visible count inside the accessible
+                     * name, and an `aria-label` replaces the content instead of adding to it. The
+                     * gate only caught it when the live GitHub request succeeded and a count was
+                     * on screen; while the counter showed an error or a spinner there was no
+                     * visible text to mismatch. Same shape as the header's GithubStars trigger.
+                     */}
+                    <span className="visuallyHidden">{f({ id: 'starCounter.label' })}</span>
                     <AiOutlineStar aria-hidden="true" />
                     <RenderManager
                         loading={loading}
