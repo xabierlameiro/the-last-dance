@@ -164,6 +164,7 @@ test.describe('Static pages', () => {
             await page.goto(path);
 
             const dock = await page.getByTestId('dock').boundingBox();
+            expect(dock).not.toBeNull();
             await expect
                 .poll(async () => {
                     const dialog = await page.getByTestId('dialog').boundingBox();
@@ -275,7 +276,7 @@ test.describe('RSS feeds', () => {
             ([, url]) => (url === undefined ? [] : [new URL(url).pathname])
         );
 
-        expect(links.length).toBe(postsInLocale('en'));
+        expect(links).toHaveLength(postsInLocale('en'));
         for (const pathname of links) {
             expect((await request.get(pathname)).status(), `${pathname} should not be a dead link`).toBe(200);
         }

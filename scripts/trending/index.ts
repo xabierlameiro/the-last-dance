@@ -130,15 +130,15 @@ const collectRecentRepos = async (): Promise<{ name: string; url: string; pushed
 // service-account env vars as /api/analytics. Skipped silently when absent.
 const collectRisingQueries = async (): Promise<{ query: string; impressions: number; delta: number }[]> => {
     if (!process.env.ANALYTICS_CLIENT_EMAIL || !process.env.ANALYTICS_PRIVATE_KEY) return [];
-    const { google } = await import('googleapis');
-    const auth = new google.auth.GoogleAuth({
+    const { auth, webmasters: searchConsole } = await import('@googleapis/webmasters');
+    const googleAuth = new auth.GoogleAuth({
         credentials: {
             client_email: process.env.ANALYTICS_CLIENT_EMAIL,
             private_key: process.env.ANALYTICS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
         },
         scopes: 'https://www.googleapis.com/auth/webmasters.readonly',
     });
-    const webmasters = google.webmasters({ version: 'v3', auth });
+    const webmasters = searchConsole({ version: 'v3', auth: googleAuth });
     const day = (offset: number): string => new Date(Date.now() - offset * 86_400_000).toISOString().slice(0, 10);
     const query = async (startDate: string, endDate: string): Promise<Map<string, number>> => {
         const response = await webmasters.searchanalytics.query({

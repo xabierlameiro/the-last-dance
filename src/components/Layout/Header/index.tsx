@@ -1,9 +1,10 @@
 import React, { ReactNode } from 'react';
 import styles from './header.module.css';
 import type { IconType } from 'react-icons';
-import { SiBitcoincash, SiGithub, SiLinkedin, SiReadthedocs, SiReddit, SiStorybook } from 'react-icons/si';
+import { SiBitcoincash, SiGithub, SiReadthedocs, SiReddit, SiStorybook } from 'react-icons/si';
 import { FaChartPie, FaCheckDouble } from 'react-icons/fa';
 import { FaGaugeHigh } from 'react-icons/fa6';
+import LinkedIn from '@/components/Icons/LinkedIn';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import { socialLinks, translateRoute } from '@/constants/site';
@@ -119,7 +120,7 @@ const Route = () => {
  * importing React components into it would make every consumer of the constants pull in icons.
  */
 const STATUS_ICONS: Record<string, IconType> = {
-    'linkedin-link': SiLinkedin,
+    'linkedin-link': LinkedIn,
     'github-link': SiGithub,
     'reddit-link': SiReddit,
     'storybook-link': SiStorybook,
