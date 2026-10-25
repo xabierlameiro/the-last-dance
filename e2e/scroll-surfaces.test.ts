@@ -176,6 +176,8 @@ const waitForStableHeader = async (page: Page) => {
         const widths = await readHeaderWidths(page);
         if (widths.scrollWidth === previous) return widths;
         previous = widths.scrollWidth;
+        // The interval of a bounded settle loop, not a fixed wait: the loop exits on the first stable read.
+        // eslint-disable-next-line sonarjs/no-fixed-wait-in-tests
         await page.waitForTimeout(100);
     }
 
@@ -220,6 +222,8 @@ const waitForStableStatusContent = async (page: Page) => {
         const signature = await readStatusSignature(page);
         if (signature !== '' && signature === previous) return signature;
         previous = signature;
+        // Same shape as waitForStableHeader above: a polling interval, exited on the first stable read.
+        // eslint-disable-next-line sonarjs/no-fixed-wait-in-tests
         await page.waitForTimeout(150);
     }
 

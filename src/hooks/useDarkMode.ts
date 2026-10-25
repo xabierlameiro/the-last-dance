@@ -48,7 +48,7 @@ const useDarkMode = (): { theme: null | 'dark' | 'light'; toggleTheme: () => voi
 
         // Follow the OS only while the visitor has not made a choice of their own.
         const handler = (event: MediaQueryListEvent) => {
-            let hasExplicitChoice = false;
+            let hasExplicitChoice: boolean;
             try {
                 hasExplicitChoice = window.localStorage.getItem(THEME_STORAGE_KEY) !== null;
             } catch {

@@ -58,9 +58,9 @@ export type NormalizedItem = {
 /** The subset `scoreItem` actually reads — callers may pass richer objects. */
 export type ScoreInput = {
     title: string;
-    tags?: string | undefined;
+    tags?: string;
     popularity: number;
-    createdAt?: string | undefined;
+    createdAt?: string;
 };
 
 /**

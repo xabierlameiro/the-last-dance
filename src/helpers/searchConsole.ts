@@ -1,4 +1,10 @@
-import { google, webmasters_v3 } from 'googleapis';
+/*
+ * The Search Console package alone, not the all-APIs `googleapis` entry point. `googleapis` ships
+ * declarations for 339 APIs and `import { google }` loads every one of them into the type checker:
+ * with octokit 5 beside it, the type check inside `next build` ran out of the default 2 GB heap.
+ * `@googleapis/webmasters` is the same client class and the same `auth` helper, scoped to this API.
+ */
+import { auth, webmasters, type webmasters_v3 } from '@googleapis/webmasters';
 
 export const SITE_URL = 'sc-domain:xabierlameiro.com';
 
@@ -14,7 +20,7 @@ export const getSearchConsoleClient = (): webmasters_v3.Webmasters | null => {
         return null;
     }
 
-    const auth = new google.auth.GoogleAuth({
+    const googleAuth = new auth.GoogleAuth({
         credentials: {
             client_email: process.env.ANALYTICS_CLIENT_EMAIL,
             private_key: process.env.ANALYTICS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
@@ -22,5 +28,5 @@ export const getSearchConsoleClient = (): webmasters_v3.Webmasters | null => {
         scopes: 'https://www.googleapis.com/auth/webmasters.readonly',
     });
 
-    return google.webmasters({ version: 'v3', auth });
+    return webmasters({ version: 'v3', auth: googleAuth });
 };

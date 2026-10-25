@@ -74,5 +74,19 @@ const customJestConfig = {
     },
 };
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-export default createJestConfig(customJestConfig);
+/**
+ * `next/jest` builds the final config asynchronously and sets its own `transformIgnorePatterns`,
+ * which exclude all of node_modules. Since react-intl 12 the package and its @formatjs dependencies
+ * ship ESM only, and Jest 30 on Node 22 cannot `require` them untransformed: the two suites that
+ * load the real formatter (`galician.test.ts`, `clock.test.tsx`) failed with "Must use import to
+ * load ES Module". The patterns are rewritten here, after `next/jest` has had its say, to let those
+ * packages through SWC. The CSS-module entry is the one `next/jest` had set and is kept.
+ */
+export default async () => {
+    const config = await createJestConfig(customJestConfig)();
+    config.transformIgnorePatterns = [
+        '/node_modules/(?!(react-intl|intl-messageformat|@formatjs)/)',
+        '^.+\\.module\\.(css|sass|scss)$',
+    ];
+    return config;
+};
