@@ -46,6 +46,14 @@ updates:
           - dependency-name: 'typescript'
             update-types:
                 - 'version-update:semver-major'
+          # jsdom 30 pulls an ESM-only chain (@exodus/bytes, parse5, @asamuzakjp/css-color) that Jest
+          # cannot `require` on Node 22, so every suite importing src/pages/api/news.ts fails to load
+          # (#260). jest-environment-jsdom 30 carries its own nested jsdom; only the direct import in
+          # news.ts is pinned here. Moves with Node 24.9+ (`require(esm)`) or when news.ts stops
+          # depending on jsdom.
+          - dependency-name: 'jsdom'
+            update-types:
+                - 'version-update:semver-major'
       groups:
           # Patch and minor bumps are the ones that are usually safe to take together and rarely
           # worth reading individually.
