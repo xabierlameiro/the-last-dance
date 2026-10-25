@@ -1,7 +1,7 @@
 {
     "name": "the-last-dance",
     "type": "module",
-    "version": "1.5.62",
+    "version": "1.5.63",
     "description": "The Last Dance",
     "license": "MIT",
     "private": true,
