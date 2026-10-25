@@ -31,9 +31,16 @@ updates:
           # Code Hike 0.8 depends on shiki ^0.10 and `mdx.plugins.ts` imports its theme JSON from the
           # same copy. shiki 4 dropped `shiki/themes/*.json`, so `next.config.ts` fails to load and the
           # production build dies (#250, 2026-10-07). Moves together with Code Hike.
+          #
+          # Minors too: shiki is 0.x, so 0.10 -> 0.14 (#266, 2026-10-24) is a breaking bump that the
+          # `safe-updates` group let through. It does not satisfy Code Hike's `^0.10.1`, so npm nests a
+          # second shiki for the highlighter while the top-level copy only supplies the theme JSON — and
+          # 0.14's `one-dark-pro.json` changes three UI colours Code Hike reads, which moved 9 visual
+          # baselines by 75-115 px for no gain.
           - dependency-name: 'shiki'
             update-types:
                 - 'version-update:semver-major'
+                - 'version-update:semver-minor'
           # TypeScript 7 removes `compilerOptions.baseUrl` (TS5102) and typescript-eslint does not support
           # it yet (#10940), so `tsc`, `next build` and `eslint .` all fail on #250. Stays on 5.x.
           - dependency-name: 'typescript'
