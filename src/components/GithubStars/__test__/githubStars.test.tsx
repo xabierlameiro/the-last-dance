@@ -25,6 +25,16 @@ describe('GithubStars', () => {
     });
 
     /**
+     * WCAG 2.5.3: the visible text has to be part of the accessible name. An `aria-label` used to
+     * replace the count with the label and axe-core 4.14 flagged it (`label-content-name-mismatch`),
+     * so the label is hidden text inside the button and the name carries both.
+     */
+    it('names the trigger with the label and the visible count', () => {
+        render(<GithubStars />);
+        expect(screen.getByRole('button', { name: 'githubStars.open 1234' })).toBeInTheDocument();
+    });
+
+    /**
      * The panel ships in the server HTML so it can be the target of `aria-controls`; `hidden` is
      * what keeps it out of the accessibility tree until asked for.
      */

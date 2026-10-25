@@ -86,9 +86,16 @@ const GithubStars = () => {
                 className={styles.trigger}
                 aria-expanded={open}
                 aria-controls={PANEL_ID}
-                aria-label={f({ id: 'githubStars.open' })}
                 onClick={() => setOpen((wasOpen) => !wasOpen)}
             >
+                {/*
+                 * The label is text inside the button rather than an `aria-label`. WCAG 2.5.3
+                 * (axe `label-content-name-mismatch`, enforced since axe-core 4.14) wants the
+                 * visible text — the count — inside the accessible name, and an `aria-label`
+                 * replaces the content instead of adding to it. Hidden text composes: the name
+                 * reads "Repository status 1,234".
+                 */}
+                <span className="visuallyHidden">{f({ id: 'githubStars.open' })}</span>
                 <AiFillStar className={styles.star} aria-hidden="true" />
                 <RenderManager
                     loading={loading}
