@@ -43,7 +43,7 @@
         "@vercel/analytics": "^2.0.1",
         "gray-matter": "^4.0.3",
         "jsdom": "^26.1.0",
-        "next": "^16.4.2",
+        "next": "^16.4.6",
         "next-mdx-remote": "^6.0.0",
         "octokit": "^5.0.5",
         "react": "^19.3.1",
