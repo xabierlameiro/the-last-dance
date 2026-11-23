@@ -87,6 +87,17 @@ describe('createSiteMap', () => {
         expect(xml).toContain('/es/blog/nextjs/una-entrada');
     });
 
+    it('should percent-encode non-ASCII characters in <loc>', async () => {
+        await createSiteMap(
+            [{ params: { category: 'react', slug: 'os-meus-compoñentes' }, locale: 'gl', date: null }],
+            ['gl']
+        );
+
+        const xml = written();
+        expect(xml).toContain('/gl/blog/react/os-meus-compo%C3%B1entes');
+        expect(xml).not.toContain('ñ');
+    });
+
     // lastmod is a freshness signal; emitting it for a post with no date would be inventing one.
     it('should emit lastmod only for posts that have a date', async () => {
         await createSiteMap(ROUTES, ['en', 'es']);
