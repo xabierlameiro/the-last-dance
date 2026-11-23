@@ -31,9 +31,11 @@ const NON_SITEMAP_PAGES = new Set([
     'comments.tsx',
 ]);
 
+// The sitemaps protocol requires <loc> to be URL-escaped: a Galician slug with `ñ` was emitted raw
+// and made the URL invalid for strict parsers. Slugs never carry `%`, so encodeURI cannot double-encode.
 const urlEntry = (loc: string, lastmod?: string | null) => `
     <url>
-        <loc>${loc}</loc>
+        <loc>${encodeURI(loc)}</loc>
         ${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}
     </url>
 `;
