@@ -65,13 +65,23 @@ const nextConfig: NextConfig = {
     // slug, and a locale-varying destination needs `locale: false`, whose matcher runs against
     // the raw path. That works for /es and /gl but cannot express the default locale — neither
     // `/blog` nor `/en/blog` as source ever matches an incoming `/blog`, which then 404s.
-    redirects: async () => {
-        return [
+    // Next expects a Promise; nothing here is asynchronous, so the array is wrapped instead of
+    // declaring an `async` function with no `await` in it.
+    redirects: () =>
+        Promise.resolve([
             { source: '/about', destination: '/', permanent: true },
             { source: '/contact', destination: '/', permanent: true },
+            // The Galician GitHub stars post was renamed from `estrelas` to `estrellas` in #185 and
+            // the old URL, already indexed, started returning 404. `locale: false` because the
+            // source only exists under /gl.
+            {
+                source: '/gl/blog/nextjs/contador-de-estrelas-de-github',
+                destination: '/gl/blog/nextjs/contador-de-estrellas-de-github',
+                permanent: true,
+                locale: false,
+            },
             ...legacyFacetRedirects(path.join(process.cwd(), 'data/blog')),
-        ];
-    },
+        ]),
     // SDD-L04: two rewrites removed here.
     //  - `/:coverage -> /:coverage/index.html` read as the literal path /coverage, but `:coverage` is a
     //    named parameter matching ANY single segment. Harmless today because array rewrites run
