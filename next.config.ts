@@ -69,6 +69,15 @@ const nextConfig: NextConfig = {
         return [
             { source: '/about', destination: '/', permanent: true },
             { source: '/contact', destination: '/', permanent: true },
+            // The Galician GitHub stars post was renamed from `estrelas` to `estrellas` in #185 and
+            // the old URL, already indexed, started returning 404. `locale: false` because the
+            // source only exists under /gl.
+            {
+                source: '/gl/blog/nextjs/contador-de-estrelas-de-github',
+                destination: '/gl/blog/nextjs/contador-de-estrellas-de-github',
+                permanent: true,
+                locale: false,
+            },
             ...legacyFacetRedirects(path.join(process.cwd(), 'data/blog')),
         ];
     },
