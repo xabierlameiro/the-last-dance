@@ -67,7 +67,7 @@
         "@storybook/nextjs": "^10.6.3",
         "@storybook/react": "^10.6.0",
         "@testing-library/dom": "^10.0.0",
-        "@testing-library/jest-dom": "^7.0.1",
+        "@testing-library/jest-dom": "^8.0.0",
         "@testing-library/react": "^16.3.3",
         "@testing-library/user-event": "^14.6.8",
         "@types/glob": "^8.0.0",
